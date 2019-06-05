@@ -1,0 +1,33 @@
+{
+  "name": "reserve",
+  "version": "1.0.0",
+  "description": "Lightweight http server statically configurable using regular expressions",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ArnaudBuchholz/reserve.git"
+  },
+  "keywords": [
+    "http",
+    "serve",
+    "static",
+    "json",
+    "regexp"
+  ],
+  "author": "Arnaud Buchholz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ArnaudBuchholz/reserve/issues"
+  },
+  "homepage": "https://github.com/ArnaudBuchholz/reserve#readme",
+  "devDependencies": {
+    "standard": "^12.0.1"
+  },
+  "dependencies": {
+    "colors": "^1.3.3",
+    "mime": "^2.4.3"
+  }
+}
