@@ -1,7 +1,7 @@
 'use strict'
 
 const util = require('util')
-const engine = require('./engine')
+const serve = require('./serve')
 const fs = require('fs')
 const path = require('path')
 
@@ -16,9 +16,4 @@ statAsync(localConfiguration)
     return readFileAsync(path.join(__dirname, 'default.json'))
   })
   .then(buffer => JSON.parse(buffer.toString()))
-  .then(configuration => {
-    // Validate & process
-  })
-  .then(configuration => {
-      engine(configuration)
-  })
+  .then(serve)
