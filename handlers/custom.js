@@ -4,12 +4,13 @@ module.exports = {
   schema: {
     self: 'function'
   },
-  redirect: (request, response) => {
+  redirect: (request, response) => new Promise((resolve, reject) => {
     try {
       // Include timeout?
-      request.mapping(request, response)
+      request.mapping.custom(request, response)
+      resolve()
     } catch (e) {
-      //
+      reject(e)
     }
-  }
+  })
 }
