@@ -22,7 +22,7 @@ module.exports = {
   schema: {
     'unsecure-cookies': 'boolean'
   },
-  redirect: (request, response) => {
+  redirect: (request, response) => new Promise((resolve, reject) => {
     const url = request.redirect
     const {
       method,
@@ -38,9 +38,12 @@ module.exports = {
         .on('end', () => log(request, response, redirectedResponse.headers['content-length'] || 0))
         .pipe(response)
     })
-    redirectedRequest.on('error', err => error(request, response, { message: err.toString() }))
+    redirectedRequest.on('error', reject)
     request
       .on('data', chunk => redirectedRequest.write(chunk))
-      .on('end', () => redirectedRequest.end())
-  }
+      .on('end', () => {
+        redirectedRequest.end()
+        resolve()
+      })
+  })
 }
