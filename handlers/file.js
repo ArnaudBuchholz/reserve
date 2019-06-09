@@ -1,6 +1,8 @@
 'use strict'
 
+const fs = require('fs')
 const mime = require('mime')
+const path = require('path')
 
 module.exports = {
   schema: {},
@@ -8,7 +10,7 @@ module.exports = {
     const filePath = /([^?]+)/.exec(request.redirect)[1]
     fs.stat(filePath, (err, stat) => {
       if (err || stat.isDirectory()) {
-        reject(404)
+        reject(err || new Error('directory'))
       } else {
         response.writeHead(200, {
           'Content-Type': mime.getType(path.extname(filePath)) || mime.getType('bin'),
