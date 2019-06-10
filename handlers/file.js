@@ -33,5 +33,5 @@ module.exports = {
     const filePath = /([^?#]+)/.exec(request.redirect)[1] // filter URL parameters & hash
     return statAsync(filePath)
       .then(stat => stat.isDirectory() ? sendIndex(response, filePath) : sendFile(response, filePath, stat))
-  })
+  }
 }
