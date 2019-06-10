@@ -35,15 +35,16 @@ module.exports = {
       }
       response.writeHead(redirectedResponse.statusCode, redirectedResponse.headers)
       redirectedResponse
-        .on('end', () => log(request, response, redirectedResponse.headers['content-length'] || 0))
+        .on('error', reject)
+        .on('end', resolve)
         .pipe(response)
     })
     redirectedRequest.on('error', reject)
     request
       .on('data', chunk => redirectedRequest.write(chunk))
+      .on('error', reject)
       .on('end', () => {
         redirectedRequest.end()
-        resolve()
       })
   })
 }
