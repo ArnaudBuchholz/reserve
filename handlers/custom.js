@@ -5,12 +5,13 @@ module.exports = {
     self: 'function'
   },
   redirect: (request, response) => new Promise((resolve, reject) => {
-    try {
-      // Include timeout?
-      request.mapping.custom(request, response)
+    // Include timeout?
+    const parameters = [request, response].concat([].slice.call(request.match, 1))
+    const result = request.mapping.custom.apply(request.mapping, parameters)
+    if (result && typeof result.then === 'function') {
+      result.then(resolve, reject)
+    } else {
       resolve()
-    } catch (e) {
-      reject(e)
     }
   })
 }
