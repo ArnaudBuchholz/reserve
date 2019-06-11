@@ -2,12 +2,12 @@
 
 module.exports = {
   schema: {
-    self: 'function'
+    custom: 'function'
   },
-  redirect: (request, response) => new Promise((resolve, reject) => {
+  redirect: ({mapping, match, request, response}) => new Promise((resolve, reject) => {
     // Include timeout?
-    const parameters = [request, response].concat([].slice.call(request.match, 1))
-    const result = request.mapping.custom.apply(request.mapping, parameters)
+    const parameters = [request, response].concat([].slice.call(match, 1))
+    const result = mapping.custom.apply(mapping, parameters)
     if (result && typeof result.then === 'function') {
       result.then(resolve, reject)
     } else {
