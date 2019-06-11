@@ -29,8 +29,8 @@ function sendIndex (response, folderPath) {
 
 module.exports = {
   schema: {},
-  redirect: (request, response) => {
-    const filePath = /([^?#]+)/.exec(request.redirect)[1] // filter URL parameters & hash
+  redirect: ({mapping, match, redirect, request, response}) => {
+    const filePath = /([^?#]+)/.exec(redirect)[1] // filter URL parameters & hash
     return statAsync(filePath)
       .then(stat => stat.isDirectory() ? sendIndex(response, filePath) : sendFile(response, filePath, stat))
   }
