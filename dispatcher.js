@@ -15,47 +15,34 @@ function error (request, response, message) {
 }
 
 module.exports = function (configuration, request, response) {
-  if (configuration.verbose) {
-    this.emit('incoming', {
-      method: request.method,
-      url: request.url
-    })
+  const emitParameters = {
+    method: request.method,
+    url: request.url,
+    start: new Date()
   }
+  this.emit('incoming', emitParameters)
   if (configuration.mappings.every(mapping => {
     const match = mapping.match.exec(request.url)
     if (match) {
-      request.mapping = mapping
-      request.match = match
-      let redirect
-      let type
-      if (types.every(member => {
-        type = member
-        redirect = mapping[member]
-        return !redirect
-      })) {
-        error.(request, response, 'no mapping')
-        this.emit('error-no-mapping')
-        return false
-      }
+      let {
+        handler,
+        redirect,
+        type
+      } = configuration.handler(mapping)
       if (typeof redirect === 'string') {
         for (let capturingGroupIndex = match.length; capturingGroupIndex > 0; --capturingGroupIndex) {
           redirect = redirect.replace(new RegExp(`\\$${capturingGroupIndex}`, 'g'), match[capturingGroupIndex])
         }
       }
-      this.emit('redirecting', {
-        method: request.method,
-        url: request.url,
-        type,
-        redirect
-      })
-      typeHandlers[type](request, response)
+      this.emit('redirecting', Object.assign(emitParameters, { type, redirect }))
+      handler.redirect({mapping, match, redirect, request, response})
         .then(() => {
-          this.emit('redirected', {
-            method: request.method,
-            url: request.url,
-            type,
-            redirect
-          })
+          const end = new Date()
+          this.emit('redirected', Object.assign(emitParameters, {
+            end,
+            timeSpent: end - emitParameters.start,
+            statusCode: response.statusCode
+          }))
         }, reason => {
           error(request, response, reason.toString())
           this.emit('error-redirecting', reason)
