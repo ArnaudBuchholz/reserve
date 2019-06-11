@@ -4,8 +4,12 @@ const defaults = {
   hostname: '127.0.0.1',
   port: 5000,
   mappings: [{
-    'match': '(.*)',
-    'file': './$1'
+    match: /^\/proxy\/(https?)\/(.*)/,
+    url: '$1://$2',
+    'unsecure-cookies': true
+  }, {
+    match: '(.*)',
+    file: './$1'
   }]
 }
 
