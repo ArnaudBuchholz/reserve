@@ -21,7 +21,14 @@ statAsync(localConfigurationFile)
       .on('error', reason => {
         console.error('ERROR'.red, reason.toString().white)
       })
-      .on('incoming', ({method, url}) => {
-        console.error('INCOMING'.magenta, method.gray, url.gray)
+      .on('redirected', ({method, url, statusCode, timeSpent}) => {
+        let report
+        if (statusCode > 399) {
+          report = statusCode.toString().red
+        } else {
+          report = statusCode.toString().green
+        }
+        report += ` ${timeSpent} ms`.magenta
+        console.log('SERVE'.magenta, method.gray, url.gray, report)
       })
   })
