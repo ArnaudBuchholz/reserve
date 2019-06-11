@@ -22,15 +22,15 @@ module.exports = {
   schema: {
     'unsecure-cookies': 'boolean'
   },
-  redirect: (request, response) => new Promise((resolve, reject) => {
-    const url = request.redirect
+  redirect: ({mapping, redirect, request, response}) => new Promise((resolve, reject) => {
+    const url = redirect
     const {
       method,
       headers
     } = request
     delete headers.host // Some websites rely on the host header
     const redirectedRequest = protocol(url).request(url, { method, headers }, redirectedResponse => {
-      if (request.mapping['unsecure-cookies']) {
+      if (mapping['unsecure-cookies']) {
         unsecureCookies(redirectedResponse.headers)
       }
       response.writeHead(redirectedResponse.statusCode, redirectedResponse.headers)
