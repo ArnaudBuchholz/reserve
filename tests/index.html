@@ -1,0 +1,51 @@
+<html>
+  <head>
+    <script src="/gpf.js"></script>
+    <script src="/proxy/https/arnaudbuchholz.github.io/blog/jsfiddle-assert.js"></script>
+    <script>
+
+function tryLoad (url, validate) {
+  return gpf.http.get(url)
+    .then(function (response) {
+      if (response.status !== 200) {
+        throw new Error(url + ' ' + response.status)
+      }
+      if (validate) {
+        validate(response.responseText)
+      }
+      assert(true, url)
+    })
+}
+
+function checkFileNotFound (url) {
+  return gpf.http.get(url)
+    .then(function (response) {
+      if (response.status !== 404) {
+        throw new Error(url + ' ' + response.status)
+      }
+      assert(true, url)
+    })
+}
+
+function onLoad () {
+  assert(document.getElementById("imgOK").naturalWidth !== 0, "/proxy/http/facetheforce.today/luke/200 loaded")
+  assert(document.getElementById("imgKO").naturalWidth === 0, "/proxy/http/facethe4th.tomorrow/luke/200 failed")
+  tryLoad('/reserve.json', JSON.parse)
+    .then(function () { return tryLoad('/Hello World.txt') })
+    .then(function () { return checkFileNotFound('/not-found') })
+    .then(function () {
+      gpf.http.get('/chrome/OK')
+    })
+    .catch(function (reason) {
+      assert(false, reason.toString());
+      gpf.http.get('/chrome/KO')
+    });
+}
+
+    </script>
+  </head>
+  <body onload="onLoad()">
+    <img id="imgOK" src="/proxy/http/facetheforce.today/luke/200" />
+    <img id="imgKO" src="/proxy/http/facethe4th.tomorrow/luke/200" />
+  </body>
+</html>
