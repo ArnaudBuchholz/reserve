@@ -30,7 +30,7 @@ function sendIndex (response, folderPath) {
 module.exports = {
   schema: {},
   redirect: ({ mapping, match, redirect, request, response }) => {
-    const filePath = /([^?#]+)/.exec(redirect)[1] // filter URL parameters & hash
+    const filePath = /([^?#]+)/.exec(unescape(redirect))[1] // filter URL parameters & hash
     return statAsync(filePath)
       .then(stat => stat.isDirectory() ? sendIndex(response, filePath) : sendFile(response, filePath, stat))
   }
