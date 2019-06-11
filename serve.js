@@ -24,13 +24,11 @@ const handlersReady = readdirAsync(path.join(__dirname, 'handlers'))
 
 function createServer (configuration, requestHandler) {
   if (configuration.ssl) {
-    configuration.protocol = 'https'
     return https.createServer({
-      key: fs.readFileSync(configuration.ssl.key),
-      cert: fs.readFileSync(configuration.ssl.cert)
+      key: configuration.ssl.key,
+      cert: configuration.ssl.cert
     }, requestHandler)
   }
-  configuration.protocol = 'http'
   return http.createServer(requestHandler)
 }
 
