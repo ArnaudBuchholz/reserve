@@ -22,7 +22,7 @@ module.exports = {
   schema: {
     'unsecure-cookies': 'boolean'
   },
-  redirect: ({mapping, redirect, request, response}) => new Promise((resolve, reject) => {
+  redirect: ({ mapping, redirect, request, response }) => new Promise((resolve, reject) => {
     const url = redirect
     const {
       method,
