@@ -35,7 +35,7 @@ module.exports = function (configuration, request, response) {
         }
       }
       this.emit('redirecting', Object.assign(emitParameters, { type, redirect }))
-      handler.redirect({mapping, match, redirect, request, response})
+      handler.redirect({ mapping, match, redirect, request, response })
         .then(() => {
           const end = new Date()
           this.emit('redirected', Object.assign(emitParameters, {
