@@ -1,0 +1,16 @@
+{
+  "port": 5001,
+  "ssl0": {
+  },
+  "mappings": [{
+    "match": "^\\/proxy\\/(https?)\\/(.*)",
+    "url": "$1://$2",
+    "unsecure-cookies": true
+  }, {
+    "match": "^\\/gpf\\.js$",
+    "url": "https://cdn.jsdelivr.net/npm/gpf-js/build/gpf.js"
+  }, {
+    "match": "(.*)",
+    "file": "./$1"
+  }]
+}
