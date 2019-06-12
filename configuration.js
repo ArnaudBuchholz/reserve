@@ -1,5 +1,10 @@
 'use strict'
 
+const fs = require('fs')
+const util = require('util')
+
+const readFileAsync = util.promisify(fs.readFile)
+
 const defaults = {
   hostname: '127.0.0.1',
   port: 5000,
@@ -55,7 +60,14 @@ function setHandlers (configuration, defaultHandlers) {
 async function checkProtocol (configuration) {
   if (configuration.ssl) {
     configuration.protocol = 'https'
-    // TODO check/load certificates
+    return readFileAsync(configuration.ssl.cert)
+      .then(buffer => {
+        configuration.ssl.cert = buffer.toString()
+        return readFileAsync(configuration.ssl.key)
+      })
+      .then(buffer => {
+        configuration.ssl.key = buffer.toString()
+      })
   } else {
     configuration.protocol = 'http'
   }
