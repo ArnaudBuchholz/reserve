@@ -1,5 +1,7 @@
 'use strict'
 
+/* global process */
+
 require('colors')
 const util = require('util')
 const serve = require('./serve')
@@ -9,15 +11,37 @@ const path = require('path')
 const statAsync = util.promisify(fs.stat)
 const readFileAsync = util.promisify(fs.readFile)
 
-const localConfigurationFile = path.join(process.cwd(), 'reserve.json')
-statAsync(localConfigurationFile)
-  .then(() => readFileAsync(localConfigurationFile).then(buffer => JSON.parse(buffer.toString())))
+const configurationFileName = process.argv.reduce((name, parameter) => {
+  if (parameter === '--config') {
+    return false
+  }
+  if (name === false) {
+    return parameter
+  }
+  return name
+}, '') || 'reserve.json'
+
+const configurationFilePath = path.join(process.cwd(), configurationFileName)
+statAsync(configurationFilePath)
+  .then(() => readFileAsync(configurationFilePath).then(buffer => JSON.parse(buffer.toString())))
   .catch(reason => {
-    console.warn('No or invalid local configuration found, applying defaults'.yellow)
+    console.warn(`'${configurationFileName}' not found or invalid, applying defaults`.yellow)
     return {} // empty configuration will use all defaults
   })
   .then(configuration => {
+    if (process.argv.includes('--verbose')) {
+      configuration.verbose = true
+    }
+    return configuration
+  })
+  .then(configuration => {
     serve(configuration)
+      .on('ready', ({ url }) => {
+        console.log(`Server running at ${url}`.yellow)
+        if (process.send) {
+          process.send('ready')
+        }
+      })
       .on('error', reason => {
         console.error('ERROR'.red, reason.toString().white)
       })
