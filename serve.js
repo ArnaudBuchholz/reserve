@@ -1,7 +1,7 @@
 'use strict'
 
-const dispatcher = require('./dispatcher')
 const checkConfiguration = require('./configuration')
+const dispatcher = require('./dispatcher')
 const EventEmitter = require('events')
 const fs = require('fs')
 const http = require('http')
@@ -41,8 +41,9 @@ module.exports = configuration => {
         .listen(configuration.port, configuration.hostname, err => err ? reject(err) : resolve())
     }))
     .then(() => {
-      console.log(`Server running at ${configuration.protocol}://${configuration.hostname}:${configuration.port}/`.yellow)
-      eventEmitter.emit('ready')
+      eventEmitter.emit('ready', {
+        url: `${configuration.protocol}://${configuration.hostname}:${configuration.port}/`
+      })
     })
     .catch(reason => eventEmitter.emit('error', reason))
   return eventEmitter
