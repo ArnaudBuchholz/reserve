@@ -1,0 +1,4 @@
+{
+  "extend": "./mappings.json",
+  "port": 5000
+}
