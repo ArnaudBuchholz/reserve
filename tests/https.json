@@ -1,6 +1,8 @@
 {
   "port": 5001,
-  "ssl0": {
+  "ssl": {
+    "key": "./privatekey.pem",
+    "cert": "./certificate.pem"
   },
   "mappings": [{
     "match": "^\\/proxy\\/(https?)\\/(.*)",
