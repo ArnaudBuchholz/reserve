@@ -30,7 +30,7 @@ function checkFileNotFound (url) {
 function onLoad () {
   assert(document.getElementById("imgOK").naturalWidth !== 0, "/proxy/http/facetheforce.today/luke/200 loaded")
   assert(document.getElementById("imgKO").naturalWidth === 0, "/proxy/http/facethe4th.tomorrow/luke/200 failed")
-  tryLoad('/reserve.json', JSON.parse)
+  tryLoad('/mappings.json', JSON.parse)
     .then(function () { return tryLoad('/Hello World.txt') })
     .then(function () { return checkFileNotFound('/not-found') })
     .then(function () {
