@@ -45,6 +45,6 @@ module.exports = configuration => {
         url: `${configuration.protocol}://${configuration.hostname}:${configuration.port}/`
       })
     })
-    .catch(reason => eventEmitter.emit('error', reason))
+    .catch(reason => eventEmitter.emit('error', { reason }))
   return eventEmitter
 }
