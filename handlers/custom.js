@@ -9,7 +9,7 @@ module.exports = {
     const parameters = [request, response].concat([].slice.call(match, 1))
     const result = mapping.custom.apply(mapping, parameters)
     if (result && typeof result.then === 'function') {
-      result.then(resolve, reject)
+      result.then(resolve, () => 500)
     } else {
       resolve()
     }
