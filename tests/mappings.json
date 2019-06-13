@@ -1,10 +1,10 @@
 {
   "mappings": [{
-    "match": "^\\/proxy\\/(https?)\\/(.*)",
+    "match": "^/proxy/(https?)/(.*)",
     "url": "$1://$2",
     "unsecure-cookies": true
   }, {
-    "match": "^\\/gpf\\.js$",
+    "match": "^/gpf\\.js$",
     "url": "https://cdn.jsdelivr.net/npm/gpf-js/build/gpf.js"
   }, {
     "match": "(.*)",
