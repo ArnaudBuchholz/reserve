@@ -24,7 +24,7 @@ function sendFile (response, filePath, stat) {
 function sendIndex (response, folderPath) {
   const indexPath = path.join(folderPath, 'index.html')
   return statAsync(indexPath)
-    .then(stat => sendFile(response, indexPath, stat))
+    .then(stat => sendFile(response, indexPath, stat), () => 403)
 }
 
 module.exports = {
@@ -32,6 +32,6 @@ module.exports = {
   redirect: ({ mapping, match, redirect, request, response }) => {
     const filePath = /([^?#]+)/.exec(unescape(redirect))[1] // filter URL parameters & hash
     return statAsync(filePath)
-      .then(stat => stat.isDirectory() ? sendIndex(response, filePath) : sendFile(response, filePath, stat))
+      .then(stat => stat.isDirectory() ? sendIndex(response, filePath) : sendFile(response, filePath, stat), () => 404)
   }
 }
