@@ -62,7 +62,7 @@ statAsync(configurationFilePath)
           process.send('ready')
         }
       })
-      .on('error', reason => {
+      .on('error', ({ reason }) => {
         console.error('ERROR'.red, reason.toString().white)
       })
       .on('redirected', ({ method, url, statusCode, timeSpent }) => {
