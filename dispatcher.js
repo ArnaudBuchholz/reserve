@@ -22,7 +22,7 @@ const byStatus = {
 async function status (statusCode) {
   const content = byStatus[statusCode](this.request) || ''
   const length = content.length
-  this.response.writeHead(500, {
+  this.response.writeHead(statusCode, {
     'Content-Type': textMimeType,
     'Content-Length': length
   })
