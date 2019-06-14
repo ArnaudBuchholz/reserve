@@ -2,58 +2,80 @@
 
 const mime = require('mime')
 
+function redirected () {
+  const end = new Date()
+  this.eventEmitter.emit('redirected', Object.assign(this.emitParameters, {
+    end,
+    timeSpent: end - this.emitParameters.start,
+    statusCode: this.response.statusCode
+  }))
+}
+
 const textMimeType = mime.getType('text')
 
-function error (request, response, message) {
-  const content = `An error occurred while processing ${request.method} ${request.url}: ${message}`
+const byStatus = {
+  '403': () => 'Forbidden',
+  '404': () => 'Not found',
+  '500': () => 'Internal Server Error'
+}
+
+async function status (statusCode) {
+  const content = byStatus[statusCode](this.request) || ''
   const length = content.length
-  response.writeHead(500, {
+  this.response.writeHead(500, {
     'Content-Type': textMimeType,
     'Content-Length': length
   })
-  response.end(content)
+  this.response.end(content)
+  redirected.call(this)
 }
 
-function process ({emitParameters, configuration, request, response, url}) {
-  emitParameters.url = url
-  this.emit('processing', emitParameters)
-  if (configuration.mappings.every(mapping => {
-    const match = mapping.match.exec(url)
-    if (match) {
-      let {
-        handler,
-        redirect,
-        type
-      } = configuration.handler(mapping)
-      if (typeof redirect === 'string') {
-        for (let capturingGroupIndex = match.length; capturingGroupIndex > 0; --capturingGroupIndex) {
-          redirect = redirect.replace(new RegExp(`\\$${capturingGroupIndex}`, 'g'), match[capturingGroupIndex])
-        }
-      }
-      this.emit('redirecting', Object.assign(emitParameters, { type, redirect }))
-      try {
-          handler.redirect({ mapping, match, redirect, request, response })
-            .then(() => {
-              const end = new Date()
-              this.emit('redirected', Object.assign(emitParameters, {
-                end,
-                timeSpent: end - emitParameters.start,
-                statusCode: response.statusCode
-              }))
-            }, reason => {
-              error(request, response, reason.toString())
-              this.emit('error', {...emitParameters, reason})
-            })
-      } catch (e) {
+function error (reason) {
+  this.eventEmitter.emit('error', {...this.emitParameters, reason})
+  return process.call(this, 500)
+}
 
-      }
-      return false
-    }
-    return true
-  })) {
-    this.emit('error', {...emitParameters, reason: 'no mapping'})
-    process({emitParameters, configuration, request, response, 500})
+function next (url, index = 0) {
+  if (index === this.configuration.mappings.length) {
+    return error.call(this, 'no mapping')
   }
+  const mapping = this.configuration.mappings[index]
+  const match = mapping.match.exec(url)
+  if (!match) {
+    return next.call(this, url, index + 1)
+  }
+  let {
+    handler,
+    redirect,
+    type
+  } = this.configuration.handler(mapping)
+  if (typeof redirect === 'string') {
+    for (let capturingGroupIndex = match.length; capturingGroupIndex > 0; --capturingGroupIndex) {
+      redirect = redirect.replace(new RegExp(`\\$${capturingGroupIndex}`, 'g'), match[capturingGroupIndex])
+    }
+  }
+  this.eventEmitter.emit('redirecting', Object.assign(this.emitParameters, { type, redirect }))
+  try {
+    return handler.redirect({ mapping, match, redirect, request: this.request, response: this.response })
+        .then(result => {
+          if (undefined === result) {
+            // Assuming the request is terminated (else should call next())
+            redirected.call(this)
+          } else {
+            return process.call(this, result)
+          }
+        }, error.bind(this))
+  } catch (e) {
+    return error.call(this, e)
+  }
+}
+
+function process (url) {
+  this.eventEmitter.emit('processing', this.emitParameters)
+  if (typeof url === 'number') {
+    return status.call(this, url)
+  }
+  return next.call(this, url)
 }
 
 module.exports = function (configuration, request, response) {
@@ -61,13 +83,13 @@ module.exports = function (configuration, request, response) {
     method: request.method,
     url: request.url,
     start: new Date(),
-    incomingUrl: request.url
   }
   this.emit('incoming', emitParameters)
-  process.call(this, {
+  process.call({
+    eventEmitter: this,
     emitParameters,
     configuration,
     request,
     response
-  })
+  }, request.url)
 }
