@@ -22,8 +22,14 @@ const configurationFileName = process.argv.reduce((name, parameter) => {
 }, '') || 'reserve.json'
 
 function extend (configurationFilePath, configuration) {
+  const configurationFolderPath = path.dirname(configurationFilePath)
+  configuration.mappings.forEach(mapping => {
+    if (!mapping._path) {
+      mapping._path = configurationFolderPath
+    }
+  })
   if (configuration.extend) {
-    const baseConfigurationFilePath = path.join(path.dirname(configurationFilePath), configuration.extend)
+    const baseConfigurationFilePath = path.join(configurationFolderPath, configuration.extend)
     delete configuration.extend
     return readFileAsync(baseConfigurationFilePath)
       .then(buffer => JSON.parse(buffer.toString()))
@@ -52,6 +58,7 @@ statAsync(configurationFilePath)
     if (process.argv.includes('--verbose')) {
       configuration.verbose = true
     }
+    configuration._json = true
     return configuration
   })
   .then(configuration => {
@@ -64,9 +71,9 @@ statAsync(configurationFilePath)
       })
       .on('error', ({ method, url, reason }) => {
         if (method && url) {
-          console.error('ERROR'.red, method.gray, url.gray, reason.toString().white)
+          console.error('ERROR'.red, method.gray, url.gray, '\n\\____'.red, reason.toString().gray)
         } else {
-          console.error('ERROR'.red, reason.toString().white)
+          console.error('ERROR'.red, reason.toString().gray)
         }
       })
       .on('redirected', ({ method, url, statusCode, timeSpent }) => {
