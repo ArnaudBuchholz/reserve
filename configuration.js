@@ -1,6 +1,9 @@
 'use strict'
 
+/* global process */
+
 const fs = require('fs')
+const path = require('path')
 const util = require('util')
 
 const readFileAsync = util.promisify(fs.readFile)
@@ -76,12 +79,20 @@ async function checkProtocol (configuration) {
 function checkMappings (configuration) {
   configuration.mappings.forEach(mapping => {
     if (typeof mapping.match === 'string') {
+      if (!mapping._path) {
+        mapping._path = process.cwd()
+      }
       mapping.match = new RegExp(mapping.match)
       const { handler } = configuration.handler(mapping)
       if (!handler) {
         throw new Error('Unknown handler for mapping: ' + JSON.stringify(mapping))
       }
       // TODO validate mapping properties
+      if (configuration._json) {
+        if (handler.schema.custom === 'function' && typeof mapping.custom === 'string') {
+          mapping.custom = require(path.join(mapping._path, mapping.custom))
+        }
+      }
     }
   })
 }
