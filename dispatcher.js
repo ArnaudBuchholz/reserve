@@ -31,7 +31,7 @@ async function status (statusCode) {
 }
 
 function error (reason) {
-  this.eventEmitter.emit('error', {...this.emitParameters, reason})
+  this.eventEmitter.emit('error', { ...this.emitParameters, reason })
   return process.call(this, 500)
 }
 
@@ -57,14 +57,14 @@ function next (url, index = 0) {
   this.eventEmitter.emit('redirecting', Object.assign(this.emitParameters, { type, redirect }))
   try {
     return handler.redirect({ mapping, match, redirect, request: this.request, response: this.response })
-        .then(result => {
-          if (undefined === result) {
-            // Assuming the request is terminated (else should call next())
-            redirected.call(this)
-          } else {
-            return process.call(this, result)
-          }
-        }, error.bind(this))
+      .then(result => {
+        if (undefined === result) {
+          // Assuming the request is terminated (else should call next())
+          redirected.call(this)
+        } else {
+          return process.call(this, result)
+        }
+      }, error.bind(this))
   } catch (e) {
     return error.call(this, e)
   }
@@ -82,7 +82,7 @@ module.exports = function (configuration, request, response) {
   const emitParameters = {
     method: request.method,
     url: request.url,
-    start: new Date(),
+    start: new Date()
   }
   this.emit('incoming', emitParameters)
   process.call({
