@@ -23,11 +23,13 @@ const configurationFileName = process.argv.reduce((name, parameter) => {
 
 function extend (configurationFilePath, configuration) {
   const configurationFolderPath = path.dirname(configurationFilePath)
-  configuration.mappings.forEach(mapping => {
-    if (!mapping._path) {
-      mapping._path = configurationFolderPath
-    }
-  })
+  if (configuration.mappings) {
+    configuration.mappings.forEach(mapping => {
+      if (!mapping._path) {
+        mapping._path = configurationFolderPath
+      }
+    })
+  }
   if (configuration.extend) {
     const baseConfigurationFilePath = path.join(configurationFolderPath, configuration.extend)
     delete configuration.extend
@@ -46,7 +48,12 @@ function extend (configurationFilePath, configuration) {
   return configuration
 }
 
-const configurationFilePath = path.join(process.cwd(), configurationFileName)
+let configurationFilePath
+if (path.isAbsolute(configurationFileName)) {
+  configurationFilePath = configurationFileName
+} else {
+  configurationFilePath = path.join(process.cwd(), configurationFileName)
+}
 statAsync(configurationFilePath)
   .then(() => readFileAsync(configurationFilePath).then(buffer => JSON.parse(buffer.toString())))
   .then(configuration => extend(configurationFilePath, configuration))
