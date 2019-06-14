@@ -4,6 +4,9 @@
     "url": "$1://$2",
     "unsecure-cookies": true
   }, {
+    "match": "^/echo/(.*)$",
+    "custom": "./echo.js"
+  }, {
     "match": "^/gpf\\.js$",
     "url": "https://cdn.jsdelivr.net/npm/gpf-js/build/gpf.js"
   }, {
