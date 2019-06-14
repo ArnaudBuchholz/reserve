@@ -7,6 +7,9 @@
     "match": "^/echo/(.*)$",
     "custom": "./echo.js"
   }, {
+    "match": "^/chrome/(.*)$",
+    "custom": "./chrome.js"
+  }, {
     "match": "^/gpf\\.js$",
     "url": "https://cdn.jsdelivr.net/npm/gpf-js/build/gpf.js"
   }, {
