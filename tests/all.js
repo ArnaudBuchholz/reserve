@@ -48,7 +48,6 @@ async function all () {
     await testServer('http://localhost:5002')
     console.error(`All tests succeeded`.green)
   } catch (e) {
-    failed = true
     console.error(e.toString().red)
   } finally {
     console.log('Total time (ms): ', new Date() - now)
