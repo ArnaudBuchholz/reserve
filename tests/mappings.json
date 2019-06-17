@@ -11,7 +11,7 @@
     "custom": "./chrome.js"
   }, {
     "match": "^/gpf\\.js$",
-    "url": "https://cdn.jsdelivr.net/npm/gpf-js/build/gpf.js"
+    "file": "../node_modules/gpf-js/build/gpf.js"
   }, {
     "match": "(.*)",
     "file": "./$1"
