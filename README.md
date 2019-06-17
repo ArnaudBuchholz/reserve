@@ -52,6 +52,26 @@ Create a file named `reserve.json` in the root folder:
 }
 ```
 
+A different configuration file can be specified using `--config <file name>`
+
+## JSON format
+
+### localhost, port and ssl
+
+localhost:
+
+port:
+
+ssl key and certificate
+
+### mappings
+
+Mappings are evaluated in the order of declaration. When matching, the handler is triggered.
+
+### extend
+
+Mappings are always relative to the configuration file
+
 # Embedding
 
 ```javascript
@@ -66,3 +86,29 @@ reserve({
   }]
 })
 ```
+
+# Handlers
+
+## file
+
+Redirect to local file, capturing groups can be used as substitution parameters.
+
+Mime type computation is based on [mime](https://www.npmjs.com/package/mime).
+
+## url
+
+Redirect to an URL, capturing groups can be used as substitution parameters.
+
+### url Options
+
+* `unsecure-cookies`: _(boolean)_ when true, the secured cookies are stored even if not running on https
+
+## custom
+
+It expects a function taking:
+* request
+* response
+
+Capturing groups' values are passed as additional parameters.
+
+When used in a json file, the value may point to a module that will be loaded with require. The result is expected to be the function.
