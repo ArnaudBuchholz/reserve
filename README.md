@@ -28,7 +28,7 @@ A lightweight http(s) server statically configurable using regular expressions. 
 
 # Usage
 
-In the package.json:
+In the `package.json`:
 ```json
 {
   " ... ": {},
@@ -41,7 +41,7 @@ In the package.json:
 }
 ```
 
-Create a file named reserve.json in the root folder:
+Create a file named `reserve.json` in the root folder:
 ```json
 {
   "port": 8080,
