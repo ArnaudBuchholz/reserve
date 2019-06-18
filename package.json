@@ -4,7 +4,8 @@
   "description": "Lightweight http server statically configurable using regular expressions",
   "main": "index.js",
   "scripts": {
-    "test": "standard --fix & node tests/all"
+    "test": "standard --fix & node tests/all",
+    "lint": "standard --fix"
   },
   "repository": {
     "type": "git",
