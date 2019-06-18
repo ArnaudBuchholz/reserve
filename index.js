@@ -1,6 +1,7 @@
 'use strict'
 
 /* global process */
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
 
 require('colors')
 const util = require('util')
@@ -81,6 +82,17 @@ statAsync(configurationFilePath)
           console.error('ERROR'.red, method.gray, url.gray, '\n\\____'.red, reason.toString().gray)
         } else {
           console.error('ERROR'.red, reason.toString().gray)
+        }
+      })
+      .on('redirecting', ({ method, url, type, redirect }) => {
+        if (configuration.verbose) {
+          let redirectLabel
+          if (typeof redirect === 'function') {
+            redirectLabel = '(function)'
+          } else {
+            redirectLabel = redirect.toString()
+          }
+          console.log('RDRCT'.gray, method.gray, url.gray, '\n\\____'.gray, type.gray, redirectLabel.gray)
         }
       })
       .on('redirected', ({ method, url, statusCode, timeSpent }) => {
