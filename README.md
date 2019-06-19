@@ -23,6 +23,7 @@
 [![reserve](http://img.shields.io/npm/dm/reserve.svg)](https://www.npmjs.org/package/reserve)
 [![install size](https://packagephobia.now.sh/badge?p=reserve)](https://packagephobia.now.sh/result?p=reserve)
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FArnaudBuchholz%2Freserve.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FArnaudBuchholz%2Freserve?ref=badge_shield)
 
 A lightweight http(s) server statically configurable using regular expressions. It can also be embedded and extended.
 
@@ -112,3 +113,7 @@ It expects a function taking:
 Capturing groups' values are passed as additional parameters.
 
 When used in a json file, the value may point to a module that will be loaded with require. The result is expected to be the function.
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FArnaudBuchholz%2Freserve.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FArnaudBuchholz%2Freserve?ref=badge_large)
