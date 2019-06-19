@@ -4,7 +4,7 @@
   "description": "Lightweight http server statically configurable using regular expressions",
   "main": "index.js",
   "scripts": {
-    "test": "standard --fix & node tests/all",
+    "test": "standard && nyc node tests/all",
     "lint": "standard --fix"
   },
   "repository": {
@@ -26,6 +26,8 @@
   "homepage": "https://github.com/ArnaudBuchholz/reserve#readme",
   "devDependencies": {
     "gpf-js": "^0.2.9",
+    "mocha": "^6.1.4",
+    "nyc": "^14.1.1",
     "standard": "^12.0.1"
   },
   "dependencies": {
