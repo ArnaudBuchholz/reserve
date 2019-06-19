@@ -1,6 +1,6 @@
 'use strict'
 
-const assert = require('assert')
+const assert = require('../assert')
 const mime = require('mime')
 const Response = require('../Response')
 const statusHandler = require('../../../handlers/status')
@@ -11,16 +11,16 @@ describe('handlers/status', () => {
   it('returns a promise', () => {
     const response = new Response()
     const result = statusHandler.redirect({ response, redirect: 404 })
-    assert(typeof result.then === 'function')
+    assert(() => typeof result.then === 'function')
   })
 
   it('sends a generic response for knonw codes', () => {
     const response = new Response()
     return statusHandler.redirect({ response, redirect: 404 })
       .then(() => {
-        assert(response.statusCode === 404)
-        assert(response.headers['Content-Type'] === textMimeType)
-        assert(response.toString() === 'Not found')
+        assert(() => response.statusCode === 404)
+        assert(() => response.headers['Content-Type'] === textMimeType)
+        assert(() => response.toString() === 'Not found')
       })
   })
 
@@ -28,9 +28,9 @@ describe('handlers/status', () => {
     const response = new Response()
     return statusHandler.redirect({ response, redirect: 418 })
       .then(() => {
-        assert(response.statusCode === 418)
-        assert(response.headers['Content-Type'] === textMimeType)
-        assert(response.toString() === '')
+        assert(() => response.statusCode === 418)
+        assert(() => response.headers['Content-Type'] === textMimeType)
+        assert(() => response.toString() === '')
       })
   })
 })
