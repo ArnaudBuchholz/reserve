@@ -29,7 +29,7 @@ function sendIndex (response, folderPath) {
 
 module.exports = {
   schema: {},
-  redirect: ({ mapping, match, redirect, request, response }) => {
+  redirect: ({ mapping, redirect, response }) => {
     let filePath = /([^?#]+)/.exec(unescape(redirect))[1] // filter URL parameters & hash
     if (!path.isAbsolute(filePath)) {
       filePath = path.join(mapping._path, filePath)
