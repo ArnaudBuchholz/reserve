@@ -28,6 +28,7 @@
   "devDependencies": {
     "gpf-js": "^0.2.9",
     "mocha": "^6.1.4",
+    "mock-require": "^3.0.3",
     "nyc": "^14.1.1",
     "standard": "^12.0.1"
   },
@@ -36,6 +37,9 @@
     "mime": "^2.4.3"
   },
   "standard": {
-    "globals": [ "describe", "it" ]
+    "globals": [
+      "describe",
+      "it"
+    ]
   }
 }
