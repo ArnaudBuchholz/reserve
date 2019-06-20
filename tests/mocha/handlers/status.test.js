@@ -17,7 +17,8 @@ describe('handlers/status', () => {
   it('sends a generic response for knonw codes', () => {
     const response = new Response()
     return statusHandler.redirect({ response, redirect: 404 })
-      .then(() => {
+      .then(value => {
+        assert(() => value === undefined)
         assert(() => response.statusCode === 404)
         assert(() => response.headers['Content-Type'] === textMimeType)
         assert(() => response.toString() === 'Not found')
@@ -27,7 +28,8 @@ describe('handlers/status', () => {
   it('sends an empty response for unknonw codes', () => {
     const response = new Response()
     return statusHandler.redirect({ response, redirect: 418 })
-      .then(() => {
+      .then(value => {
+        assert(() => value === undefined)
         assert(() => response.statusCode === 418)
         assert(() => response.headers['Content-Type'] === textMimeType)
         assert(() => response.toString() === '')
