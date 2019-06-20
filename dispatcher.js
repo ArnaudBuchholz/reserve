@@ -14,17 +14,18 @@ function error (reason) {
   return dispatch.call(this, 500)
 }
 
-function redirecting ({ mapping, match, handler, type, redirect }) {
+function redirecting ({ mapping, match, handler, type, redirect, url, index = 0 }) {
   this.eventEmitter.emit('redirecting', Object.assign(this.emitParameters, { type, redirect }))
   try {
     return handler.redirect({ mapping, match, redirect, request: this.request, response: this.response })
       .then(result => {
-        if (undefined === result) {
-          // Assuming the request is terminated (else should call dispatch())
-          redirected.call(this)
-        } else {
+        if (undefined !== result) {
           return dispatch.call(this, result)
         }
+        if (this.response.finished) {
+          return redirected.call(this)
+        }
+        return dispatch.call(this, url, index + 1)
       }, error.bind(this))
   } catch (e) {
     return error.call(this, e)
@@ -57,7 +58,7 @@ function dispatch (url, index = 0) {
       redirect = redirect.replace(new RegExp(`\\$${capturingGroupIndex}`, 'g'), match[capturingGroupIndex])
     }
   }
-  return redirecting.call(this, { mapping, match, handler, type, redirect })
+  return redirecting.call(this, { mapping, match, handler, type, redirect, url, index })
 }
 
 module.exports = function (configuration, request, response) {
