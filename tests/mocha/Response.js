@@ -1,8 +1,12 @@
 'use strict'
 
-const Writable = require('stream').Writable
+const { Duplex } = require('stream')
 
-module.exports = class Response extends Writable {
+module.exports = class Response extends Duplex {
+  _read () {
+    return null
+  }
+
   _write (chunk) {
     this._buffer.push(chunk.toString())
   }
