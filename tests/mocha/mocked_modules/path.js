@@ -1,7 +1,7 @@
 'use strict'
 
 const nativePath = require('path')
-const sep = '/' // Force POSIX to simplify testing
+const sep = '/'
 
 require('mock-require')('path', Object.assign({}, nativePath, {
   sep,
