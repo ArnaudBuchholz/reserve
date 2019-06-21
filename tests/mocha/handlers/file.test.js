@@ -120,6 +120,22 @@ describe('handlers/file', () => {
       })
   })
 
+  it('fails with 404 if the folder does not exist', () => {
+    const request = new Request()
+    const response = new Response()
+    return fileHandler.redirect({
+      request,
+      response,
+      mapping: {
+        _path: '/'
+      },
+      redirect: './not-a-folder/not-found'
+    })
+      .then(value => {
+        assert(() => value === 404)
+      })
+  })
+
   it('fails with 403 if the folder does not have index.html', () => {
     const request = new Request()
     const response = new Response()
