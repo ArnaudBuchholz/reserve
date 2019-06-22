@@ -4,7 +4,8 @@ const { Duplex } = require('stream')
 
 module.exports = class Response extends Duplex {
   _read () {
-    return null
+    this.push(this.toString())
+    this.push(null)
   }
 
   _write (chunk) {
