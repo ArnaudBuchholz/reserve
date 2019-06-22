@@ -43,8 +43,6 @@ module.exports = {
     request
       .on('data', chunk => redirectedRequest.write(chunk))
       .on('error', reject)
-      .on('end', () => {
-        redirectedRequest.end()
-      })
+      .on('end', () => { redirectedRequest.end() })
   })
 }
