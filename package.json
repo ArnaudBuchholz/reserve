@@ -4,9 +4,9 @@
   "description": "Lightweight http server statically configurable using regular expressions",
   "main": "index.js",
   "scripts": {
-    "test": "standard && node tests/all.js && nyc npm run-script mocha",
+    "test": "standard && node tests/all.js && nyc mocha",
     "lint": "standard --fix",
-    "mocha": "mocha tests/mocha/*.test.js tests/mocha/handlers/*.test.js"
+    "mocha": "mocha"
   },
   "repository": {
     "type": "git",
@@ -40,6 +40,12 @@
     "globals": [
       "describe",
       "it"
+    ]
+  },
+  "mocha": {
+    "spec": [
+      "tests/mocha/*.test.js",
+      "tests/mocha/handlers/*.test.js"
     ]
   }
 }
