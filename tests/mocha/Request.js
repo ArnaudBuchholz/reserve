@@ -4,11 +4,8 @@ const { Readable } = require('stream')
 
 module.exports = class Request extends Readable {
   _read () {
-    if (this._readCompleted) {
-      return null
-    }
-    this._readCompleted = true
-    return this._body
+    this.push(this._body)
+    this.push(null)
   }
 
   constructor (method = 'GET', url = '/', headers = {}, body = '') {
@@ -17,7 +14,6 @@ module.exports = class Request extends Readable {
     this._url = url
     this._headers = headers
     this._body = body
-    this._readCompleted = false
   }
 
   get method () {
