@@ -17,10 +17,18 @@ module.exports = class Response extends Duplex {
     this._headers = { ...this._headers, ...headers }
   }
 
+  end (chunk) {
+    if (chunk) {
+      this.write(chunk)
+    }
+    this._finished = true
+  }
+
   constructor () {
     super()
     this._buffer = []
     this._headers = {}
+    this._finished = false
   }
 
   get headers () {
@@ -29,6 +37,10 @@ module.exports = class Response extends Duplex {
 
   get statusCode () {
     return this._statusCode
+  }
+
+  get finished () {
+    return this._finished
   }
 
   toString () {
