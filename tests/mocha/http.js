@@ -3,7 +3,7 @@
 const EventEmitter = require('events')
 const Response = require('./Response')
 const empty = 'http://www.mocked.com/empty'
-const echo = 'http://www.mocked.com/empty'
+const echo = 'http://www.mocked.com/echo'
 
 module.exports = {
 
