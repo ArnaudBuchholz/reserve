@@ -6,7 +6,8 @@
   "scripts": {
     "test": "standard && node tests/all.js && nyc mocha",
     "lint": "standard --fix",
-    "mocha": "mocha"
+    "mocha": "mocha",
+    "cover:report": "nyc report --reporter=lcov --reporter=text"
   },
   "repository": {
     "type": "git",
