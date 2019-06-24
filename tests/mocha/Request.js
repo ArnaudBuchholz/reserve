@@ -20,9 +20,11 @@ module.exports = class Request extends Readable {
     return this._method
   }
 
+  /*
   get url () {
     return this._url
   }
+*/
 
   get headers () {
     return this._headers
