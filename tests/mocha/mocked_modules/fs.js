@@ -60,6 +60,14 @@ require('mock-require')('fs', {
       contentSent = true
     }
     return stream
-  }
+  },
 
+  readFile (entryPath, callback) {
+    const entry = getEntry(entryPath)
+    if (entry) {
+      callback(null, entry.content)
+    } else {
+      callback(new Error('not found'))
+    }
+  }
 })
