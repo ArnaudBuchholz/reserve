@@ -19,3 +19,4 @@ node_modules/
 
 # nyc output directory
 .nyc_output
+coverage
