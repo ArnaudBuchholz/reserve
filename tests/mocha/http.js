@@ -17,11 +17,11 @@ module.exports = {
   request: (url, options, callback) => {
     const result = new EventEmitter()
     const response = new Response()
-    if (url === empty) {
-      response.writeHead(200)
-    } else if (url === echo || url === echos) {
+    if (url === echo || url === echos) {
       const statusCode = options.headers['x-status-code']
       response.writeHead(statusCode, options.headers)
+    } else /* if (url === empty) */ {
+      response.writeHead(200)
     }
     result.write = chunk => {
       response.write(chunk)
