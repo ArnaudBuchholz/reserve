@@ -23,7 +23,7 @@ describe('handlers/url', () => {
   })
 
   it('pipes URL content', () => {
-    const request = new Request('GET', 'http://example.com/abwhatever', {
+    const request = new Request('GET', 'http://example.com/whatever', {
       'x-status-code': 200,
       'x-value-1': 'test',
       'host': 'http://example.com'
@@ -45,7 +45,7 @@ describe('handlers/url', () => {
   })
 
   it('pipes URL content (https)', () => {
-    const request = new Request('GET', 'http://example.com/abwhatever', {
+    const request = new Request('GET', 'http://example.com/whatever', {
       'x-status-code': 200
     }, 'Hello World!')
     const response = new Response()
@@ -65,7 +65,7 @@ describe('handlers/url', () => {
   it('unsecures cookies', () => {
     const request = new Request('GET', 'http://example.com/abwhatever', {
       'x-status-code': 200,
-      'Set-Cookie': ['name=value; Secure']
+      'Set-Cookie': ['name=value; Secure;']
     })
     const response = new Response()
     return urlHandler.redirect({
@@ -79,7 +79,7 @@ describe('handlers/url', () => {
       .then(value => {
         assert(() => value === undefined)
         assert(() => response.statusCode === 200)
-        assert(() => response.headers['Set-Cookie'] === 'name=value;')
+        assert(() => response.headers['Set-Cookie'][0] === 'name=value;')
       })
   })
 })
