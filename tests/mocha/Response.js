@@ -39,9 +39,11 @@ module.exports = class Response extends Duplex {
     return this._statusCode
   }
 
+  /*
   get finished () {
     return this._finished
   }
+*/
 
   toString () {
     return this._buffer.join('')
