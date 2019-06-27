@@ -1,7 +1,5 @@
 'use strict'
 
-require('../mocked_modules/http')
-require('../mocked_modules/https')
 const http = require('../http')
 
 const assert = require('../assert')
