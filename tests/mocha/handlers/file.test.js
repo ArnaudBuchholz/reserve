@@ -1,8 +1,5 @@
 'use strict'
 
-require('../mocked_modules/path')
-require('../mocked_modules/fs')
-
 const assert = require('../assert')
 const mime = require('mime')
 const Request = require('../Request')
