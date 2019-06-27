@@ -34,8 +34,8 @@ function createServer (configuration, requestHandler) {
 
 function createServerAsync (configuration, requestHandler) {
   return new Promise((resolve, reject) => {
-      createServer(configuration, requestHandler)
-        .listen(configuration.port, configuration.hostname, err => err ? reject(err) : resolve())
+    createServer(configuration, requestHandler)
+      .listen(configuration.port, configuration.hostname, err => err ? reject(err) : resolve())
   })
 }
 
@@ -46,7 +46,7 @@ module.exports = jsonConfiguration => {
     .then(configuration => createServerAsync(configuration, dispatcher.bind(eventEmitter, configuration))
       .then(() => {
         eventEmitter.emit('ready', {
-            url: `${configuration.protocol}://${configuration.hostname}:${configuration.port}/`
+          url: `${configuration.protocol}://${configuration.hostname}:${configuration.port}/`
         })
       })
     )
