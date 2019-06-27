@@ -32,7 +32,7 @@ function applyDefaults (configuration) {
 function setHandlers (configuration, defaultHandlers) {
   if (configuration.handlers) {
     // Default hanlders can't be overridden
-    Object.assign(configuration.handlers, defaultHandlers)
+    configuration.handlers = Object.assign({}, configuration.handlers, defaultHandlers)
   } else {
     configuration.handlers = defaultHandlers
   }
@@ -98,8 +98,10 @@ function checkMappings (configuration) {
 }
 
 module.exports = async function (configuration, defaultHandlers) {
-  applyDefaults(configuration)
-  setHandlers(configuration, defaultHandlers)
-  await checkProtocol(configuration)
-  checkMappings(configuration)
+  const checkedConfiguration = Object.assign({}, configuration)
+  applyDefaults(checkedConfiguration)
+  setHandlers(checkedConfiguration, defaultHandlers)
+  await checkProtocol(checkedConfiguration)
+  checkMappings(checkedConfiguration)
+  return checkedConfiguration
 }
