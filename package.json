@@ -47,6 +47,12 @@
     "spec": [
       "tests/mocha/*.test.js",
       "tests/mocha/handlers/*.test.js"
+    ],
+    "require": [
+      "tests/mocha/mocked_modules/path.js",
+      "tests/mocha/mocked_modules/fs.js",
+      "tests/mocha/mocked_modules/http.js",
+      "tests/mocha/mocked_modules/https.js"
     ]
   }
 }
