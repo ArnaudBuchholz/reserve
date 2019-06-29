@@ -1,6 +1,6 @@
 'use strict'
 
-const assert = require('assert')
+const assert = require('./assert')
 const mime = require('mime')
 const EventEmitter = require('events')
 const Request = require('./Request')
@@ -20,26 +20,34 @@ const sampleConfPromise = checkConfiguration({
   handlers,
   mappings: [{
     match: '/redirect',
-    custom: async () => '/file.txt'
+    custom: async function redirect () {
+      return '/file.txt'
+    }
   }, {
     match: '/404',
-    custom: async () => 404
+    custom: async function err404 () {
+      return 404
+    }
   }, {
     match: '/throw',
-    custom: () => { throw new Error() }
+    custom: function throw_ () {
+      throw new Error()
+    }
   }, {
     match: '/reject',
-    custom: () => Promise.reject(new Error())
+    custom: function reject () {
+      return Promise.reject(new Error())
+    }
   }, {
     match: '(.*)',
-    custom: async (request, response) => {
+    custom: async function setXFlag (request, response) {
       response.setHeader('x-flag', 'true')
     }
   }, {
     match: '/subst/(.*)/(.*)',
     file: '/$1.$2'
   }, {
-    match: '(.*)',
+    match: '/(.*)',
     file: '/$1'
   }]
 })
@@ -74,10 +82,14 @@ describe('dispatcher', () => {
       emitter
         .on('error', parameters => reject(parameters.error))
         .on('redirected', parameters => {
-          assert(() => response.statusCode === 200)
-          assert(() => response.headers['Content-Type'] === textMimeType)
-          assert(() => response.toString() === 'Hello World!')
-          resolve()
+          try {
+            assert(() => response.statusCode === 200)
+            assert(() => response.headers['Content-Type'] === textMimeType)
+            assert(() => response.toString() === 'Hello World!')
+            resolve()
+          } catch (e) {
+            reject(e)
+          }
         })
     })
   })
@@ -92,10 +104,14 @@ describe('dispatcher', () => {
       emitter
         .on('error', parameters => reject(parameters.error))
         .on('redirected', parameters => {
-          assert(() => response.statusCode === 200)
-          assert(() => response.headers['Content-Type'] === textMimeType)
-          assert(() => response.toString() === 'Hello World!')
-          resolve()
+          try {
+            assert(() => response.statusCode === 200)
+            assert(() => response.headers['Content-Type'] === textMimeType)
+            assert(() => response.toString() === 'Hello World!')
+            resolve()
+          } catch (e) {
+            reject(e)
+          }
         })
     })
   })
@@ -110,10 +126,14 @@ describe('dispatcher', () => {
       emitter
         .on('error', parameters => reject(parameters.error))
         .on('redirected', parameters => {
-          assert(() => response.statusCode === 200)
-          assert(() => response.headers['Content-Type'] === textMimeType)
-          assert(() => response.toString() === 'Hello World!')
-          resolve()
+          try {
+            assert(() => response.statusCode === 200)
+            assert(() => response.headers['Content-Type'] === textMimeType)
+            assert(() => response.toString() === 'Hello World!')
+            resolve()
+          } catch (e) {
+            reject(e)
+          }
         })
     })
   })
@@ -128,8 +148,12 @@ describe('dispatcher', () => {
       emitter
         .on('error', parameters => reject(parameters.error))
         .on('redirected', parameters => {
-          assert(() => response.statusCode === 404)
-          resolve()
+          try {
+            assert(() => response.statusCode === 404)
+            resolve()
+          } catch (e) {
+            reject(e)
+          }
         })
     })
   })
@@ -145,9 +169,15 @@ describe('dispatcher', () => {
       emitter
         .on('error', () => { errorThrown = true })
         .on('redirected', parameters => {
-          assert(() => response.statusCode === 500)
-          assert(() => errorThrown)
-          resolve()
+console.log(response.statusCode, response.toString())
+console.log(emitter.emitted)
+          try {
+            assert(() => response.statusCode === 500)
+            assert(() => errorThrown)
+            resolve()
+          } catch (e) {
+            reject(e)
+          }
         })
     })
   })
@@ -163,9 +193,13 @@ describe('dispatcher', () => {
       emitter
         .on('error', () => { errorThrown = true })
         .on('redirected', parameters => {
-          assert(() => response.statusCode === 500)
-          assert(() => errorThrown)
-          resolve()
+          try {
+            assert(() => response.statusCode === 500)
+            assert(() => errorThrown)
+            resolve()
+          } catch (e) {
+            reject(e)
+          }
         })
     })
   })
@@ -180,11 +214,15 @@ describe('dispatcher', () => {
       emitter
         .on('error', parameters => reject(parameters.error))
         .on('redirected', parameters => {
-          assert(() => response.headers['x-flag'] === 'true')
-          assert(() => response.statusCode === 200)
-          assert(() => response.headers['Content-Type'] === textMimeType)
-          assert(() => response.toString() === 'Hello World!')
-          resolve()
+          try {
+            assert(() => response.headers['x-flag'] === 'true')
+            assert(() => response.statusCode === 200)
+            assert(() => response.headers['Content-Type'] === textMimeType)
+            assert(() => response.toString() === 'Hello World!')
+            resolve()
+          } catch (e) {
+            reject(e)
+          }
         })
     })
   })
