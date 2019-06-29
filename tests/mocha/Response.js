@@ -12,6 +12,10 @@ module.exports = class Response extends Duplex {
     this._buffer.push(chunk.toString())
   }
 
+  setHeader (name, value) {
+    this._headers[name] = value
+  }
+
   writeHead (statusCode, headers) {
     this._statusCode = statusCode
     this._headers = { ...this._headers, ...headers }
