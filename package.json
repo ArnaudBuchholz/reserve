@@ -7,6 +7,7 @@
     "test": "standard && node tests/all.js && nyc mocha",
     "lint": "standard --fix",
     "mocha": "mocha",
+    "cover": "nyc mocha",
     "cover:report": "nyc report --reporter=lcov --reporter=text"
   },
   "repository": {
