@@ -1,11 +1,10 @@
 'use strict'
 
-/* global process */
-
 const fs = require('fs')
 const path = require('path')
 const util = require('util')
 
+const statAsync = util.promisify(fs.stat)
 const readFileAsync = util.promisify(fs.readFile)
 
 const defaults = {
@@ -87,14 +86,38 @@ function checkMappings (configuration) {
       if (!handler) {
         throw new Error('Unknown handler for mapping: ' + JSON.stringify(mapping))
       }
-      // TODO validate mapping properties
-      if (configuration._json) {
-        if (handler.schema.custom === 'function' && typeof mapping.custom === 'string') {
-          mapping.custom = require(path.join(mapping._path, mapping.custom))
-        }
+      if (handler.schema.custom === 'function' && typeof mapping.custom === 'string') {
+        mapping.custom = require(path.join(mapping._path, mapping.custom))
       }
     }
   })
+}
+
+function extend (filePath, configuration) {
+  const folderPath = path.dirname(filePath)
+  if (configuration.mappings) {
+    configuration.mappings.forEach(mapping => {
+      if (!mapping._path) {
+        mapping._path = folderPath
+      }
+    })
+  }
+  if (configuration.extend) {
+    const basefilePath = path.join(folderPath, configuration.extend)
+    delete configuration.extend
+    return readFileAsync(basefilePath)
+      .then(buffer => JSON.parse(buffer.toString()))
+      .then(baseConfiguration => {
+        // Only merge mappings
+        const baseMappings = baseConfiguration.mappings
+        const mergedConfiguration = Object.assign(baseConfiguration, configuration)
+        if (baseMappings !== mergedConfiguration.mappings) {
+          mergedConfiguration.mappings = [...configuration.mappings, baseMappings]
+        }
+        return extend(basefilePath, mergedConfiguration)
+      })
+  }
+  return configuration
 }
 
 module.exports = {
@@ -105,5 +128,17 @@ module.exports = {
     await checkProtocol(checkedConfiguration)
     checkMappings(checkedConfiguration)
     return checkedConfiguration
+  },
+
+  async read (fileName) {
+    let filePath
+    if (path.isAbsolute(fileName)) {
+      filePath = fileName
+    } else {
+      filePath = path.join(process.cwd(), fileName)
+    }
+    return statAsync(filePath)
+      .then(() => readFileAsync(filePath).then(buffer => JSON.parse(buffer.toString())))
+      .then(configuration => extend(filePath, configuration))
   }
 }
