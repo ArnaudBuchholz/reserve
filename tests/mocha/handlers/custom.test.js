@@ -46,23 +46,28 @@ describe('handlers/custom', () => {
       .then(result => assert(() => result === 'OK'))
   })
 
-  it('fails with 500 if handler throws an exception', () => {
+  it('lets any exception flow (will be intercepted by dispatcher)', () => {
     const request = new Request()
     const response = new Response()
-    return customHandler.redirect({
-      request,
-      response,
-      mapping: {
-        custom: () => {
-          throw new Error('KO')
-        }
-      },
-      match: []
-    })
-      .then(statusCode => assert(() => statusCode === 500))
+    let exception
+    try {
+      customHandler.redirect({
+        request,
+        response,
+        mapping: {
+          custom: () => {
+            throw new Error('KO')
+          }
+        },
+        match: []
+      })
+    } catch (e) {
+      exception = e
+    }
+    assert(() => !!exception)
   })
 
-  it('fails with 500 if handler returns a rejected promise', () => {
+  it('returns any rejected promise (will be intercepted by dispatcher)', () => {
     const request = new Request()
     const response = new Response()
     return customHandler.redirect({
@@ -75,6 +80,10 @@ describe('handlers/custom', () => {
       },
       match: []
     })
-      .then(statusCode => assert(() => statusCode === 500))
+      .then(() => {
+        assert(() => false)
+      }, reason => {
+        assert(() => reason.message === 'KO')
+      })
   })
 })
