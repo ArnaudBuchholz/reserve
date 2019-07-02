@@ -97,11 +97,13 @@ function checkMappings (configuration) {
   })
 }
 
-module.exports = async function (configuration, defaultHandlers) {
-  const checkedConfiguration = Object.assign({}, configuration)
-  applyDefaults(checkedConfiguration)
-  setHandlers(checkedConfiguration, defaultHandlers)
-  await checkProtocol(checkedConfiguration)
-  checkMappings(checkedConfiguration)
-  return checkedConfiguration
+module.exports = {
+  async check (configuration, defaultHandlers) {
+    const checkedConfiguration = Object.assign({}, configuration)
+    applyDefaults(checkedConfiguration)
+    setHandlers(checkedConfiguration, defaultHandlers)
+    await checkProtocol(checkedConfiguration)
+    checkMappings(checkedConfiguration)
+    return checkedConfiguration
+  }
 }
