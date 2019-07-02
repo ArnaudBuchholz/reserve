@@ -1,5 +1,7 @@
 'use strict'
 
+require('colors')
+
 module.exports = (serve, verbose) => {
   serve
     .on('ready', ({ url }) => {
