@@ -1,6 +1,6 @@
 'use strict'
 
-const checkConfiguration = require('./configuration')
+const checkConfiguration = require('./configuration').check
 const dispatcher = require('./dispatcher')
 const EventEmitter = require('events')
 const fs = require('fs')
