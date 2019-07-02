@@ -47,8 +47,8 @@ const sampleConfPromise = checkConfiguration({
     match: '/subst/(.*)/(.*)',
     file: '/$1.$2'
   }, {
-    match: '/(.*)',
-    file: '/$1'
+    match: '/file.txt',
+    file: '/file.txt'
   }]
 })
 
@@ -77,7 +77,6 @@ describe('dispatcher', () => {
     const request = new Request('GET', '/file.txt')
     const response = new Response()
     const emitter = new RecordedEventEmitter()
-    dispatcher.call(emitter, sampleConf, request, response)
     return new Promise((resolve, reject) => {
       emitter
         .on('error', parameters => reject(parameters.error))
@@ -91,6 +90,7 @@ describe('dispatcher', () => {
             reject(e)
           }
         })
+      dispatcher.call(emitter, sampleConf, request, response)
     })
   })
 
@@ -99,7 +99,6 @@ describe('dispatcher', () => {
     const request = new Request('GET', '/subst/file/txt')
     const response = new Response()
     const emitter = new RecordedEventEmitter()
-    dispatcher.call(emitter, sampleConf, request, response)
     return new Promise((resolve, reject) => {
       emitter
         .on('error', parameters => reject(parameters.error))
@@ -113,6 +112,7 @@ describe('dispatcher', () => {
             reject(e)
           }
         })
+      dispatcher.call(emitter, sampleConf, request, response)
     })
   })
 
@@ -121,7 +121,6 @@ describe('dispatcher', () => {
     const request = new Request('GET', '/redirect')
     const response = new Response()
     const emitter = new RecordedEventEmitter()
-    dispatcher.call(emitter, sampleConf, request, response)
     return new Promise((resolve, reject) => {
       emitter
         .on('error', parameters => reject(parameters.error))
@@ -135,6 +134,7 @@ describe('dispatcher', () => {
             reject(e)
           }
         })
+      dispatcher.call(emitter, sampleConf, request, response)
     })
   })
 
@@ -143,7 +143,6 @@ describe('dispatcher', () => {
     const request = new Request('GET', '/404')
     const response = new Response()
     const emitter = new RecordedEventEmitter()
-    dispatcher.call(emitter, sampleConf, request, response)
     return new Promise((resolve, reject) => {
       emitter
         .on('error', parameters => reject(parameters.error))
@@ -155,6 +154,7 @@ describe('dispatcher', () => {
             reject(e)
           }
         })
+      dispatcher.call(emitter, sampleConf, request, response)
     })
   })
 
@@ -163,14 +163,11 @@ describe('dispatcher', () => {
     const request = new Request('GET', '/throw')
     const response = new Response()
     const emitter = new RecordedEventEmitter()
-    dispatcher.call(emitter, sampleConf, request, response)
     return new Promise((resolve, reject) => {
       let errorThrown = false
       emitter
         .on('error', () => { errorThrown = true })
         .on('redirected', parameters => {
-console.log(response.statusCode, response.toString())
-console.log(emitter.emitted)
           try {
             assert(() => response.statusCode === 500)
             assert(() => errorThrown)
@@ -179,6 +176,7 @@ console.log(emitter.emitted)
             reject(e)
           }
         })
+      dispatcher.call(emitter, sampleConf, request, response)
     })
   })
 
@@ -187,7 +185,6 @@ console.log(emitter.emitted)
     const request = new Request('GET', '/reject')
     const response = new Response()
     const emitter = new RecordedEventEmitter()
-    dispatcher.call(emitter, sampleConf, request, response)
     return new Promise((resolve, reject) => {
       let errorThrown = false
       emitter
@@ -201,15 +198,15 @@ console.log(emitter.emitted)
             reject(e)
           }
         })
+      dispatcher.call(emitter, sampleConf, request, response)
     })
   })
 
   it('allows handlers that don\'t finalize response', async () => {
     const sampleConf = await sampleConfPromise
-    const request = new Request('GET', '/file.text')
+    const request = new Request('GET', '/file.txt')
     const response = new Response()
     const emitter = new RecordedEventEmitter()
-    dispatcher.call(emitter, sampleConf, request, response)
     return new Promise((resolve, reject) => {
       emitter
         .on('error', parameters => reject(parameters.error))
@@ -224,6 +221,29 @@ console.log(emitter.emitted)
             reject(e)
           }
         })
+      dispatcher.call(emitter, sampleConf, request, response)
+    })
+  })
+
+  it('fails when no mapping finalizes the request', async () => {
+    const sampleConf = await sampleConfPromise
+    const request = new Request('GET', '/unhandled')
+    const response = new Response()
+    const emitter = new RecordedEventEmitter()
+    return new Promise((resolve, reject) => {
+      let errorThrown = false
+      emitter
+        .on('error', () => { errorThrown = true })
+        .on('redirected', parameters => {
+          try {
+            assert(() => response.statusCode === 500)
+            assert(() => errorThrown)
+            resolve()
+          } catch (e) {
+            reject(e)
+          }
+        })
+      dispatcher.call(emitter, sampleConf, request, response)
     })
   })
 })
