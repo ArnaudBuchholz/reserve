@@ -5,7 +5,7 @@ const mime = require('mime')
 const EventEmitter = require('events')
 const Request = require('./Request')
 const Response = require('./Response')
-const checkConfiguration = require('../../configuration')
+const checkConfiguration = require('../../configuration').check
 const dispatcher = require('../../dispatcher')
 
 const textMimeType = mime.getType('text')
