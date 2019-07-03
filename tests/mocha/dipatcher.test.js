@@ -5,19 +5,11 @@ const mime = require('mime')
 const EventEmitter = require('events')
 const Request = require('./Request')
 const Response = require('./Response')
-const checkConfiguration = require('../../configuration').check
+const { check } = require('../../configuration')
 const dispatcher = require('../../dispatcher')
 
 const textMimeType = mime.getType('text')
-const handlers = {
-  custom: require('../../handlers/custom'),
-  file: require('../../handlers/file'),
-  status: require('../../handlers/status'),
-  url: require('../../handlers/url')
-}
-
-const sampleConfPromise = checkConfiguration({
-  handlers,
+const sampleConfPromise = check({
   mappings: [{
     match: '/redirect',
     custom: async function redirect () {
