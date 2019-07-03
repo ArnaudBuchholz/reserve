@@ -66,17 +66,18 @@ function setHandlers (configuration) {
   }
 }
 
+async function readSslFile (configuration, filePath) {
+  if (path.isAbsolute(filePath)) {
+    return (await readFileAsync(filePath)).toString()
+  }
+  return (await readFileAsync(path.join(configuration.ssl.cwd, filePath))).toString()
+}
+
 async function checkProtocol (configuration) {
   if (configuration.ssl) {
     configuration.protocol = 'https'
-    return readFileAsync(configuration.ssl.cert)
-      .then(buffer => {
-        configuration.ssl.cert = buffer.toString()
-        return readFileAsync(configuration.ssl.key)
-      })
-      .then(buffer => {
-        configuration.ssl.key = buffer.toString()
-      })
+    configuration.ssl.cert = await readSslFile(configuration, configuration.ssl.cert)
+    configuration.ssl.key = await readSslFile(configuration, configuration.ssl.key)
   } else {
     configuration.protocol = 'http'
   }
@@ -108,6 +109,9 @@ function extend (filePath, configuration) {
         mapping.cwd = folderPath
       }
     })
+  }
+  if (configuration.ssl && !configuration.ssl.cwd) {
+    configuration.ssl.cwd = folderPath
   }
   if (configuration.extend) {
     const basefilePath = path.join(folderPath, configuration.extend)
