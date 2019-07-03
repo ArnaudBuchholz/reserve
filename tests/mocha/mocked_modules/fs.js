@@ -24,13 +24,19 @@ const entries = {
       content: JSON.stringify({
         extend: '../reserve.json',
         ssl: {
-          key: './privatekey.pem',
+          key: '/folder/privatekey.pem',
           cert: './certificate.pem'
         },
         mappings: [{
           match: '/folder/.*',
           url: 'https://secured.com/$1'
         }]
+      })
+    },
+    'reserve-with-another-port.json': {
+      content: JSON.stringify({
+        port: 220103,
+        extend: './reserve.json'
       })
     },
     'invalid-extend.json': {
