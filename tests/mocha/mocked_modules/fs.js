@@ -13,7 +13,40 @@ const entries = {
   'folder': {
     'index.html': {
       content: '<html />'
+    },
+    'privatekey.pem': {
+      content: 'privatekey'
+    },
+    'certificate.pem': {
+      content: 'certificate'
+    },
+    'reserve.json': {
+      content: JSON.stringify({
+        extend: '../reserve.json',
+        ssl: {
+          key: './privatekey.pem',
+          cert: './certificate.pem'
+        },
+        mappings: [{
+          match: '/folder/.*',
+          url: 'https://secured.com/$1'
+        }]
+      })
+    },
+    'invalid-extend.json': {
+      content: JSON.stringify({
+        extend: './not-found'
+      })
     }
+  },
+  'reserve.json': {
+    content: JSON.stringify({
+      port: 3475,
+      mappings: [{
+        match: '/(.*)',
+        file: '/$1'
+      }]
+    })
   },
   'no-index': {}
 }
