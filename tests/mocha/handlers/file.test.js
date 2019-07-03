@@ -18,7 +18,7 @@ describe('handlers/file', () => {
       request,
       response,
       mapping: {
-        _path: '/'
+        cwd: '/'
       },
       redirect: './file.txt'
     })
@@ -32,7 +32,7 @@ describe('handlers/file', () => {
       request,
       response,
       mapping: {
-        _path: '/'
+        cwd: '/'
       },
       redirect: './file.txt'
     })
@@ -51,9 +51,28 @@ describe('handlers/file', () => {
       request,
       response,
       mapping: {
-        _path: '/folder'
+        cwd: '/folder'
       },
       redirect: '/file.txt'
+    })
+      .then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 200)
+        assert(() => response.headers['Content-Type'] === textMimeType)
+        assert(() => response.toString() === 'Hello World!')
+      })
+  })
+
+  it('pipes file content (trim parameters)', () => {
+    const request = new Request()
+    const response = new Response()
+    return fileHandler.redirect({
+      request,
+      response,
+      mapping: {
+        cwd: '/'
+      },
+      redirect: '/file.txt?param=1#hash'
     })
       .then(value => {
         assert(() => value === undefined)
@@ -70,7 +89,7 @@ describe('handlers/file', () => {
       request,
       response,
       mapping: {
-        _path: '/'
+        cwd: '/'
       },
       redirect: './folder'
     })
@@ -89,7 +108,7 @@ describe('handlers/file', () => {
       request,
       response,
       mapping: {
-        _path: '/'
+        cwd: '/'
       },
       redirect: './file'
     })
@@ -108,7 +127,7 @@ describe('handlers/file', () => {
       request,
       response,
       mapping: {
-        _path: '/'
+        cwd: '/'
       },
       redirect: './not-found'
     })
@@ -124,7 +143,7 @@ describe('handlers/file', () => {
       request,
       response,
       mapping: {
-        _path: '/'
+        cwd: '/'
       },
       redirect: './not-a-folder/not-found'
     })
@@ -140,7 +159,7 @@ describe('handlers/file', () => {
       request,
       response,
       mapping: {
-        _path: '/'
+        cwd: '/'
       },
       redirect: './no-index'
     })
@@ -157,7 +176,7 @@ describe('handlers/file', () => {
       request,
       response,
       mapping: {
-        _path: '/'
+        cwd: '/'
       },
       redirect: './file.txt'
     })
