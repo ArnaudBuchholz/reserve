@@ -4,8 +4,15 @@ const fs = require('fs')
 const path = require('path')
 const util = require('util')
 
-const statAsync = util.promisify(fs.stat)
 const readFileAsync = util.promisify(fs.readFile)
+const statAsync = util.promisify(fs.stat)
+
+const defaultHandlers = {
+  custom: require('./handlers/custom'),
+  file: require('./handlers/file'),
+  status: require('./handlers/status'),
+  url: require('./handlers/url')
+}
 
 const defaults = {
   hostname: '127.0.0.1',
@@ -28,7 +35,7 @@ function applyDefaults (configuration) {
   })
 }
 
-function setHandlers (configuration, defaultHandlers) {
+function setHandlers (configuration) {
   if (configuration.handlers) {
     // Default hanlders can't be overridden
     configuration.handlers = Object.assign({}, configuration.handlers, defaultHandlers)
@@ -78,8 +85,8 @@ async function checkProtocol (configuration) {
 function checkMappings (configuration) {
   configuration.mappings.forEach(mapping => {
     if (typeof mapping.match === 'string') {
-      if (!mapping._path) {
-        mapping._path = process.cwd()
+      if (!mapping.cwd) {
+        mapping.cwd = process.cwd()
       }
       mapping.match = new RegExp(mapping.match)
       const { handler } = configuration.handler(mapping)
@@ -87,7 +94,7 @@ function checkMappings (configuration) {
         throw new Error('Unknown handler for mapping: ' + JSON.stringify(mapping))
       }
       if (handler.schema.custom === 'function' && typeof mapping.custom === 'string') {
-        mapping.custom = require(path.join(mapping._path, mapping.custom))
+        mapping.custom = require(path.join(mapping.cwd, mapping.custom))
       }
     }
   })
@@ -97,8 +104,8 @@ function extend (filePath, configuration) {
   const folderPath = path.dirname(filePath)
   if (configuration.mappings) {
     configuration.mappings.forEach(mapping => {
-      if (!mapping._path) {
-        mapping._path = folderPath
+      if (!mapping.cwd) {
+        mapping.cwd = folderPath
       }
     })
   }
@@ -112,7 +119,7 @@ function extend (filePath, configuration) {
         const baseMappings = baseConfiguration.mappings
         const mergedConfiguration = Object.assign(baseConfiguration, configuration)
         if (baseMappings !== mergedConfiguration.mappings) {
-          mergedConfiguration.mappings = [...configuration.mappings, baseMappings]
+          mergedConfiguration.mappings = [...configuration.mappings, ...baseMappings]
         }
         return extend(basefilePath, mergedConfiguration)
       })
@@ -121,10 +128,10 @@ function extend (filePath, configuration) {
 }
 
 module.exports = {
-  async check (configuration, defaultHandlers) {
+  async check (configuration) {
     const checkedConfiguration = Object.assign({}, configuration)
     applyDefaults(checkedConfiguration)
-    setHandlers(checkedConfiguration, defaultHandlers)
+    setHandlers(checkedConfiguration)
     await checkProtocol(checkedConfiguration)
     checkMappings(checkedConfiguration)
     return checkedConfiguration
