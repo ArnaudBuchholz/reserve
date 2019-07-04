@@ -6,9 +6,6 @@ module.exports = (serve, verbose) => {
   serve
     .on('ready', ({ url }) => {
       console.log(`Server running at ${url}`.yellow)
-      if (process.send) {
-        process.send('ready')
-      }
     })
     .on('error', ({ method, url, reason }) => {
       if (method && url) {
@@ -39,4 +36,6 @@ module.exports = (serve, verbose) => {
       console.log('RDRCT'.gray, method.gray, url.gray, '\n\\____'.gray, type.gray, redirectLabel.gray)
     })
   }
+
+  return serve
 }
