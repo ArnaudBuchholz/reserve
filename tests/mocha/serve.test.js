@@ -38,19 +38,19 @@ describe('serve', () => {
   })
 
   it('transmits server creation error', done => {
-      serve({
-        hostname: 'error'
+    serve({
+      hostname: 'error'
+    })
+      .on('error', parameters => {
+        try {
+          assert(() => parameters.reason.message === 'error')
+          done()
+        } catch (e) {
+          done(e)
+        }
       })
-        .on('error', parameters => {
-          try {
-            assert(() => parameters.reason.message === 'error')
-            done()
-          } catch (e) {
-            done(e)
-          }
-        })
-        .on('ready', () => {
-          done(new Error('unexpected'))
-        })
+      .on('ready', () => {
+        done(new Error('unexpected'))
+      })
   })
 })
