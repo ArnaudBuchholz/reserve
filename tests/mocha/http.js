@@ -31,6 +31,13 @@ module.exports = {
       callback(response)
     }
     return result
-  }
+  },
 
+  createServer: () => {
+    return {
+      listen: (port, hostname, callback) => {
+        callback(null)
+      }
+    }
+  }
 }
