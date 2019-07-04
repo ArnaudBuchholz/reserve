@@ -36,7 +36,11 @@ module.exports = {
   createServer: () => {
     return {
       listen: (port, hostname, callback) => {
-        callback(null)
+        if (hostname === 'error') {
+          callback(new Error('error'))
+        } else {
+          callback(null)
+        }
       }
     }
   }
