@@ -2,10 +2,11 @@
 
 <table border="0" cellpadding="2" cellspacing="0">
     <tr>
-        <td valign="top" style="border-right: 2px solid gray;">
+        <td valign="top">
           <strong>RE</strong>
         </td>
         <td>
+          <i>levant</i></br />
           <i>verse proxy</i><br />
           <i>gexp-based</i><br />
           <i>useable</i><br />
@@ -25,55 +26,78 @@
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FArnaudBuchholz%2Freserve.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FArnaudBuchholz%2Freserve?ref=badge_shield)
 
-A lightweight http(s) server statically configurable using regular expressions. It can also be embedded and extended.
+A **lightweight** http(s) server statically **configurable** with regular expressions.
+It can also be **embedded** and **extended**.
 
-# Usage
+# Rational
 
-In the `package.json`:
-```json
-{
-  " ... ": {},
-  "scripts": {
-      "start": "reserve"
-  },
-  "dependencies": {
-    "reserve": "^1.0.0"
-  }
-}
-```
+Initially started to build a local **development environment** where static files are served and resources can be fetched
+from remote repositories, this **tool** is **versatile** and can support different scenarios:
+- A simple web server
+- A reverse proxy to an existing server
+- A server that aggregates several sources
+- ...
 
-Create a file named `reserve.json` in the root folder:
+By defining **an array of mappings**, one can decide how the server will process the requests. Each mapping associates
+a **matching** criteria defined with a
+[regular expression](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp) to
+a **handler** that will answer the request.
+
+The configuration syntax favors **simplicity** without dropping flexibility.
+
+For instance, the definition of a server that **exposes files** of the current folder but **forbids access** to
+the folder `private` consists in:
+
 ```json
 {
   "port": 8080,
   "mappings": [{
-    "match": "(.*)",
+    "match": "/private/.*",
+    "status": 403
+  }, {
+    "match": "/(.*)",
     "file": "./$1"
   }]
 }
 ```
 
-A different configuration file can be specified using `--config <file name>`
+# Usage
 
-## JSON format
+* Install the package with `npm install reserve` *(you decide if you want to save it as development dependency or not)*
+* You may create a start script in `package.json`:
 
-### localhost, port and ssl
+```json
+{
+  "scripts": {
+    "start": "reserve"
+  }
+}
+```
+* By default, **reserve** will look for a file named `reserve.json` in the project folder:
 
-localhost:
+```json
+{
+  "port": 8080,
+  "mappings": [{
+    "match": "/(.*)",
+    "file": "./$1"
+  }]
+}
+```
 
-port:
+* A configuration file name can be specified using `--config <file name>`, for instance:
 
-ssl key and certificate
-
-### mappings
-
-Mappings are evaluated in the order of declaration. When matching, the handler is triggered.
-
-### extend
-
-Mappings are always relative to the configuration file
+```json
+{
+  "scripts": {
+    "start": "reserve --config reserve-dev.json"
+  }
+}
+```
 
 # Embedding
+
+It is possible to implement the server in any application using the `reserve/serve` module:
 
 ```javascript
 const path = require('path')
@@ -81,28 +105,87 @@ const reserve = require('reserve/serve')
 reserve({
   port: 8080,
   mappings: [{
-    // mapping to file access
-    match: /(.*)/,
+    match: /\/(.*)/,
     file: path.join(__dirname, '$1')
   }]
 })
+  .on('ready', ({ url }) => {
+      console.log(`Server running at ${url}`)
+  })
 ```
+
+The package also gives access to the configuration reader:
+
+```javascript
+const path = require('path')
+const { read } = require('reserve/configuration')
+const reserve = require('reserve/serve')
+read('reserve.json')
+  .then(configuration => {
+    reserve(configuration)
+      .on('ready', ({ url }) => {
+        console.log(`Server running at ${url}`)
+      })
+  })
+```
+
+And a default log output *(verbose mode will dump all redirections)*:
+
+```javascript
+const path = require('path')
+const { read } = require('reserve/configuration')
+const log = require('reserve/log')
+const reserve = require('reserve/serve')
+read('reserve.json')
+  .then(configuration => {
+    log(reserve(configuration), /*verbose: */ true)
+  })
+```
+
+# Configuration
+
+## hostname
+
+## port
+
+## ssl
+
+key and certificate
+
+## mappings
+
+Mappings are evaluated in the order of declaration. When matching, the handler is triggered.
+
+## extend
+
+*Only for JSON configuration*
+
+Mappings are always relative to the configuration file
 
 # Handlers
 
 ## file
 
 Redirect to local file, capturing groups can be used as substitution parameters.
+Relative path are relative to the place where the JSON configuration file was read or the process working directory.
+
+Folder access is redirected to the inner index.html file (if any) or 403
+If the requested file is missing or can't be read, it returns 404
 
 Mime type computation is based on [mime](https://www.npmjs.com/package/mime).
 
+Example:
+
 ## url
 
-Redirect to an URL, capturing groups can be used as substitution parameters.
+Redirect to any URL (http or https), capturing groups can be used as substitution parameters.
+
+Example:
 
 ### url Options
 
-* `unsecure-cookies`: _(boolean)_ when true, the secured cookies are stored even if not running on https
+* `unsecure-cookies`: _(boolean)_ when true, the secured cookies are converted to unsecure ones.
+Hence, the browser will keep them even if not running on https
 
 ## custom
 
@@ -110,6 +193,15 @@ It expects a function taking:
 * request
 * response
 
+It must returns a Promise that resolves to:
+* undefined
+* any string: the request is redirected internally
+* number: the request is terminated with the given status code
+
 Capturing groups' values are passed as additional parameters.
 
 When used in a json file, the value may point to a module that will be loaded with require. The result is expected to be the function.
+
+
+
+## status
