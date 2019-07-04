@@ -125,17 +125,17 @@ describe('configuration', () => {
     })
 
     it('allows custom handlers', () => {
-        return check({
-          handlers: {
-            mock: {
-              redirect: () => Promise.resolve()
-            }
-          },
-          mappings: [{
-            match: /(.*)/,
-            mock: '$1'
-          }]
-        })
+      return check({
+        handlers: {
+          mock: {
+            redirect: () => Promise.resolve()
+          }
+        },
+        mappings: [{
+          match: /(.*)/,
+          mock: '$1'
+        }]
+      })
         .then(configuration => {
           assert(() => typeof configuration.handlers.mock.redirect === 'function')
           assert(() => Object.keys(configuration.handlers).length > 4)
