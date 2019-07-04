@@ -1,6 +1,6 @@
 'use strict'
 
-const readConfiguration = require('./configuration').read
+const { read } = require('./configuration')
 const log = require('./log')
 const serve = require('./serve')
 
@@ -14,9 +14,16 @@ const configurationFileName = process.argv.reduce((name, parameter) => {
   return name
 }, '') || 'reserve.json'
 
-readConfiguration(configurationFileName)
+read(configurationFileName)
   .catch(reason => {
     console.warn(`'${configurationFileName}' not found or invalid, applying defaults`.yellow)
     return {} // empty configuration will use all defaults
   })
-  .then(configuration => log(serve(configuration), process.argv.includes('--verbose')))
+  .then(configuration => {
+    log(serve(configuration), process.argv.includes('--verbose'))
+      .on('ready', () => {
+        if (process.send) {
+          process.send('ready')
+        }
+      })
+  })
