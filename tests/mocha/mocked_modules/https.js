@@ -1,5 +1,8 @@
 'use strict'
 
+const { request, createServer } = require('../http')
+
 require('mock-require')('https', {
-  request: require('../http').request
+  request,
+  createServer
 })
