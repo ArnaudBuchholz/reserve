@@ -118,7 +118,7 @@ The resulting object implements the [EventEmitter](https://nodejs.org/api/events
 | **ready** | url *(String, example: `'http://127.0.0.1:5002/'`)*| The server is listening and ready to receive requests
 | **incoming** | method *(String, example: `'GET'`)*, url *(String)*, start *(Date)* | New request received, these parameters are also transmitted to **error**, **redirecting** and **redirected** events |
 | **error** | reason *(Any)* | Error reason, contains **incoming** parameters if related to a request |
-| **redirecting** | type *(Handler type, example: `'file'`)*, redirect *(String or Number, example: `403`)* | Processing redirection to handler, gives handler type and redirection value |
+| **redirecting** | type *(Handler type, example: `'status'`)*, redirect *(String or Number, example: `403`)* | Processing redirection to handler, gives handler type and redirection value |
 | **redirected** | end *(Date)*, timeSpent *(Number of ms)*, statusCode *(Number)* | Request is fully processed |
 
 The package also gives access to the configuration reader:
