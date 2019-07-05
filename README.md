@@ -48,10 +48,10 @@ For instance, the definition of a server that **exposes files** of the current f
 {
   "port": 8080,
   "mappings": [{
-    "match": "/private/.*",
+    "match": "^/private/.*",
     "status": 403
   }, {
-    "match": "/(.*)",
+    "match": "^/(.*)",
     "file": "./$1"
   }]
 }
@@ -75,7 +75,7 @@ For instance, the definition of a server that **exposes files** of the current f
 {
   "port": 8080,
   "mappings": [{
-    "match": "/(.*)",
+    "match": "^/(.*)",
     "file": "./$1"
   }]
 }
@@ -102,7 +102,7 @@ const reserve = require('reserve/serve')
 reserve({
   port: 8080,
   mappings: [{
-    match: /\/(.*)/,
+    match: /^\/(.*)/,
     file: path.join(__dirname, '$1')
   }]
 })
@@ -195,7 +195,7 @@ For instance:
     "match": ".*",
     "custom": "./cors"
   }, {
-    "match": "/(.*)",
+    "match": "^/(.*)",
     "file": "./$1"
   }]
 }
@@ -229,42 +229,80 @@ Recursion is allowed but not secured (beware of loops).
 
 ## file
 
-Redirect to local file, capturing groups can be used as substitution parameters.
-Relative path are relative to the place where the JSON configuration file was read or the process working directory.
-
-Folder access is redirected to the inner index.html file (if any) or 403
-If the requested file is missing or can't be read, it returns 404
-
-Mime type computation is based on [mime](https://www.npmjs.com/package/mime).
-
 Example:
+```json
+{
+  "match": "^/(.*)",
+  "file": "./$1"
+}
+```
+
+* Only supports [GET](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET)
+* Capturing groups can be used as substitution parameters
+* Absolute or relative to the handler's `cwd` member *(see [mappings]()#mappings)*
+* Folder access is internally redirected to the inner `index.html` file *(if any)* or `403` status
+* File access returns `404` status if missing or can't be read
+* Mime type computation is based on [mime](https://www.npmjs.com/package/mime)
 
 ## url
 
-Redirect to any URL (http or https), capturing groups can be used as substitution parameters.
-
 Example:
+```json
+{
+  "match": "^/proxy/(https?)/(.*)",
+  "url": "$1://$2",
+  "unsecure-cookies": true
+}
+```
 
-### url Options
+* Supports [all methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods)
+* Capturing groups can be used as substitution parameters
+* Redirects to any URL (http or https)
 
-* `unsecure-cookies`: _(boolean)_ when true, the secured cookies are converted to unsecure ones.
-Hence, the browser will keep them even if not running on https
+**NOTE**: It must redirect to an absolute URL
+
+| option | type | default | description |
+|---|---|---|---|
+| `unsecure-cookies` | Boolean | `false` | when true, the secured cookies are converted to unsecure ones. Hence, the browser will keep them even if not running on https |
 
 ## custom
 
-It expects a function taking:
-* request
-* response
+Example:
+```javascript
+{
+  match: /.*/,
+  custom: async (request, response) => {
+    response.setHeader('Access-Control-Allow-Origin', '*')
+  }
+}
+```
 
-It must returns a Promise that resolves to:
-* undefined
-* any string: the request is redirected internally
-* number: the request is terminated with the given status code
-
-Capturing groups' values are passed as additional parameters.
-
-When used in a json file, the value may point to a module that will be loaded with require. The result is expected to be the function.
-
-
+`custom` must point to a [function](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Functions)
+* That takes at least two parameters: [`request`](https://nodejs.org/api/http.html#http_class_http_incomingmessage) and [`response`](https://nodejs.org/api/http.html#http_class_http_serverresponse)
+* Capturing groups' values are passed as additional parameters.
+* This function must return a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+* If the promise is resolved to a value (i.e. not `undefined`), an internal redirection occurs (i.e. the request is going over the mappings again)
+* If the `response` is not [finished](https://nodejs.org/api/http.html#http_response_finished) after executing the function, the `request` is going over the remaining mappings
 
 ## status
+
+Example:
+```json
+{
+  "match": "^/private/.*",
+  "status": 403
+}
+```
+
+* Supports [all methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods)
+* Accepts only Numbers
+* Used when an internal redirection to a Number occurs
+* Capturing groups are ignored
+* End the response with the given status and, if defined, with a textual message:
+
+| status | message |
+|---|---|
+| 403 | Forbidden |
+| 404 | Not found |
+| 405 | Method Not Allowed |
+| 500 | Internal Server Error |
