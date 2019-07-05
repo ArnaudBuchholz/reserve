@@ -26,27 +26,23 @@
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FArnaudBuchholz%2Freserve.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FArnaudBuchholz%2Freserve?ref=badge_shield)
 
-A **lightweight** http(s) server statically **configurable** with regular expressions.
+A **lightweight** web server statically **configurable** with regular expressions.
 It can also be **embedded** and **extended**.
 
 # Rational
 
-Initially started to build a local **development environment** where static files are served and resources can be fetched
-from remote repositories, this **tool** is **versatile** and can support different scenarios:
+Initially started to build a local **development environment** where static files are served and resources can be fetched from remote repositories, this **tool** is **versatile** and can support different scenarios:
 - A simple web server
 - A reverse proxy to an existing server
 - A server that aggregates several sources
 - ...
 
-By defining **an array of mappings**, one can decide how the server will process the requests. Each mapping associates
-a **matching** criteria defined with a
-[regular expression](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp) to
-a **handler** that will answer the request.
+By defining **an array of mappings**, one can decide how the server will process the requests. Each mapping associates a **matching** criteria defined with a
+[regular expression](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp) to a **handler** that will answer the request.
 
 The configuration syntax favors **simplicity** without dropping flexibility.
 
-For instance, the definition of a server that **exposes files** of the current folder but **forbids access** to
-the folder `private` consists in:
+For instance, the definition of a server that **exposes files** of the current folder but **forbids access** to the folder `private` consists in:
 
 ```json
 {
@@ -73,7 +69,7 @@ the folder `private` consists in:
   }
 }
 ```
-* By default, **reserve** will look for a file named `reserve.json` in the project folder:
+* By default, **reserve** will look for a file named `reserve.json` in the current folder:
 
 ```json
 {
@@ -90,7 +86,8 @@ the folder `private` consists in:
 ```json
 {
   "scripts": {
-    "start": "reserve --config reserve-dev.json"
+    "start": "reserve",
+    "start-dev": "reserve --config reserve-dev.json"
   }
 }
 ```
@@ -113,6 +110,16 @@ reserve({
       console.log(`Server running at ${url}`)
   })
 ```
+
+The resulting object implements the [EventEmitter](https://nodejs.org/api/events.html) class and throw the following events with parameters:
+
+| Event | Parameter (object containing members) | Description |
+|---|---|---|
+| **ready** | url *(String, example: `'http://127.0.0.1:5002/'`)*| The server is listening and ready to receive requests
+| **incoming** | method *(String, example: `'GET'`)*, url *(String)*, start *(Date)* | New request received, these parameters are also transmitted to **error**, **redirecting** and **redirected** events |
+| **error** | reason *(Any)* | Error reason, contains **incoming** parameters if related to a request |
+| **redirecting** | type *(Handler type, example: `'file'`)*, redirect *(String or Number, example: `403`)* | Processing redirection to handler, gives handler type and redirection value |
+| **redirected** | end *(Date)*, timeSpent *(Number of ms)*, statusCode *(Number)* | Request is fully processed |
 
 The package also gives access to the configuration reader:
 
@@ -144,23 +151,79 @@ read('reserve.json')
 
 # Configuration
 
-## hostname
+## hostname *(optional)*
 
-## port
+Used to set the `host` parameter when calling http(s) server's [listen](https://nodejs.org/api/net.html#net_server_listen).
 
-## ssl
+Default is `'127.0.01'`.
 
-key and certificate
+## port *(optional)*
+
+Used to set the `port` parameter when calling http(s) server's [listen](https://nodejs.org/api/net.html#net_server_listen).
+
+Default is `5000`.
+
+## ssl *(optional)*
+
+This object provides certificate information to build an https server. You might be interested by the article [An Express HTTPS server with a self-signed certificate](https://flaviocopes.com/express-https-self-signed-certificate/).
+
+The object must contain:
+* `cert`: a relative or absolute path to the certificate file
+* `key`: a relative or absolute path to the key file
+
+If relative, the configuration file folder or the current working folder (when embedding) is considered.
 
 ## mappings
 
-Mappings are evaluated in the order of declaration. When matching, the handler is triggered.
+An array of mappings that is evaluated in the order of declaration.
+
+Each mapping must contain:
+* `match`: a string (converted to a regular expression) or a regular expression that will be applied to the request URL
+* the handler key (`custom`, `file`, `status`, `url` ...) which value may contain capturing groups *(see [handlers](#handlers))*
+* `cwd` *(optional)*: the folder to consider for relative path, defaulted to the configuration file folder or the current working folder (when embedding)
+
+**NOTE**: when using `custom` in a [JSON](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON) file, since functions can't be used in this format, the expected value is a string referencing the relative or absolute module to load. If relative, the `cwd` member is considered.
+
+For instance:
+
+* `reserve.json`:
+
+```json
+{
+  "port": 8080,
+  "mappings": [{
+    "match": ".*",
+    "custom": "./cors"
+  }, {
+    "match": "/(.*)",
+    "file": "./$1"
+  }]
+}
+```
+
+* `cors.js`:
+
+```javascript
+module.exports = (request, response) => {
+  response.setHeader('Access-Control-Allow-Origin', '*')
+  return Promise.resolve()
+}
+```
+
 
 ## extend
 
 *Only for JSON configuration*
 
-Mappings are always relative to the configuration file
+A relative or absolute path to another configuration file to extend.
+If relative, the current configuration file folder is considered.
+
+The current settings always overwrite the ones coming from the extended configuration file.
+
+The only exception is `mappings`.
+Extended mappings are imported in a way that makes them have a lower priority than the current one.
+
+Recursion is allowed but not secured (beware of loops).
 
 # Handlers
 
