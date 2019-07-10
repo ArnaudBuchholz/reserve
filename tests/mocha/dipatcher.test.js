@@ -39,6 +39,9 @@ const sampleConfPromise = check({
     match: '/subst/(.*)/(.*)',
     file: '/$1.$2'
   }, {
+    match: '/subst-complex/(.*)/(.*)',
+    file: '/$1$$1.$2$3'
+  }, {
     match: '/file.txt',
     file: '/file.txt'
   }]
@@ -99,6 +102,28 @@ describe('dispatcher', () => {
             assert(() => response.statusCode === 200)
             assert(() => response.headers['Content-Type'] === textMimeType)
             assert(() => response.toString() === 'Hello World!')
+            resolve()
+          } catch (e) {
+            reject(e)
+          }
+        })
+      dispatcher.call(emitter, sampleConf, request, response)
+    })
+  })
+
+  it('supports capturing groups substitution (complex)', async () => {
+    const sampleConf = await sampleConfPromise
+    const request = new Request('GET', '/subst-complex/file/txt')
+    const response = new Response()
+    const emitter = new RecordedEventEmitter()
+    return new Promise((resolve, reject) => {
+      emitter
+        .on('error', parameters => reject(parameters.error))
+        .on('redirected', parameters => {
+          try {
+            assert(() => response.statusCode === 200)
+            assert(() => response.headers['Content-Type'] === textMimeType)
+            assert(() => response.toString() === '$1')
             resolve()
           } catch (e) {
             reject(e)
