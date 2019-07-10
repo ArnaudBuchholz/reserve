@@ -32,6 +32,19 @@ function redirecting ({ mapping, match, handler, type, redirect, url, index = 0 
   }
 }
 
+function interpolate (match, redirect) {
+  if (typeof redirect === 'string') {
+    return redirect.replace(/\$(\d+|\$)/g, (token, sIndex) => {
+      if (sIndex === '$') {
+        return '$'
+      } else {
+        return match[sIndex] || ''
+      }
+    })
+  }
+  return redirect
+}
+
 function dispatch (url, index = 0) {
   if (typeof url === 'number') {
     return redirecting.call(this, {
@@ -48,17 +61,8 @@ function dispatch (url, index = 0) {
   if (!match) {
     return dispatch.call(this, url, index + 1)
   }
-  let {
-    handler,
-    redirect,
-    type
-  } = this.configuration.handler(mapping)
-  if (typeof redirect === 'string') {
-    for (let capturingGroupIndex = match.length; capturingGroupIndex > 0; --capturingGroupIndex) {
-      redirect = redirect.replace(new RegExp(`\\$${capturingGroupIndex}`, 'g'), match[capturingGroupIndex])
-    }
-  }
-  return redirecting.call(this, { mapping, match, handler, type, redirect, url, index })
+  const { handler, redirect, type } = this.configuration.handler(mapping)
+  return redirecting.call(this, { mapping, match, handler, type, redirect: interpolate(match, redirect), url, index })
 }
 
 module.exports = function (configuration, request, response) {
