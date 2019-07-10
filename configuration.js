@@ -44,25 +44,18 @@ function setHandlers (configuration) {
   }
   const types = Object.keys(configuration.handlers)
   configuration.handler = mapping => {
-    let redirect
-    let type
-    let handler
-    if (types.every(member => {
-      type = member
-      redirect = mapping[member]
+    for (let index = 0; index < types.length; ++index) {
+      const type = types[index]
+      const redirect = mapping[type]
       if (redirect !== undefined) {
-        handler = configuration.handlers[member]
-        return false
+        return {
+          handler: configuration.handlers[type],
+          redirect,
+          type
+        }
       }
-      return true
-    })) {
-      return {}
     }
-    return {
-      handler,
-      redirect,
-      type
-    }
+    return {}
   }
 }
 
@@ -101,8 +94,7 @@ function checkMappings (configuration) {
   })
 }
 
-function extend (filePath, configuration) {
-  const folderPath = path.dirname(filePath)
+function setCwd (folderPath, configuration) {
   if (configuration.mappings) {
     configuration.mappings.forEach(mapping => {
       if (!mapping.cwd) {
@@ -113,6 +105,11 @@ function extend (filePath, configuration) {
   if (configuration.ssl && !configuration.ssl.cwd) {
     configuration.ssl.cwd = folderPath
   }
+}
+
+function extend (filePath, configuration) {
+  const folderPath = path.dirname(filePath)
+  setCwd(folderPath, configuration)
   if (configuration.extend) {
     const basefilePath = path.join(folderPath, configuration.extend)
     delete configuration.extend
