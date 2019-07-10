@@ -10,6 +10,9 @@ const entries = {
   'file.txt': {
     content: 'Hello World!'
   },
+  'file$1.txt': {
+    content: '$1'
+  },
   'folder': {
     'index.html': {
       content: '<html />'
