@@ -10,8 +10,7 @@
     "test": "standard && node tests/all.js && nyc mocha",
     "lint": "standard --fix",
     "mocha": "mocha",
-    "cover": "nyc mocha",
-    "cover:report": "nyc report --reporter=lcov --reporter=text"
+    "cover": "nyc mocha && nyc report --reporter=lcov"
   },
   "repository": {
     "type": "git",
@@ -31,6 +30,7 @@
   },
   "homepage": "https://github.com/ArnaudBuchholz/reserve#readme",
   "devDependencies": {
+    "coveralls": "^3.0.4",
     "gpf-js": "^0.2.9",
     "mocha": "^6.1.4",
     "mock-require": "^3.0.3",
