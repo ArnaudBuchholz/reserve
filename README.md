@@ -1,4 +1,4 @@
-# reserve
+# **RE**serve
 
 <table border="0" cellpadding="2" cellspacing="0">
     <tr>
@@ -10,7 +10,7 @@
           <i>verse proxy</i><br />
           <i>gexp-based</i><br />
           <i>useable</i><br />
-          <strong>SERVE</strong>
+          <strong>serve</strong>
         </td>
     </tr>
 </table>
@@ -71,7 +71,7 @@ For instance, the definition of a server that **exposes files** of the current f
   }
 }
 ```
-* By default, **reserve** will look for a file named `reserve.json` in the current folder:
+* By default, it will look for a file named `reserve.json` in the current folder:
 
 ```json
 {
@@ -231,6 +231,8 @@ Recursion is allowed but not secured (beware of loops).
 
 ## file
 
+Answers the request using **file system**.
+
 Example:
 ```json
 {
@@ -247,6 +249,8 @@ Example:
 * Mime type computation is based on [mime](https://www.npmjs.com/package/mime)
 
 ## url
+
+Answers the request by **forwarding** it to a different URL.
 
 Example:
 ```json
@@ -269,6 +273,8 @@ Example:
 
 ## custom
 
+Enables **custom** handlers.
+
 Example:
 ```javascript
 {
@@ -287,6 +293,8 @@ Example:
 * If the `response` is not [finished](https://nodejs.org/api/http.html#http_response_finished) after executing the function, the `request` is going over the remaining mappings
 
 ## status
+
+**Ends** the request with a given status.
 
 Example:
 ```json
