@@ -44,7 +44,7 @@ By defining **an array of mappings**, one can decide how the server will process
 
 The configuration syntax favors **simplicity** without dropping flexibility.
 
-For instance, the definition of a server that **exposes files** of the current folder but **forbids access** to the folder `private` consists in:
+For instance, the definition of a server that **exposes files** of the current directory but **forbids access** to the directory `private` consists in:
 
 ```json
 {
@@ -71,18 +71,8 @@ For instance, the definition of a server that **exposes files** of the current f
   }
 }
 ```
-* By default, it will look for a file named `reserve.json` in the current folder:
 
-```json
-{
-  "port": 8080,
-  "mappings": [{
-    "match": "^/(.*)",
-    "file": "./$1"
-  }]
-}
-```
-
+* By default, it will look for a file named `reserve.json` in the current working directory.
 * A configuration file name can be specified using `--config <file name>`, for instance:
 
 ```json
@@ -117,11 +107,11 @@ The resulting object implements the [EventEmitter](https://nodejs.org/api/events
 
 | Event | Parameter (object containing members) | Description |
 |---|---|---|
-| **ready** | url *(String, example: `'http://127.0.0.1:5002/'`)*| The server is listening and ready to receive requests
-| **incoming** | method *(String, example: `'GET'`)*, url *(String)*, start *(Date)* | New request received, these parameters are also transmitted to **error**, **redirecting** and **redirected** events |
-| **error** | reason *(Any)* | Error reason, contains **incoming** parameters if related to a request |
-| **redirecting** | type *(Handler type, example: `'status'`)*, redirect *(String or Number, example: `403`)* | Processing redirection to handler, gives handler type and redirection value |
-| **redirected** | end *(Date)*, timeSpent *(Number of ms)*, statusCode *(Number)* | Request is fully processed |
+| **ready** | `url` *(String, example: `'http://127.0.0.1:8080/'`)*| The server is listening and ready to receive requests
+| **incoming** | `method` *(String, example: `'GET'`)*, `url` *(String)*, `start` *(Date)* | New request received, these parameters are also transmitted to **error**, **redirecting** and **redirected** events |
+| **error** | `reason` *(Any)* | Error reason, contains **incoming** parameters if related to a request |
+| **redirecting** | `type` *(Handler type, example: `'status'`)*, `redirect` *(String or Number, example: `403`)* | Processing redirection to handler, gives handler type and redirection value. <br />*For instance, when a request will be served by the file handler, this event is generated once. But if the [file](#file) does not exist, the request will be redirected to the [status](#status) 404 triggering again this event.* |
+| **redirected** | `end` *(Date)*, `timeSpent` *(Number of ms)*, `statusCode` *(Number)* | Request is fully processed. `timeSpent` is evaluated by comparing `start` and `end` (i.e. not using high resolution timers) and provided for information only. |
 
 The package also gives access to the configuration reader:
 
@@ -173,16 +163,19 @@ The object must contain:
 * `cert`: a relative or absolute path to the certificate file
 * `key`: a relative or absolute path to the key file
 
-If relative, the configuration file folder or the current working folder (when embedding) is considered.
+If relative, the configuration file directory or the current working directory (when embedding) is considered.
 
 ## mappings
 
 An array of mappings that is evaluated in the order of declaration.
+* Several mappings may apply to the same request
+* Evaluation stops when the request is answered (i.e. [finished](https://nodejs.org/api/http.html#http_response_finished))
+* When a handler triggers a redirection, the array of mappings is reevaluated
 
 Each mapping must contain:
 * `match`: a string (converted to a regular expression) or a regular expression that will be applied to the request URL
 * the handler key (`custom`, `file`, `status`, `url` ...) which value may contain capturing groups *(see [handlers](#handlers))*
-* `cwd` *(optional)*: the folder to consider for relative path, defaulted to the configuration file folder or the current working folder (when embedding)
+* `cwd` *(optional)*: the current working directory to consider for relative path, defaulted to the configuration file directory or the current working directory (when embedding)
 
 **NOTE**: when using `custom` in a [JSON](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON) file, since functions can't be used in this format, the expected value is a string referencing the relative or absolute module to load. If relative, the `cwd` member is considered.
 
@@ -218,14 +211,11 @@ module.exports = (request, response) => {
 *Only for JSON configuration*
 
 A relative or absolute path to another configuration file to extend.
-If relative, the current configuration file folder is considered.
+If relative, the current configuration file directory is considered.
 
-The current settings always overwrite the ones coming from the extended configuration file.
+The current settings overwrite the ones coming from the extended configuration file.
 
-The only exception is `mappings`.
-Extended mappings are imported in a way that makes them have a lower priority than the current one.
-
-Recursion is allowed but not secured (beware of loops).
+Extended `mappings` are imported at the end of the resulting array, making the current ones being evaluated first. This way, it is possible to override the extended mappings.
 
 # Handlers
 
@@ -243,8 +233,8 @@ Example:
 
 * Only supports [GET](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET)
 * Capturing groups can be used as substitution parameters
-* Absolute or relative to the handler's `cwd` member *(see [mappings]()#mappings)*
-* Folder access is internally redirected to the inner `index.html` file *(if any)* or `403` status
+* Absolute or relative to the handler's `cwd` member *(see [mappings](#mappings))*
+* Directory access is internally redirected to the inner `index.html` file *(if any)* or `404` status
 * File access returns `404` status if missing or can't be read
 * Mime type computation is based on [mime](https://www.npmjs.com/package/mime)
 
@@ -261,7 +251,7 @@ Example:
 }
 ```
 
-* Supports [all methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods)
+* Supports [all HTTP methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods)
 * Capturing groups can be used as substitution parameters
 * Redirects to any URL (http or https)
 
@@ -289,7 +279,7 @@ Example:
 * That takes at least two parameters: [`request`](https://nodejs.org/api/http.html#http_class_http_incomingmessage) and [`response`](https://nodejs.org/api/http.html#http_class_http_serverresponse)
 * Capturing groups' values are passed as additional parameters.
 * This function must return a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-* If the promise is resolved to a value (i.e. not `undefined`), an internal redirection occurs (i.e. the request is going over the mappings again)
+* If the promise is resolved to a value (i.e. not `undefined`), an internal redirection occurs i.e. the request is going over the mappings again (*infinite loops are not prevented*).
 * If the `response` is not [finished](https://nodejs.org/api/http.html#http_response_finished) after executing the function, the `request` is going over the remaining mappings
 
 ## status
@@ -304,7 +294,7 @@ Example:
 }
 ```
 
-* Supports [all methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods)
+* Supports [all HTTP methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods)
 * Accepts only Numbers
 * Used when an internal redirection to a Number occurs
 * Capturing groups are ignored
