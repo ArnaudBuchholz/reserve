@@ -24,7 +24,7 @@ function sendFile (response, filePath, stat) {
 function sendIndex (response, folderPath) {
   const indexPath = path.join(folderPath, 'index.html')
   return statAsync(indexPath)
-    .then(stat => sendFile(response, indexPath, stat), () => 403)
+    .then(stat => sendFile(response, indexPath, stat), () => 404)
 }
 
 module.exports = {
