@@ -72,7 +72,7 @@ For instance, the definition of a server that **exposes files** of the current d
 }
 ```
 
-* By default, it will look for a file named `reserve.json` in the current working directory.
+* By default, it will look for a file named `reserve.json` in the current working directory
 * A configuration file name can be specified using `--config <file name>`, for instance:
 
 ```json
@@ -110,7 +110,7 @@ The resulting object implements the [EventEmitter](https://nodejs.org/api/events
 | **ready** | `url` *(String, example: `'http://127.0.0.1:8080/'`)*| The server is listening and ready to receive requests
 | **incoming** | `method` *(String, example: `'GET'`)*, `url` *(String)*, `start` *(Date)* | New request received, these parameters are also transmitted to **error**, **redirecting** and **redirected** events |
 | **error** | `reason` *(Any)* | Error reason, contains **incoming** parameters if related to a request |
-| **redirecting** | `type` *(Handler type, example: `'status'`)*, `redirect` *(String or Number, example: `403`)* | Processing redirection to handler, gives handler type and redirection value. <br />*For instance, when a request will be served by the file handler, this event is generated once. But if the [file](#file) does not exist, the request will be redirected to the [status](#status) 404 triggering again this event.* |
+| **redirecting** | `type` *(Handler type, example: `'status'`)*, `redirect` *(String or Number, example: `404`)* | Processing redirection to handler, gives handler type and redirection value. <br />*For instance, when a request will be served by the [file handler](#file), this event is generated once. But if the requested resource does not exist, the request will be redirected to the [status](#status) 404 triggering again this event.* |
 | **redirected** | `end` *(Date)*, `timeSpent` *(Number of ms)*, `statusCode` *(Number)* | Request is fully processed. `timeSpent` is evaluated by comparing `start` and `end` (i.e. not using high resolution timers) and provided for information only. |
 
 The package also gives access to the configuration reader:
