@@ -30,16 +30,12 @@
     return checkFileStatus(url, 404)
   }
 
-  function checkFolderForbidden (url) {
-    return checkFileStatus(url, 403)
-  }
-
   module.exports = function assertions () {
     return tryLoad('/mappings.json', JSON.parse)
       .then(function () { return tryLoad('/proxy/https/arnaudbuchholz.github.io/blog/jsfiddle-assert.js') })
       .then(function () { return tryLoad('/Hello World.txt') })
       .then(function () { return checkFileNotFound('/not-found') })
-      .then(function () { return checkFolderForbidden('/no-index') })
+      .then(function () { return checkFileNotFound('/no-index') })
       .then(function () {
         var token = encodeURIComponent((new Date()).toString())
         return tryLoad('/echo/' + token, function (content) {
