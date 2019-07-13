@@ -152,7 +152,7 @@ describe('handlers/file', () => {
       })
   })
 
-  it('fails with 403 if the folder does not have index.html', () => {
+  it('fails with 404 if the folder does not have index.html', () => {
     const request = new Request()
     const response = new Response()
     return fileHandler.redirect({
@@ -164,7 +164,7 @@ describe('handlers/file', () => {
       redirect: './no-index'
     })
       .then(value => {
-        assert(() => value === 403)
+        assert(() => value === 404)
       })
   })
 
