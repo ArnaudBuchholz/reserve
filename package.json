@@ -32,6 +32,7 @@
   "devDependencies": {
     "coveralls": "^3.0.4",
     "gpf-js": "^0.2.9",
+    "lodash": ">=4.17.13",
     "mocha": "^6.1.4",
     "mock-require": "^3.0.3",
     "nyc": "^14.1.1",
