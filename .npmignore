@@ -5,8 +5,9 @@ Desktop.ini
 # Project files & folders
 
 tests
-.travis.yml
 .gitattributes
+.gitignore
+.travis.yml
 
 # Temporary files
 
