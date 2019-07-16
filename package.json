@@ -1,10 +1,13 @@
 {
   "name": "reserve",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Lightweight http server statically configurable using regular expressions",
   "main": "./index.js",
   "bin": {
     "reserve": "./index.js"
+  },
+  "engines": {
+    "node": ">=10.0.0"
   },
   "scripts": {
     "test": "standard && node tests/all.js && nyc mocha",
