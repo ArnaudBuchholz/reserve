@@ -3,10 +3,10 @@
 const mime = require('mime')
 const textMimeType = mime.getType('text')
 const byStatus = {
-  '403': 'Forbidden',
-  '404': 'Not found',
-  '405': 'Method Not Allowed',
-  '500': 'Internal Server Error'
+  403: 'Forbidden',
+  404: 'Not found',
+  405: 'Method Not Allowed',
+  500: 'Internal Server Error'
 }
 
 module.exports = {
