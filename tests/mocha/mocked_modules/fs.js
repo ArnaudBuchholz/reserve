@@ -4,7 +4,7 @@ const path = require('path')
 const Readable = require('stream').Readable
 
 const entries = {
-  'file': {
+  file: {
     content: 'binary'
   },
   'file.txt': {
@@ -13,7 +13,7 @@ const entries = {
   'file$1.txt': {
     content: '$1'
   },
-  'folder': {
+  folder: {
     'index.html': {
       content: '<html />'
     },
