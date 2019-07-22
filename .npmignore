@@ -8,6 +8,8 @@ tests
 .gitattributes
 .gitignore
 .travis.yml
+.nyc_output
+coverage
 
 # Temporary files
 
