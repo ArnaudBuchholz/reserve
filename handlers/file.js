@@ -29,15 +29,31 @@ function sendIndex (response, folderPath) {
 
 module.exports = {
   schema: {},
-  redirect: ({ request, mapping, redirect, response }) => {
+  redirect: async ({ request, mapping, redirect, response }) => {
     if (request.method !== 'GET') {
-      return Promise.resolve(405)
+      return 405
     }
     let filePath = /([^?#]+)/.exec(unescape(redirect))[1] // filter URL parameters & hash
     if (!path.isAbsolute(filePath)) {
       filePath = path.join(mapping.cwd, filePath)
     }
-    return statAsync(filePath)
-      .then(stat => stat.isDirectory() ? sendIndex(response, filePath) : sendFile(response, filePath, stat), () => 404)
+    const directoryAccess = filePath.endsWith('/')
+    if (directoryAccess) {
+      filePath = filePath.substring(0, filePath.length - 1)
+    }
+    let stat
+    try {
+      stat = await statAsync(filePath)
+    } catch (e) {
+      return 404
+    }
+    const isDirectory = stat.isDirectory()
+    if (isDirectory ^ directoryAccess) {
+      return 404
+    }
+    if (isDirectory) {
+      return sendIndex(response, filePath)
+    }
+    return sendFile(response, filePath, stat)
   }
 }
