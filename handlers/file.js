@@ -24,14 +24,14 @@ function sendFile (response, filePath, stat) {
 function sendIndex (response, folderPath) {
   const indexPath = path.join(folderPath, 'index.html')
   return statAsync(indexPath)
-    .then(stat => sendFile(response, indexPath, stat), () => 404)
+    .then(stat => sendFile(response, indexPath, stat))
 }
 
 module.exports = {
   schema: {},
-  redirect: async ({ request, mapping, redirect, response }) => {
+  redirect: ({ request, mapping, redirect, response }) => {
     if (request.method !== 'GET') {
-      return 405
+      return Promise.resolve(405)
     }
     let filePath = /([^?#]+)/.exec(unescape(redirect))[1] // filter URL parameters & hash
     if (!path.isAbsolute(filePath)) {
@@ -41,19 +41,17 @@ module.exports = {
     if (directoryAccess) {
       filePath = filePath.substring(0, filePath.length - 1)
     }
-    let stat
-    try {
-      stat = await statAsync(filePath)
-    } catch (e) {
-      return 404
-    }
-    const isDirectory = stat.isDirectory()
-    if (isDirectory ^ directoryAccess) {
-      return 404
-    }
-    if (isDirectory) {
-      return sendIndex(response, filePath)
-    }
-    return sendFile(response, filePath, stat)
+    return statAsync(filePath)
+      .then(stat => {
+        const isDirectory = stat.isDirectory()
+        if (isDirectory ^ directoryAccess) {
+          return 404
+        }
+        if (isDirectory) {
+          return sendIndex(response, filePath)
+        }
+        return sendFile(response, filePath, stat)
+      })
+      .catch(() => 404)
   }
 }
