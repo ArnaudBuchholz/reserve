@@ -37,7 +37,7 @@ module.exports = {
     if (!path.isAbsolute(filePath)) {
       filePath = path.join(mapping.cwd, filePath)
     }
-    const directoryAccess = filePath.endsWith('/')
+    const directoryAccess = !!filePath.match(/(\\|\/)$/) // Test known path separators
     if (directoryAccess) {
       filePath = filePath.substring(0, filePath.length - 1)
     }
