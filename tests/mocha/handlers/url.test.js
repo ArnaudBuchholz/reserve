@@ -24,7 +24,7 @@ describe('handlers/url', () => {
     const request = new Request('GET', 'http://example.com/whatever', {
       'x-status-code': 200,
       'x-value-1': 'test',
-      'host': 'http://example.com'
+      host: 'http://example.com'
     }, 'Hello World!')
     const response = new Response()
     return urlHandler.redirect({
