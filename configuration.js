@@ -29,7 +29,7 @@ const defaults = {
 
 function applyDefaults (configuration) {
   Object.keys(defaults).forEach(property => {
-    if (!configuration.hasOwnProperty(property)) {
+    if (!Object.prototype.hasOwnProperty.call(configuration, property)) {
       configuration[property] = defaults[property]
     }
   })
