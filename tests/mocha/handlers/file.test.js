@@ -82,7 +82,23 @@ describe('handlers/file', () => {
       })
   })
 
-  it('sends index.html if accessing a folder', () => {
+  it('checks file access (url must *not* end with /)', () => {
+    const request = new Request()
+    const response = new Response()
+    return fileHandler.redirect({
+      request,
+      response,
+      mapping: {
+        cwd: '/'
+      },
+      redirect: './file.txt/'
+    })
+      .then(value => {
+        assert(() => value === 404)
+      })
+  })
+
+  it('checks folder access (url must end with /)', () => {
     const request = new Request()
     const response = new Response()
     return fileHandler.redirect({
@@ -92,6 +108,22 @@ describe('handlers/file', () => {
         cwd: '/'
       },
       redirect: './folder'
+    })
+      .then(value => {
+        assert(() => value === 404)
+      })
+  })
+
+  it('sends index.html if accessing a folder', () => {
+    const request = new Request()
+    const response = new Response()
+    return fileHandler.redirect({
+      request,
+      response,
+      mapping: {
+        cwd: '/'
+      },
+      redirect: './folder/'
     })
       .then(value => {
         assert(() => value === undefined)
@@ -161,7 +193,7 @@ describe('handlers/file', () => {
       mapping: {
         cwd: '/'
       },
-      redirect: './no-index'
+      redirect: './no-index/'
     })
       .then(value => {
         assert(() => value === 404)
