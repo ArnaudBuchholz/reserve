@@ -20,7 +20,10 @@ function unsecureCookies (headers) {
 
 module.exports = {
   schema: {
-    'unsecure-cookies': 'boolean'
+    'unsecure-cookies': {
+      type: 'boolean',
+      defaultValue: false
+    }
   },
   redirect: ({ mapping, redirect, request, response }) => new Promise((resolve, reject) => {
     const url = redirect
