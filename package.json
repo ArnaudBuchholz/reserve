@@ -3,7 +3,7 @@
   "version": "1.0.5",
   "description": "Lightweight http server statically configurable using regular expressions",
   "main": "./index.js",
-  files: [
+  "files": [
     "handlers/*.js",
     "*.js"
   ],
