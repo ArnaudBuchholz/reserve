@@ -77,22 +77,22 @@ async function checkProtocol (configuration) {
   }
 }
 
-function checkMappings (configuration) {
-  configuration.mappings.forEach(mapping => {
-    if (typeof mapping.match === 'string') {
-      if (!mapping.cwd) {
-        mapping.cwd = process.cwd()
-      }
-      mapping.match = new RegExp(mapping.match)
-      const { handler } = configuration.handler(mapping)
-      if (!handler) {
-        throw new Error('Unknown handler for mapping: ' + JSON.stringify(mapping))
-      }
-      if (handler.schema.custom === 'function' && typeof mapping.custom === 'string') {
-        mapping.custom = require(path.join(mapping.cwd, mapping.custom))
-      }
+async function checkMappings (configuration) {
+  for await (const mapping of configuration.mappings) {
+    if (!mapping.cwd) {
+      mapping.cwd = process.cwd()
     }
-  })
+    if (typeof mapping.match === 'string') {
+      mapping.match = new RegExp(mapping.match)
+    }
+    const { handler } = configuration.handler(mapping)
+    if (!handler) {
+      throw new Error('Unknown handler for mapping: ' + JSON.stringify(mapping))
+    }
+    if (handler.validate) {
+      await handler.validate(mapping)
+    }
+  }
 }
 
 function setCwd (folderPath, configuration) {
@@ -135,7 +135,7 @@ module.exports = {
     applyDefaults(checkedConfiguration)
     setHandlers(checkedConfiguration)
     await checkProtocol(checkedConfiguration)
-    checkMappings(checkedConfiguration)
+    await checkMappings(checkedConfiguration)
     return checkedConfiguration
   },
 
