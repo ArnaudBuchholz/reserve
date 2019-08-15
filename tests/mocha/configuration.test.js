@@ -105,8 +105,8 @@ describe('configuration', () => {
         }]
       })
         .then(configuration => {
-          assert(() => typeof configuration.mappings[0].custom === 'function')
-          return configuration.mappings[0].custom()
+          assert(() => typeof configuration.mappings[0]._callback === 'function')
+          return configuration.mappings[0]._callback()
         })
     })
 
