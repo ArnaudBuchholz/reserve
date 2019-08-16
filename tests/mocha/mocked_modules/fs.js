@@ -3,6 +3,11 @@
 const path = require('path')
 const Readable = require('stream').Readable
 
+let fakeNow = 0
+function fakeNowInMs () {
+  return ++fakeNow
+}
+
 const entries = {
   file: {
     content: 'binary'
@@ -63,7 +68,7 @@ const entries = {
   },
   'not-now.js': {
     content: '',
-    mtime: new Date()
+    mtimeMs: fakeNowInMs()
   }
 }
 
@@ -85,12 +90,12 @@ require('mock-require')('fs', {
         callback(null, {
           isDirectory: () => false,
           size: entry.content.length,
-          mtime: entry.mtime || new Date()
+          mtimeMs: entry.mtimeMs || fakeNowInMs()
         })
       } else {
         callback(null, {
           isDirectory: () => true,
-          mtime: entry.mtime || new Date()
+          mtimeMs: entry.mtimeMs || fakeNowInMs()
         })
       }
     } else {
