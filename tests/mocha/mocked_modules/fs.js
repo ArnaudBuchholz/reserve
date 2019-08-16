@@ -57,7 +57,14 @@ const entries = {
       }]
     })
   },
-  'no-index': {}
+  'no-index': {},
+  'now.js': {
+    content: ''
+  },
+  'not-now.js': {
+    content: '',
+    mtime: new Date()
+  }
 }
 
 function getEntry (entryPath) {
@@ -77,12 +84,13 @@ require('mock-require')('fs', {
       if (entry.content) {
         callback(null, {
           isDirectory: () => false,
-          size: entry.content.length
+          size: entry.content.length,
+          mtime: entry.mtime || new Date()
         })
       } else {
         callback(null, {
           isDirectory: () => true,
-          mtime: new Date()
+          mtime: entry.mtime || new Date()
         })
       }
     } else {
