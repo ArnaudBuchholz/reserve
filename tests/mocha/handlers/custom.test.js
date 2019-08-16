@@ -1,5 +1,6 @@
 'use strict'
 
+const mockRequire = require('mock-require')
 const assert = require('../assert')
 const Request = require('../Request')
 const Response = require('../Response')
@@ -82,5 +83,69 @@ describe('handlers/custom', () => {
       }, reason => {
         assert(() => reason.message === 'KO')
       })
+  })
+
+  it('implements file watching (timestamp changes)', async () => {
+    const request = new Request()
+    const response1 = new Response()
+    const mapping = {
+      cwd: '/',
+      custom: 'now.js',
+      watch: true
+    }
+    mockRequire('/now.js', (request, response) => response.end('first'))
+    await customHandler.validate(mapping)
+    await customHandler.redirect({
+      request,
+      response: response1,
+      mapping,
+      match: []
+    })
+    const mtime1 = mapping._mtime
+    assert(() => response1.toString() === 'first')
+    assert(() => mtime1)
+
+    const response2 = new Response()
+    mockRequire('/now.js', (request, response) => response.end('second'))
+    await customHandler.redirect({
+      request,
+      response: response2,
+      mapping,
+      match: []
+    })
+    assert(() => response2.toString() === 'second')
+    assert(() => mapping._mtime.getTime() !== mtime1.getTime())
+  })
+
+  it('implements file watching (timestamp remains the same)', async () => {
+    const request = new Request()
+    const response1 = new Response()
+    const mapping = {
+      cwd: '/',
+      custom: 'not-now.js',
+      watch: true
+    }
+    mockRequire('/not-now.js', (request, response) => response.end('first'))
+    await customHandler.validate(mapping)
+    await customHandler.redirect({
+      request,
+      response: response1,
+      mapping,
+      match: []
+    })
+    const mtime1 = mapping._mtime
+    assert(() => response1.toString() === 'first')
+    assert(() => mtime1)
+
+    const response2 = new Response()
+    mockRequire('/not-now.js', (request, response) => response.end('second'))
+    await customHandler.redirect({
+      request,
+      response: response2,
+      mapping,
+      match: []
+    })
+    assert(() => response2.toString() === 'first')
+    assert(() => mapping._mtime.getTime() === mtime1.getTime())
   })
 })
