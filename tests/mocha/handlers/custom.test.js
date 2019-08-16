@@ -101,9 +101,9 @@ describe('handlers/custom', () => {
       mapping,
       match: []
     })
-    const mtime1 = mapping._mtime
+    const timestamp1 = mapping._timestamp
     assert(() => response1.toString() === 'first')
-    assert(() => mtime1)
+    assert(() => timestamp1)
 
     const response2 = new Response()
     mockRequire('/now.js', (request, response) => response.end('second'))
@@ -114,7 +114,7 @@ describe('handlers/custom', () => {
       match: []
     })
     assert(() => response2.toString() === 'second')
-    assert(() => mapping._mtime.getTime() !== mtime1.getTime())
+    assert(() => mapping._timestamp !== timestamp1)
   })
 
   it('implements file watching (timestamp remains the same)', async () => {
@@ -133,9 +133,9 @@ describe('handlers/custom', () => {
       mapping,
       match: []
     })
-    const mtime1 = mapping._mtime
+    const timestamp1 = mapping._timestamp
     assert(() => response1.toString() === 'first')
-    assert(() => mtime1)
+    assert(() => timestamp1)
 
     const response2 = new Response()
     mockRequire('/not-now.js', (request, response) => response.end('second'))
@@ -146,6 +146,6 @@ describe('handlers/custom', () => {
       match: []
     })
     assert(() => response2.toString() === 'first')
-    assert(() => mapping._mtime.getTime() === mtime1.getTime())
+    assert(() => mapping._timestamp === timestamp1)
   })
 })
