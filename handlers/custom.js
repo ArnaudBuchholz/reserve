@@ -21,7 +21,7 @@ module.exports = {
         mapping._mtime = (await statAsync(mapping._path)).mtime
       }
     } else {
-      mapping._callback = mapping.custom;
+      mapping._callback = mapping.custom
     }
   },
   redirect: async ({ mapping, match, request, response }) => {
