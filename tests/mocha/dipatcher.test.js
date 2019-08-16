@@ -10,6 +10,13 @@ const dispatcher = require('../../dispatcher')
 
 const textMimeType = mime.getType('text')
 const sampleConfPromise = check({
+  handlers: {
+    fail: {
+      redirect: function fail () {
+        throw new Error('FAIL')
+      }
+    }
+  },
   mappings: [{
     match: '/redirect',
     custom: async function redirect () {
@@ -20,6 +27,9 @@ const sampleConfPromise = check({
     custom: async function err404 () {
       return 404
     }
+  }, {
+    match: '/fail',
+    fail: true
   }, {
     match: '/throw',
     custom: function throw_ () {
@@ -175,7 +185,29 @@ describe('dispatcher', () => {
     })
   })
 
-  it('supports internal error', async () => {
+  it('supports internal handler error', async () => {
+    const sampleConf = await sampleConfPromise
+    const request = new Request('GET', '/fail')
+    const response = new Response()
+    const emitter = new RecordedEventEmitter()
+    return new Promise((resolve, reject) => {
+      let errorThrown = false
+      emitter
+        .on('error', () => { errorThrown = true })
+        .on('redirected', parameters => {
+          try {
+            assert(() => response.statusCode === 500)
+            assert(() => errorThrown)
+            resolve()
+          } catch (e) {
+            reject(e)
+          }
+        })
+      dispatcher.call(emitter, sampleConf, request, response)
+    })
+  })
+
+  it('supports internal custom error', async () => {
     const sampleConf = await sampleConfPromise
     const request = new Request('GET', '/throw')
     const response = new Response()
