@@ -9,7 +9,7 @@ describe('handlers/custom', () => {
   it('returns a promise', () => {
     const request = new Request()
     const response = new Response()
-    const result = customHandler.redirect({ request, response, mapping: { custom: () => {} }, match: [] })
+    const result = customHandler.redirect({ request, response, mapping: { _callback: () => {} }, match: [] })
     assert(() => typeof result.then === 'function')
   })
 
@@ -20,7 +20,7 @@ describe('handlers/custom', () => {
       request,
       response,
       mapping: {
-        custom: (receivedRequest, receivedResponse, ...additionalParameters) => {
+        _callback: (receivedRequest, receivedResponse, ...additionalParameters) => {
           assert(() => receivedRequest === request)
           assert(() => receivedResponse === response)
           assert(() => additionalParameters.length === 2)
@@ -39,7 +39,7 @@ describe('handlers/custom', () => {
       request,
       response,
       mapping: {
-        custom: () => Promise.resolve('OK')
+        _callback: async () => 'OK'
       },
       match: []
     })
@@ -49,22 +49,21 @@ describe('handlers/custom', () => {
   it('lets any exception flow (will be intercepted by dispatcher)', () => {
     const request = new Request()
     const response = new Response()
-    let exception
-    try {
-      customHandler.redirect({
-        request,
-        response,
-        mapping: {
-          custom: () => {
-            throw new Error('KO')
-          }
-        },
-        match: []
+    return customHandler.redirect({
+      request,
+      response,
+      mapping: {
+        _callback: () => {
+          throw new Error('KO')
+        }
+      },
+      match: []
+    })
+      .then(() => {
+        assert(() => false)
+      }, reason => {
+        assert(() => reason.message === 'KO')
       })
-    } catch (e) {
-      exception = e
-    }
-    assert(() => !!exception)
   })
 
   it('returns any rejected promise (will be intercepted by dispatcher)', () => {
@@ -74,9 +73,7 @@ describe('handlers/custom', () => {
       request,
       response,
       mapping: {
-        custom: () => {
-          return new Promise((resolve, reject) => reject(new Error('KO')))
-        }
+        _callback: () => Promise.reject(new Error('KO'))
       },
       match: []
     })
