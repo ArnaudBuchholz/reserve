@@ -81,7 +81,8 @@ require('mock-require')('fs', {
         })
       } else {
         callback(null, {
-          isDirectory: () => true
+          isDirectory: () => true,
+          mtime: new Date()
         })
       }
     } else {
