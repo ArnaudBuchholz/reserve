@@ -18,17 +18,17 @@ module.exports = {
       mapping._path = path.join(mapping.cwd, mapping.custom)
       mapping._callback = require(mapping._path)
       if (mapping.watch) {
-        mapping._mtime = (await statAsync(mapping._path)).mtime
+        mapping._timestamp = (await statAsync(mapping._path)).mtimeMs
       }
     } else {
       mapping._callback = mapping.custom
     }
   },
   redirect: async ({ mapping, match, request, response }) => {
-    if (mapping._mtime) {
-      const mtime = (await statAsync(mapping._path)).mtime
-      if (mtime !== mapping._mtime) {
-        mapping._mtime = mtime
+    if (mapping._timestamp) {
+      const timestamp = (await statAsync(mapping._path)).mtimeMs
+      if (timestamp !== mapping._timestamp) {
+        mapping._timestamp = timestamp
         delete require.cache[mapping._path]
         mapping._callback = require(mapping._path)
       }
