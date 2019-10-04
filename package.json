@@ -38,6 +38,7 @@
   "homepage": "https://github.com/ArnaudBuchholz/reserve#readme",
   "devDependencies": {
     "coveralls": "^3.0.4",
+    "eslint-utils": ">=1.4.1",
     "gpf-js": "^0.2.9",
     "lodash": ">=4.17.13",
     "mocha": "^6.1.4",
