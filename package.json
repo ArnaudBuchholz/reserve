@@ -5,6 +5,8 @@
   "main": "./index.js",
   "files": [
     "handlers/*.js",
+    "tests/mocha/Request.js",
+    "tests/mocha/Response.js",
     "*.js"
   ],
   "bin": {
