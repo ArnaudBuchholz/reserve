@@ -2,11 +2,13 @@
 
 function redirected () {
   const end = new Date()
-  this.eventEmitter.emit('redirected', Object.assign(this.emitParameters, {
+  const redirectedInfos = Object.assign(this.emitParameters, {
     end,
     timeSpent: end - this.emitParameters.start,
     statusCode: this.response.statusCode
-  }))
+  })
+  this.eventEmitter.emit('redirected', redirectedInfos)
+  this.resolve(redirectedInfos)
 }
 
 function error (reason) {
@@ -71,12 +73,18 @@ module.exports = function (configuration, request, response) {
     url: request.url,
     start: new Date()
   }
+  let dispatchResolver
+  const promise = new Promise(resolve => {
+    dispatchResolver = resolve
+  })
   this.emit('incoming', emitParameters)
   dispatch.call({
     eventEmitter: this,
     emitParameters,
     configuration,
     request,
-    response
+    response,
+    resolve: dispatchResolver
   }, request.url)
+  return promise
 }
