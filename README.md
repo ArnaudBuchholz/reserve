@@ -328,3 +328,39 @@ Example :
 | 404 | Not found |
 | 405 | Method Not Allowed |
 | 500 | Internal Server Error |
+
+# Mocking
+
+Since version 1.1.0, the package includes the helper `reserve/mock` to build tests. This method receives a configuration (like `reserve/serve`) and returns a promise resolving to an [EventEmitter](https://nodejs.org/api/events.html)  augmented with a `request` method :
+
+```javascript
+function request (method, url, headers = {}, body = '') {
+  return Promise.resolve(mockedResponse)
+}
+```
+
+Call the `request` method to simulate an incoming request, it returns a promise resolving to a mocked response exposing the following memebers :
+
+| Member | Type | Description |
+|---|---|---|
+| **headers** | Object | Response headers
+| **statusCode** | Number | Status code
+| **finished** | Boolean | `true`
+| **toString()** | String | Gives the response body
+
+Example :
+
+```javascript
+require('reserve/mock')({
+  port: 8080,
+  mappings: [{
+    match: /^\/(.*)/,
+    file: path.join(__dirname, '$1')
+  }]
+})
+  .then(mocked => mocked.request('GET', '/'))
+  .then(response => {
+    assert(response.statusCode === 200)
+    assert(response.toString() === '<html />')
+  })
+```
