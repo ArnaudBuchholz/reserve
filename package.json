@@ -56,7 +56,8 @@
     "globals": [
       "process",
       "describe",
-      "it"
+      "it",
+      "before"
     ]
   },
   "mocha": {
