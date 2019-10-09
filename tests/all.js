@@ -46,7 +46,7 @@ async function all () {
     await testServer('https://localhost:5001', '--config', 'https.json')
     process.chdir('./sub')
     await testServer('http://localhost:5002')
-    console.error(`All tests succeeded`.green)
+    console.error('All tests succeeded'.green)
   } catch (e) {
     console.error(e.toString().red)
   } finally {
