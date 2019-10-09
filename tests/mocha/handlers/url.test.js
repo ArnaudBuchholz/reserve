@@ -37,7 +37,7 @@ describe('handlers/url', () => {
         assert(() => value === undefined)
         assert(() => response.statusCode === 200)
         assert(() => response.headers['x-value-1'] === 'test')
-        assert(() => response.headers['host'] === undefined)
+        assert(() => response.headers.host === undefined)
         assert(() => response.toString() === 'Hello World!')
       })
   })
