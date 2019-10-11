@@ -9,7 +9,7 @@ try {
 const app = 'application'
 const html = 'text/html'
 const jpeg = 'image/jpeg'
-const text = `${app}/text`
+const text = 'text/plain'
 
 const types = {
   bin: `${app}/octet-stream`,
