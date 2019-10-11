@@ -4,6 +4,7 @@ const assert = require('./assert')
 const { read, check } = require('../../configuration')
 
 const shouldFail = promise => promise.then(() => {
+  /* istanbul ignore next */ // We don't expect it to happen !
   assert(() => false) // Not expected
 }, () => {
   assert(() => true) // expected
@@ -128,7 +129,7 @@ describe('configuration', () => {
       return check({
         handlers: {
           mock: {
-            redirect: () => Promise.resolve()
+            redirect: async () => {}
           }
         },
         mappings: [{
