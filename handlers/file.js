@@ -1,7 +1,7 @@
 'use strict'
 
 const fs = require('fs')
-const mime = require('mime')
+const mime = require('../detect/mime')
 const path = require('path')
 const util = require('util')
 
