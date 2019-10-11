@@ -6,11 +6,13 @@ const { read } = require('../../configuration')
 
 function promisify (configuration, callback) {
   return new Promise((resolve, reject) => {
+    /* istanbul ignore next */ // We don't expect it to happen !
+    function unexpectedError (parameters) {
+      reject(parameters.error)
+    }
+
     serve(configuration)
-      .on('error', parameters => {
-        /* istanbul ignore next */ // We don't expect it to happen !
-        reject(parameters.error)
-      })
+      .on('error', unexpectedError)
       .on('ready', parameters => {
         try {
           callback(parameters)
@@ -37,6 +39,11 @@ describe('serve', () => {
   )
 
   it('transmits server creation error', done => {
+    /* istanbul ignore next */ // We don't expect it to happen !
+    function unexpectedReady () {
+      done(new Error('unexpected'))
+    }
+
     serve({
       hostname: 'error'
     })
@@ -49,9 +56,6 @@ describe('serve', () => {
           done(e)
         }
       })
-      .on('ready', () => {
-        /* istanbul ignore next */ // We don't expect it to happen !
-        done(new Error('unexpected'))
-      })
+      .on('ready', unexpectedReady)
   })
 })
