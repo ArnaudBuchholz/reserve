@@ -6,6 +6,11 @@ const Request = require('../Request')
 const Response = require('../Response')
 const customHandler = require('../../../handlers/custom')
 
+/* istanbul ignore next */ // We don't expect it to happen !
+function unexpectedCall () {
+  assert(() => false)
+}
+
 describe('handlers/custom', () => {
   it('returns a promise', () => {
     const request = new Request()
@@ -60,10 +65,8 @@ describe('handlers/custom', () => {
       },
       match: []
     })
-      .then(() => {
-        /* istanbul ignore next */ // We don't expect it to happen !
-        assert(() => false)
-      }, reason => {
+      .then(unexpectedCall)
+      .catch(reason => {
         assert(() => reason.message === 'KO')
       })
   })
@@ -75,14 +78,14 @@ describe('handlers/custom', () => {
       request,
       response,
       mapping: {
-        _callback: () => Promise.reject(new Error('KO'))
+        _callback: async () => {
+          throw new Error('KO')
+        }
       },
       match: []
     })
-      .then(() => {
-        /* istanbul ignore next */ // We don't expect it to happen !
-        assert(() => false)
-      }, reason => {
+      .then(unexpectedCall)
+      .catch(reason => {
         assert(() => reason.message === 'KO')
       })
   })
@@ -140,7 +143,11 @@ describe('handlers/custom', () => {
     assert(() => timestamp1)
 
     const response2 = new Response()
-    mockRequire('/not-now.js', (request, response) => response.end('second'))
+    /* istanbul ignore next */ // We don't expect it to be called !
+    function wontBeCalled (request, response) {
+      response.end('second')
+    }
+    mockRequire('/not-now.js', wontBeCalled)
     await customHandler.redirect({
       request,
       response: response2,
