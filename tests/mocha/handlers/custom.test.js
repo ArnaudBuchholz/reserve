@@ -61,6 +61,7 @@ describe('handlers/custom', () => {
       match: []
     })
       .then(() => {
+        /* istanbul ignore next */ // We don't expect it to happen !
         assert(() => false)
       }, reason => {
         assert(() => reason.message === 'KO')
@@ -79,6 +80,7 @@ describe('handlers/custom', () => {
       match: []
     })
       .then(() => {
+        /* istanbul ignore next */ // We don't expect it to happen !
         assert(() => false)
       }, reason => {
         assert(() => reason.message === 'KO')
