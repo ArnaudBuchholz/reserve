@@ -44,14 +44,13 @@
     "eslint-utils": ">=1.4.1",
     "gpf-js": "^0.2.9",
     "lodash": ">=4.17.13",
+    "mime": "^2.4.3",
     "mocha": "^6.1.4",
     "mock-require": "^3.0.3",
     "nyc": "^14.1.1",
     "standard": "^14.3.1"
   },
-  "dependencies": {
-    "mime": "^2.4.3"
-  },
+  "dependencies": {},
   "standard": {
     "globals": [
       "process",
