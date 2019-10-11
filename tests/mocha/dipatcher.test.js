@@ -70,21 +70,18 @@ class RecordedEventEmitter extends EventEmitter {
       parameters: Object.assign({}, args[0])
     })
   }
-
-  get emitted () {
-    /* istanbul ignore next */ // Not used yet
-    return this._emitted
-  }
 }
 
 describe('dispatcher', () => {
   function promisify (emitter, callback) {
     return new Promise((resolve, reject) => {
+      /* istanbul ignore next */ // We don't expect it to happen !
+      function unexpectedError (parameters) {
+        reject(parameters.error)
+      }
+
       emitter
-        .on('error', parameters => {
-          /* istanbul ignore next */ // We don't expect it to happen !
-          reject(parameters.error)
-        })
+        .on('error', unexpectedError)
         .on('redirected', parameters => {
           try {
             callback(parameters)
