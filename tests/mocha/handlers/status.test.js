@@ -1,7 +1,7 @@
 'use strict'
 
 const assert = require('../assert')
-const mime = require('mime')
+const mime = require('../../../detect/mime')
 const Response = require('../Response')
 const statusHandler = require('../../../handlers/status')
 
