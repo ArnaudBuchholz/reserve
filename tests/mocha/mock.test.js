@@ -52,5 +52,12 @@ describe('mock', () => {
         assert(() => response.toString() === 'ABCDE')
       })
     )
+
+    it('suports internal redirection', () => mocked.request('GET', '/error')
+      .then(response => {
+        assert(() => response.finished)
+        assert(() => response.statusCode === 500)
+      })
+    )
   })
 })
