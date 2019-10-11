@@ -4,38 +4,37 @@ const assert = require('./assert')
 const serve = require('../../serve')
 const { read } = require('../../configuration')
 
-describe('serve', () => {
-  it('allocates http server', done => {
-    serve({
-      port: 3475
-    })
-      .on('error', parameters => done(parameters.error))
-      .on('ready', ({ url }) => {
+function promisify (configuration, callback) {
+  return new Promise((resolve, reject) => {
+    serve(configuration)
+      .on('error', parameters => {
+        /* istanbul ignore next */ // We don't expect it to happen !
+        reject(parameters.error)
+      })
+      .on('ready', parameters => {
         try {
-          assert(() => url === 'http://127.0.0.1:3475/')
-          done()
+          callback(parameters)
+          resolve()
         } catch (e) {
-          done(e)
+          /* istanbul ignore next */ // We don't expect it to happen !
+          reject(e)
         }
       })
   })
+}
 
-  it('allocates https server', done => {
-    read('/folder/reserve-with-another-port.json')
-      .then(configuration => {
-        serve(configuration)
-          .on('error', parameters => done(parameters.error))
-          .on('ready', ({ url }) => {
-            try {
-              assert(() => url === 'https://127.0.0.1:220103/')
-              done()
-            } catch (e) {
-              done(e)
-            }
-          })
-      })
-      .catch(done)
-  })
+describe('serve', () => {
+  it('allocates http server', () => promisify({
+    port: 3475
+  }, ({ url }) => {
+    assert(() => url === 'http://127.0.0.1:3475/')
+  }))
+
+  it('allocates https server', () => read('/folder/reserve-with-another-port.json')
+    .then(configuration => promisify(configuration, ({ url }) => {
+      assert(() => url === 'https://127.0.0.1:220103/')
+    }))
+  )
 
   it('transmits server creation error', done => {
     serve({
@@ -46,10 +45,12 @@ describe('serve', () => {
           assert(() => parameters.reason.message === 'error')
           done()
         } catch (e) {
+          /* istanbul ignore next */ // We don't expect it to happen !
           done(e)
         }
       })
       .on('ready', () => {
+        /* istanbul ignore next */ // We don't expect it to happen !
         done(new Error('unexpected'))
       })
   })
