@@ -3,10 +3,12 @@
 const assert = require('./assert')
 const { read, check } = require('../../configuration')
 
-const shouldFail = promise => promise.then(() => {
-  /* istanbul ignore next */ // We don't expect it to happen !
-  assert(() => false) // Not expected
-}, () => {
+/* istanbul ignore next */ // We don't expect it to happen !
+function successNotExpected () {
+  assert(() => false)
+}
+
+const shouldFail = promise => promise.then(successNotExpected, () => {
   assert(() => true) // expected
 })
 
@@ -129,7 +131,7 @@ describe('configuration', () => {
       return check({
         handlers: {
           mock: {
-            redirect: async () => {}
+            redirect: async () => 'OK'
           }
         },
         mappings: [{
@@ -138,9 +140,11 @@ describe('configuration', () => {
         }]
       })
         .then(configuration => {
-          assert(() => typeof configuration.handlers.mock.redirect === 'function')
           assert(() => Object.keys(configuration.handlers).length > 4)
+          assert(() => typeof configuration.handlers.mock.redirect === 'function')
+          return configuration.handlers.mock.redirect()
         })
+        .then(value => assert(() => value === 'OK'))
     })
   })
 })
