@@ -1,6 +1,6 @@
 'use strict'
 
-const mime = require('mime')
+const mime = require('../detect/mime')
 const textMimeType = mime.getType('text')
 const byStatus = {
   403: 'Forbidden',
