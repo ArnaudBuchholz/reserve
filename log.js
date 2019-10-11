@@ -1,24 +1,25 @@
 'use strict'
 
-require('colors')
+const colors = require('./detect/colors')
 
 const onError = ({ method, url, reason }) => {
   if (method && url) {
-    console.error('ERROR'.red, method.gray, url.gray, '\n\\____'.red, reason.toString().gray)
+    console.error(colors.red('ERROR'), colors.gray(method), colors.gray(url), colors.red('\n\\____'),
+      colors.gray(reason.toString()))
   } else {
-    console.error('ERROR'.red, reason.toString().gray)
+    console.error(colors.red('ERROR'), colors.gray(reason.toString()))
   }
 }
 
 const onRedirected = ({ method, url, statusCode, timeSpent }) => {
   let report
   if (statusCode > 399) {
-    report = statusCode.toString().red
+    report = colors.red(statusCode.toString())
   } else {
-    report = statusCode.toString().green
+    report = colors.green(statusCode.toString())
   }
-  report += ` ${timeSpent} ms`.magenta
-  console.log('SERVE'.magenta, method.gray, url.gray, report)
+  report += colors.magenta(` ${timeSpent} ms`)
+  console.log(colors.magenta('SERVE'), colors.gray(method), colors.gray(url), report)
 }
 
 const onRedirecting = ({ method, url, type, redirect }) => {
@@ -28,13 +29,14 @@ const onRedirecting = ({ method, url, type, redirect }) => {
   } else {
     redirectLabel = redirect.toString()
   }
-  console.log('RDRCT'.gray, method.gray, url.gray, '\n\\____'.gray, type.gray, redirectLabel.gray)
+  console.log(colors.gray('RDRCT'), colors.gray(method), colors.gray(url), colors.gray('\n\\____'), colors.gray(type),
+    colors.gray(redirectLabel))
 }
 
 module.exports = (serve, verbose) => {
   serve
     .on('ready', ({ url }) => {
-      console.log(`Server running at ${url}`.yellow)
+      console.log(colors.yellow(`Server running at ${url}`))
     })
     .on('error', onError)
     .on('redirected', onRedirected)
