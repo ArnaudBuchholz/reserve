@@ -6,20 +6,20 @@ const { read } = require('./configuration')
 const log = require('./log')
 const serve = require('./serve')
 
-const configurationFileName = process.argv.reduce((name, parameter) => {
-  if (parameter === '--config') {
-    return false
-  }
-  if (name === false) {
-    return parameter
-  }
-  return name
-}, '') || 'reserve.json'
-
-const verbose = process.argv.includes('--verbose')
-
+/* istanbul ignore if */ // Only used for command line
 if (require.main === module) {
-  // command line usage
+  const configurationFileName = process.argv.reduce((name, parameter) => {
+    if (parameter === '--config') {
+      return false
+    }
+    if (name === false) {
+      return parameter
+    }
+    return name
+  }, '') || 'reserve.json'
+
+  const verbose = process.argv.includes('--verbose')
+
   read(configurationFileName)
     .catch(reason => {
       if (verbose) {
