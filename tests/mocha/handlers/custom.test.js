@@ -2,8 +2,8 @@
 
 const mockRequire = require('mock-require')
 const assert = require('../assert')
-const Request = require('../Request')
-const Response = require('../Response')
+const Request = require('../../../mock/Request')
+const Response = require('../../../mock/Response')
 const customHandler = require('../../../handlers/custom')
 
 /* istanbul ignore next */ // We don't expect it to happen !
