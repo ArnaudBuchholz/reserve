@@ -66,7 +66,7 @@ For instance, the definition of a server that **exposes files** of the current d
 |---|---|
 |1.0.0|Initial version|
 |1.0.5|`watch` option in custom handler|
-|1.1.1|[`require('reserve/mock')`](#Mocking)|
+|1.1.1|[`require('reserve/mock')`](#mocking)|
 ||[`colors`](https://www.npmjs.com/package/colors) and [`mime`](https://www.npmjs.com/package/mime) are no more dependencies|
 
 # Usage
