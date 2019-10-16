@@ -3,8 +3,8 @@
 const http = require('../http')
 
 const assert = require('../assert')
-const Request = require('../Request')
-const Response = require('../Response')
+const Request = require('../../../mock/Request')
+const Response = require('../../../mock/Response')
 const urlHandler = require('../../../handlers/url')
 
 describe('handlers/url', () => {
