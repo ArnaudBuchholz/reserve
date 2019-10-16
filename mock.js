@@ -3,8 +3,8 @@
 const { check } = require('./configuration')
 const dispatcher = require('./dispatcher')
 const EventEmitter = require('events')
-const Request = require('./tests/mocha/Request')
-const Response = require('./tests/mocha/Response')
+const Request = require('./mock/Request')
+const Response = require('./mock/Response')
 
 module.exports = (jsonConfiguration, mockedHandlers = {}) => {
   const eventEmitter = new EventEmitter()
