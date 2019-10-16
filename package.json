@@ -1,12 +1,13 @@
 {
   "name": "reserve",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Lightweight http server statically configurable using regular expressions",
   "main": "./index.js",
   "files": [
     "handlers/*.js",
-    "tests/mocha/Request.js",
-    "tests/mocha/Response.js",
+    "detect/*.js",
+    "mock/Request.js",
+    "mock/Response.js",
     "*.js"
   ],
   "bin": {
