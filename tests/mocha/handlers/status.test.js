@@ -2,7 +2,7 @@
 
 const assert = require('../assert')
 const mime = require('../../../detect/mime')
-const Response = require('../Response')
+const Response = require('../../../mock/Response')
 const statusHandler = require('../../../handlers/status')
 
 const textMimeType = mime.getType('text')
