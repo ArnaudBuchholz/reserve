@@ -6,6 +6,7 @@
           <strong>RE</strong>
         </td>
         <td>
+          <i>duced</i></br />
           <i>levant</i></br />
           <i>verse proxy</i><br />
           <i>gexp-based</i><br />
@@ -58,6 +59,15 @@ For instance, the definition of a server that **exposes files** of the current d
   }]
 }
 ```
+
+# What's New ?
+
+|Version|content|
+|---|---|
+|1.0.0|Initial version|
+|1.0.5|`watch` option in custom handler|
+|1.1.1|[`require('reserve/mock')`](#Mocking)|
+||[`colors`](https://www.npmjs.com/package/colors) and [`mime`](https://www.npmjs.com/package/mime) are no more dependencies|
 
 # Usage
 
