@@ -3,8 +3,8 @@
 const assert = require('./assert')
 const mime = require('../../detect/mime')
 const EventEmitter = require('events')
-const Request = require('./Request')
-const Response = require('./Response')
+const Request = require('../../mock/Request')
+const Response = require('../../mock/Response')
 const { check } = require('../../configuration')
 const dispatcher = require('../../dispatcher')
 
