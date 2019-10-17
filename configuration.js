@@ -77,18 +77,31 @@ async function checkProtocol (configuration) {
   }
 }
 
+function checkMappingCwd (mapping) {
+  if (!mapping.cwd) {
+    mapping.cwd = process.cwd()
+  }
+}
+
+function checkMappingMatch (mapping) {
+  if (typeof mapping.match === 'string') {
+    mapping.match = new RegExp(mapping.match)
+  }
+}
+
+function checkMappingHandler (configuration, mapping) {
+  const { handler } = configuration.handler(mapping)
+  if (!handler) {
+    throw new Error('Unknown handler for mapping: ' + JSON.stringify(mapping))
+  }
+  return handler
+}
+
 async function checkMappings (configuration) {
   for await (const mapping of configuration.mappings) {
-    if (!mapping.cwd) {
-      mapping.cwd = process.cwd()
-    }
-    if (typeof mapping.match === 'string') {
-      mapping.match = new RegExp(mapping.match)
-    }
-    const { handler } = configuration.handler(mapping)
-    if (!handler) {
-      throw new Error('Unknown handler for mapping: ' + JSON.stringify(mapping))
-    }
+    checkMappingCwd(mapping)
+    checkMappingMatch(mapping)
+    const handler = checkMappingHandler(configuration, mapping)
     if (handler.validate) {
       await handler.validate(mapping)
     }
