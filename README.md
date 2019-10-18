@@ -151,6 +151,8 @@ read('reserve.json')
   })
 ```
 
+NOTE: log is using [`colors`](https://www.npmjs.com/package/colors) **if installed**.
+
 # Configuration
 
 ## hostname *(optional)*
@@ -246,7 +248,24 @@ Example :
 * Absolute or relative to the handler's `cwd` member *(see [mappings](#mappings))*
 * Directory access is internally redirected to the inner `index.html` file *(if any)* or `404` status
 * File access returns `404` status if missing or can't be read
-* Mime type computation is based on [mime](https://www.npmjs.com/package/mime)
+* Mime type computation is based on [`mime`](https://www.npmjs.com/package/mime) **if installed**. Otherwise a limited subset of mime types is used:
+
+|Extension|mime type|
+|---|---|
+|bin|application/octet-stream|
+|css|text/css|
+|gif|image/gif|
+|html|text/html|
+|htm|text/html|
+|jpeg|image/jpeg|
+|jpg|image/jpeg|
+|js|application/javascript|
+|pdf|application/pdf|
+|png|image/png|
+|svg|image/svg+xml|
+|text|text/plain|
+|txt|text/plain|
+|xml|application/xml|
 
 ## url
 
