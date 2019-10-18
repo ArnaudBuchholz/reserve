@@ -368,7 +368,7 @@ function request (method, url, headers = {}, body = '') {
 }
 ```
 
-Call the `request` method to simulate an incoming request, it returns a promise resolving to a mocked response exposing the following memebers :
+Call the `request` method to simulate an incoming request, it returns a promise resolving to a mocked response exposing the following members :
 
 | Member | Type | Description |
 |---|---|---|
@@ -392,4 +392,35 @@ require('reserve/mock')({
     assert(response.statusCode === 200)
     assert(response.toString() === '<html />')
   })
+```
+
+You may provide mocked handlers *(based on their [actual implementation](https://github.com/ArnaudBuchholz/reserve/tree/master/handlers))*:
+
+```javascript
+require('reserve/mock')({
+  port: 8080,
+  mappings: [{
+    match: /^\/(.*)/,
+    file: path.join(__dirname, '$1')
+  }]
+}, {
+  file: {
+    redirect: async ({ request, mapping, redirect, response }) => {
+      if (redirect === '/') {
+        response.writeHead(201, {
+          'Content-Type': 'text/plain',
+          'Content-Length': 6
+        })
+        response.end('MOCKED')
+      } else {
+        return 500
+      }
+    }
+  }
+})
+  .then(mocked => mocked.request('GET', '/'))
+    .then(response => {
+      assert(response.statusCode === 201)
+      assert(response.toString() === 'MOCKED')
+    })
 ```
