@@ -39,8 +39,9 @@ module.exports = (serve, verbose) => {
       console.log(colors.yellow(`Server running at ${url}`))
     })
     .on('error', onError)
-    .on('redirected', onRedirected)
-
+  if (verbose !== null) {
+    serve.on('redirected', onRedirected)
+  }
   if (verbose) {
     serve.on('redirecting', onRedirecting)
   }
