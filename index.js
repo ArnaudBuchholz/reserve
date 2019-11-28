@@ -19,6 +19,8 @@ if (require.main === module) {
   }, '') || 'reserve.json'
 
   const verbose = process.argv.includes('--verbose')
+  const silent = process.argv.includes('--silent')
+  const logLevel = silent ? null : verbose
 
   read(configurationFileName)
     .catch(reason => {
@@ -29,7 +31,7 @@ if (require.main === module) {
       return {} // empty configuration will use all defaults
     })
     .then(configuration => {
-      log(serve(configuration), verbose)
+      log(serve(configuration), logLevel)
         .on('ready', () => {
           if (process.send) {
             process.send('ready')
