@@ -1,5 +1,7 @@
 'use strict'
 
+const logError = require('./logError')
+
 function redirected () {
   const end = new Date()
   const redirectedInfos = Object.assign(this.emitParameters, {
@@ -12,7 +14,13 @@ function redirected () {
 }
 
 function error (reason) {
-  this.eventEmitter.emit('error', { ...this.emitParameters, reason })
+  const errorParameters = { ...this.emitParameters, reason }
+  try {
+    this.eventEmitter.emit('error', errorParameters)
+  } catch (e) {
+    // Unhandled error
+    logError(errorParameters)
+  }
   return dispatch.call(this, 500)
 }
 
