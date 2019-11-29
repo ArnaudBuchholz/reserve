@@ -1,15 +1,7 @@
 'use strict'
 
 const colors = require('./detect/colors')
-
-const onError = ({ method, url, reason }) => {
-  if (method && url) {
-    console.error(colors.red('ERROR'), colors.gray(method), colors.gray(url), colors.red('\n\\____'),
-      colors.gray(reason.toString()))
-  } else {
-    console.error(colors.red('ERROR'), colors.gray(reason.toString()))
-  }
-}
+const logError = require('./logError')
 
 const onRedirected = ({ method, url, statusCode, timeSpent }) => {
   let report
@@ -38,13 +30,10 @@ module.exports = (serve, verbose) => {
     .on('ready', ({ url }) => {
       console.log(colors.yellow(`Server running at ${url}`))
     })
-    .on('error', onError)
-  if (verbose !== null) {
-    serve.on('redirected', onRedirected)
-  }
+    .on('error', logError)
+    .on('redirected', onRedirected)
   if (verbose) {
     serve.on('redirecting', onRedirecting)
   }
-
   return serve
 }
