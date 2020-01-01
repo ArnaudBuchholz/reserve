@@ -5,6 +5,7 @@ const mime = require('../../../detect/mime')
 const Request = require('../../../mock/Request')
 const Response = require('../../../mock/Response')
 const fileHandler = require('../../../handlers/file')
+const fs = require('fs')
 
 const textMimeType = mime.getType('text')
 const htmlMimeType = mime.getType('html')
@@ -216,4 +217,107 @@ describe('handlers/file', () => {
         assert(() => value === 405)
       })
   }))
+
+  describe('Case insensitive file system', function () {
+    before(() => {
+      fs.setCaseSensitive(false)
+    })
+
+    it('finds the file even if the file name does not match case sensitively', () => {
+      const request = new Request()
+      const response = new Response()
+      return fileHandler.redirect({
+        request,
+        response,
+        mapping: {
+          cwd: '/'
+        },
+        redirect: '/File.txt'
+      })
+        .then(value => {
+          assert(() => value === undefined)
+          assert(() => response.statusCode === 200)
+          assert(() => response.headers['Content-Type'] === textMimeType)
+          assert(() => response.toString() === 'Hello World!')
+        })
+    })
+
+    it('fails with 404 if the file name does not match case sensitively but case-sensitive is set', () => {
+      const request = new Request()
+      const response = new Response()
+      return fileHandler.redirect({
+        request,
+        response,
+        mapping: {
+          cwd: '/',
+          'case-sensitive': true
+        },
+        redirect: '/File.txt'
+      })
+        .then(value => {
+          assert(() => value === 404)
+        })
+    })
+
+    it('finds the file case sensitively when requested', () => {
+      const request = new Request()
+      const response = new Response()
+      return fileHandler.redirect({
+        request,
+        response,
+        mapping: {
+          cwd: '/',
+          'case-sensitive': true
+        },
+        redirect: '/file.txt'
+      })
+        .then(value => {
+          assert(() => value === undefined)
+          assert(() => response.statusCode === 200)
+          assert(() => response.headers['Content-Type'] === textMimeType)
+          assert(() => response.toString() === 'Hello World!')
+        })
+    })
+
+    it('fails with 404 if the file name does not match case sensitively but case-sensitive is set (folder)', () => {
+      const request = new Request()
+      const response = new Response()
+      return fileHandler.redirect({
+        request,
+        response,
+        mapping: {
+          cwd: '/',
+          'case-sensitive': true
+        },
+        redirect: '/Folder/index.html'
+      })
+        .then(value => {
+          assert(() => value === 404)
+        })
+    })
+
+    it('finds the file case sensitively when requested (folder)', () => {
+      const request = new Request()
+      const response = new Response()
+      return fileHandler.redirect({
+        request,
+        response,
+        mapping: {
+          cwd: '/',
+          'case-sensitive': true
+        },
+        redirect: '/folder/index.html'
+      })
+        .then(value => {
+          assert(() => value === undefined)
+          assert(() => response.statusCode === 200)
+          assert(() => response.headers['Content-Type'] === htmlMimeType)
+          assert(() => response.toString() === '<html />')
+        })
+    })
+
+    after(() => {
+      fs.setCaseSensitive(true)
+    })
+  })
 })
