@@ -29,7 +29,7 @@ module.exports = jsonConfiguration => {
     .then(configuration => createServerAsync(configuration, dispatcher.bind(eventEmitter, configuration))
       .then(() => {
         eventEmitter.emit('ready', {
-          url: `${configuration.protocol}://${configuration.hostname}:${configuration.port}/`
+          url: `${configuration.protocol}://${configuration.hostname || '0.0.0.0'}:${configuration.port}/`
         })
       })
     )
