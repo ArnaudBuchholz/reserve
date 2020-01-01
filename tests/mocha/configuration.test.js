@@ -69,7 +69,7 @@ describe('configuration', () => {
       return check({})
         .then(configuration => {
           assert(() => typeof configuration.port === 'number')
-          assert(() => configuration.hostname && typeof configuration.hostname === 'string')
+          assert(() => configuration.hostname === undefined)
           assert(() => configuration.mappings.length === 2)
         })
     })
