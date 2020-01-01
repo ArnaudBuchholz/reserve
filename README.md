@@ -65,10 +65,11 @@ For instance, the definition of a server that **exposes files** of the current d
 |Version|content|
 |---|---|
 |1.0.0|Initial version|
-|1.0.5|`watch` option in custom handler|
+|1.0.5|`watch` option in **custom** handler|
 |1.1.1|[`require('reserve/mock')`](#mocking)|
 ||[`colors`](https://www.npmjs.com/package/colors) and [`mime`](https://www.npmjs.com/package/mime) are no more dependencies|
 |1.1.2|performance testing, `--silent`|
+||`case-sensitive` option in **file** handler|
 
 # Usage
 
@@ -267,6 +268,10 @@ Example :
 |text|text/plain|
 |txt|text/plain|
 |xml|application/xml|
+
+| option | type | default | description |
+|---|---|---|---|
+| `case-sensitive` | Boolean | `false` | *(for Windows)* when `true`, the file path is tested case sensitively. Since it has an impact on **performances**, use carefully. |
 
 ## url
 
