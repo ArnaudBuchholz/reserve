@@ -15,7 +15,7 @@ const defaultHandlers = {
 }
 
 const defaults = {
-  hostname: '127.0.0.1',
+  hostname: undefined,
   port: 5000,
   mappings: [{
     match: /^\/proxy\/(https?)\/(.*)/,
