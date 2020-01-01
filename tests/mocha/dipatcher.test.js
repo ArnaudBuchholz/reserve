@@ -247,4 +247,31 @@ describe('dispatcher', () => {
     dispatcher.call(emitter, sampleConf, request, response)
     return promise
   })
+
+  function promisifyNoError (emitter, callback) {
+    return new Promise((resolve, reject) => {
+      emitter
+        .on('redirected', parameters => {
+          try {
+            callback(parameters)
+            resolve()
+          } catch (e) {
+            /* istanbul ignore next */ // We don't expect it to happen !
+            reject(e)
+          }
+        })
+    })
+  }
+
+  it('logs unhandled errors', async () => {
+    const sampleConf = await sampleConfPromise
+    const request = new Request('GET', '/unhandled')
+    const response = new Response()
+    const emitter = new RecordedEventEmitter()
+    const promise = promisifyNoError(emitter, parameters => {
+      assert(() => response.statusCode === 500)
+    })
+    dispatcher.call(emitter, sampleConf, request, response)
+    return promise
+  })
 })
