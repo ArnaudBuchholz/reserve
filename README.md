@@ -70,6 +70,7 @@ For instance, the definition of a server that **exposes files** of the current d
 ||[`colors`](https://www.npmjs.com/package/colors) and [`mime`](https://www.npmjs.com/package/mime) are no more dependencies|
 |1.1.2|performance testing, `--silent`|
 ||`case-sensitive` option in **file** handler|
+|1.1.3|Default hostname changed to `undefined`|
 
 # Usage
 
@@ -119,7 +120,7 @@ The resulting object implements the [EventEmitter](https://nodejs.org/api/events
 
 | Event | Parameter (object containing members) | Description |
 |---|---|---|
-| **ready** | `url` *(String, example : `'http://127.0.0.1:8080/'`)*| The server is listening and ready to receive requests
+| **ready** | `url` *(String, example : `'http://0.0.0.0:8080/'`)*| The server is listening and ready to receive requests, hostname is replaced with `0.0.0.0` when **unspecified**.
 | **incoming** | `method` *(String, example : `'GET'`)*, `url` *(String)*, `start` *(Date)* | New request received, these parameters are also transmitted to **error**, **redirecting** and **redirected** events |
 | **error** | `reason` *(Any)* | Error reason, contains **incoming** parameters if related to a request |
 | **redirecting** | `type` *(Handler type, example : `'status'`)*, `redirect` *(String or Number, example : `404`)* | Processing redirection to handler, gives handler type and redirection value. <br />*For instance, when a request will be served by the [file handler](#file), this event is generated once. But if the requested resource does not exist, the request will be redirected to the [status](#status) 404 triggering again this event.* |
@@ -161,7 +162,7 @@ NOTE: log is using [`colors`](https://www.npmjs.com/package/colors) **if install
 
 Used to set the `host` parameter when calling http(s) server's [listen](https://nodejs.org/api/net.html#net_server_listen).
 
-Default is `'127.0.01'`.
+Default is `undefined`.
 
 ## port *(optional)*
 
