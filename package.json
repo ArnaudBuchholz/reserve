@@ -20,6 +20,7 @@
     "test": "standard && node tests/all.js && nyc mocha",
     "lint": "standard --fix",
     "mocha": "mocha",
+    "mocha-dbg": "node --inspect-brk node_modules/mocha/bin/_mocha",
     "cover": "nyc mocha && nyc report --reporter=lcov",
     "perf-serve": "node . --config ./tests/http.json --silent",
     "perf-test": "autocannon localhost:5000",
@@ -83,7 +84,8 @@
   "nyc": {
     "check-coverage": true,
     "exclude": [
-      "log.js"
+      "log.js",
+      "logError.js"
     ],
     "branches": 100,
     "lines": 100,
