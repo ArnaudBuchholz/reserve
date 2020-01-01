@@ -7,6 +7,7 @@ const util = require('util')
 
 const defaultMimeType = mime.getType('bin')
 const statAsync = util.promisify(fs.stat)
+const readdirAsync = util.promisify(fs.readdir)
 
 function sendFile (response, filePath, stat) {
   return new Promise((resolve, reject) => {
@@ -27,6 +28,18 @@ function sendIndex (response, folderPath) {
     .then(stat => sendFile(response, indexPath, stat))
 }
 
+async function checkCaseSensitivePath (filePath) {
+  const folderPath = path.dirname(filePath)
+  if (folderPath && folderPath !== filePath) {
+    const name = path.basename(filePath)
+    const names = await readdirAsync(folderPath)
+    if (!names.includes(name)) {
+      throw new Error('Not found')
+    }
+    return checkCaseSensitivePath(folderPath)
+  }
+}
+
 module.exports = {
   schema: {},
   redirect: ({ request, mapping, redirect, response }) => {
@@ -42,7 +55,10 @@ module.exports = {
       filePath = filePath.substring(0, filePath.length - 1)
     }
     return statAsync(filePath)
-      .then(stat => {
+      .then(async stat => {
+        if (mapping['case-sensitive']) {
+          await checkCaseSensitivePath(filePath)
+        }
         const isDirectory = stat.isDirectory()
         if (isDirectory ^ directoryAccess) {
           return 404
