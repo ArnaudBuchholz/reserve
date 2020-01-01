@@ -72,7 +72,15 @@ const entries = {
   }
 }
 
+let caseSensitive = true
+
 function getEntry (entryPath) {
+  if (!caseSensitive) {
+    entryPath = entryPath.toLowerCase()
+  }
+  if (entryPath === '/') {
+    return entries
+  }
   return entryPath.split(path.sep).slice(1).reduce((folder, name) => {
     if (!folder || folder.content) {
       return folder
@@ -82,6 +90,10 @@ function getEntry (entryPath) {
 }
 
 require('mock-require')('fs', {
+
+  setCaseSensitive (value) {
+    caseSensitive = value
+  },
 
   stat (entryPath, callback) {
     const entry = getEntry(entryPath)
@@ -125,5 +137,14 @@ require('mock-require')('fs', {
     } else {
       callback(new Error('not found'))
     }
+  },
+
+  readdir (entryPath, callback) {
+    const entry = getEntry(entryPath)
+    // if (entry && !entry.content) {
+    callback(null, Object.keys(entry))
+    // } else {
+    //   callback(new Error('not found'))
+    // }
   }
 })
