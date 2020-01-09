@@ -50,6 +50,22 @@ function getHandler (handlers, types, mapping) {
   return {}
 }
 
+function checkHandler (handler, type) {
+  if (typeof handler.redirect !== 'function') {
+    throw new Error('Invalid "' + type + '" handler: redirect is not a function')
+  }
+}
+
+function validateHandler (type) {
+  const handlers = this.handlers
+  let handler = handlers[type]
+  if (typeof handler === 'string') {
+    handler = require(handler)
+    handlers[type] = handler
+  }
+  checkHandler(handler, type)
+}
+
 function setHandlers (configuration) {
   if (configuration.handlers) {
     // Default hanlders can't be overridden
@@ -57,6 +73,7 @@ function setHandlers (configuration) {
   } else {
     configuration.handlers = defaultHandlers
   }
+  Object.keys(configuration.handlers).forEach(validateHandler.bind(configuration))
   configuration.handler = getHandler.bind(null, configuration.handlers, Object.keys(configuration.handlers))
 }
 
