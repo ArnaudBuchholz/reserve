@@ -146,5 +146,57 @@ describe('configuration', () => {
         })
         .then(value => assert(() => value === 'OK'))
     })
+
+    it('validates custom handlers', () => shouldFail(check({
+      handlers: {
+        mock: {
+          reidrect: async () => 'OK'
+        }
+      },
+      mappings: [{
+        match: /(.*)/,
+        mock: '$1'
+      }]
+    })))
+
+    it('allows injecting handlers through require', () => {
+      const mockedHandler = {
+        redirect: async () => 'OK'
+      }
+      require('mock-require')('mocked-handler', mockedHandler)
+      return check({
+        handlers: {
+          mock: 'mocked-handler'
+        },
+        mappings: [{
+          match: /(.*)/,
+          mock: '$1'
+        }]
+      })
+        .then(configuration => {
+          assert(() => Object.keys(configuration.handlers).length > 4)
+          assert(() => typeof configuration.handlers.mock.redirect === 'function')
+          return configuration.handlers.mock.redirect()
+        })
+        .then(value => assert(() => value === 'OK'))
+    })
+
+    it('validates injected handlers', () => {
+      const mockedHandler = {
+        reidrect: async () => 'OK'
+      }
+      require('mock-require')('invalid-handler', mockedHandler)
+      return shouldFail(check({
+        handlers: {
+          mock: {
+            reidrect: async () => 'OK'
+          }
+        },
+        mappings: [{
+          match: /(.*)/,
+          mock: '$1'
+        }]
+      }))
+    })
   })
 })
