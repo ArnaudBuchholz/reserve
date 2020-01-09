@@ -71,6 +71,7 @@ For instance, the definition of a server that **exposes files** of the current d
 |1.1.2|performance testing, `--silent`|
 ||`case-sensitive` option in **file** handler|
 |1.1.3|Default hostname changed to `undefined`|
+|1.1.4|Enables external handlers in `json` configuration through [require](https://nodejs.org/api/modules.html#modules_require_id) |
 
 # Usage
 
@@ -179,6 +180,21 @@ The object must contain :
 * `key` : a relative or absolute path to the key file
 
 If relative, the configuration file directory or the current working directory (when embedding) is considered.
+
+## handlers
+
+An object associating an handler prefix to an handler object.
+If the property value is a string, the handler is obtained using  [require](https://nodejs.org/api/modules.html#modules_require_id).
+
+The handler object is defined by:
+* **redirect** an asynchronous function that will be called with an object containing:
+  - **mapping** the mapping being executed
+  - **match** the regular expression [exec result](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec)
+  - **redirect** the value associated with the handler prefix in the mapping. Capturing groups are substituted.
+  - **request** [http.IncomingMessage](https://nodejs.org/api/http.html#http_class_http_incomingmessage)
+  - **response** [http.ServerResponse](https://nodejs.org/api/http.html#http_class_http_serverresponse)
+
+**NOTE** : it is not possible to change the associations of the default prefixes (`custom`, `file`, `status`, `url` ...).
 
 ## mappings
 
@@ -299,7 +315,7 @@ Example :
 
 ## custom
 
-Enables **custom** handlers.
+Enables 'simple' **custom** handlers.
 
 Examples :
 ```javascript
