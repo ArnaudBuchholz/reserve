@@ -12,6 +12,10 @@ const shouldFail = promise => promise.then(successNotExpected, () => {
   assert(() => true) // expected
 })
 
+async function okHandler () {
+  return 'OK'
+}
+
 describe('configuration', () => {
   describe('configuration.read', () => {
     process.mockCwd('/')
@@ -131,7 +135,7 @@ describe('configuration', () => {
       return check({
         handlers: {
           mock: {
-            redirect: async () => 'OK'
+            redirect: okHandler
           }
         },
         mappings: [{
@@ -150,7 +154,7 @@ describe('configuration', () => {
     it('validates custom handlers', () => shouldFail(check({
       handlers: {
         mock: {
-          reidrect: async () => 'OK'
+          reidrect: okHandler
         }
       },
       mappings: [{
@@ -161,7 +165,7 @@ describe('configuration', () => {
 
     it('allows injecting handlers through require', () => {
       const mockedHandler = {
-        redirect: async () => 'OK'
+        redirect: okHandler
       }
       require('mock-require')('mocked-handler', mockedHandler)
       return check({
@@ -183,14 +187,12 @@ describe('configuration', () => {
 
     it('validates injected handlers', () => {
       const mockedHandler = {
-        reidrect: async () => 'OK'
+        reidrect: okHandler
       }
       require('mock-require')('invalid-handler', mockedHandler)
       return shouldFail(check({
         handlers: {
-          mock: {
-            reidrect: async () => 'OK'
-          }
+          mock: 'invalid-handler'
         },
         mappings: [{
           match: /(.*)/,
