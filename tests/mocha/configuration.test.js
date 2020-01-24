@@ -200,5 +200,32 @@ describe('configuration', () => {
         }]
       }))
     })
+
+    it('injects handlers relatively to the reserve.json file (same level)', () => {
+      const mockedHandler = {
+        redirect: okHandler
+      }
+      require('mock-require')('/folder/mocked-relative-handler.js', mockedHandler)
+      return read('/folder/reserve-relative-handler.json')
+        .then(check)
+    })
+
+    it('injects handlers relatively to the reserve.json file (parent)', () => {
+      const mockedHandler = {
+        redirect: okHandler
+      }
+      require('mock-require')('/mocked-parent-handler.js', mockedHandler)
+      return read('/folder/reserve-parent-handler.json')
+        .then(check)
+    })
+
+    it('injects absolute handlers', () => {
+      const mockedHandler = {
+        redirect: okHandler
+      }
+      require('mock-require')('mocked-absolute-handler', mockedHandler)
+      return read('/folder/reserve-absolute-handler.json')
+        .then(check)
+    })
   })
 })
