@@ -71,7 +71,8 @@ For instance, the definition of a server that **exposes files** of the current d
 |1.1.2|performance testing, `--silent`|
 ||`case-sensitive` option in **file** handler|
 |1.1.3|Default hostname changed to `undefined`|
-|1.1.4|Enables external handlers in `json` configuration through [require](https://nodejs.org/api/modules.html#modules_require_id) |
+|1.1.4|Enables external handlers in `json` configuration through [require](https://nodejs.org/api/modules.html#modules_require_id)|
+|1.1.5|Fix relative path use of external handlers in `json` configuration|
 
 # Usage
 
