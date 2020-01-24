@@ -126,6 +126,14 @@ async function checkMappings (configuration) {
 }
 
 function setCwd (folderPath, configuration) {
+  if (configuration.handlers) {
+    Object.keys(configuration.handlers).forEach(prefix => {
+      var handler = configuration.handlers[prefix]
+      if (typeof handler === 'string' && handler.match(/^\.\.?\//)) {
+        configuration.handlers[prefix] = path.join(folderPath, handler)
+      }
+    })
+  }
   if (configuration.mappings) {
     configuration.mappings.forEach(mapping => {
       if (!mapping.cwd) {
