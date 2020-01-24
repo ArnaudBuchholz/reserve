@@ -51,6 +51,39 @@ const entries = {
       content: JSON.stringify({
         extend: './not-found'
       })
+    },
+    'reserve-relative-handler.json': {
+      content: JSON.stringify({
+        handlers: {
+          test: './mocked-relative-handler.js'
+        },
+        mappings: [{
+          match: '.*',
+          test: '$1'
+        }]
+      })
+    },
+    'reserve-parent-handler.json': {
+      content: JSON.stringify({
+        handlers: {
+          test: '../mocked-parent-handler.js'
+        },
+        mappings: [{
+          match: '.*',
+          test: '$1'
+        }]
+      })
+    },
+    'reserve-absolute-handler.json': {
+      content: JSON.stringify({
+        handlers: {
+          test: 'mocked-absolute-handler'
+        },
+        mappings: [{
+          match: '.*',
+          test: '$1'
+        }]
+      })
     }
   },
   'reserve.json': {
