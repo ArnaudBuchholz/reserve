@@ -68,11 +68,12 @@ For instance, the definition of a server that **exposes files** of the current d
 |1.0.5|`watch` option in **custom** handler|
 |1.1.1|[`require('reserve/mock')`](#mocking)|
 ||[`colors`](https://www.npmjs.com/package/colors) and [`mime`](https://www.npmjs.com/package/mime) are no more dependencies|
-|1.1.2|performance testing, `--silent`|
+|1.1.2|Performance testing, `--silent`|
 ||`case-sensitive` option in **file** handler|
 |1.1.3|Default hostname changed to `undefined`|
 |1.1.4|Enables external handlers in `json` configuration through [require](https://nodejs.org/api/modules.html#modules_require_id)|
 |1.1.5|Fixes relative path use of external handlers in `json` configuration|
+|1.1.6|Improves response mocking (`flushHeaders()` & `headersSent`)|
 
 # Usage
 
