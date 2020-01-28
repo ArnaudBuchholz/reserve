@@ -9,6 +9,7 @@ module.exports = class Response extends Duplex {
   }
 
   _write (chunk) {
+    this._headersSent = true
     this._buffer.push(chunk.toString())
   }
 
@@ -21,10 +22,15 @@ module.exports = class Response extends Duplex {
     this._headers = { ...this._headers, ...headers }
   }
 
+  flushHeaders () {
+    this._headersSent = true
+  }
+
   end (chunk) {
     if (chunk) {
       this.write(chunk)
     }
+    this._headersSent = true
     this._finished = true
   }
 
@@ -32,6 +38,7 @@ module.exports = class Response extends Duplex {
     super()
     this._buffer = []
     this._headers = {}
+    this._headersSent = false
     this._finished = false
   }
 
@@ -41,6 +48,10 @@ module.exports = class Response extends Duplex {
 
   get statusCode () {
     return this._statusCode
+  }
+
+  get headersSent () {
+    return this._headersSent
   }
 
   get finished () {
