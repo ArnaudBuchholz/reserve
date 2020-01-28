@@ -33,6 +33,7 @@ describe('mock', () => {
                 'Content-Type': 'text/plain',
                 'Content-Length': 5
               })
+              response.flushHeaders()
               response.end('ABCDE')
             } else {
               return 500
@@ -47,6 +48,7 @@ describe('mock', () => {
 
     it('simulates a request and returns a response', () => mocked.request('GET', '/')
       .then(response => {
+        assert(() => response.headersSent)
         assert(() => response.finished)
         assert(() => response.statusCode === 201)
         assert(() => response.toString() === 'ABCDE')
