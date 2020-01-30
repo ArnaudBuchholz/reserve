@@ -7,7 +7,8 @@ const { read } = require('../../configuration')
 describe('mock', () => {
   describe('keeping the original handlers', () => {
     let mocked
-    before(() => read('reserve.json')
+
+    before(() => read('/reserve.json')
       .then(configuration => mock(configuration))
       .then(eventEmitter => {
         mocked = eventEmitter
@@ -16,15 +17,17 @@ describe('mock', () => {
 
     it('simulates a request and returns a response', () => mocked.request('GET', '/file.txt')
       .then(response => {
-        assert(() => response.finished)
+        assert(() => response.writableEnded || response.finished)
         assert(() => response.statusCode === 200)
         assert(() => response.toString() === 'Hello World!')
       })
     )
   })
+
   describe('overriding the handlers', () => {
     let mocked
-    before(() => read('reserve.json')
+
+    before(() => read('/reserve.json')
       .then(configuration => mock(configuration, {
         file: {
           redirect: async ({ request, mapping, redirect, response }) => {
@@ -34,7 +37,14 @@ describe('mock', () => {
                 'Content-Length': 5
               })
               response.flushHeaders()
-              response.end('ABCDE')
+              response.write('AB')
+              response.write('CD')
+              let resolver
+              const promise = new Promise(resolve => {
+                resolver = resolve
+              })
+              response.end('E', resolver)
+              return promise
             } else {
               return 500
             }
@@ -49,7 +59,7 @@ describe('mock', () => {
     it('simulates a request and returns a response', () => mocked.request('GET', '/')
       .then(response => {
         assert(() => response.headersSent)
-        assert(() => response.finished)
+        assert(() => response.writableEnded || response.finished)
         assert(() => response.statusCode === 201)
         assert(() => response.toString() === 'ABCDE')
       })
@@ -57,7 +67,7 @@ describe('mock', () => {
 
     it('suports internal redirection', () => mocked.request('GET', '/error')
       .then(response => {
-        assert(() => response.finished)
+        assert(() => response.writableEnded || response.finished)
         assert(() => response.statusCode === 500)
       })
     )
