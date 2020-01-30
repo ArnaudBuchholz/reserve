@@ -22,5 +22,6 @@ module.exports = {
       'Content-Length': length
     })
     response.end(content)
+    return response.waitForFinish()
   }
 }
