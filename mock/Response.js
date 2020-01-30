@@ -2,15 +2,16 @@
 
 const { Duplex } = require('stream')
 
-module.exports = class Response extends Duplex {
+class Response extends Duplex {
   _read () {
     this.push(this.toString())
     this.push(null)
   }
 
-  _write (chunk) {
+  _write (chunk, encoding, onwrite) {
     this._headersSent = true
     this._buffer.push(chunk.toString())
+    onwrite()
   }
 
   setHeader (name, value) {
@@ -26,12 +27,9 @@ module.exports = class Response extends Duplex {
     this._headersSent = true
   }
 
-  end (chunk) {
-    if (chunk) {
-      this.write(chunk)
-    }
+  end () {
     this._headersSent = true
-    this._finished = true
+    return super.end.apply(this, arguments)
   }
 
   constructor () {
@@ -39,7 +37,6 @@ module.exports = class Response extends Duplex {
     this._buffer = []
     this._headers = {}
     this._headersSent = false
-    this._finished = false
   }
 
   get headers () {
@@ -54,11 +51,11 @@ module.exports = class Response extends Duplex {
     return this._headersSent
   }
 
-  get finished () {
-    return this._finished
-  }
-
   toString () {
     return this._buffer.join('')
   }
 }
+
+Response.prototype.waitForFinish = require('../waitForFinish')
+
+module.exports = Response
