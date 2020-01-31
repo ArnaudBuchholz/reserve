@@ -27,9 +27,8 @@ module.exports = {
       response.write(chunk)
     }
     result.end = () => {
-      const promise = response.waitForFinish()
       response.end()
-      promise.then(callback)
+      callback(response)
     }
     return result
   },
