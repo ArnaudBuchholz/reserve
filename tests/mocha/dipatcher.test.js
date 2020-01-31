@@ -99,7 +99,8 @@ describe('dispatcher', () => {
     const request = new Request('GET', '/file.txt')
     const response = new Response()
     const emitter = new RecordedEventEmitter()
-    const promise = promisify(emitter, parameters => {
+    const promise = promisify(emitter, async parameters => {
+      await response.waitForFinish()
       assert(() => response.statusCode === 200)
       assert(() => response.headers['Content-Type'] === textMimeType)
       assert(() => response.toString() === 'Hello World!')
@@ -113,7 +114,8 @@ describe('dispatcher', () => {
     const request = new Request('GET', '/subst/file/txt')
     const response = new Response()
     const emitter = new RecordedEventEmitter()
-    const promise = promisify(emitter, parameters => {
+    const promise = promisify(emitter, async parameters => {
+      await response.waitForFinish()
       assert(() => response.statusCode === 200)
       assert(() => response.headers['Content-Type'] === textMimeType)
       assert(() => response.toString() === 'Hello World!')
@@ -127,7 +129,8 @@ describe('dispatcher', () => {
     const request = new Request('GET', '/subst-complex/file/txt')
     const response = new Response()
     const emitter = new RecordedEventEmitter()
-    const promise = promisify(emitter, parameters => {
+    const promise = promisify(emitter, async parameters => {
+      await response.waitForFinish()
       assert(() => response.statusCode === 200)
       assert(() => response.headers['Content-Type'] === textMimeType)
       assert(() => response.toString() === '$1')
@@ -141,7 +144,8 @@ describe('dispatcher', () => {
     const request = new Request('GET', '/redirect')
     const response = new Response()
     const emitter = new RecordedEventEmitter()
-    const promise = promisify(emitter, parameters => {
+    const promise = promisify(emitter, async parameters => {
+      await response.waitForFinish()
       assert(() => response.statusCode === 200)
       assert(() => response.headers['Content-Type'] === textMimeType)
       assert(() => response.toString() === 'Hello World!')
@@ -225,7 +229,8 @@ describe('dispatcher', () => {
     const request = new Request('GET', '/file.txt')
     const response = new Response()
     const emitter = new RecordedEventEmitter()
-    const promise = promisify(emitter, parameters => {
+    const promise = promisify(emitter, async parameters => {
+      await response.waitForFinish()
       assert(() => response.headers['x-flag'] === 'true')
       assert(() => response.statusCode === 200)
       assert(() => response.headers['Content-Type'] === textMimeType)
