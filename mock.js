@@ -15,7 +15,9 @@ module.exports = (jsonConfiguration, mockedHandlers = {}) => {
       eventEmitter.request = (method, url, headers = {}, body = '') => {
         const request = new Request(method, url, headers, body)
         const response = new Response()
-        return dispatch(request, response).then(() => response)
+        const finished = response.waitForFinish()
+        return dispatch(request, response)
+          .then(() => finished)
       }
       return eventEmitter
     })
