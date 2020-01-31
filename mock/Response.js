@@ -2,7 +2,7 @@
 
 const { Duplex } = require('stream')
 
-class Response extends Duplex {
+module.exports = class Response extends Duplex {
   _read () {
     this.push(this.toString())
     this.push(null)
@@ -37,6 +37,11 @@ class Response extends Duplex {
     this._buffer = []
     this._headers = {}
     this._headersSent = false
+    let resolver
+    this._waitForFinish = new Promise(resolve => {
+      resolver = resolve
+    })
+    this.on('finish', () => resolver(this))
   }
 
   get headers () {
@@ -54,18 +59,8 @@ class Response extends Duplex {
   toString () {
     return this._buffer.join('')
   }
-}
 
-Response.prototype.waitForFinish = function () {
-  if (this.writableEnded || this.finished) {
-    return Promise.resolve(this)
+  waitForFinish () {
+    return this._waitForFinish
   }
-  let resolver
-  const promise = new Promise(resolve => {
-    resolver = resolve
-  })
-  this.on('finish', () => resolver(this))
-  return promise
 }
-
-module.exports = Response
