@@ -17,7 +17,6 @@ describe('mock', () => {
 
     it('simulates a request and returns a response', () => mocked.request('GET', '/file.txt')
       .then(response => {
-        assert(() => response.writableEnded || response.finished)
         assert(() => response.statusCode === 200)
         assert(() => response.toString() === 'Hello World!')
       })
@@ -39,12 +38,7 @@ describe('mock', () => {
               response.flushHeaders()
               response.write('AB')
               response.write('CD')
-              let resolver
-              const promise = new Promise(resolve => {
-                resolver = resolve
-              })
-              response.end('E', resolver)
-              return promise
+              response.end('E')
             } else {
               return 500
             }
@@ -59,7 +53,6 @@ describe('mock', () => {
     it('simulates a request and returns a response', () => mocked.request('GET', '/')
       .then(response => {
         assert(() => response.headersSent)
-        assert(() => response.writableEnded || response.finished)
         assert(() => response.statusCode === 201)
         assert(() => response.toString() === 'ABCDE')
       })
@@ -67,7 +60,6 @@ describe('mock', () => {
 
     it('suports internal redirection', () => mocked.request('GET', '/error')
       .then(response => {
-        assert(() => response.writableEnded || response.finished)
         assert(() => response.statusCode === 500)
       })
     )
