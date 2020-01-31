@@ -107,6 +107,7 @@ describe('handlers/custom', () => {
       match: []
     })
     const timestamp1 = mapping._timestamp
+    await response1.waitForFinish()
     assert(() => response1.toString() === 'first')
     assert(() => timestamp1)
 
@@ -118,6 +119,7 @@ describe('handlers/custom', () => {
       mapping,
       match: []
     })
+    await response2.waitForFinish()
     assert(() => response2.toString() === 'second')
     assert(() => mapping._timestamp !== timestamp1)
   })
@@ -139,6 +141,7 @@ describe('handlers/custom', () => {
       match: []
     })
     const timestamp1 = mapping._timestamp
+    await response1.waitForFinish()
     assert(() => response1.toString() === 'first')
     assert(() => timestamp1)
 
@@ -154,6 +157,7 @@ describe('handlers/custom', () => {
       mapping,
       match: []
     })
+    await response2.waitForFinish()
     assert(() => response2.toString() === 'first')
     assert(() => mapping._timestamp === timestamp1)
   })
