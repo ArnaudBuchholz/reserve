@@ -76,7 +76,6 @@ For instance, the definition of a server that **exposes files** of the current d
 |1.1.6|Improves response mocking (`flushHeaders()` & `headersSent`)|
 |1.1.7|Compatibility with Node.js >= 12.9|
 ||Improves response mocking|
-||`Response.waitForFinish` helper|
 
 # Usage
 
@@ -205,29 +204,10 @@ The handler object is defined by:
 
 An array of mappings that is evaluated in the order of declaration.
 * Several mappings may apply to the same request
-* Evaluation stops when the request is **answered** *(see the note below)*
+* Evaluation stops when the request is **finalized** *(see the note below)*
 * When a handler triggers a redirection, the array of mappings is reevaluated
 
-**NOTE** : Answered requests are detected based on the following properties:
-- [`response.finished`](https://nodejs.org/api/http.html#http_response_finished) *(deprecated)*
-- [`response.writableEnded`](https://nodejs.org/api/http.html#http_response_writableended) *since Node.js version 12.9*
-
-It means that the handler processing the request is **responsible of waiting** for the response to reach the state before completing. The helper `waitForFinish` is injected by REserve on the response object to simplify the development of handlers.
-
-For instance :
-```javascript
-redirect: async function ({ response, redirect }) {
-  const statusCode = redirect
-  const content = byStatus[statusCode] || ''
-  const length = content.length
-  response.writeHead(statusCode, {
-    'Content-Type': textMimeType,
-    'Content-Length': length
-  })
-  response.end(content)
-  return response.waitForFinish()
-}
-```
+**NOTE** : REserve hooks the [`response.end`](https://nodejs.org/api/http.html#http_response_end_data_encoding_callback) API to detect when the response is finalized.
 
 Each mapping must contain :
 * `match` : a string (converted to a regular expression) or a regular expression that will be applied to the request URL
@@ -369,7 +349,7 @@ External modules are loaded with Node.js [require](https://nodejs.org/api/module
 * Capturing groups' values are passed as additional parameters.
 * This function must return a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 * If the promise is resolved to a value (i.e. not `undefined`), an internal redirection occurs i.e. the request is going over the mappings again (*infinite loops are not prevented*).
-* If the `response` is not **answered** *(see [mappings](#mappings))* after executing the function, the `request` is going over the remaining mappings
+* If the `response` is not **finalized** after executing the function *(i.e. [`response.end`](https://nodejs.org/api/http.html#http_response_end_data_encoding_callback) was not called)*, the `request` is going over the remaining mappings
 
 | option | type | default | description |
 |---|---|---|---|
@@ -454,7 +434,6 @@ require('reserve/mock')({
           'Content-Length': 6
         })
         response.end('MOCKED')
-        return response.waitForFinish()
       } else {
         return 500
       }
