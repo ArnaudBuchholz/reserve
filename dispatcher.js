@@ -1,7 +1,7 @@
 'use strict'
 
 const logError = require('./logError')
-const waitForFinish = require('./waitForFinish')
+const $ended = Symbol('REserve:ended')
 
 function redirected () {
   const end = new Date()
@@ -33,7 +33,7 @@ function redirecting ({ mapping, match, handler, type, redirect, url, index = 0 
         if (undefined !== result) {
           return dispatch.call(this, result)
         }
-        if (this.response.writableEnded || this.response.finished) {
+        if (this.response[$ended]) {
           return redirected.call(this)
         }
         return dispatch.call(this, url, index + 1)
@@ -76,6 +76,14 @@ function dispatch (url, index = 0) {
   return redirecting.call(this, { mapping, match, handler, type, redirect: interpolate(match, redirect), url, index })
 }
 
+function hookEnd (response) {
+  const end = response.end
+  response.end = function () {
+    this[$ended] = true
+    return end.apply(this, arguments)
+  }
+}
+
 module.exports = function (configuration, request, response) {
   const emitParameters = {
     method: request.method,
@@ -87,7 +95,7 @@ module.exports = function (configuration, request, response) {
     dispatchResolver = resolve
   })
   this.emit('incoming', emitParameters)
-  response.waitForFinish = waitForFinish
+  hookEnd(response)
   dispatch.call({
     eventEmitter: this,
     emitParameters,
