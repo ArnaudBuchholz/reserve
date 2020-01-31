@@ -56,6 +56,16 @@ class Response extends Duplex {
   }
 }
 
-Response.prototype.waitForFinish = require('../waitForFinish')
+Response.prototype.waitForFinish = function () {
+  if (this.writableEnded || this.finished) {
+    return Promise.resolve(this)
+  }
+  let resolver
+  const promise = new Promise(resolve => {
+    resolver = resolve
+  })
+  this.on('finish', () => resolver(this))
+  return promise
+}
 
 module.exports = Response
