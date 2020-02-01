@@ -380,6 +380,16 @@ Example :
 | 405 | Method Not Allowed |
 | 500 | Internal Server Error |
 
+## Other handlers
+
+The following handlers can be installed separately and plugged through the `handlers` configuration property.
+
+| handler | description |
+|---|---|
+| [REserve/cmd](https://www.npmjs.com/package/reserve-cmd) | Wraps command line execution |
+| [REserve/fs](https://www.npmjs.com/package/reserve-fs) | Provides [fs](https://nodejs.org/api/fs.html) APIs to the browser |
+
+
 # Mocking
 
 Since version 1.1.0, the package includes the helper `reserve/mock` to build tests. This method receives a configuration (like `reserve/serve`) and returns a promise resolving to an [EventEmitter](https://nodejs.org/api/events.html)  augmented with a `request` method :
