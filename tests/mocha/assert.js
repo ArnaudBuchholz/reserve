@@ -1,12 +1,18 @@
 'use strict'
 
-const assert = require('assert')
+const nativeAssert = require('assert')
 
-module.exports = condition => {
+function assert (condition) {
   const message = condition.toString().match(/(?:=>|{)([^}]*)\}?/)[1].toString()
   try {
-    assert(condition(), message)
+    nativeAssert(condition(), message)
   } catch (e) {
-    assert(false, message + '- EXCEPTION ' + e.toString())
+    nativeAssert(false, message + '- EXCEPTION ' + e.toString())
   }
 }
+
+assert.notExpected = function () {
+  nativeAssert(false, 'Not expected !')
+}
+
+module.exports = assert
