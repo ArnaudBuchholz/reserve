@@ -120,7 +120,7 @@ async function checkMappings (configuration) {
     checkMappingMatch(mapping)
     const handler = checkMappingHandler(configuration, mapping)
     if (handler.validate) {
-      await handler.validate(mapping)
+      await handler.validate(mapping, configuration)
     }
   }
 }
