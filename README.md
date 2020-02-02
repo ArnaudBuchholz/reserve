@@ -76,6 +76,7 @@ For instance, the definition of a server that **exposes files** of the current d
 |1.1.6|Improves response mocking (`flushHeaders()` & `headersSent`)|
 |1.1.7|Compatibility with Node.js >= 12.9|
 ||Improves response mocking|
+|1.2.0|Handlers have access to the configuration object|
 
 # Usage
 
@@ -191,7 +192,12 @@ An object associating an handler prefix to an handler object.
 If the property value is a string, the handler is obtained using  [require](https://nodejs.org/api/modules.html#modules_require_id).
 
 The handler object is defined by:
-* **redirect** an asynchronous function that will be called with an object containing:
+* **validate** an asynchronous method that validates mapping definition, it will be called with two **parameters**:
+  - **mapping** the mapping being validated
+  - **configuration** the configuration object
+
+* **redirect** an asynchronous method that will be called with an **object** exposing:
+  - **configuration** the configuration object
   - **mapping** the mapping being executed
   - **match** the regular expression [exec result](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec)
   - **redirect** the value associated with the handler prefix in the mapping. Capturing groups are substituted.
@@ -199,6 +205,8 @@ The handler object is defined by:
   - **response** [http.ServerResponse](https://nodejs.org/api/http.html#http_class_http_serverresponse)
 
 **NOTE** : it is not possible to change the associations of the default prefixes (`custom`, `file`, `status`, `url` ...).
+
+**NOTE** : the **configuration** object gives access to `handlers` and `mappings` members, manipulate them carefully.
 
 ## mappings
 
@@ -386,6 +394,7 @@ The following handlers can be installed separately and plugged through the `hand
 
 | handler | description |
 |---|---|
+| [REserve/cache](https://www.npmjs.com/package/reserve-cache) | Caches string in memory |
 | [REserve/cmd](https://www.npmjs.com/package/reserve-cmd) | Wraps command line execution |
 | [REserve/fs](https://www.npmjs.com/package/reserve-fs) | Provides [fs](https://nodejs.org/api/fs.html) APIs to the browser |
 
