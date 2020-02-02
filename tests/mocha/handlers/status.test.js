@@ -19,8 +19,6 @@ describe('handlers/status', () => {
     return statusHandler.redirect({ response, redirect: 404 })
       .then(async value => {
         assert(() => value === undefined)
-        console.log(response.finished)
-        console.log(response.writableEnded)
         await response.waitForFinish()
         assert(() => response.statusCode === 404)
         assert(() => response.headers['Content-Type'] === textMimeType)
