@@ -3,6 +3,7 @@
 const fs = require('fs')
 const path = require('path')
 const util = require('util')
+const IConfiguration = require('./iconfiguration')
 
 const readFileAsync = util.promisify(fs.readFile)
 const statAsync = util.promisify(fs.stat)
@@ -115,12 +116,13 @@ function checkMappingHandler (configuration, mapping) {
 }
 
 async function checkMappings (configuration) {
+  const iconfiguration = new IConfiguration(configuration)
   for await (const mapping of configuration.mappings) {
     checkMappingCwd(mapping)
     checkMappingMatch(mapping)
     const handler = checkMappingHandler(configuration, mapping)
     if (handler.validate) {
-      await handler.validate(mapping, configuration)
+      await handler.validate(mapping, iconfiguration)
     }
   }
 }
