@@ -31,7 +31,7 @@ const handler = {
   }
 }
 
-describe('handler', () => {
+describe('iconfiguration', () => {
   describe('validate', () => {
     it('passes mapping and configuration to the validate method', () => {
       return check({
@@ -64,6 +64,6 @@ describe('handler', () => {
   })
 
   describe('redirect', () => {
-    
+
   })
 })
