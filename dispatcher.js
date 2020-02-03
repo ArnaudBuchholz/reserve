@@ -28,7 +28,7 @@ function error (reason) {
 function redirecting ({ mapping, match, handler, type, redirect, url, index = 0 }) {
   this.eventEmitter.emit('redirecting', Object.assign(this.emitParameters, { type, redirect }))
   try {
-    return handler.redirect({ configuration: this.configuration, mapping, match, redirect, request: this.request, response: this.response })
+    return handler.redirect({ configuration: this.configuration.interface, mapping, match, redirect, request: this.request, response: this.response })
       .then(result => {
         if (undefined !== result) {
           return dispatch.call(this, result)
