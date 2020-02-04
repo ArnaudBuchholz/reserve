@@ -27,15 +27,13 @@ function createServerAsync (configuration, requestHandler) {
 module.exports = jsonConfiguration => {
   const eventEmitter = new EventEmitter()
   check(jsonConfiguration)
-    .then(configuration => {
-      configuration.interface = new IConfiguration(configuration)
-      return createServerAsync(configuration, dispatcher.bind(eventEmitter, configuration))
+    .then(configuration => createServerAsync(configuration, dispatcher.bind(eventEmitter, configuration))
         .then(() => {
           eventEmitter.emit('ready', {
             url: `${configuration.protocol}://${configuration.hostname || '0.0.0.0'}:${configuration.port}/`
           })
         })
-    })
+    )
     .catch(reason => eventEmitter.emit('error', { reason }))
   return eventEmitter
 }
