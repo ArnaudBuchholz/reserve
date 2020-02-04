@@ -12,6 +12,15 @@ function checkConfiguration (configuration, mapping) {
   assert(() => !!configuration.handlers.url)
   assert(() => Array.isArray(configuration.mappings))
   assert(() => configuration.mappings[0] === mapping)
+  // Read-only handlers
+  delete configuration.handlers.custom
+  assert(() => !!configuration.handlers.custom)
+  const fileHandler = configuration.handlers.file
+  configuration.handlers.file = configuration.handlers.custom
+  assert(() => configuration.handlers.file === fileHandler)
+  // Read-only mappings
+  configuration.mappings.length = 0
+  assert(() => configuration.mappings[0] === mapping)
 }
 
 const handler = {
