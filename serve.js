@@ -5,7 +5,6 @@ const dispatcher = require('./dispatcher')
 const EventEmitter = require('events')
 const http = require('http')
 const https = require('https')
-const IConfiguration = require('./iconfiguration')
 
 function createServer (configuration, requestHandler) {
   if (configuration.ssl) {
@@ -28,11 +27,11 @@ module.exports = jsonConfiguration => {
   const eventEmitter = new EventEmitter()
   check(jsonConfiguration)
     .then(configuration => createServerAsync(configuration, dispatcher.bind(eventEmitter, configuration))
-        .then(() => {
-          eventEmitter.emit('ready', {
-            url: `${configuration.protocol}://${configuration.hostname || '0.0.0.0'}:${configuration.port}/`
-          })
+      .then(() => {
+        eventEmitter.emit('ready', {
+          url: `${configuration.protocol}://${configuration.hostname || '0.0.0.0'}:${configuration.port}/`
         })
+      })
     )
     .catch(reason => eventEmitter.emit('error', { reason }))
   return eventEmitter
