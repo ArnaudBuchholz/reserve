@@ -3,12 +3,7 @@
 const assert = require('./assert')
 const { read, check } = require('../../configuration')
 
-/* istanbul ignore next */ // We don't expect it to happen !
-function successNotExpected () {
-  assert(() => false)
-}
-
-const shouldFail = promise => promise.then(successNotExpected, () => {
+const shouldFail = promise => promise.then(assert.notExpected, () => {
   assert(() => true) // expected
 })
 
