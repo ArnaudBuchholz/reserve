@@ -37,7 +37,13 @@ const handler = {
   async redirect ({ configuration, mapping, redirect, response }) {
     checkConfiguration(configuration, mapping)
     response.writeHead(200)
-    response.end('OK')
+    let answer = 'OK'
+    if (redirect === 'reset') {
+      mapping.count = 0
+    } else if (redirect === 'count') {
+      answer = (++mapping.count).toString()
+    }
+    response.end(answer)
   }
 }
 
@@ -94,6 +100,23 @@ describe('iconfiguration', () => {
       .then(response => {
         assert(() => response.statusCode === 200)
         assert(() => response.toString() === 'OK')
+      })
+    )
+
+    it('allows dynamic change of mappings (with synchronization)', () => Promise.all([
+        mocked.request('GET', 'reset'),
+        mocked.request('GET', 'count'),
+        mocked.request('GET', 'count'),
+        mocked.request('GET', 'inject'),
+        mocked.request('GET', 'count')
+      ])
+      .then(responses => {
+        assert(() => responses.every(response => response.statusCode === 200))
+        assert(() => responses[0].toString() === 'OK')
+        assert(() => responses[1].toString() === '1')
+        assert(() => responses[2].toString() === '2')
+        assert(() => responses[3].toString() === 'OK')
+        assert(() => responses[4].toString() === '3')
       })
     )
   })
