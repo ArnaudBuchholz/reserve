@@ -1,7 +1,7 @@
 'use strict'
 
 const assert = require('./assert')
-const { check } = require('../../configuration')
+const { check, mock } = require('../../index')
 
 function checkConfiguration (configuration, mapping) {
   assert(() => configuration.handlers instanceof Object)
@@ -27,16 +27,17 @@ const handler = {
   async validate (mapping, configuration) {
     checkConfiguration(configuration, mapping)
     if (mapping.ko) {
-      throw new Error('Invalid configuration')
+      throw new Error('mapping.ko')
     }
     assert(() => mapping.test === '$1')
     assert(() => mapping.match instanceof RegExp)
     mapping.ok = true
   },
 
-  async redirect ({ configuration, mapping, redirect }) {
+  async redirect ({ configuration, mapping, redirect, response }) {
     checkConfiguration(configuration, mapping)
-    return 'OK'
+    response.writeHead(200)
+    response.end('OK')
   }
 }
 
@@ -63,16 +64,37 @@ describe('iconfiguration', () => {
           test: handler
         },
         mappings: [{
-          ko: true
+          ko: true,
+          test: '$1'
         }]
       })
         .then(assert.notExpected, reason => {
           assert(() => reason instanceof Error)
+          assert(() => reason.message === 'mapping.ko')
         })
     })
   })
 
   describe('redirect', () => {
+    let mocked
 
+    before(async () => {
+      mocked = await mock({
+        handlers: {
+          test: handler
+        },
+        mappings: [{
+          match: '(.*)',
+          test: '$1'
+        }]
+      })
+    })
+
+    it('gives access to the configuration', () => mocked.request('GET', 'test')
+      .then(response => {
+          assert(() => response.statusCode === 200)
+          assert(() => response.toString() === 'OK')
+      })
+    )
   })
 })
