@@ -92,8 +92,8 @@ describe('iconfiguration', () => {
 
     it('gives access to the configuration', () => mocked.request('GET', 'test')
       .then(response => {
-          assert(() => response.statusCode === 200)
-          assert(() => response.toString() === 'OK')
+        assert(() => response.statusCode === 200)
+        assert(() => response.toString() === 'OK')
       })
     )
   })
