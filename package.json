@@ -84,6 +84,7 @@
   "nyc": {
     "check-coverage": true,
     "exclude": [
+      "tests/mocha/assert.js",
       "log.js",
       "logError.js"
     ],
