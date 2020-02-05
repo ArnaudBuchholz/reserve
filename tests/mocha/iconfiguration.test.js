@@ -104,12 +104,12 @@ describe('iconfiguration', () => {
     )
 
     it('allows dynamic change of mappings (with synchronization)', () => Promise.all([
-        mocked.request('GET', 'reset'),
-        mocked.request('GET', 'count'),
-        mocked.request('GET', 'count'),
-        mocked.request('GET', 'inject'),
-        mocked.request('GET', 'count')
-      ])
+      mocked.request('GET', 'reset'),
+      mocked.request('GET', 'count'),
+      mocked.request('GET', 'count'),
+      mocked.request('GET', 'inject'),
+      mocked.request('GET', 'count')
+    ])
       .then(responses => {
         assert(() => responses.every(response => response.statusCode === 200))
         assert(() => responses[0].toString() === 'OK')
