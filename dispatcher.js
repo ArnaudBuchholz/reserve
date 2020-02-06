@@ -2,6 +2,7 @@
 
 const logError = require('./logError')
 const $ended = Symbol('REserve:ended')
+const $redirectCount = Symbol('REserve:redirect-count')
 
 function redirected () {
   const end = new Date()
@@ -15,6 +16,12 @@ function redirected () {
 }
 
 function error (reason) {
+  let statusCode
+  if (typeof reason === "number") {
+    statusCode = reason
+  } else {
+    statusCode = 500
+  }
   const errorParameters = { ...this.emitParameters, reason }
   try {
     this.eventEmitter.emit('error', errorParameters)
@@ -22,7 +29,7 @@ function error (reason) {
     // Unhandled error
     logError(errorParameters)
   }
-  return dispatch.call(this, 500)
+  return dispatch.call(this, statusCode)
 }
 
 function redirecting ({ mapping, match, handler, type, redirect, url, index = 0 }) {
@@ -31,6 +38,10 @@ function redirecting ({ mapping, match, handler, type, redirect, url, index = 0 
     return handler.redirect({ configuration: this.configuration.interface, mapping, match, redirect, request: this.request, response: this.response })
       .then(result => {
         if (undefined !== result) {
+          const redirectCount = ++this.request[$redirectCount]
+          if (redirectCount > this.configuration['max-redirect']) {
+            return error.call(this, 508)
+          }
           return dispatch.call(this, result)
         }
         if (this.response[$ended]) {
@@ -65,7 +76,7 @@ function dispatch (url, index = 0) {
     })
   }
   if (index === this.configuration.mappings.length) {
-    return error.call(this, 'no mapping')
+    return error.call(this, 501)
   }
   const mapping = this.configuration.mappings[index]
   const match = mapping.match.exec(url)
@@ -95,6 +106,7 @@ module.exports = function (configuration, request, response) {
     dispatchResolver = resolve
   })
   this.emit('incoming', emitParameters)
+  request[$redirectCount] = 0
   hookEnd(response)
   dispatch.call({
     eventEmitter: this,
