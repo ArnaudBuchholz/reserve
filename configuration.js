@@ -18,6 +18,7 @@ const defaultHandlers = {
 const defaults = {
   hostname: undefined,
   port: 5000,
+  'max-redirect': 10,
   mappings: [{
     match: /^\/proxy\/(https?)\/(.*)/,
     url: '$1://$2',
