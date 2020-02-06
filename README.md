@@ -76,7 +76,8 @@ For instance, the definition of a server that **exposes files** of the current d
 |1.1.6|Improves response mocking (`flushHeaders()` & `headersSent`)|
 |1.1.7|Compatibility with Node.js >= 12.9|
 ||Improves response mocking|
-|1.2.0|Handlers have access to the configuration object|
+|1.2.0|Gives handlers access to the configuration object|
+||Prevents internal redirection infinite loops (see `max-redirect`)|
 
 # Usage
 
@@ -176,6 +177,13 @@ Used to set the `port` parameter when calling http(s) server's [listen](https://
 
 Default is `5000`.
 
+## max-redirect *(optional)*
+
+When an internal redirection occurs, a counter is incremented.
+If the number of redirection goes beyond the parameter value, the request fails with error [`508`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/508).
+
+Default is `10`.
+
 ## ssl *(optional)*
 
 This object provides certificate information to build an https server. You might be interested by the article [An Express HTTPS server with a self-signed certificate](https://flaviocopes.com/express-https-self-signed-certificate/).
@@ -246,7 +254,6 @@ For instance :
 ```javascript
 module.exports = async (request, response) => response.setHeader('Access-Control-Allow-Origin', '*')
 ```
-
 
 ## extend
 
