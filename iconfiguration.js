@@ -14,4 +14,7 @@ module.exports = class IConfiguration {
   get mappings () {
     return [].concat(this[$configuration].mappings)
   }
+
+  async setMappings (mappings) {
+  }
 }
