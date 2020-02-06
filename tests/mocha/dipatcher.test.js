@@ -5,7 +5,7 @@ const mime = require('../../detect/mime')
 const EventEmitter = require('events')
 const Request = require('../../mock/Request')
 const Response = require('../../mock/Response')
-const { check } = require('../../configuration')
+const { check, mock } = require('../../index')
 const dispatcher = require('../../dispatcher')
 
 const textMimeType = mime.getType('text')
@@ -240,43 +240,69 @@ describe('dispatcher', () => {
     return promise
   })
 
-  it('fails when no mapping finalizes the request', async () => {
-    const sampleConf = await sampleConfPromise
-    const request = new Request('GET', '/unhandled')
-    const response = new Response()
-    const emitter = new RecordedEventEmitter()
-    const promise = promisifyWithError(emitter, (parameters, errorThrown) => {
-      assert(() => response.statusCode === 500)
-      assert(() => errorThrown)
-    })
-    dispatcher.call(emitter, sampleConf, request, response)
-    return promise
-  })
+  describe("Error handling", () => {
+    function promisifyNoError (emitter, callback) {
+      return new Promise((resolve, reject) => {
+        emitter
+          .on('redirected', parameters => {
+            try {
+              callback(parameters)
+              resolve()
+            } catch (e) {
+              /* istanbul ignore next */ // We don't expect it to happen !
+              reject(e)
+            }
+          })
+      })
+    }
 
-  function promisifyNoError (emitter, callback) {
-    return new Promise((resolve, reject) => {
-      emitter
-        .on('redirected', parameters => {
-          try {
-            callback(parameters)
-            resolve()
-          } catch (e) {
-            /* istanbul ignore next */ // We don't expect it to happen !
-            reject(e)
-          }
+    describe("No handler for the request", () => {
+      it('fails with error 501', async () => {
+        const sampleConf = await sampleConfPromise
+        const request = new Request('GET', '/unhandled')
+        const response = new Response()
+        const emitter = new RecordedEventEmitter()
+        const promise = promisifyWithError(emitter, (parameters, errorThrown) => {
+          assert(() => response.statusCode === 501)
+          assert(() => errorThrown)
         })
-    })
-  }
+        dispatcher.call(emitter, sampleConf, request, response)
+        return promise
+      })
 
-  it('logs unhandled errors', async () => {
-    const sampleConf = await sampleConfPromise
-    const request = new Request('GET', '/unhandled')
-    const response = new Response()
-    const emitter = new RecordedEventEmitter()
-    const promise = promisifyNoError(emitter, parameters => {
-      assert(() => response.statusCode === 500)
+      it('logs error 501', async () => {
+        const sampleConf = await sampleConfPromise
+        const request = new Request('GET', '/unhandled')
+        const response = new Response()
+        const emitter = new RecordedEventEmitter()
+        const promise = promisifyNoError(emitter, parameters => {
+          assert(() => response.statusCode === 501)
+        })
+        dispatcher.call(emitter, sampleConf, request, response)
+        return promise
+      })
     })
-    dispatcher.call(emitter, sampleConf, request, response)
-    return promise
+
+    describe('Infinite loop', () => {
+      let mocked
+
+      before(async () => {
+        mocked = await mock({
+          mappings: [{
+            match: 'a',
+            custom: async () => 'b'
+          }, {
+            match: 'b',
+            custom: async () => 'a'
+          }]
+        })
+      })
+
+      it('prevents infinite redirection', () => mocked.request('GET', 'a')
+        .then(response => {
+          assert(() => response.statusCode === 508)
+        })
+      )
+    })
   })
 })
