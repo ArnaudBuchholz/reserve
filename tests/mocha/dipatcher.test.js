@@ -240,7 +240,7 @@ describe('dispatcher', () => {
     return promise
   })
 
-  describe("Error handling", () => {
+  describe('Error handling', () => {
     function promisifyNoError (emitter, callback) {
       return new Promise((resolve, reject) => {
         emitter
@@ -256,7 +256,7 @@ describe('dispatcher', () => {
       })
     }
 
-    describe("No handler for the request", () => {
+    describe('No handler for the request', () => {
       it('fails with error 501', async () => {
         const sampleConf = await sampleConfPromise
         const request = new Request('GET', '/unhandled')
