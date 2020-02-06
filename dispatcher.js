@@ -17,7 +17,7 @@ function redirected () {
 
 function error (reason) {
   let statusCode
-  if (typeof reason === "number") {
+  if (typeof reason === 'number') {
     statusCode = reason
   } else {
     statusCode = 500
