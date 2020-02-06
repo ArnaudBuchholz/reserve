@@ -4,6 +4,9 @@ const assert = require('./assert')
 const { check, mock } = require('../../index')
 
 function checkConfiguration (configuration, mapping) {
+  if (mapping.skipCheck) {
+    return
+  }
   assert(() => configuration.handlers instanceof Object)
   assert(() => !!configuration.handlers.custom)
   assert(() => !!configuration.handlers.file)
@@ -38,10 +41,18 @@ const handler = {
     checkConfiguration(configuration, mapping)
     response.writeHead(200)
     let answer = 'OK'
-    if (redirect === 'reset') {
-      mapping.count = 0
-    } else if (redirect === 'count') {
+    if (redirect === 'count') {
       answer = (++mapping.count).toString()
+    }
+    if (redirect === 'inject') {
+      const mappings = configuration.mappings;
+      mappings.unshift({
+        match: '.*',
+        custom: async (request, response) => {
+          response.setHeader('x-injected', 'true')
+        }
+      })
+      await configuration.setMappings(mappings)
     }
     response.end(answer)
   }
@@ -81,7 +92,7 @@ describe('iconfiguration', () => {
     })
   })
 
-  describe('redirect', () => {
+  describe('redirect', function () {
     let mocked
 
     before(async () => {
@@ -90,7 +101,19 @@ describe('iconfiguration', () => {
           test: handler
         },
         mappings: [{
+          match: '.*',
+          custom: async (request, response) => {
+            const timeout = request.headers['x-timeout']
+            if (timeout) {
+              return new Promise(resolve => {
+                setTimeout(resolve, parseInt(timeout, 10))
+              })
+            }
+          }
+        }, {
           match: '(.*)',
+          skipCheck: true,
+          count: 0,
           test: '$1'
         }]
       })
@@ -104,19 +127,17 @@ describe('iconfiguration', () => {
     )
 
     it('allows dynamic change of mappings (with synchronization)', () => Promise.all([
-      mocked.request('GET', 'reset'),
-      mocked.request('GET', 'count'),
-      mocked.request('GET', 'count'),
-      mocked.request('GET', 'inject'),
+      mocked.request('GET', 'count', { 'x-timeout': 200 }),
+      mocked.request('GET', 'count', { 'x-timeout': 100 }),
+      mocked.request('GET', 'inject'), // Should wait for pending requests to complete
       mocked.request('GET', 'count')
     ])
       .then(responses => {
         assert(() => responses.every(response => response.statusCode === 200))
-        assert(() => responses[0].toString() === 'OK')
+        assert(() => responses[0].toString() === '2')
         assert(() => responses[1].toString() === '1')
-        assert(() => responses[2].toString() === '2')
-        assert(() => responses[3].toString() === 'OK')
-        assert(() => responses[4].toString() === '3')
+        assert(() => responses[2].toString() === 'OK')
+        assert(() => responses[3].toString() === '3')
       })
     )
   })
