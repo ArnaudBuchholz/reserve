@@ -5,6 +5,11 @@ const path = require('path')
 const util = require('util')
 const IConfiguration = require('./iconfiguration')
 
+const {
+  $configurationInterface,
+  $configurationRequests
+} = require('./symbols')
+
 const readFileAsync = util.promisify(fs.readFile)
 const statAsync = util.promisify(fs.stat)
 
@@ -117,13 +122,14 @@ function checkMappingHandler (configuration, mapping) {
 }
 
 async function checkMappings (configuration) {
-  configuration.interface = new IConfiguration(configuration)
+  const configurationInterface = new IConfiguration(configuration)
+  configuration[$configurationInterface] = configurationInterface
   for await (const mapping of configuration.mappings) {
     checkMappingCwd(mapping)
     checkMappingMatch(mapping)
     const handler = checkMappingHandler(configuration, mapping)
     if (handler.validate) {
-      await handler.validate(mapping, configuration.interface)
+      await handler.validate(mapping, configurationInterface)
     }
   }
 }
@@ -177,8 +183,11 @@ module.exports = {
     setHandlers(checkedConfiguration)
     await checkProtocol(checkedConfiguration)
     await checkMappings(checkedConfiguration)
-    checkedConfiguration.holdRequests = Promise.resolve()
-    checkedConfiguration.pendingRequests = []
+    checkedConfiguration[$configurationRequests] = {
+      current: null,
+      hold: Promise.resolve(),
+      promises: []
+    }
     return checkedConfiguration
   },
 
