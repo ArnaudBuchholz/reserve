@@ -1,8 +1,13 @@
 'use strict'
 
 const logError = require('./logError')
-const $ended = Symbol('REserve:ended')
-const $redirectCount = Symbol('REserve:redirect-count')
+const {
+  $configurationInterface,
+  $configurationRequests,
+  $requestPromise,
+  $requestRedirectCount,
+  $responseEnded
+} = require('./symbols')
 
 function redirected () {
   const end = new Date()
@@ -35,16 +40,24 @@ function error (reason) {
 function redirecting ({ mapping, match, handler, type, redirect, url, index = 0 }) {
   this.eventEmitter.emit('redirecting', Object.assign(this.emitParameters, { type, redirect }))
   try {
-    return handler.redirect({ configuration: this.configuration.interface, mapping, match, redirect, request: this.request, response: this.response })
+    this.configuration[$configurationRequests].current = this.request
+    return handler.redirect({
+      configuration: this.configuration[$configurationInterface],
+      mapping,
+      match,
+      redirect,
+      request: this.request,
+      response: this.response
+    })
       .then(result => {
         if (undefined !== result) {
-          const redirectCount = ++this.request[$redirectCount]
+          const redirectCount = ++this.request[$requestRedirectCount]
           if (redirectCount > this.configuration['max-redirect']) {
             return error.call(this, 508)
           }
           return dispatch.call(this, result)
         }
-        if (this.response[$ended]) {
+        if (this.response[$responseEnded]) {
           return redirected.call(this)
         }
         return dispatch.call(this, url, index + 1)
@@ -90,7 +103,7 @@ function dispatch (url, index = 0) {
 function hookEnd (response) {
   const end = response.end
   response.end = function () {
-    this[$ended] = true
+    this[$responseEnded] = true
     return end.apply(this, arguments)
   }
 }
@@ -102,15 +115,17 @@ module.exports = function (configuration, request, response) {
     start: new Date()
   }
   let dispatchResolver
-  const promise = new Promise(resolve => {
+  const requestPromise = new Promise(resolve => {
     dispatchResolver = resolve
   })
   this.emit('incoming', emitParameters)
-  request[$redirectCount] = 0
+  request[$requestPromise] = requestPromise
+  request[$requestRedirectCount] = 0
   hookEnd(response)
-  return configuration.holdRequests
+  const configurationRequests = configuration[$configurationRequests]
+  return configurationRequests.hold
     .then(() => {
-      configuration.pendingRequests.push(promise)
+      configurationRequests.promises.push(requestPromise)
       dispatch.call({
         eventEmitter: this,
         emitParameters,
@@ -119,10 +134,10 @@ module.exports = function (configuration, request, response) {
         response,
         resolve: dispatchResolver
       }, request.url)
-      return promise
+      return requestPromise
     })
     .then(() => {
-      configuration.pendingRequests = configuration.pendingRequests
-      .filter(pendingRequest => pendingRequest !== promise)
+      configurationRequests.promises = configurationRequests.promises
+        .filter(promise => promise !== requestPromise)
     })
 }
