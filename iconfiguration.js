@@ -16,5 +16,11 @@ module.exports = class IConfiguration {
   }
 
   async setMappings (mappings) {
+    const configuration = this[$configuration]
+    configuration.holdRequests = Promise.all(configuration.pendingRequests)
+      .then(() => {
+        configuration.mappings = mappings
+      })
+    return configuration.holdRequests
   }
 }
