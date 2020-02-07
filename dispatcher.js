@@ -108,13 +108,21 @@ module.exports = function (configuration, request, response) {
   this.emit('incoming', emitParameters)
   request[$redirectCount] = 0
   hookEnd(response)
-  dispatch.call({
-    eventEmitter: this,
-    emitParameters,
-    configuration,
-    request,
-    response,
-    resolve: dispatchResolver
-  }, request.url)
-  return promise
+  return configuration.holdRequests
+    .then(() => {
+      configuration.pendingRequests.push(promise)
+      dispatch.call({
+        eventEmitter: this,
+        emitParameters,
+        configuration,
+        request,
+        response,
+        resolve: dispatchResolver
+      }, request.url)
+      return promise
+    })
+    .then(() => {
+      configuration.pendingRequests = configuration.pendingRequests
+      .filter(pendingRequest => pendingRequest !== promise)
+    })
 }
