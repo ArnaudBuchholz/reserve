@@ -177,6 +177,8 @@ module.exports = {
     setHandlers(checkedConfiguration)
     await checkProtocol(checkedConfiguration)
     await checkMappings(checkedConfiguration)
+    checkedConfiguration.holdRequests = Promise.resolve()
+    checkedConfiguration.pendingRequests = []
     return checkedConfiguration
   },
 
