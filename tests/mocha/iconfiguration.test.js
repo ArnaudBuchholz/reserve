@@ -37,7 +37,7 @@ const handler = {
     mapping.ok = true
   },
 
-  async redirect ({ configuration, mapping, redirect, response }) {
+  async redirect ({ configuration, mapping, redirect, request, response }) {
     checkConfiguration(configuration, mapping)
     response.writeHead(200)
     let answer = 'OK'
@@ -45,9 +45,9 @@ const handler = {
       answer = (++mapping.count).toString()
     }
     if (redirect === 'inject') {
-      const mappings = configuration.mappings;
+      const mappings = configuration.mappings
       mappings.unshift({
-        match: '.*',
+        match: /.*/,
         custom: async (request, response) => {
           response.setHeader('x-injected', 'true')
         }
@@ -134,10 +134,18 @@ describe('iconfiguration', () => {
     ])
       .then(responses => {
         assert(() => responses.every(response => response.statusCode === 200))
-        assert(() => responses[0].toString() === '2')
-        assert(() => responses[1].toString() === '1')
+        assert(() => responses.every(response => response.headers['x-injected'] !== 'true'))
+        assert(() => responses[0].toString() === '3')
+        assert(() => responses[1].toString() === '2')
         assert(() => responses[2].toString() === 'OK')
-        assert(() => responses[3].toString() === '3')
+        assert(() => responses[3].toString() === '1')
+        return mocked.request('GET', 'count')
+      })
+      .then(response => {
+          console.log('YEAH', response)
+        assert(() => response.statusCode === 200)
+        assert(() => response.headers['x-injected'] === 'true')
+        assert(() => response.toString() === '4')
       })
     )
   })
