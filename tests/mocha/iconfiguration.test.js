@@ -46,12 +46,14 @@ const handler = {
     }
     if (redirect === 'inject') {
       const mappings = configuration.mappings
-      mappings.unshift({
-        match: /.*/,
+      const injectedMapping = {
+        match: /.*/, // Needs to go through configuration.check
         custom: async (request, response) => {
           response.setHeader('x-injected', 'true')
         }
-      })
+      }
+      configuration.handlers.custom.validate(injectedMapping, configuration)
+      mappings.unshift(injectedMapping)
       await configuration.setMappings(mappings)
     }
     response.end(answer)
@@ -142,7 +144,6 @@ describe('iconfiguration', () => {
         return mocked.request('GET', 'count')
       })
       .then(response => {
-          console.log('YEAH', response)
         assert(() => response.statusCode === 200)
         assert(() => response.headers['x-injected'] === 'true')
         assert(() => response.toString() === '4')
