@@ -1,6 +1,10 @@
 'use strict'
 
-const $configuration = Symbol('configuration')
+const {
+  $configuration,
+  $configurationRequests,
+  $requestPromise
+} = require('./symbols')
 
 module.exports = class IConfiguration {
   constructor (configuration) {
@@ -17,10 +21,13 @@ module.exports = class IConfiguration {
 
   async setMappings (mappings) {
     const configuration = this[$configuration]
-    configuration.holdRequests = Promise.all(configuration.pendingRequests)
+    const configurationRequests = configuration[$configurationRequests]
+    const requestPromise = configurationRequests.current[$requestPromise]
+    const otherRequestsPromises = configurationRequests.promises.filter(promise => promise !== requestPromise)
+    configurationRequests.hold = Promise.all(otherRequestsPromises)
       .then(() => {
         configuration.mappings = mappings
       })
-    return configuration.holdRequests
+    return configurationRequests.hold
   }
 }
