@@ -1,10 +1,21 @@
 'use strict'
 
+const { checkMapping } = require('./mapping')
+
 const {
   $configuration,
   $configurationRequests,
+  $mappingChecked,
   $requestPromise
 } = require('./symbols')
+
+async function checkMappings (configuration, mappings) {
+  for await (const mapping of mappings) {
+    if (!mapping[$mappingChecked]) {
+      await checkMapping(configuration, mapping)
+    }
+  }
+}
 
 module.exports = class IConfiguration {
   constructor (configuration) {
@@ -21,6 +32,7 @@ module.exports = class IConfiguration {
 
   async setMappings (mappings) {
     const configuration = this[$configuration]
+    await checkMappings(configuration, mappings)
     const configurationRequests = configuration[$configurationRequests]
     const requestPromise = configurationRequests.current[$requestPromise]
     const otherRequestsPromises = configurationRequests.promises.filter(promise => promise !== requestPromise)
