@@ -4,10 +4,12 @@ const fs = require('fs')
 const path = require('path')
 const util = require('util')
 const IConfiguration = require('./iconfiguration')
+const { checkMapping } = require('./mapping')
 
 const {
   $configurationInterface,
-  $configurationRequests
+  $configurationRequests,
+  $mappingChecked
 } = require('./symbols')
 
 const readFileAsync = util.promisify(fs.readFile)
@@ -101,36 +103,11 @@ async function checkProtocol (configuration) {
   }
 }
 
-function checkMappingCwd (mapping) {
-  if (!mapping.cwd) {
-    mapping.cwd = process.cwd()
-  }
-}
-
-function checkMappingMatch (mapping) {
-  if (typeof mapping.match === 'string') {
-    mapping.match = new RegExp(mapping.match)
-  }
-}
-
-function checkMappingHandler (configuration, mapping) {
-  const { handler } = configuration.handler(mapping)
-  if (!handler) {
-    throw new Error('Unknown handler for mapping: ' + JSON.stringify(mapping))
-  }
-  return handler
-}
-
 async function checkMappings (configuration) {
   const configurationInterface = new IConfiguration(configuration)
   configuration[$configurationInterface] = configurationInterface
   for await (const mapping of configuration.mappings) {
-    checkMappingCwd(mapping)
-    checkMappingMatch(mapping)
-    const handler = checkMappingHandler(configuration, mapping)
-    if (handler.validate) {
-      await handler.validate(mapping, configurationInterface)
-    }
+    await checkMapping(configuration, mapping)
   }
 }
 
