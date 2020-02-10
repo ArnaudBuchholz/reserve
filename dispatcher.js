@@ -40,7 +40,6 @@ function error (reason) {
 function redirecting ({ mapping, match, handler, type, redirect, url, index = 0 }) {
   this.eventEmitter.emit('redirecting', Object.assign(this.emitParameters, { type, redirect }))
   try {
-    this.configuration[$configurationRequests].current = this.request
     return handler.redirect({
       configuration: this.configuration[$configurationInterface],
       mapping,
