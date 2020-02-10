@@ -161,7 +161,6 @@ module.exports = {
     await checkProtocol(checkedConfiguration)
     await checkMappings(checkedConfiguration)
     checkedConfiguration[$configurationRequests] = {
-      current: null,
       hold: Promise.resolve(),
       promises: []
     }
