@@ -30,11 +30,11 @@ module.exports = class IConfiguration {
     return [].concat(this[$configuration].mappings)
   }
 
-  async setMappings (mappings) {
+  async setMappings (mappings, request) {
     const configuration = this[$configuration]
     await checkMappings(configuration, mappings)
     const configurationRequests = configuration[$configurationRequests]
-    const requestPromise = configurationRequests.current[$requestPromise]
+    const requestPromise = request[$requestPromise]
     const otherRequestsPromises = configurationRequests.promises.filter(promise => promise !== requestPromise)
     configurationRequests.hold = Promise.all(otherRequestsPromises)
       .then(() => {
