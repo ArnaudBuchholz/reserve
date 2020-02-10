@@ -47,14 +47,14 @@ const handler = {
     if (redirect === 'inject') {
       const mappings = configuration.mappings
       const injectedMapping = {
-        match: /.*/, // Needs to go through configuration.check
+        match: ".*",
         custom: async (request, response) => {
           response.setHeader('x-injected', 'true')
         }
       }
       mappings.unshift(injectedMapping)
       try {
-        await configuration.setMappings(mappings)
+        await configuration.setMappings(mappings, request)
       } catch (e) {
         console.error(e.toString())
       }
