@@ -4,9 +4,6 @@ const assert = require('./assert')
 const { check, mock } = require('../../index')
 
 function checkConfiguration (configuration, mapping) {
-  if (mapping.skipCheck) {
-    return
-  }
   assert(() => configuration.handlers instanceof Object)
   assert(() => !!configuration.handlers.custom)
   assert(() => !!configuration.handlers.file)
@@ -14,16 +11,23 @@ function checkConfiguration (configuration, mapping) {
   assert(() => !!configuration.handlers.test)
   assert(() => !!configuration.handlers.url)
   assert(() => Array.isArray(configuration.mappings))
-  assert(() => configuration.mappings[0] === mapping)
+  assert(() => configuration.mappings.includes(mapping))
   // Read-only handlers
   delete configuration.handlers.custom
   assert(() => !!configuration.handlers.custom)
   const fileHandler = configuration.handlers.file
   configuration.handlers.file = configuration.handlers.custom
   assert(() => configuration.handlers.file === fileHandler)
-  // Read-only mappings
+  const fileHandlerRedirect = fileHandler.redirect
+  try {
+    fileHandler.redirect = () => {}
+  } catch (e) {
+    assert(() => e instanceof TypeError)
+  }
+  assert(() => fileHandler.redirect === fileHandlerRedirect)
+  // Read-only mapping list
   configuration.mappings.length = 0
-  assert(() => configuration.mappings[0] === mapping)
+  assert(() => configuration.mappings.includes(mapping))
 }
 
 const handler = {
@@ -47,7 +51,7 @@ const handler = {
     if (redirect === 'inject') {
       const mappings = configuration.mappings
       const injectedMapping = {
-        match: ".*",
+        match: '.*',
         custom: async (request, response) => {
           response.setHeader('x-injected', 'true')
         }
@@ -117,7 +121,6 @@ describe('iconfiguration', () => {
           }
         }, {
           match: '(.*)',
-          skipCheck: true,
           count: 0,
           test: '$1'
         }]
@@ -132,16 +135,13 @@ describe('iconfiguration', () => {
     )
 
     it('allows dynamic change of mappings (with synchronization)', () => Promise.all([
-      mocked.request('GET', 'count', { 'x-timeout': 200 }),
-      mocked.request('GET', 'count', { 'x-timeout': 100 }),
+      mocked.request('GET', 'count', { 'x-timeout': 50 }),
+      mocked.request('GET', 'count', { 'x-timeout': 25 }),
       mocked.request('GET', 'inject'), // Should wait for pending requests to complete
       mocked.request('GET', 'count')
     ])
       .then(responses => {
         responses.forEach((response, index) => {
-          // if (response => response.statusCode !== 200) {
-          //   console.error(`${index} ${response.statusCode} ${response.toString()}`)
-          // }
           assert(() => response => response.statusCode === 200)
           assert(() => response => response.headers['x-injected'] !== 'true')
         })
