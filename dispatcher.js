@@ -109,8 +109,8 @@ function hookEnd (response) {
 
 module.exports = function (configuration, request, response) {
   const emitParameters = { method: request.method, url: request.url, start: new Date() }
-  let resolve
-  const requestPromise = new Promise(promiseResolver => { resolve = promiseResolver })
+  let promiseResolver
+  const requestPromise = new Promise(resolve => { promiseResolver = resolve })
   this.emit('incoming', emitParameters)
   request[$requestPromise] = requestPromise
   request[$requestRedirectCount] = 0
@@ -119,7 +119,7 @@ module.exports = function (configuration, request, response) {
   return configurationRequests.hold
     .then(() => {
       configurationRequests.promises.push(requestPromise)
-      dispatch.call({ eventEmitter: this, emitParameters, configuration, request, response, resolve }, request.url)
+      dispatch.call({ eventEmitter: this, emitParameters, configuration, request, response, resolve: promiseResolver }, request.url)
       return requestPromise
     })
     .then(() => {
