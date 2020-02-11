@@ -8,8 +8,7 @@ const { checkMapping } = require('./mapping')
 
 const {
   $configurationInterface,
-  $configurationRequests,
-  $mappingChecked
+  $configurationRequests
 } = require('./symbols')
 
 const readFileAsync = util.promisify(fs.readFile)
@@ -73,6 +72,7 @@ function validateHandler (type) {
     handlers[type] = handler
   }
   checkHandler(handler, type)
+  Object.freeze(handler)
 }
 
 function setHandlers (configuration) {
