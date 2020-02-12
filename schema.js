@@ -1,5 +1,17 @@
 'use strict'
 
+function parseProperty (name, value) {
+  let types
+  if (typeof value === 'string') {
+    types = [value]
+  } else if (Array.isArray(value)) {
+    types = value
+  } else {
+    types = value.types || [value.type || 'string']
+  }
+  return { name, types }
+}
+
 function validate (property, object, value = property.defaultValue) {
   const { name, types } = property
   if (value === undefined) {
@@ -12,13 +24,12 @@ function validate (property, object, value = property.defaultValue) {
   object[property.name] = value
 }
 
-function parseProperty (name, value) {
-  if (typeof value === 'string') {
-    return { name, types: [ value ]}
-  }
-}
+module.exports = {
+  parse (schema) {
+    return Object.keys(schema).map(name => parseProperty(name, schema[name]))
+  },
 
-module.exports = (schema, object) => {
-  Object.keys(schema).map(name => parseProperty(name, schema[name]))
-    .forEach(property => validate(property, object, object[property.name]))
+  validate (schema, object) {
+    schema.forEach(property => validate(property, object, object[property.name]))
+  }
 }
