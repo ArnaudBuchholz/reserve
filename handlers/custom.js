@@ -5,10 +5,7 @@ const path = require('path')
 const util = require('util')
 const statAsync = util.promisify(fs.stat)
 
-const ns = 'REserve/custom@'
-const $path = Symbol(`${ns}path`)
-const $callback = Symbol(`${ns}callback`)
-const $timestamp = Symbol(`${ns}timestamp`)
+const { $customPath, $customCallback, $customTimestamp } = require('../symbols')
 
 module.exports = {
   schema: {
@@ -20,26 +17,26 @@ module.exports = {
   },
   validate: async mapping => {
     if (typeof mapping.custom === 'string') {
-      mapping[$path] = path.join(mapping.cwd, mapping.custom)
-      mapping[$callback] = require(mapping[$path])
+      mapping[$customPath] = path.join(mapping.cwd, mapping.custom)
+      mapping[$customCallback] = require(mapping[$customPath])
       if (mapping.watch) {
-        mapping[$timestamp] = (await statAsync(mapping[$path])).mtimeMs
+        mapping[$customTimestamp] = (await statAsync(mapping[$customPath])).mtimeMs
       }
     } else {
-      mapping[$callback] = mapping.custom
+      mapping[$customCallback] = mapping.custom
     }
   },
   redirect: async ({ mapping, match, request, response }) => {
-    if (mapping[$timestamp]) {
-      const timestamp = (await statAsync(mapping[$path])).mtimeMs
-      if (timestamp !== mapping[$timestamp]) {
-        mapping[$timestamp] = timestamp
-        delete require.cache[mapping[$path]]
-        mapping[$callback] = require(mapping[$path])
+    if (mapping[$customTimestamp]) {
+      const timestamp = (await statAsync(mapping[$customPath])).mtimeMs
+      if (timestamp !== mapping[$customTimestamp]) {
+        mapping[$customTimestamp] = timestamp
+        delete require.cache[mapping[$customPath]]
+        mapping[$customCallback] = require(mapping[$customPath])
       }
     }
     // Include timeout?
     const parameters = [request, response].concat([].slice.call(match, 1))
-    return mapping[$callback].apply(mapping, parameters)
+    return mapping[$customCallback].apply(mapping, parameters)
   }
 }
