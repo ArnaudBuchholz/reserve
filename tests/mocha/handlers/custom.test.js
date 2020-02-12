@@ -6,6 +6,8 @@ const Request = require('../../../mock/Request')
 const Response = require('../../../mock/Response')
 const customHandler = require('../../../handlers/custom')
 
+const { $customCallback, $customTimestamp } = require('../../../symbols')
+
 /* istanbul ignore next */ // We don't expect it to happen !
 function unexpectedCall () {
   assert(() => false)
@@ -15,7 +17,7 @@ describe('handlers/custom', () => {
   it('returns a promise', () => {
     const request = new Request()
     const response = new Response()
-    const result = customHandler.redirect({ request, response, mapping: { _callback: () => {} }, match: [] })
+    const result = customHandler.redirect({ request, response, mapping: { [$customCallback]: () => {} }, match: [] })
     assert(() => typeof result.then === 'function')
   })
 
@@ -26,7 +28,7 @@ describe('handlers/custom', () => {
       request,
       response,
       mapping: {
-        _callback: (receivedRequest, receivedResponse, ...additionalParameters) => {
+        [$customCallback]: (receivedRequest, receivedResponse, ...additionalParameters) => {
           assert(() => receivedRequest === request)
           assert(() => receivedResponse === response)
           assert(() => additionalParameters.length === 2)
@@ -45,7 +47,7 @@ describe('handlers/custom', () => {
       request,
       response,
       mapping: {
-        _callback: async () => 'OK'
+        [$customCallback]: async () => 'OK'
       },
       match: []
     })
@@ -59,7 +61,7 @@ describe('handlers/custom', () => {
       request,
       response,
       mapping: {
-        _callback: () => {
+        [$customCallback]: () => {
           throw new Error('KO')
         }
       },
@@ -78,7 +80,7 @@ describe('handlers/custom', () => {
       request,
       response,
       mapping: {
-        _callback: async () => {
+        [$customCallback]: async () => {
           throw new Error('KO')
         }
       },
@@ -106,7 +108,7 @@ describe('handlers/custom', () => {
       mapping,
       match: []
     })
-    const timestamp1 = mapping._timestamp
+    const timestamp1 = mapping[$customTimestamp]
     await response1.waitForFinish()
     assert(() => response1.toString() === 'first')
     assert(() => timestamp1)
@@ -121,7 +123,7 @@ describe('handlers/custom', () => {
     })
     await response2.waitForFinish()
     assert(() => response2.toString() === 'second')
-    assert(() => mapping._timestamp !== timestamp1)
+    assert(() => mapping[$customTimestamp] !== timestamp1)
   })
 
   it('implements file watching (timestamp remains the same)', async () => {
@@ -140,7 +142,7 @@ describe('handlers/custom', () => {
       mapping,
       match: []
     })
-    const timestamp1 = mapping._timestamp
+    const timestamp1 = mapping[$customTimestamp]
     await response1.waitForFinish()
     assert(() => response1.toString() === 'first')
     assert(() => timestamp1)
@@ -159,6 +161,6 @@ describe('handlers/custom', () => {
     })
     await response2.waitForFinish()
     assert(() => response2.toString() === 'first')
-    assert(() => mapping._timestamp === timestamp1)
+    assert(() => mapping[$customTimestamp] === timestamp1)
   })
 })
