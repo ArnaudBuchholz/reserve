@@ -3,6 +3,8 @@
 const assert = require('./assert')
 const { read, check } = require('../../configuration')
 
+const { $customCallback } = require('../../symbols')
+
 const shouldFail = promise => promise.then(assert.notExpected, () => {
   assert(() => true) // expected
 })
@@ -107,8 +109,8 @@ describe('configuration', () => {
         }]
       })
         .then(configuration => {
-          assert(() => typeof configuration.mappings[0]._callback === 'function')
-          return configuration.mappings[0]._callback()
+          assert(() => typeof configuration.mappings[0][$customCallback] === 'function')
+          return configuration.mappings[0][$customCallback]()
         })
     })
 
