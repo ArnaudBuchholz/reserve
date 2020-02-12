@@ -59,17 +59,17 @@ describe('schema', () => {
 
   describe('validate', () => {
     function check (schema, object, shouldSucceed) {
-        var exceptionCaught
-        try {
-          validate(parse(schema), object)
-        } catch (e) {
-          exceptionCaught = e
-        }
-        if (shouldSucceed) {
-          assert(() => !exceptionCaught)
-        } else {
-          assert(() => !!exceptionCaught)
-        }
+      var exceptionCaught
+      try {
+        validate(parse(schema), object)
+      } catch (e) {
+        exceptionCaught = e
+      }
+      if (shouldSucceed) {
+        assert(() => !exceptionCaught)
+      } else {
+        assert(() => !!exceptionCaught)
+      }
     }
 
     function succeeds (schema, object) {
@@ -82,9 +82,13 @@ describe('schema', () => {
 
     describe('type', () => {
       it('accepts correct type (boolean)', succeeds({ property: 'boolean' }, { property: false }))
+      it('rejects incorrect type (boolean)', fails({ property: 'boolean' }, { property: 123 }))
       it('accepts correct type (function)', succeeds({ property: 'function' }, { property: () => {} }))
+      it('rejects incorrect type (function)', fails({ property: 'function' }, { property: 123 }))
       it('accepts correct type (number)', succeeds({ property: 'number' }, { property: 123 }))
+      it('reject incorrect type (number)', fails({ property: 'number' }, { property: () => {} }))
       it('accepts correct type (string)', succeeds({ property: 'string' }, { property: 'Hello World!' }))
+      it('rejects incorrect type (string)', fails({ property: 'string' }, { property: 123 }))
     })
   })
 })
