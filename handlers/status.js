@@ -12,9 +12,6 @@ const byStatus = {
 }
 
 module.exports = {
-  schema: {
-    status: 'number'
-  },
   redirect: async function ({ response, redirect }) {
     const statusCode = redirect
     const content = byStatus[statusCode] || ''
