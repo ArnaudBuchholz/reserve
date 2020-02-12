@@ -41,7 +41,6 @@ async function checkCaseSensitivePath (filePath) {
 }
 
 module.exports = {
-  schema: {},
   redirect: ({ request, mapping, redirect, response }) => {
     if (request.method !== 'GET') {
       return Promise.resolve(405)
