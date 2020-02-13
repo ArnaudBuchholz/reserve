@@ -1,7 +1,10 @@
 'use strict'
 
+const { validate } = require('./schema')
+
 const {
   $configurationInterface,
+  $handlerSchema,
   $mappingChecked
 } = require('./symbols')
 
@@ -30,6 +33,9 @@ module.exports = {
     checkMappingCwd(mapping)
     checkMappingMatch(mapping)
     const handler = checkMappingHandler(configuration, mapping)
+    if (handler[$handlerSchema]) {
+      validate(handler[$handlerSchema], mapping)
+    }
     if (handler.validate) {
       await handler.validate(mapping, configuration[$configurationInterface])
     }
