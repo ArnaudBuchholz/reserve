@@ -2,6 +2,7 @@
 
 function parseProperty (name, value) {
   let types
+  const { defaultValue } = value
   if (typeof value === 'string') {
     types = [value]
   } else if (Array.isArray(value)) {
@@ -9,7 +10,7 @@ function parseProperty (name, value) {
   } else {
     types = value.types || [value.type || 'string']
   }
-  return { name, types }
+  return { name, types, defaultValue }
 }
 
 function validate (property, object, value = property.defaultValue) {
