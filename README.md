@@ -76,7 +76,8 @@ For instance, the definition of a server that **exposes files** of the current d
 |1.1.6|Improves response mocking (`flushHeaders()` & `headersSent`)|
 |1.1.7|Compatibility with Node.js >= 12.9|
 ||Improves response mocking|
-|1.2.0|Gives handlers access to the configuration object|
+|1.2.0|Implementation of handler schema|
+||Gives handlers access to the configuration interface|
 ||Prevents internal redirection infinite loops (see `max-redirect`)|
 
 # Usage
