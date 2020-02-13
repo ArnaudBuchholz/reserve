@@ -9,6 +9,7 @@ module.exports = {
   $customPath: Symbol(`${ns}custom.path`),
   $customCallback: Symbol(`${ns}custom.callback`),
   $customTimestamp: Symbol(`${ns}custom.timestamp`),
+  $handlerSchema: Symbol(`${ns}handler.schema`),
   $mappingChecked: Symbol(`${ns}mapping.checked`),
   $requestPromise: Symbol(`${ns}request.promise`),
   $requestRedirectCount: Symbol(`${ns}request.redirectCount`),
