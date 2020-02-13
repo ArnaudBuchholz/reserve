@@ -82,6 +82,8 @@
     ]
   },
   "nyc": {
+    "all": true,
+    "cache": false,
     "check-coverage": true,
     "exclude": [
       "tests/mocha/assert.js",
