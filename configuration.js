@@ -5,10 +5,12 @@ const path = require('path')
 const util = require('util')
 const IConfiguration = require('./iconfiguration')
 const { checkMapping } = require('./mapping')
+const { parse } = require('./schema')
 
 const {
   $configurationInterface,
-  $configurationRequests
+  $configurationRequests,
+  $handlerSchema
 } = require('./symbols')
 
 const readFileAsync = util.promisify(fs.readFile)
@@ -59,6 +61,10 @@ function getHandler (handlers, types, mapping) {
 }
 
 function checkHandler (handler, type) {
+  if (handler.schema) {
+    handler[$handlerSchema] = parse(handler.schema)
+    delete handler.schema
+  }
   if (typeof handler.redirect !== 'function') {
     throw new Error('Invalid "' + type + '" handler: redirect is not a function')
   }
