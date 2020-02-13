@@ -58,10 +58,12 @@ describe('schema', () => {
   })
 
   describe('validate', () => {
-    function check (schema, object, shouldSucceed) {
-      var exceptionCaught
+    function parseAndCheck (schema, object, shouldSucceed = true) {
+      let exceptionCaught
+      let parsedSchema
       try {
-        validate(parse(schema), object)
+        parsedSchema = parse(schema)
+        validate(parsedSchema, object)
       } catch (e) {
         exceptionCaught = e
       }
@@ -70,14 +72,15 @@ describe('schema', () => {
       } else {
         assert(() => !!exceptionCaught)
       }
+      return parsedSchema
     }
 
     function succeeds (schema, object) {
-      return () => check(schema, object, true)
+      return () => parseAndCheck(schema, object, true)
     }
 
     function fails (schema, object) {
-      return () => check(schema, object, false)
+      return () => parseAndCheck(schema, object, false)
     }
 
     describe('type', () => {
@@ -89,6 +92,33 @@ describe('schema', () => {
       it('reject incorrect type (number)', fails({ property: 'number' }, { property: () => {} }))
       it('accepts correct type (string)', succeeds({ property: 'string' }, { property: 'Hello World!' }))
       it('rejects incorrect type (string)', fails({ property: 'string' }, { property: 123 }))
+      it('accepts one of several types (boolean, string), boolean use', succeeds({ property: ['boolean', 'string'] }, { property: false }))
+      it('accepts one of several types (boolean, string), string use', succeeds({ property: ['boolean', 'string'] }, { property: 'false' }))
+      it('rejects incorrect types (boolean, string), number use', fails({ property: ['boolean', 'string'] }, { property: 0 }))
+    })
+
+    describe('defaultValue', () => {
+      it('uses value when set', () => {
+        var object = { property: true }
+        parseAndCheck({
+          property: {
+            type: 'boolean',
+            defaultValue: false
+          }
+        }, object)
+        assert(() => object.property === true)
+      })
+
+      it('sets value when missing', () => {
+        var object = {}
+        parseAndCheck({
+          property: {
+            type: 'boolean',
+            defaultValue: false
+          }
+        }, object)
+        assert(() => object.property === false)
+      })
     })
   })
 })
