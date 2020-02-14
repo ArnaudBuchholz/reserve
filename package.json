@@ -86,6 +86,7 @@
     "cache": false,
     "check-coverage": true,
     "exclude": [
+      "tests/*.js",
       "tests/mocha/assert.js",
       "log.js",
       "logError.js"
