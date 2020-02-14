@@ -57,11 +57,7 @@ const handler = {
         }
       }
       mappings.unshift(injectedMapping)
-      try {
-        await configuration.setMappings(mappings, request)
-      } catch (e) {
-        console.error(e.toString())
-      }
+      await configuration.setMappings(mappings, request)
     }
     response.end(answer)
   }
@@ -69,36 +65,34 @@ const handler = {
 
 describe('iconfiguration', () => {
   describe('validate', () => {
-    it('passes mapping and configuration to the validate method', () => {
-      return check({
-        handlers: {
-          test: handler
-        },
-        mappings: [{
-          match: '(.*)',
-          test: '$1'
-        }]
-      })
-        .then(configuration => {
-          assert(() => configuration.mappings[0].ok)
-        })
+    it('passes mapping and configuration to the validate method', () => check({
+      handlers: {
+        test: handler
+      },
+      mappings: [{
+        match: '(.*)',
+        test: '$1'
+      }]
     })
+      .then(configuration => {
+        assert(() => configuration.mappings[0].ok)
+      })
+    )
 
-    it('invalidates mapping using exception', () => {
-      return check({
-        handlers: {
-          test: handler
-        },
-        mappings: [{
-          ko: true,
-          test: '$1'
-        }]
-      })
-        .then(assert.notExpected, reason => {
-          assert(() => reason instanceof Error)
-          assert(() => reason.message === 'mapping.ko')
-        })
+    it('invalidates mapping using exception', () => check({
+      handlers: {
+        test: handler
+      },
+      mappings: [{
+        ko: true,
+        test: '$1'
+      }]
     })
+      .then(assert.notExpected, reason => {
+        assert(() => reason instanceof Error)
+        assert(() => reason.message === 'mapping.ko')
+      })
+    )
   })
 
   describe('redirect', function () {
