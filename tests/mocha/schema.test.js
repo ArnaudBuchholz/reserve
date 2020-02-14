@@ -83,6 +83,10 @@ describe('schema', () => {
       return () => parseAndCheck(schema, object, false)
     }
 
+    describe('required properties', () => {
+      it('checks that the property exists', fails({ property: 'boolean' }, {}))
+    })
+
     describe('type', () => {
       it('accepts correct type (boolean)', succeeds({ property: 'boolean' }, { property: false }))
       it('rejects incorrect type (boolean)', fails({ property: 'boolean' }, { property: 123 }))
