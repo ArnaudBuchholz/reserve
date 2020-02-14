@@ -20,7 +20,7 @@ function checkConfiguration (configuration, mapping) {
   assert(() => configuration.handlers.file === fileHandler)
   const fileHandlerRedirect = fileHandler.redirect
   try {
-    fileHandler.redirect = () => {}
+    fileHandler.redirect = 0
   } catch (e) {
     assert(() => e instanceof TypeError)
   }
@@ -95,7 +95,7 @@ describe('iconfiguration', () => {
     )
   })
 
-  describe('redirect', function () {
+  describe('redirect', () => {
     let mocked
 
     before(async () => {
