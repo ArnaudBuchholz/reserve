@@ -3,6 +3,9 @@
 const assert = require('./assert')
 const { parse, validate } = require('../../schema')
 
+/* istanbul ignore next */ // Will not be called
+function noop () {}
+
 describe('schema', () => {
   describe('parsing', () => {
     it('expands property reduced to a type specification', () => {
@@ -90,10 +93,10 @@ describe('schema', () => {
     describe('type', () => {
       it('accepts correct type (boolean)', succeeds({ property: 'boolean' }, { property: false }))
       it('rejects incorrect type (boolean)', fails({ property: 'boolean' }, { property: 123 }))
-      it('accepts correct type (function)', succeeds({ property: 'function' }, { property: () => {} }))
+      it('accepts correct type (function)', succeeds({ property: 'function' }, { property: noop }))
       it('rejects incorrect type (function)', fails({ property: 'function' }, { property: 123 }))
       it('accepts correct type (number)', succeeds({ property: 'number' }, { property: 123 }))
-      it('reject incorrect type (number)', fails({ property: 'number' }, { property: () => {} }))
+      it('reject incorrect type (number)', fails({ property: 'number' }, { property: noop }))
       it('accepts correct type (string)', succeeds({ property: 'string' }, { property: 'Hello World!' }))
       it('rejects incorrect type (string)', fails({ property: 'string' }, { property: 123 }))
       it('accepts one of several types (boolean, string), boolean use', succeeds({ property: ['boolean', 'string'] }, { property: false }))
