@@ -1,26 +1,25 @@
 'use strict'
 
 const { validate } = require('./schema')
-
 const {
   $configurationInterface,
   $handlerSchema,
   $mappingChecked
 } = require('./symbols')
 
-function checkMappingCwd (mapping) {
+function checkCwd (mapping) {
   if (!mapping.cwd) {
     mapping.cwd = process.cwd()
   }
 }
 
-function checkMappingMatch (mapping) {
+function checkMatch (mapping) {
   if (typeof mapping.match === 'string') {
     mapping.match = new RegExp(mapping.match)
   }
 }
 
-function checkMappingHandler (configuration, mapping) {
+function checkHandler (configuration, mapping) {
   const { handler } = configuration.handler(mapping)
   if (!handler) {
     throw new Error('Unknown handler for mapping: ' + JSON.stringify(mapping))
@@ -29,10 +28,10 @@ function checkMappingHandler (configuration, mapping) {
 }
 
 module.exports = {
-  async checkMapping (configuration, mapping) {
-    checkMappingCwd(mapping)
-    checkMappingMatch(mapping)
-    const handler = checkMappingHandler(configuration, mapping)
+  async check (configuration, mapping) {
+    checkCwd(mapping)
+    checkMatch(mapping)
+    const handler = checkHandler(configuration, mapping)
     if (handler[$handlerSchema]) {
       validate(handler[$handlerSchema], mapping)
     }
