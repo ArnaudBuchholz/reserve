@@ -400,6 +400,8 @@ Example :
 | 404 | Not found |
 | 405 | Method Not Allowed |
 | 500 | Internal Server Error |
+| 501 | Not Implemented |
+| 508 | Loop Detected |
 
 ## Other handlers
 
