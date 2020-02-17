@@ -121,10 +121,10 @@ describe('iconfiguration', () => {
       })
     })
 
-    it('gives access to the configuration', () => mocked.request('GET', 'test')
+    it('gives access to the configuration', () => mocked.request('GET', 'count')
       .then(response => {
         assert(() => response.statusCode === 200)
-        assert(() => response.toString() === 'OK')
+        assert(() => response.toString() === '1')
       })
     )
 
@@ -135,20 +135,20 @@ describe('iconfiguration', () => {
       mocked.request('GET', 'count')
     ])
       .then(responses => {
-        responses.forEach((response, index) => {
-          assert(() => response => response.statusCode === 200)
-          assert(() => response => response.headers['x-injected'] !== 'true')
+        responses.forEach(response => {
+          assert(() => response.statusCode === 200)
+          assert(() => response.headers['x-injected'] !== 'true')
         })
-        assert(() => responses[0].toString() === '3')
-        assert(() => responses[1].toString() === '2')
+        assert(() => responses[0].toString() === '4')
+        assert(() => responses[1].toString() === '3')
         assert(() => responses[2].toString() === 'OK')
-        assert(() => responses[3].toString() === '1')
+        assert(() => responses[3].toString() === '2')
         return mocked.request('GET', 'count')
       })
       .then(response => {
         assert(() => response.statusCode === 200)
         assert(() => response.headers['x-injected'] === 'true')
-        assert(() => response.toString() === '4')
+        assert(() => response.toString() === '5')
       })
     )
   })
