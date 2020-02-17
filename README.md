@@ -40,7 +40,7 @@ Initially started to build a local **development environment** where static file
 - A server that aggregates several sources
 - ...
 
-By defining **an array of mappings**, one can decide how the server will process the requests. Each mapping associates a **matching** criteria defined with a
+By defining **an array of mappings**, one can decide how the server will process the requests. Each mapping associates a **matching** criterion defined with a
 [regular expression](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp) to a **handler** that will answer the request.
 
 The configuration syntax favors **simplicity** without dropping flexibility.
@@ -76,11 +76,13 @@ For instance, the definition of a server that **exposes files** of the current d
 |1.1.6|Improves response mocking (`flushHeaders()` & `headersSent`)|
 |1.1.7|Compatibility with Node.js >= 12.9|
 ||Improves response mocking|
-|1.2.0|Implementation of handler schema|
-||Gives handlers access to the configuration interface|
-||Prevents internal redirection infinite loops (see `max-redirect`)|
+|1.2.0|Implementation of handlers' schema|
+||Gives handlers access to a configuration interface|
+||Prevents infinite loops during internal redirection (see `max-redirect`)|
 
 # Usage
+
+## In a project
 
 * Install the package with `npm install reserve` *(you decide if you want to save it as development dependency or not)*
 * You may create a start script in `package.json` :
@@ -104,6 +106,13 @@ For instance, the definition of a server that **exposes files** of the current d
   }
 }
 ```
+
+## Global
+
+* Install the package with `npm install reserve --global`
+* Run `reserve`
+  * By default, it will look for a file named `reserve.json` in the current working directory
+  * A configuration file name can be specified using `--config <file name>`
 
 # Embedding
 
@@ -180,8 +189,7 @@ Default is `5000`.
 
 ## max-redirect *(optional)*
 
-When an internal redirection occurs, a counter is incremented.
-If the number of redirection goes beyond the parameter value, the request fails with error [`508`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/508).
+Limits the number of internal redirections. If the number of redirections goes beyond the parameter value, the request fails with error [`508`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/508).
 
 Default is `10`.
 
@@ -197,25 +205,22 @@ If relative, the configuration file directory or the current working directory (
 
 ## handlers
 
-An object associating an handler prefix to an handler object.
+An object associating a handler prefix to a handler object.
 If the property value is a string, the handler is obtained using  [require](https://nodejs.org/api/modules.html#modules_require_id).
 
-The handler object is defined by:
-* **validate** an asynchronous method that validates mapping definition, it will be called with two **parameters**:
-  - **mapping** the mapping being validated
-  - **configuration** the configuration object
+For instance : every mapping containing the `cache` property will be associated to the [REserve/cache](https://www.npmjs.com/package/reserve-cache) handler.
 
-* **redirect** an asynchronous method that will be called with an **object** exposing:
-  - **configuration** the configuration object
-  - **mapping** the mapping being executed
-  - **match** the regular expression [exec result](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec)
-  - **redirect** the value associated with the handler prefix in the mapping. Capturing groups are substituted.
-  - **request** [http.IncomingMessage](https://nodejs.org/api/http.html#http_class_http_incomingmessage)
-  - **response** [http.ServerResponse](https://nodejs.org/api/http.html#http_class_http_serverresponse)
+```json
+{
+  "handlers": {
+    "cache": "reserve-cache"
+  }
+}
+```
 
-**NOTE** : it is not possible to change the associations of the default prefixes (`custom`, `file`, `status`, `url` ...).
+**NOTE** : it is not possible to change the associations of the default prefixes (`custom`, `file`, `status`, `url`).
 
-**NOTE** : the **configuration** object gives access to `handlers` and `mappings` members, manipulate them carefully.
+See [Custom handlers](#custom-handlers) for more information.
 
 ## mappings
 
@@ -228,7 +233,7 @@ An array of mappings that is evaluated in the order of declaration.
 
 Each mapping must contain :
 * `match` : a string (converted to a regular expression) or a regular expression that will be applied to the request URL
-* the handler key (`custom`, `file`, `status`, `url` ...) which value may contain capturing groups *(see [handlers](#handlers))*
+* the handler prefix (`custom`, `file`, `status`, `url` ...) which value may contain capturing groups *(see [Custom handlers](#custom-handlers))*
 * `cwd` *(optional)* : the current working directory to consider for relative path, defaulted to the configuration file directory or the current working directory (when embedding)
 
 **NOTE** : when using `custom` in a [JSON](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON) file, since functions can't be used in this format, the expected value is a string referencing the relative or absolute module to load. If relative, the `cwd` member is considered.
@@ -406,6 +411,64 @@ The following handlers can be installed separately and plugged through the `hand
 | [REserve/cmd](https://www.npmjs.com/package/reserve-cmd) | Wraps command line execution |
 | [REserve/fs](https://www.npmjs.com/package/reserve-fs) | Provides [fs](https://nodejs.org/api/fs.html) APIs to the browser |
 
+## Custom handlers
+
+A custom handler object may define:
+
+* **schema** *(optional)* a mapping validation schema, see [below](#schema) for the proposed syntax
+
+
+* **validate** *(optional)* an [asynchronous](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) method that validates mapping definition, it will be called with two **parameters**:
+  - **mapping** the mapping being validated
+  - **configuration** the [configuration interface](#configuration-interface)
+
+
+* **redirect** *(mandatory)* an [asynchronous](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) method that will be called with an **object** exposing:
+  - **configuration** the [configuration interface](#configuration-interface)
+  - **mapping** the mapping being executed
+  - **match** the regular expression [exec result](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec)
+  - **redirect** the value associated with the handler prefix in the mapping. Capturing groups **are** substituted.
+  - **request** Node.js' [http.IncomingMessage](https://nodejs.org/api/http.html#http_class_http_incomingmessage)
+  - **response** Node.js' [http.ServerResponse](https://nodejs.org/api/http.html#http_class_http_serverresponse)
+
+### Schema
+
+The schema syntax is designed to be short and self-explanatory. It is a dictionary mapping a property name to its specification.
+
+It can be either:
+* Simple type specification (for instance: `"string"`)
+* Multiple types specification (for instance `["function", "string"]`)
+* Complete specification: an object containing `type` (or `types`) and a `defaultValue` for optional properties.
+
+For instance, the following schema specification defines:
+* a **mandatory** `custom` property that must be either a `function` or a `string`
+* an **optional** `watch` boolean property which default value is `false`
+
+```json
+{
+  "schema": {
+    "custom": ["function", "string"],
+    "watch": {
+      "type": "boolean",
+      "defaultValue": false
+    }
+  }
+}
+```
+
+If provided, the schema is applied on the mapping **before** the **validate** function.
+
+### Configuration interface
+
+The configuration interface lets you access the dictionary of handlers (member `handlers`) as well as the array of existing mappings (member `mappings`).
+
+It is recommended to be extremely careful when manipulating the mappings' content, since you might break the logic of the server.
+
+It is possible to safely change the list of mapping using the [asynchronous](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) `setMappings` method. This API takes two parameters: the new list of mappings and the current request.
+
+The API will:
+* validate any new mapping *(relies on an internal detection mechanism based on symbols)*
+* wait for all pending requests to be completed before applying the new list
 
 # Mocking
 
