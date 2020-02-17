@@ -4,9 +4,8 @@ const fs = require('fs')
 const path = require('path')
 const util = require('util')
 const IConfiguration = require('./iconfiguration')
-const { checkMapping } = require('./mapping')
+const { check } = require('./mapping')
 const { parse } = require('./schema')
-
 const {
   $configurationInterface,
   $configurationRequests,
@@ -113,7 +112,7 @@ async function checkMappings (configuration) {
   const configurationInterface = new IConfiguration(configuration)
   configuration[$configurationInterface] = configurationInterface
   for await (const mapping of configuration.mappings) {
-    await checkMapping(configuration, mapping)
+    await check(configuration, mapping)
   }
 }
 
