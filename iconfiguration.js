@@ -1,7 +1,6 @@
 'use strict'
 
-const { checkMapping } = require('./mapping')
-
+const { check } = require('./mapping')
 const {
   $configuration,
   $configurationRequests,
@@ -12,7 +11,7 @@ const {
 async function checkMappings (configuration, mappings) {
   for await (const mapping of mappings) {
     if (!mapping[$mappingChecked]) {
-      await checkMapping(configuration, mapping)
+      await check(configuration, mapping)
     }
   }
 }
