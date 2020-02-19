@@ -2,6 +2,7 @@
 
 'use strict'
 
+const colors = require('./detect/colors')
 const { read } = require('./configuration')
 const log = require('./log')
 const serve = require('./serve')
@@ -24,9 +25,9 @@ if (require.main === module) {
   read(configurationFileName)
     .catch(reason => {
       if (verbose) {
-        console.error(reason.toString().red)
+        console.error(colors.red(reason.toString()))
       }
-      console.warn(`'${configurationFileName}' not found or invalid, applying defaults`.yellow)
+      console.warn(colors.yellow(`'${configurationFileName}' not found or invalid, applying defaults`))
       return {} // empty configuration will use all defaults
     })
     .then(configuration => {
