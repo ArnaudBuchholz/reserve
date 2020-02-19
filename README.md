@@ -79,6 +79,7 @@ For instance, the definition of a server that **exposes files** of the current d
 |1.2.0|Implementation of handlers' schema|
 ||Gives handlers access to a configuration interface|
 ||Prevents infinite loops during internal redirection (see `max-redirect`)|
+|1.2.1|Fix coloring in command line usage|
 
 # Usage
 
