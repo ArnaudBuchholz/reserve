@@ -34,11 +34,6 @@ function redirected () {
 }
 
 function error (reason) {
-  if (this.failed) {
-    this.response.end()
-    return
-  }
-  this.failed = true
   let statusCode
   if (typeof reason === 'number') {
     statusCode = reason
@@ -52,6 +47,12 @@ function error (reason) {
     // Unhandled error
     logError(errorParameters)
   }
+  if (this.failed) {
+    // Error during error: finalize the response (whatever it means)
+    this.response.end()
+    return redirected.call(this)
+  }
+  this.failed = true
   return dispatch.call(this, statusCode)
 }
 
@@ -78,7 +79,7 @@ function redirecting ({ mapping, match, handler, type, redirect, url, index = 0 
           return redirected.call(this)
         }
         return dispatch.call(this, url, index + 1)
-      }, error.bind(this))
+    }, error.bind(this))
   } catch (e) {
     return error.call(this, e)
   }
