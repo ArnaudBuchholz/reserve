@@ -80,6 +80,8 @@ For instance, the definition of a server that **exposes files** of the current d
 ||Gives handlers access to a configuration interface|
 ||Prevents infinite loops during internal redirection (see `max-redirect`)|
 |1.2.1|Fix coloring in command line usage|
+|1.3.0|Fixes infinite loop in the error handler|
+||Adds experimental `use` handler for [express middlewares](https://www.npmjs.com/search?q=keywords%3Aexpress%20keywords%3Amiddleware)|
 
 # Usage
 
