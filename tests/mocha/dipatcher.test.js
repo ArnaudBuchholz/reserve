@@ -294,6 +294,14 @@ describe('dispatcher', () => {
           }, {
             match: 'b',
             custom: async () => 'a'
+          }, {
+            match: 'error',
+            custom: async (request, response) => {
+              response.writeHead = () => {
+                throw new Error('Simulates exception during writeHead')
+              }
+              throw new Error('Simulates exception during redirect')
+            }
           }]
         })
       })
@@ -301,6 +309,12 @@ describe('dispatcher', () => {
       it('prevents infinite redirection', () => mocked.request('GET', 'a')
         .then(response => {
           assert(() => response.statusCode === 508)
+        })
+      )
+
+      it('prevents infinite loops in error handling', () => mocked.request('GET', 'error')
+        .then(response => {
+          assert(() => response.statusCode === 500)
         })
       )
     })
