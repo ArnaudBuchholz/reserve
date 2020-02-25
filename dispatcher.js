@@ -4,10 +4,23 @@ const logError = require('./logError')
 const {
   $configurationInterface,
   $configurationRequests,
+  $dispatcherEnd,
   $requestPromise,
   $requestRedirectCount,
   $responseEnded
 } = require('./symbols')
+
+function hookEnd (response) {
+  if (!response.end[$dispatcherEnd]) {
+    const end = response.end
+    response.end = function () {
+      this[$responseEnded] = true
+      return end.apply(this, arguments)
+    }
+    response.end[$dispatcherEnd] = true
+  }
+  return response
+}
 
 function redirected () {
   const end = new Date()
@@ -21,6 +34,11 @@ function redirected () {
 }
 
 function error (reason) {
+  if (this.failed) {
+    this.response.end()
+    return
+  }
+  this.failed = true
   let statusCode
   if (typeof reason === 'number') {
     statusCode = reason
@@ -46,7 +64,7 @@ function redirecting ({ mapping, match, handler, type, redirect, url, index = 0 
       match,
       redirect,
       request: this.request,
-      response: this.response
+      response: hookEnd(this.response)
     })
       .then(result => {
         if (undefined !== result) {
@@ -99,14 +117,6 @@ function dispatch (url, index = 0) {
   return redirecting.call(this, { mapping, match, handler, type, redirect: interpolate(match, redirect), url, index })
 }
 
-function hookEnd (response) {
-  const end = response.end
-  response.end = function () {
-    this[$responseEnded] = true
-    return end.apply(this, arguments)
-  }
-}
-
 module.exports = function (configuration, request, response) {
   const emitParameters = { method: request.method, url: request.url, start: new Date() }
   let promiseResolver
@@ -114,7 +124,6 @@ module.exports = function (configuration, request, response) {
   this.emit('incoming', emitParameters)
   request[$requestPromise] = requestPromise
   request[$requestRedirectCount] = 0
-  hookEnd(response)
   const configurationRequests = configuration[$configurationRequests]
   return configurationRequests.hold
     .then(() => {
