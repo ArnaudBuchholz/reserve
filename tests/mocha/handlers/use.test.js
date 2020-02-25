@@ -21,7 +21,9 @@ describe('handlers/use', () => {
   it('rejects invalid signatures (err)', () => useHandler.validate({
     use: function () {
       /* istanbul ignore next */ // Won't be executed
-      return function (err, request, response, next) {}
+      return function (err, request, response, next) {
+        throw err
+      }
     }
   })
     .then(assert.notExpected, function (reason) {
@@ -78,7 +80,7 @@ describe('handlers/use', () => {
     }
     await useHandler.validate(mapping)
     useHandler.redirect({ mapping, request: dispatchedRequest, response: dispatchedResponse })
-        .then(assert.notExpected, reason => assert(() => reason === error))
+      .then(assert.notExpected, reason => assert(() => reason === error))
   })
 
   it('forward the middleware error (exception)', async () => {
@@ -94,6 +96,6 @@ describe('handlers/use', () => {
     }
     await useHandler.validate(mapping)
     return useHandler.redirect({ mapping, request: dispatchedRequest, response: dispatchedResponse })
-        .then(assert.notExpected, reason => assert(() => reason === error))
+      .then(assert.notExpected, reason => assert(() => reason === error))
   })
 })
