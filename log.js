@@ -5,7 +5,9 @@ const logError = require('./logError')
 
 const onRedirected = ({ method, url, statusCode, timeSpent }) => {
   let report
-  if (statusCode > 399) {
+  if (!statusCode) {
+    report = colors.red('N/A')
+  } else if (statusCode > 399) {
     report = colors.red(statusCode.toString())
   } else {
     report = colors.green(statusCode.toString())
