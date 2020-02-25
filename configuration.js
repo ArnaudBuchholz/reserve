@@ -19,7 +19,8 @@ const defaultHandlers = {
   custom: require('./handlers/custom'),
   file: require('./handlers/file'),
   status: require('./handlers/status'),
-  url: require('./handlers/url')
+  url: require('./handlers/url'),
+  use: require('./handlers/use')
 }
 
 const defaults = {
