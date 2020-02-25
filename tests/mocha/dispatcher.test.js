@@ -5,7 +5,7 @@ const mime = require('../../detect/mime')
 const EventEmitter = require('events')
 const Request = require('../../mock/Request')
 const Response = require('../../mock/Response')
-const { check, mock } = require('../../index')
+const { check, mock, log } = require('../../index')
 const dispatcher = require('../../dispatcher')
 
 const textMimeType = mime.getType('text')
@@ -312,9 +312,9 @@ describe('dispatcher', () => {
         })
       )
 
-      it('prevents infinite loops in error handling', () => mocked.request('GET', 'error')
+      it('prevents infinite loops in error handling', () => log(mocked, true).request('GET', 'error')
         .then(response => {
-          assert(() => response.statusCode === 500)
+          assert(() => !response.statusCode)
         })
       )
     })
