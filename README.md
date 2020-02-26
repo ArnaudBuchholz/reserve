@@ -70,18 +70,19 @@ For instance, the definition of a server that **exposes files** of the current d
 ||[`colors`](https://www.npmjs.com/package/colors) and [`mime`](https://www.npmjs.com/package/mime) are no more dependencies|
 |1.1.2|Performance testing, `--silent`|
 ||`case-sensitive` option in **file** handler|
-|1.1.3|Default hostname changed to `undefined`|
+|1.1.3|Changes default hostname to `undefined`|
 |1.1.4|Enables external handlers in `json` configuration through [require](https://nodejs.org/api/modules.html#modules_require_id)|
 |1.1.5|Fixes relative path use of external handlers in `json` configuration|
 |1.1.6|Improves response mocking (`flushHeaders()` & `headersSent`)|
 |1.1.7|Compatibility with Node.js >= 12.9|
 ||Improves response mocking|
-|1.2.0|Implementation of handlers' schema|
+|1.2.0|Implements handlers' schema|
 ||Gives handlers access to a configuration interface|
 ||Prevents infinite loops during internal redirection (see `max-redirect`)|
-|1.2.1|Fix coloring in command line usage|
+|1.2.1|Fixes coloring in command line usage|
 |1.3.0|Fixes infinite loop in the error handler|
 ||Adds experimental `use` handler for [express middlewares](https://www.npmjs.com/search?q=keywords%3Aexpress%20keywords%3Amiddleware)|
+||Makes the mapping `match` member optional|
 
 # Usage
 
@@ -235,7 +236,7 @@ An array of mappings that is evaluated in the order of declaration.
 **NOTE** : REserve hooks the [`response.end`](https://nodejs.org/api/http.html#http_response_end_data_encoding_callback) API to detect when the response is finalized.
 
 Each mapping must contain :
-* `match` : a string (converted to a regular expression) or a regular expression that will be applied to the request URL
+* `match` *(optional)* : a string (converted to a regular expression) or a regular expression that will be applied to the request URL, defaulted to `"(.*)"`
 * the handler prefix (`custom`, `file`, `status`, `url` ...) which value may contain capturing groups *(see [Custom handlers](#custom-handlers))*
 * `cwd` *(optional)* : the current working directory to consider for relative path, defaulted to the configuration file directory or the current working directory (when embedding)
 
@@ -405,6 +406,25 @@ Example :
 | 500 | Internal Server Error |
 | 501 | Not Implemented |
 | 508 | Loop Detected |
+
+## use
+
+Enables the use of [express middlewares](https://www.npmjs.com/search?q=keywords%3Aexpress%20keywords%3Amiddleware).
+
+Example :
+
+```json
+{
+  "use": "express-session",
+  "options" : {
+    "secret": "keyboard cat",
+    "resave": false,
+    "saveUninitialized": true
+  }
+}
+```
+
+This is an **experimental feature** that needs deeper testing.
 
 ## Other handlers
 
