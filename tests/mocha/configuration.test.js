@@ -100,6 +100,47 @@ describe('configuration', () => {
       }]
     })))
 
+    it('allows optional match', () => check({
+      mappings: [{
+        file: '$1'
+      }]
+    })
+      .then(configuration => {
+        assert(() => configuration.mappings[0].match instanceof RegExp)
+      })
+    )
+
+    const invalidMatches = [
+      true,
+      false,
+      0,
+      1,
+      {}
+    ]
+
+    invalidMatches.forEach(invalidMatch => {
+      it(`validates match (${JSON.stringify(invalidMatch)})`, () => shouldFail(check({
+        mappings: [{
+          match: invalidMatch,
+          invalid: '$1'
+        }]
+      })))
+    })
+
+    it('validates match (function)', () => shouldFail(check({
+      mappings: [{
+        match: shouldFail,
+        invalid: '$1'
+      }]
+    })))
+
+    it('validates match (Symbol)', () => shouldFail(check({
+      mappings: [{
+        match: Symbol('test'),
+        invalid: '$1'
+      }]
+    })))
+
     it('loads custom handlers using require', () => {
       return check({
         mappings: [{
