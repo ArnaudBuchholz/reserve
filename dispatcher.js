@@ -79,7 +79,7 @@ function redirecting ({ mapping, match, handler, type, redirect, url, index = 0 
           return redirected.call(this)
         }
         return dispatch.call(this, url, index + 1)
-    }, error.bind(this))
+      }, error.bind(this))
   } catch (e) {
     return error.call(this, e)
   }
