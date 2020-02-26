@@ -1,6 +1,5 @@
 {
   "mappings": [{
-    "match": ".*",
     "use": "express-session",
     "options" : {
       "secret": "keyboard cat",
