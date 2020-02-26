@@ -81,7 +81,7 @@ For instance, the definition of a server that **exposes files** of the current d
 ||Prevents infinite loops during internal redirection (see `max-redirect`)|
 |1.2.1|Fixes coloring in command line usage|
 |1.3.0|Fixes infinite loop in the error handler|
-||Adds experimental `use` handler for [express middlewares](https://www.npmjs.com/search?q=keywords%3Aexpress%20keywords%3Amiddleware)|
+||Adds experimental `use` handler for [express middleware functions](https://www.npmjs.com/search?q=keywords%3Aexpress%20keywords%3Amiddleware)|
 ||Makes the mapping `match` member optional|
 
 # Usage
@@ -222,7 +222,7 @@ For instance : every mapping containing the `cache` property will be associated 
 }
 ```
 
-**NOTE** : it is not possible to change the associations of the default prefixes (`custom`, `file`, `status`, `url`).
+**NOTE** : it is not possible to change the associations of the default prefixes (`custom`, `file`, `status`, `url`, `use`).
 
 See [Custom handlers](#custom-handlers) for more information.
 
@@ -237,7 +237,7 @@ An array of mappings that is evaluated in the order of declaration.
 
 Each mapping must contain :
 * `match` *(optional)* : a string (converted to a regular expression) or a regular expression that will be applied to the request URL, defaulted to `"(.*)"`
-* the handler prefix (`custom`, `file`, `status`, `url` ...) which value may contain capturing groups *(see [Custom handlers](#custom-handlers))*
+* the handler prefix (`custom`, `file`, `status`, `url`, `use` ...) which value may contain capturing groups *(see [Custom handlers](#custom-handlers))*
 * `cwd` *(optional)* : the current working directory to consider for relative path, defaulted to the configuration file directory or the current working directory (when embedding)
 
 **NOTE** : when using `custom` in a [JSON](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON) file, since functions can't be used in this format, the expected value is a string referencing the relative or absolute module to load. If relative, the `cwd` member is considered.
@@ -409,7 +409,11 @@ Example :
 
 ## use
 
-Enables the use of [express middlewares](https://www.npmjs.com/search?q=keywords%3Aexpress%20keywords%3Amiddleware).
+Enables the use of [express middleware functions](https://www.npmjs.com/search?q=keywords%3Aexpress%20keywords%3Amiddleware).
+
+**NOTE** : Supports only middleware functions accepting exactly three parameters (`request`, `response` and `next`) as described [here](http://expressjs.com/en/guide/writing-middleware.html).
+
+**NOTE** : This is an **experimental feature** that needs deeper testing.
 
 Example :
 
@@ -424,7 +428,9 @@ Example :
 }
 ```
 
-This is an **experimental feature** that needs deeper testing.
+| option | type | default | description |
+|---|---|---|---|
+| `options` | Object | `{}` | Options passed to the middleware factory |
 
 ## Other handlers
 
