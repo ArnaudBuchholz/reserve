@@ -13,10 +13,32 @@ function checkCwd (mapping) {
   }
 }
 
-function checkMatch (mapping) {
-  if (typeof mapping.match === 'string') {
+function invalidMatch () {
+  throw new Error('Invalid mapping match')
+}
+
+const matchTypes = {
+  undefined: mapping => {
+    mapping.match = /(.*)/
+  },
+  string: (mapping, match) => {
     mapping.match = new RegExp(mapping.match)
+  },
+  object: (mapping, match) => {
+    if (!(mapping.match instanceof RegExp)) {
+      throw new Error('')
+    }
   }
+}
+
+'boolean,number,bigint,symbol,function'
+  .split(',')
+  .forEach(type => {
+    matchTypes[type] = invalidMatch
+  })
+
+function checkMatch (mapping) {
+  matchTypes[typeof mapping.match](mapping, mapping.match)
 }
 
 function checkHandler (configuration, mapping) {
