@@ -250,7 +250,6 @@ For instance :
 {
   "port": 8080,
   "mappings": [{
-    "match": ".*",
     "custom": "./cors"
   }, {
     "match": "^/(.*)",
@@ -293,6 +292,7 @@ Example :
 * Only supports [GET](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET)
 * Capturing groups can be used as substitution parameters
 * Absolute or relative to the handler's `cwd` member *(see [mappings](#mappings))*
+* Incoming URL parameters are automatically stripped out to simplify the matching expression
 * Directory access is internally redirected to the inner `index.html` file *(if any)* or `404` status
 * File access returns `404` status if missing or can't be read
 * Mime type computation is based on [`mime`](https://www.npmjs.com/package/mime) **if installed**. Otherwise a limited subset of mime types is used:
@@ -348,7 +348,6 @@ Enables 'simple' **custom** handlers.
 Examples :
 ```javascript
 {
-  match: /.*/,
   custom: async (request, response) => response.setHeader('Access-Control-Allow-Origin', '*')
 }
 ```
@@ -357,7 +356,6 @@ Or using an external module :
 
 ```javascript
 {
-  match: /.*/,
   custom: './cors.js'
 }
 ```
