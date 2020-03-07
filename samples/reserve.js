@@ -1,0 +1,6 @@
+require('colors')
+const path = require('path')
+const { log, read, serve } = require('..')
+read(path.join(process.env.INIT_CWD, 'reserve.json'))
+  .then(configuration => log(serve(configuration)))
+  .catch(reason => console.error(reason.toString().red))
