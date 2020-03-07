@@ -94,7 +94,8 @@
       "tests/mocha/assert.js",
       "log.js",
       "logError.js",
-      "coverage/**"
+      "coverage/**",
+      "samples/**"
     ],
     "branches": 100,
     "lines": 100,
