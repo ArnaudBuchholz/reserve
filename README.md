@@ -60,6 +60,12 @@ For instance, the definition of a server that **exposes files** of the current d
 }
 ```
 
+## More documentation
+
+* [Rational](https://github.com/ArnaudBuchholz/reserve/tree/master/doc/rational.md)
+* [Technical details](https://github.com/ArnaudBuchholz/reserve/tree/master/doc/technical%20details.md)
+* [Tests & Quality](https://github.com/ArnaudBuchholz/reserve/tree/master/doc/tests%20%%20quality.md)
+
 # What's New ?
 
 |Version|content|
@@ -83,6 +89,7 @@ For instance, the definition of a server that **exposes files** of the current d
 |1.3.0|Fixes infinite loop in the error handler|
 ||Adds experimental `use` handler for [express middleware functions](https://www.npmjs.com/search?q=keywords%3Aexpress%20keywords%3Amiddleware)|
 ||Makes the mapping `match` member optional|
+|1.3.1|More documentation|
 
 # Usage
 
