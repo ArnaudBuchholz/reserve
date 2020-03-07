@@ -181,7 +181,7 @@ This mapping executes the [express-session](https://www.npmjs.com/package/expres
 
 ## Mock
 
-The mock component is a **substitute to the serve agent** designed to provide a **controlled environment to test a configuration**. On top of mocking the serve agent, it offers a method to simulate a request by dispatching it and waiting for its processing to be completed.
+The mock component is a **substitute to the serve agent** designed to provide a **controlled environment to test a configuration**. It offers a method to simulate a request by dispatching it and waiting for its processing to be completed.
 
 Example :
 ```javascript
