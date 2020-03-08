@@ -2,9 +2,9 @@
   "port": 8080,
   "mappings": [{
     "match": "^/$",
-    "file": "../www/static.html"
+    "file": "./www/static.html"
   }, {
     "match": "^/(.*)",
-    "file": "../www/$1"
+    "file": "./www/$1"
   }]
 }
