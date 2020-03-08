@@ -5,7 +5,7 @@ module.exports = (request, response, url) => {
     const buffer = Buffer.from(/Basic (.*)/.exec(request.headers.authorization)[1], 'base64')
     const nameAndPassword = buffer.toString('ascii').split(':')
     if (nameAndPassword[0] === 'arnaud') {
-        return
+      return
     }
   }
   response.writeHead(401, {
