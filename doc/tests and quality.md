@@ -1,10 +1,14 @@
 # Tests & Quality
 
-How do you test a web server ?
-One basic option consists in creating a website and open a browser to it
-But this can hardly be automated.
+When it comes to web application testing, there are many ways to deal with it. On one hand, you may use [selenium-based tools](https://www.guru99.com/automated-testing-tools.html) (or [alternatives](https://www.guru99.com/selenium-alternatives.html)) to automate a browser,  run a given set of scenario and assess the expected results. On the other hand, you may leverage a simple http client *(for instance [curl](https://curl.haxx.se/) or Node.js' [request](https://www.npmjs.com/package/request))* and analyze the responses.
+
+But, with regards to [REserve](https://www.npmjs.com/package/reserve),
+the server behavior needs to be validated.
+Since it is very flexible, every possible configuration should be tested and the error management should be controlled.
 
 ## Basic testing
+
+Like many proof of concepts, the very first testing that was done consisted in creating a mappings.json file illustrating all types of mapping
 
 mappings.json
 extended by http.json, https.json
