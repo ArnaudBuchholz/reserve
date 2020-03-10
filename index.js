@@ -45,6 +45,7 @@ if (require.main === module) {
     })
 } else {
   module.exports = {
+    body: require('./body'),
     check: require('./configuration').check,
     log,
     mock: require('./mock'),
