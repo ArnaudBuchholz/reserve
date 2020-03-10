@@ -90,6 +90,7 @@ For instance, the definition of a server that **exposes files** of the current d
 ||Adds experimental `use` handler for [express middleware functions](https://www.npmjs.com/search?q=keywords%3Aexpress%20keywords%3Amiddleware)|
 ||Makes the mapping `match` member optional|
 |1.3.1|More documentation|
+||simple body reader|
 
 # Usage
 
@@ -505,6 +506,21 @@ It is possible to safely change the list of mapping using the [asynchronous](htt
 The API will:
 * validate any new mapping *(relies on an internal detection mechanism based on symbols)*
 * wait for all pending requests to be completed before applying the new list
+
+# Helpers
+
+## body
+
+Since version 1.3.1, the package offers a **basic** method to **read the request body**.
+
+```javascript
+const { body } = require('reserve')
+
+async function customHandler (request, response) {
+  const requestBody = JSON.parse(await body(request))
+  /* ... */
+}
+```
 
 # Mocking
 
