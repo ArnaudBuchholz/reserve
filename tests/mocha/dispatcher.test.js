@@ -94,153 +94,161 @@ describe('dispatcher', () => {
     })
   }
 
-  it('redirects a request to the right handler', async () => {
-    const sampleConf = await sampleConfPromise
-    const request = new Request('GET', '/file.txt')
-    const response = new Response()
-    const emitter = new RecordedEventEmitter()
-    const promise = promisify(emitter, async parameters => {
-      await response.waitForFinish()
-      assert(() => response.statusCode === 200)
-      assert(() => response.headers['Content-Type'] === textMimeType)
-      assert(() => response.toString() === 'Hello World!')
+  describe('redirection', () => {
+    it('supports internal redirection', async () => {
+      const sampleConf = await sampleConfPromise
+      const request = new Request('GET', '/redirect')
+      const response = new Response()
+      const emitter = new RecordedEventEmitter()
+      const promise = promisify(emitter, async parameters => {
+        await response.waitForFinish()
+        assert(() => response.statusCode === 200)
+        assert(() => response.headers['Content-Type'] === textMimeType)
+        assert(() => response.toString() === 'Hello World!')
+      })
+      dispatcher.call(emitter, sampleConf, request, response)
+      return promise
     })
-    dispatcher.call(emitter, sampleConf, request, response)
-    return promise
+
+    it('supports internal status code', async () => {
+      const sampleConf = await sampleConfPromise
+      const request = new Request('GET', '/404')
+      const response = new Response()
+      const emitter = new RecordedEventEmitter()
+      const promise = promisify(emitter, parameters => {
+        assert(() => response.statusCode === 404)
+      })
+      dispatcher.call(emitter, sampleConf, request, response)
+      return promise
+    })
   })
 
-  it('supports capturing groups substitution', async () => {
-    const sampleConf = await sampleConfPromise
-    const request = new Request('GET', '/subst/file/txt')
-    const response = new Response()
-    const emitter = new RecordedEventEmitter()
-    const promise = promisify(emitter, async parameters => {
-      await response.waitForFinish()
-      assert(() => response.statusCode === 200)
-      assert(() => response.headers['Content-Type'] === textMimeType)
-      assert(() => response.toString() === 'Hello World!')
+  describe('regexp matching', () => {
+    it('supports capturing groups substitution', async () => {
+      const sampleConf = await sampleConfPromise
+      const request = new Request('GET', '/subst/file/txt')
+      const response = new Response()
+      const emitter = new RecordedEventEmitter()
+      const promise = promisify(emitter, async parameters => {
+        await response.waitForFinish()
+        assert(() => response.statusCode === 200)
+        assert(() => response.headers['Content-Type'] === textMimeType)
+        assert(() => response.toString() === 'Hello World!')
+      })
+      dispatcher.call(emitter, sampleConf, request, response)
+      return promise
     })
-    dispatcher.call(emitter, sampleConf, request, response)
-    return promise
+
+    it('supports capturing groups substitution (complex)', async () => {
+      const sampleConf = await sampleConfPromise
+      const request = new Request('GET', '/subst-complex/file/txt')
+      const response = new Response()
+      const emitter = new RecordedEventEmitter()
+      const promise = promisify(emitter, async parameters => {
+        await response.waitForFinish()
+        assert(() => response.statusCode === 200)
+        assert(() => response.headers['Content-Type'] === textMimeType)
+        assert(() => response.toString() === '$1')
+      })
+      dispatcher.call(emitter, sampleConf, request, response)
+      return promise
+    })
   })
 
-  it('supports capturing groups substitution (complex)', async () => {
-    const sampleConf = await sampleConfPromise
-    const request = new Request('GET', '/subst-complex/file/txt')
-    const response = new Response()
-    const emitter = new RecordedEventEmitter()
-    const promise = promisify(emitter, async parameters => {
-      await response.waitForFinish()
-      assert(() => response.statusCode === 200)
-      assert(() => response.headers['Content-Type'] === textMimeType)
-      assert(() => response.toString() === '$1')
+  describe('handlers', () => {
+    it('redirects a request to the right handler', async () => {
+      const sampleConf = await sampleConfPromise
+      const request = new Request('GET', '/file.txt')
+      const response = new Response()
+      const emitter = new RecordedEventEmitter()
+      const promise = promisify(emitter, async parameters => {
+        await response.waitForFinish()
+        assert(() => response.statusCode === 200)
+        assert(() => response.headers['Content-Type'] === textMimeType)
+        assert(() => response.toString() === 'Hello World!')
+      })
+      dispatcher.call(emitter, sampleConf, request, response)
+      return promise
     })
-    dispatcher.call(emitter, sampleConf, request, response)
-    return promise
-  })
 
-  it('supports internal redirection', async () => {
-    const sampleConf = await sampleConfPromise
-    const request = new Request('GET', '/redirect')
-    const response = new Response()
-    const emitter = new RecordedEventEmitter()
-    const promise = promisify(emitter, async parameters => {
-      await response.waitForFinish()
-      assert(() => response.statusCode === 200)
-      assert(() => response.headers['Content-Type'] === textMimeType)
-      assert(() => response.toString() === 'Hello World!')
+    it('allows handlers that don\'t finalize response', async () => {
+      const sampleConf = await sampleConfPromise
+      const request = new Request('GET', '/file.txt')
+      const response = new Response()
+      const emitter = new RecordedEventEmitter()
+      const promise = promisify(emitter, async parameters => {
+        await response.waitForFinish()
+        assert(() => response.headers['x-flag'] === 'true')
+        assert(() => response.statusCode === 200)
+        assert(() => response.headers['Content-Type'] === textMimeType)
+        assert(() => response.toString() === 'Hello World!')
+      })
+      dispatcher.call(emitter, sampleConf, request, response)
+      return promise
     })
-    dispatcher.call(emitter, sampleConf, request, response)
-    return promise
-  })
-
-  it('supports internal status code', async () => {
-    const sampleConf = await sampleConfPromise
-    const request = new Request('GET', '/404')
-    const response = new Response()
-    const emitter = new RecordedEventEmitter()
-    const promise = promisify(emitter, parameters => {
-      assert(() => response.statusCode === 404)
-    })
-    dispatcher.call(emitter, sampleConf, request, response)
-    return promise
-  })
-
-  function promisifyWithError (emitter, callback) {
-    let errorThrown
-    return new Promise((resolve, reject) => {
-      emitter
-        .on('error', () => {
-          errorThrown = true
-        })
-        .on('redirected', parameters => {
-          try {
-            callback(parameters, errorThrown)
-            resolve()
-          } catch (e) {
-            /* istanbul ignore next */ // We don't expect it to happen !
-            reject(e)
-          }
-        })
-    })
-  }
-
-  it('supports internal handler error', async () => {
-    const sampleConf = await sampleConfPromise
-    const request = new Request('GET', '/fail')
-    const response = new Response()
-    const emitter = new RecordedEventEmitter()
-    const promise = promisifyWithError(emitter, (parameters, errorThrown) => {
-      assert(() => response.statusCode === 500)
-      assert(() => errorThrown)
-    })
-    dispatcher.call(emitter, sampleConf, request, response)
-    return promise
-  })
-
-  it('supports internal custom error', async () => {
-    const sampleConf = await sampleConfPromise
-    const request = new Request('GET', '/throw')
-    const response = new Response()
-    const emitter = new RecordedEventEmitter()
-    const promise = promisifyWithError(emitter, (parameters, errorThrown) => {
-      assert(() => response.statusCode === 500)
-      assert(() => errorThrown)
-    })
-    dispatcher.call(emitter, sampleConf, request, response)
-    return promise
-  })
-
-  it('supports internal promise rejection', async () => {
-    const sampleConf = await sampleConfPromise
-    const request = new Request('GET', '/reject')
-    const response = new Response()
-    const emitter = new RecordedEventEmitter()
-    const promise = promisifyWithError(emitter, (parameters, errorThrown) => {
-      assert(() => response.statusCode === 500)
-      assert(() => errorThrown)
-    })
-    dispatcher.call(emitter, sampleConf, request, response)
-    return promise
-  })
-
-  it('allows handlers that don\'t finalize response', async () => {
-    const sampleConf = await sampleConfPromise
-    const request = new Request('GET', '/file.txt')
-    const response = new Response()
-    const emitter = new RecordedEventEmitter()
-    const promise = promisify(emitter, async parameters => {
-      await response.waitForFinish()
-      assert(() => response.headers['x-flag'] === 'true')
-      assert(() => response.statusCode === 200)
-      assert(() => response.headers['Content-Type'] === textMimeType)
-      assert(() => response.toString() === 'Hello World!')
-    })
-    dispatcher.call(emitter, sampleConf, request, response)
-    return promise
   })
 
   describe('Error handling', () => {
+    function promisifyWithError (emitter, callback) {
+      let errorThrown
+      return new Promise((resolve, reject) => {
+        emitter
+          .on('error', () => {
+            errorThrown = true
+          })
+          .on('redirected', parameters => {
+            try {
+              callback(parameters, errorThrown)
+              resolve()
+            } catch (e) {
+              /* istanbul ignore next */ // We don't expect it to happen !
+              reject(e)
+            }
+          })
+      })
+    }
+
+    describe('Internal errors', () => {
+      it('supports internal handler error', async () => {
+        const sampleConf = await sampleConfPromise
+        const request = new Request('GET', '/fail')
+        const response = new Response()
+        const emitter = new RecordedEventEmitter()
+        const promise = promisifyWithError(emitter, (parameters, errorThrown) => {
+          assert(() => response.statusCode === 500)
+          assert(() => errorThrown)
+        })
+        dispatcher.call(emitter, sampleConf, request, response)
+        return promise
+      })
+
+      it('supports internal custom error', async () => {
+        const sampleConf = await sampleConfPromise
+        const request = new Request('GET', '/throw')
+        const response = new Response()
+        const emitter = new RecordedEventEmitter()
+        const promise = promisifyWithError(emitter, (parameters, errorThrown) => {
+          assert(() => response.statusCode === 500)
+          assert(() => errorThrown)
+        })
+        dispatcher.call(emitter, sampleConf, request, response)
+        return promise
+      })
+
+      it('supports internal promise rejection', async () => {
+        const sampleConf = await sampleConfPromise
+        const request = new Request('GET', '/reject')
+        const response = new Response()
+        const emitter = new RecordedEventEmitter()
+        const promise = promisifyWithError(emitter, (parameters, errorThrown) => {
+          assert(() => response.statusCode === 500)
+          assert(() => errorThrown)
+        })
+        dispatcher.call(emitter, sampleConf, request, response)
+        return promise
+      })
+    })
+
     function promisifyNoError (emitter, callback) {
       return new Promise((resolve, reject) => {
         emitter
