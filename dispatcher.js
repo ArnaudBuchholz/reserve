@@ -110,6 +110,9 @@ function dispatch (url, index = 0) {
     return error.call(this, 501)
   }
   const mapping = this.configuration.mappings[index]
+  if (mapping.method && !mapping.method.includes(this.request.method)) {
+    return dispatch.call(this, url, index + 1)
+  }
   const match = mapping.match.exec(url)
   if (!match) {
     return dispatch.call(this, url, index + 1)
