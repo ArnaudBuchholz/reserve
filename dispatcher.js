@@ -5,6 +5,7 @@ const {
   $configurationInterface,
   $configurationRequests,
   $dispatcherEnd,
+  $mappingMethod,
   $requestPromise,
   $requestRedirectCount,
   $responseEnded
@@ -98,6 +99,13 @@ function interpolate (match, redirect) {
   return redirect
 }
 
+function tryMatch (mapping, method, url) {
+  if (mapping[$mappingMethod] && !mapping[$mappingMethod].includes(method)) {
+    return null
+  }
+  return mapping.match.exec(url)
+}
+
 function dispatch (url, index = 0) {
   if (typeof url === 'number') {
     return redirecting.call(this, {
@@ -110,10 +118,7 @@ function dispatch (url, index = 0) {
     return error.call(this, 501)
   }
   const mapping = this.configuration.mappings[index]
-  if (mapping.method && !mapping.method.includes(this.request.method)) {
-    return dispatch.call(this, url, index + 1)
-  }
-  const match = mapping.match.exec(url)
+  const match = tryMatch(mapping, this.request.method, url)
   if (!match) {
     return dispatch.call(this, url, index + 1)
   }
