@@ -89,6 +89,7 @@ Go to this [page](https://github.com/ArnaudBuchholz/reserve/tree/master/doc/READ
 ||Makes the mapping `match` member optional|
 |1.3.1|More [documentation](https://github.com/ArnaudBuchholz/reserve/tree/master/doc/README.md) |
 ||simple body reader|
+||`method` specification (handlers & mappings)|
 
 # Usage
 
