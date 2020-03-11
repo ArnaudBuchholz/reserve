@@ -87,7 +87,7 @@ Go to this [page](https://github.com/ArnaudBuchholz/reserve/tree/master/doc/READ
 |1.3.0|Fixes infinite loop in the error handler|
 ||Adds experimental `use` handler for [express middleware functions](https://www.npmjs.com/search?q=keywords%3Aexpress%20keywords%3Amiddleware)|
 ||Makes the mapping `match` member optional|
-|1.3.1|More [documentation](https://github.com/ArnaudBuchholz/reserve/tree/master/doc/README.md) |
+|1.4.0|More [documentation](https://github.com/ArnaudBuchholz/reserve/tree/master/doc/README.md) |
 ||simple body reader|
 ||`method` specification (handlers & mappings)|
 
