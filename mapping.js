@@ -1,10 +1,13 @@
 'use strict'
 
 const { validate } = require('./schema')
+const checkMethod = require('./checkMethod')
 const {
   $configurationInterface,
+  $handlerMethod,
   $handlerSchema,
-  $mappingChecked
+  $mappingChecked,
+  $mappingMethod
 } = require('./symbols')
 
 function checkCwd (mapping) {
@@ -49,25 +52,12 @@ function checkHandler (configuration, mapping) {
   return handler
 }
 
-function checkMethod (mapping, handler) {
-  if (!mapping.method) {
-    return
-  }
-  if (typeof mapping.method === 'string') {
-    mapping.method = mapping.method.split(',')
-  }
-  if (!Array.isArray(mapping.method)) {
-    throw new Error('Invalid method specification for mapping: ' + JSON.stringify(mapping))
-  }
-  mapping.method = mapping.method.map(verb => verb.toUpperCase())
-}
-
 module.exports = {
   async check (configuration, mapping) {
     checkCwd(mapping)
     checkMatch(mapping)
     const handler = checkHandler(configuration, mapping)
-    checkMethod(mapping, handler)
+    checkMethod(mapping, $mappingMethod, handler[$handlerMethod])
     if (handler[$handlerSchema]) {
       validate(handler[$handlerSchema], mapping)
     }
