@@ -47,10 +47,8 @@ module.exports = {
       defaultValue: false
     }
   },
+  method: 'GET',
   redirect: ({ request, mapping, redirect, response }) => {
-    if (request.method !== 'GET') {
-      return Promise.resolve(405)
-    }
     let filePath = /([^?#]+)/.exec(unescape(redirect))[1] // filter URL parameters & hash
     if (!path.isAbsolute(filePath)) {
       filePath = path.join(mapping.cwd, filePath)
