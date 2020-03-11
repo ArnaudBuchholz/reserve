@@ -5,10 +5,12 @@ const path = require('path')
 const util = require('util')
 const IConfiguration = require('./iconfiguration')
 const { check } = require('./mapping')
+const checkMethod = require('./checkMethod')
 const { parse } = require('./schema')
 const {
   $configurationInterface,
   $configurationRequests,
+  $handlerMethod,
   $handlerSchema
 } = require('./symbols')
 
@@ -64,6 +66,10 @@ function checkHandler (handler, type) {
   if (handler.schema) {
     handler[$handlerSchema] = parse(handler.schema)
     delete handler.schema
+  }
+  if (handler.method) {
+    checkMethod(handler, $handlerMethod)
+    delete handler.method
   }
   if (typeof handler.redirect !== 'function') {
     throw new Error('Invalid "' + type + '" handler: redirect is not a function')
