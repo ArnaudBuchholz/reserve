@@ -87,9 +87,28 @@ describe('dispatcher', () => {
 
       emitter
         .on('error', unexpectedError)
+        .on('redirected', async parameters => {
+          try {
+            await callback(parameters)
+            resolve()
+          } catch (e) {
+            /* istanbul ignore next */ // We don't expect it to happen !
+            reject(e)
+          }
+        })
+    })
+  }
+
+  function promisifyWithError (emitter, callback) {
+    let errorThrown
+    return new Promise((resolve, reject) => {
+      emitter
+        .on('error', () => {
+          errorThrown = true
+        })
         .on('redirected', parameters => {
           try {
-            callback(parameters)
+            callback(parameters, errorThrown)
             resolve()
           } catch (e) {
             /* istanbul ignore next */ // We don't expect it to happen !
@@ -120,7 +139,7 @@ describe('dispatcher', () => {
       const request = new Request('GET', '/404')
       const response = new Response()
       const emitter = new RecordedEventEmitter()
-      const promise = promisify(emitter, parameters => {
+      const promise = promisify(emitter, async parameters => {
         assert(() => response.statusCode === 404)
       })
       dispatcher.call(emitter, sampleConf, request, response)
@@ -154,6 +173,34 @@ describe('dispatcher', () => {
         assert(() => response.statusCode === 200)
         assert(() => response.headers['Content-Type'] === textMimeType)
         assert(() => response.toString() === '$1')
+      })
+      dispatcher.call(emitter, sampleConf, request, response)
+      return promise
+    })
+  })
+
+  describe('method matching', () => {
+    it('matches the mapping method', async () => {
+      const sampleConf = await sampleConfPromise
+      const request = new Request('INFO', '/file.txt')
+      const response = new Response()
+      const emitter = new RecordedEventEmitter()
+      const promise = promisify(emitter, async () => {
+        await response.waitForFinish()
+        assert(() => response.statusCode === 405)
+      })
+      dispatcher.call(emitter, sampleConf, request, response)
+      return promise
+    })
+
+    it('matches the handler method (no matching)', async () => {
+      const sampleConf = await sampleConfPromise
+      const request = new Request('POST', '/file.txt')
+      const response = new Response()
+      const emitter = new RecordedEventEmitter()
+      const promise = promisifyWithError(emitter, async (parameters, errorThrown) => {
+        assert(() => errorThrown)
+        assert(() => response.statusCode === 501)
       })
       dispatcher.call(emitter, sampleConf, request, response)
       return promise
@@ -194,25 +241,6 @@ describe('dispatcher', () => {
   })
 
   describe('Error handling', () => {
-    function promisifyWithError (emitter, callback) {
-      let errorThrown
-      return new Promise((resolve, reject) => {
-        emitter
-          .on('error', () => {
-            errorThrown = true
-          })
-          .on('redirected', parameters => {
-            try {
-              callback(parameters, errorThrown)
-              resolve()
-            } catch (e) {
-              /* istanbul ignore next */ // We don't expect it to happen !
-              reject(e)
-            }
-          })
-      })
-    }
-
     describe('Internal errors', () => {
       it('supports internal handler error', async () => {
         const sampleConf = await sampleConfPromise
