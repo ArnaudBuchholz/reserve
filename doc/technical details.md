@@ -1,5 +1,7 @@
 # Technical Details
 
+Based on a **clean concept**, the development of [REserve](https://www.npmjs.com/package/reserve) follows a **simple architecture** that enables **flexibility** and **extensibility**. This article provides keys to understand the **modular structure** of the implementation.
+
 ## Concept overview
 
 By defining an **array of mappings**, one can decide how the server will process the incoming requests. Each mapping associates a **matching** criterion defined with a [regular expression](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp) to a **handler** that will answer the request.
@@ -17,7 +19,6 @@ Consequently, the following mapping will match the URL `/sample/index.html` and 
   "file": "../www/$1"
 }
 ```
-
 
 ## Implementation overview
 
