@@ -201,23 +201,6 @@ describe('handlers/file', () => {
       })
   })
 
-  const methods = ['POST', 'PUT', 'DELETE']
-  methods.forEach(method => it(`fails with 405 for ${method}`, () => {
-    const request = new Request(method)
-    const response = new Response()
-    return fileHandler.redirect({
-      request,
-      response,
-      mapping: {
-        cwd: '/'
-      },
-      redirect: './file.txt'
-    })
-      .then(value => {
-        assert(() => value === 405)
-      })
-  }))
-
   describe('Case insensitive file system', function () {
     before(() => {
       fs.setCaseSensitive(false)
