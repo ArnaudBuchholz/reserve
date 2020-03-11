@@ -18,6 +18,11 @@ const sampleConfPromise = check({
     }
   },
   mappings: [{
+    method: 'INFO',
+    custom: async function redirect () {
+      return 405
+    }
+  }, {
     match: '/redirect',
     custom: async function redirect () {
       return '/file.txt'
