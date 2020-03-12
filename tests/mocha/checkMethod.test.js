@@ -5,9 +5,6 @@ const checkMethod = require('../../checkMethod')
 
 function test (method, expected, allowed) {
   return () => {
-    if (allowed) {
-        debugger
-    }
     const object = { method }
     try {
       checkMethod(object, 'checked', allowed)
@@ -32,9 +29,9 @@ describe('checkMethod', () => {
     it('ignores undefined', test(undefined, undefined))
     it('validates string', test('post', ['POST']))
     it('validates comma separated string', test('get,post', ['GET', 'POST']))
-    it('validates array', test(['get' , 'post'], ['GET', 'POST']))
+    it('validates array', test(['get', 'post'], ['GET', 'POST']))
     it('invalidates function', test(test, Error))
-    const invalidValues = [[], false, true, 0, 1, Symbol()]
+    const invalidValues = [[], false, true, 0, 1, Symbol('test')]
     invalidValues.forEach(value => it(`invalidates ${JSON.stringify(value)}`, test(value, Error)))
   })
 
