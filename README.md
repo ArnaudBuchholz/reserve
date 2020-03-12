@@ -89,8 +89,7 @@ Go to this [page](https://github.com/ArnaudBuchholz/reserve/tree/master/doc/READ
 ||Makes the mapping `match` member optional|
 |1.4.0|More [documentation](https://github.com/ArnaudBuchholz/reserve/tree/master/doc/README.md) |
 ||Exposes simple body reader (`require('reserve').body`)|
-||Adds `method` specification (handlers & mappings)|
-||Adds validation to prevent use of known prefixes|
+||Adds `method` specification *(handlers & mappings)*|
 
 # Usage
 
@@ -230,7 +229,7 @@ For instance : every mapping containing the `cache` property will be associated 
 }
 ```
 
-**NOTE** : it is not possible to change the associations of the default prefixes (`custom`, `file`, `status`, `url`, `use`).
+**NOTE** : it is not possible to change the associations of the default prefixes (`custom`, `file`, `status`, `url`, `use`). **No error** will be thrown if its prefix collides with a predefined one.
 
 See [Custom handlers](#custom-handlers) for more information.
 
@@ -244,11 +243,14 @@ An array of mappings that is evaluated in the order of declaration.
 **NOTE** : REserve hooks the [`response.end`](https://nodejs.org/api/http.html#http_response_end_data_encoding_callback) API to detect when the response is finalized.
 
 Each mapping must contain :
-* `match` *(optional)* : a string (converted to a regular expression) or a regular expression that will be applied to the request URL, defaulted to `"(.*)"`
+* `match` *(optional)* : a string (converted to a regular expression) or a regular expression that will be applied to the [request URL](https://nodejs.org/api/http.html#http_message_url), defaulted to `"(.*)"`
+* `method` *(optional)* : a comma separated string or an array of [HTTP verbs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) that is matched with the [request method](https://nodejs.org/api/http.html#http_message_method), defaulted to `undefined` *(meaning all methods are allowed)*.
 * the handler prefix (`custom`, `file`, `status`, `url`, `use` ...) which value may contain capturing groups *(see [Custom handlers](#custom-handlers))*
 * `cwd` *(optional)* : the current working directory to consider for relative path, defaulted to the configuration file directory or the current working directory (when embedding)
 
 **NOTE** : when using `custom` in a [JSON](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON) file, since functions can't be used in this format, the expected value is a string referencing the relative or absolute module to load. If relative, the `cwd` member is considered.
+
+**NOTE** : each **handler may provide its own `method` parameter** depending on which verbs are implemented. The mapping's `method` value can **not** allow a verb that is not implemented. As a consequence **an error is thrown** if the combination of handler and mapping `method` parameters leads to an empty list.
 
 For instance :
 
@@ -454,6 +456,7 @@ A custom handler object may define:
 
 * **schema** *(optional)* a mapping validation schema, see [below](#schema) for the proposed syntax
 
+* **method** *(optional)* a comma separated string or an array of [HTTP verbs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) that indicates which methods are implemented. When no value is provided, REserve considers that any verbs is supported.
 
 * **validate** *(optional)* an [asynchronous](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) method that validates mapping definition, it will be called with two **parameters**:
   - **mapping** the mapping being validated
