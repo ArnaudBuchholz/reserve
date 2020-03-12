@@ -88,8 +88,9 @@ Go to this [page](https://github.com/ArnaudBuchholz/reserve/tree/master/doc/READ
 ||Adds experimental `use` handler for [express middleware functions](https://www.npmjs.com/search?q=keywords%3Aexpress%20keywords%3Amiddleware)|
 ||Makes the mapping `match` member optional|
 |1.4.0|More [documentation](https://github.com/ArnaudBuchholz/reserve/tree/master/doc/README.md) |
-||simple body reader|
-||`method` specification (handlers & mappings)|
+||Exposes simple body reader (`require('reserve').body`)|
+||Adds `method` specification (handlers & mappings)|
+||Adds validation to prevent use of known prefixes|
 
 # Usage
 
