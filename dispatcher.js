@@ -114,16 +114,17 @@ function dispatch (url, index = 0) {
       redirect: url
     })
   }
-  if (index === this.configuration.mappings.length) {
-    return error.call(this, 501)
+  const length = this.configuration.mappings.length
+  while (index < length) {
+    const mapping = this.configuration.mappings[index]
+    const match = tryMatch(mapping, this.request.method, url)
+    if (match) {
+      const { handler, redirect, type } = this.configuration.handler(mapping)
+      return redirecting.call(this, { mapping, match, handler, type, redirect: interpolate(match, redirect), url, index })
+    }
+    ++index
   }
-  const mapping = this.configuration.mappings[index]
-  const match = tryMatch(mapping, this.request.method, url)
-  if (!match) {
-    return dispatch.call(this, url, index + 1)
-  }
-  const { handler, redirect, type } = this.configuration.handler(mapping)
-  return redirecting.call(this, { mapping, match, handler, type, redirect: interpolate(match, redirect), url, index })
+  return error.call(this, 501)
 }
 
 module.exports = function (configuration, request, response) {
