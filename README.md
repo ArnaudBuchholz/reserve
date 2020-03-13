@@ -144,7 +144,7 @@ reserve({
   })
 ```
 
-The resulting object implements the [EventEmitter](https://nodejs.org/api/events.html) class and throw the following events with parameters :
+The resulting object implements the [EventEmitter](https://nodejs.org/api/events.html) class and throws the following events with parameters :
 
 | Event | Parameter (object containing members) | Description |
 |---|---|---|
@@ -229,7 +229,7 @@ For instance : every mapping containing the `cache` property will be associated 
 }
 ```
 
-**NOTE** : it is not possible to change the associations of the default prefixes (`custom`, `file`, `status`, `url`, `use`). **No error** will be thrown if its prefix collides with a predefined one.
+**NOTE** : it is not possible to change the associations of the default prefixes (`custom`, `file`, `status`, `url`, `use`). **No error** will be thrown if a prefix collides with a predefined one.
 
 See [Custom handlers](#custom-handlers) for more information.
 
@@ -238,7 +238,7 @@ See [Custom handlers](#custom-handlers) for more information.
 An array of mappings that is evaluated in the order of declaration.
 * Several mappings may apply to the same request
 * Evaluation stops when the request is **finalized** *(see the note below)*
-* When a handler triggers a redirection, the array of mappings is reevaluated
+* When a handler triggers a redirection, the array of mappings is re-evaluated
 
 **NOTE** : REserve hooks the [`response.end`](https://nodejs.org/api/http.html#http_response_end_data_encoding_callback) API to detect when the response is finalized.
 
@@ -250,7 +250,7 @@ Each mapping must contain :
 
 **NOTE** : when using `custom` in a [JSON](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON) file, since functions can't be used in this format, the expected value is a string referencing the relative or absolute module to load. If relative, the `cwd` member is considered.
 
-**NOTE** : each **handler may provide its own `method` parameter** depending on which verbs are implemented. The mapping's `method` value can **not** allow a verb that is not implemented. As a consequence **an error is thrown** if the combination of handler and mapping `method` parameters leads to an empty list.
+**NOTE** : each **handler may provide its own `method` parameter** depending on which verbs are implemented. The mapping's `method` value **cannot** allow a verb that is not implemented. As a consequence **an error is thrown** if the combination of handler and mapping `method` parameters leads to an empty list.
 
 For instance :
 
@@ -456,7 +456,7 @@ A custom handler object may define:
 
 * **schema** *(optional)* a mapping validation schema, see [below](#schema) for the proposed syntax
 
-* **method** *(optional)* a comma separated string or an array of [HTTP verbs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) that indicates which methods are implemented. When no value is provided, REserve considers that any verbs is supported.
+* **method** *(optional)* a comma separated string or an array of [HTTP verbs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) that indicates which methods are implemented. When no value is provided, REserve considers that any verb is supported.
 
 * **validate** *(optional)* an [asynchronous](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) method that validates mapping definition, it will be called with two **parameters**:
   - **mapping** the mapping being validated
@@ -514,7 +514,7 @@ The API will:
 
 ## body
 
-Since version 1.3.1, the package offers a **basic** method to **read the request body**.
+Since version 1.4.0, the package offers a **basic** method to **read the request body**.
 
 ```javascript
 const { body } = require('reserve')
