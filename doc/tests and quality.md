@@ -4,9 +4,9 @@ After drafting the first version of [REserve](https://npmjs.com/package/reserve)
 
 ## Basic testing
 
-When it comes to web application testing, there are many ways to deal with it. On one hand, you may use [selenium-based tools](https://www.guru99.com/automated-testing-tools.html) (or any [alternative](https://www.guru99.com/selenium-alternatives.html)) to **automate a browser**, run a given set of **scenario** and assess the **expected results**. On the other hand, you may leverage a simple **http client** *(for instance [curl](https://curl.haxx.se/) or Node.js' [request](https://www.npmjs.com/package/request))* and **analyze the responses**.
+There are many ways to deal with web application testing. On one hand, you may use one of the [selenium-based tools](https://www.guru99.com/automated-testing-tools.html) (or any [alternative](https://www.guru99.com/selenium-alternatives.html)) to **automate a browser**, run a given set of **scenario** and assess the **expected results**. On the other hand, you may leverage a simpler **http client** *(for instance [curl](https://curl.haxx.se/) or Node.js' [request](https://www.npmjs.com/package/request))* and **analyze the responses**.
 
-> But, with regards to this project, the most important thing is to validate the way the server behaves. Since it is very flexible, every possible configuration should be tested and the error management should be finely controlled.
+With regards to this project, the most important thing is to validate the way the **server behaves** depending on how it was configured. Since it is very **flexible**, every possible configuration should be tested and the error management should be finely controlled.
 
 
 The initial - a.k.a. basic - test is a **small website illustrating most of the features** that is run with a browser. First, a [mappings.json](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/mappings.json) file contains a mix of different handlers and mappings. Then, two additional files extend this definition to  expose it through [http](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/http.json) and [https](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/https.json).
@@ -42,17 +42,13 @@ The initial - a.k.a. basic - test is a **small website illustrating most of the 
 ```
 <u>*http.json file used to expose mappings through http*</u>
 
-A [web page](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/index.html) is designed to test different URLs and everything is validated with a list of [assertions](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/assertions.js) (thanks to the [gpf-js http](https://arnaudbuchholz.github.io/gpf/doc/gpf.http.html) helper).
+A [web page](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/index.html) is designed to test different URLs and the result is validated with a list of [assertions](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/assertions.js) (thanks to the [gpf-js http](https://arnaudbuchholz.github.io/gpf/doc/gpf.http.html) helper).
 
 ![test result](localhost_5000.png)
 
+However, this can hardly be **automated**.
 
-
-mappings.json
-extended by http.json, https.json
-assertions.js based on gpf's http helper
-index.html for browser testing
-all.js for Node.js testing
+This is the reason why the **Node.js command line** [all.js](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/all.js) was introduced. It runs the different configuration files *(http & https)* by creating a **child process** (using [fork](https://nodejs.org/api/child_process.html#child_process_child_process_fork_modulepath_args_options)) and waiting for the [startup signal](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/all.js#L24) before executing the assertions.
 
 ## In-depth testing
 
