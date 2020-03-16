@@ -46,9 +46,12 @@ A [web page](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/index.h
 
 ![test result](localhost_5000.png)
 
-However, this can hardly be **automated**.
+However, this can hardly be **automated** *(or I am too lazy to use selenium)*.
 
-This is the reason why the **Node.js command line** [all.js](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/all.js) was introduced. It runs the different configuration files *(http & https)* by creating a **child process** (using [fork](https://nodejs.org/api/child_process.html#child_process_child_process_fork_modulepath_args_options)) and waiting for the [startup signal](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/all.js#L24) before executing the assertions.
+This is the reason why the **Node.js command line** [all.js](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/all.js) was introduced.
+
+ It runs the different configuration files *(http & https)* by creating a **child process** with [child_process.fork](https://nodejs.org/api/child_process.html#child_process_child_process_fork_modulepath_args_options)). REserve detects that a parent process exists and sends a [`'ready'` message](https://github.com/ArnaudBuchholz/reserve/blob/master/index.js#L41).
+  and waiting for the [startup signal](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/all.js#L24) before executing the assertions.
 
 ## In-depth testing
 
