@@ -4,11 +4,11 @@ After drafting the first version of [REserve](https://npmjs.com/package/reserve)
 
 ## Basic testing
 
-There are many ways to deal with web application testing. On one hand, you may use one of the [selenium-based tools](https://www.guru99.com/automated-testing-tools.html) (or any [alternative](https://www.guru99.com/selenium-alternatives.html)) to **automate a browser**, run a given set of **scenario** and assess the **expected results**. On the other hand, you may leverage a simpler **http client** *(for instance [curl](https://curl.haxx.se/) or Node.js' [request](https://www.npmjs.com/package/request))* and **analyze the responses**.
+There are many ways to deal with web application testing. On one hand, you may use one of the [selenium-based tools](https://www.guru99.com/automated-testing-tools.html) (or any [alternative](https://www.guru99.com/selenium-alternatives.html)) to **automate a browser**, run a given set of **scenarios** and assess the **expected results**. On the other hand, you may leverage a simpler **http client** *(for instance [curl](https://curl.haxx.se/) or Node.js' [request](https://www.npmjs.com/package/request))* and **analyze the responses**.
 
-With regards to this project, the most important thing is to validate the way the **server behaves** depending on how it was configured. Since it is very **flexible**, every possible configuration should be tested and the error management should be finely controlled.
+With regards to this project, the most important thing is to validate the way the **server behaves** according to its configuration. Since it is very **flexible**, every possible combination should be tested and the error management should be finely controlled.
 
-The initial - a.k.a. basic - test is a **small website illustrating most of the features** that is run with a browser. First, a [mappings.json](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/mappings.json) file contains a mix of different handlers and mappings. Then, two additional files extend this definition to  expose it through [http](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/http.json) and [https](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/https.json).
+When the project started, an initial - not to say basic - test was created by building a **small website illustrating most of the features**. First, a [mappings.json](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/mappings.json) file contains a mix of different handlers and mappings. Then, two additional files extend this definition to  expose it through [http](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/http.json) and [https](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/https.json).
 
 ```json
 {
@@ -41,9 +41,10 @@ The initial - a.k.a. basic - test is a **small website illustrating most of the 
 ```
 <u>*http.json file used to expose mappings through http*</u>
 
-A [web page](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/index.html) is designed to test different URLs and the result is validated with a list of [assertions](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/assertions.js) *(thanks to the [gpf-js http](https://arnaudbuchholz.github.io/gpf/doc/gpf.http.html) helper)*.
+A [web page](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/index.html) is designed to leverage the different mappings and the result is validated with a list of [assertions](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/assertions.js) *(thanks to the [gpf-js http](https://arnaudbuchholz.github.io/gpf/doc/gpf.http.html) helper)*.
 
 ![test result](localhost_5000.png)
+<u>*Basic tests executed in a browser*</u>
 
 However, this can hardly be **automated** *(or I am too lazy to use selenium)*.
 
@@ -53,12 +54,18 @@ This is the reason why the **Node.js command line** [all.js](https://github.com/
 
 ## In-depth testing
 
-The first approach consisted in considering the whole project as a single component and test it by leveraging its known interface. This is also known as integration testing or white box testing. If you understand the pyramid of test, we are almost on the top of it... Meaning that this should be the place where the least effort is being done.
+The previous approach consisted in considering the **whole project** as a standalone - monolithic - component and test it by leveraging **a client**. This is also known as **end to end testing**. If you understand the **[pyramid of test](https://martinfowler.com/articles/practical-test-pyramid.html)**, we are almost on the top of it... Meaning that this should be the place where the least effort is being put.
 
-Another angle for testing is to isolate each class and service by mocking or stubbing their dependencies and test them individually. This is known as unit testing or white box testing.
+Another angle for testing is to **isolate each class and service** by [mocking or stubbing](https://www.martinfowler.com/articles/mocksArentStubs.html#TheDifferenceBetweenMocksAndStubs) their dependencies and **test them individually**. This is known as **unit testing**.
 
-The mocha framework was chosen for its simplicity.
+
+
+The [mocha framework](https://www.npmjs.com/package/mocha) was chosen for its simplicity.
 For each source file of the project a corresponding test file is created.
+
+![Mocha execution excerpt](mocha%20tests%20%28excerpt%29.png)
+<u>*Mocha execution excerpt*</u>
+
 
 It is possible to mock Node.js modules (such as fs, http, ...) using [mock-require](https://www.npmjs.com/package/mock-require). This tools allows you to predefine a module particular mocked object
 
