@@ -8,7 +8,6 @@ There are many ways to deal with web application testing. On one hand, you may u
 
 With regards to this project, the most important thing is to validate the way the **server behaves** depending on how it was configured. Since it is very **flexible**, every possible configuration should be tested and the error management should be finely controlled.
 
-
 The initial - a.k.a. basic - test is a **small website illustrating most of the features** that is run with a browser. First, a [mappings.json](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/mappings.json) file contains a mix of different handlers and mappings. Then, two additional files extend this definition to  expose it through [http](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/http.json) and [https](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/https.json).
 
 ```json
@@ -42,7 +41,7 @@ The initial - a.k.a. basic - test is a **small website illustrating most of the 
 ```
 <u>*http.json file used to expose mappings through http*</u>
 
-A [web page](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/index.html) is designed to test different URLs and the result is validated with a list of [assertions](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/assertions.js) (thanks to the [gpf-js http](https://arnaudbuchholz.github.io/gpf/doc/gpf.http.html) helper).
+A [web page](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/index.html) is designed to test different URLs and the result is validated with a list of [assertions](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/assertions.js) *(thanks to the [gpf-js http](https://arnaudbuchholz.github.io/gpf/doc/gpf.http.html) helper)*.
 
 ![test result](localhost_5000.png)
 
@@ -50,17 +49,27 @@ However, this can hardly be **automated** *(or I am too lazy to use selenium)*.
 
 This is the reason why the **Node.js command line** [all.js](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/all.js) was introduced.
 
- It runs the different configuration files *(http & https)* by creating a **child process** with [child_process.fork](https://nodejs.org/api/child_process.html#child_process_child_process_fork_modulepath_args_options)). REserve detects that a parent process exists and sends a [`'ready'` message](https://github.com/ArnaudBuchholz/reserve/blob/master/index.js#L41).
-  and waiting for the [startup signal](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/all.js#L24) before executing the assertions.
+ It **runs** the different configuration files *(http & https)* by creating a **child process** with [child_process.fork](https://nodejs.org/api/child_process.html#child_process_child_process_fork_modulepath_args_options) and relies on REserve's [parent process notification feature](https://github.com/ArnaudBuchholz/reserve/blob/master/index.js#L41) to wait for the server startup. Once synchronized, it **executes all the assertions** and then **stops** the server *(by killing the process)*.
 
 ## In-depth testing
 
-Test cases are defined and executed
-with mocha  
+The first approach consisted in considering the whole project as a single component and test it by leveraging its known interface. This is also known as integration testing or white box testing. If you understand the pyramid of test, we are almost on the top of it... Meaning that this should be the place where the least effort is being done.
 
+Another angle for testing is to isolate each class and service by mocking or stubbing their dependencies and test them individually. This is known as unit testing or white box testing.
 
-Node.js modules (fs, http, ...) mocking is possible
-with [mock-require](https://www.npmjs.com/package/mock-require)  
+The mocha framework was chosen for its simplicity.
+For each source file of the project a corresponding test file is created.
+
+It is possible to mock Node.js modules (such as fs, http, ...) using [mock-require](https://www.npmjs.com/package/mock-require). This tools allows you to predefine a module particular mocked object
+
+### Mocking the file system
+
+Talk about windows / unix differences
+Only the required APIs are mocked
+
+### Mocking of requests & responses
+
+Streams !
 
 ## Continuous integration
 
@@ -70,10 +79,12 @@ Travis https://travis-ci.org/ArnaudBuchholz/reserve
 ## Code coverage with Istanbul
 
 Code coverage measurement is made simple
-with [nyc](https://www.npmjs.com/package/nyc)
+thanks to [nyc](https://www.npmjs.com/package/nyc)
 
-Results are uploaded to Coveralls platform Coveralls
+Results are uploaded to and memorized by Coveralls platform Coveralls
 https://coveralls.io/github/ArnaudBuchholz/reserve
+
+npm run cover and a sample output
 
 ## Code smells
 
