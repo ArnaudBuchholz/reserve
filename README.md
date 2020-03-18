@@ -125,6 +125,8 @@ Go to this [page](https://github.com/ArnaudBuchholz/reserve/tree/master/doc/READ
   * By default, it will look for a file named `reserve.json` in the current working directory
   * A configuration file name can be specified using `--config <file name>`
 
+**NOTE** : if [`process.send`](https://nodejs.org/api/process.html#process_process_send_message_sendhandle_options_callback) is defined, REserve will notify the parent process when the server is ready by sending the message `'ready'`.
+
 # Embedding
 
 It is possible to implement the server in any application using the `reserve/serve` module :
@@ -381,7 +383,7 @@ External modules are loaded with Node.js [require](https://nodejs.org/api/module
 * That takes at least two parameters : [`request`](https://nodejs.org/api/http.html#http_class_http_incomingmessage) and [`response`](https://nodejs.org/api/http.html#http_class_http_serverresponse)
 * Capturing groups' values are passed as additional parameters.
 * This function must return a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-* If the promise is resolved to a value (i.e. not `undefined`), an internal redirection occurs i.e. the request is going over the mappings again (*infinite loops are not prevented*).
+* If the promise is resolved to a value (i.e. not `undefined`), an internal redirection occurs i.e. the request is going over the mappings again (*infinite loops are now prevented, see `max-redirect`*).
 * If the `response` is not **finalized** after executing the function *(i.e. [`response.end`](https://nodejs.org/api/http.html#http_response_end_data_encoding_callback) was not called)*, the `request` is going over the remaining mappings
 
 | option | type | default | description |
