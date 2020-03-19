@@ -56,27 +56,45 @@ This is the reason why the **Node.js command line** [all.js](https://github.com/
 
 The previous approach consisted in considering the **whole project** as a standalone - monolithic - component and test it by leveraging **a client**. This is also known as **end to end testing**. If you understand the **[pyramid of test](https://martinfowler.com/articles/practical-test-pyramid.html)**, we are almost on the top of it... Meaning that this should be the place where the least effort is being put.
 
-Another angle for testing is to **isolate each class and service** by [mocking or stubbing](https://www.martinfowler.com/articles/mocksArentStubs.html#TheDifferenceBetweenMocksAndStubs) their dependencies and **test them individually**. This is known as **unit testing**.
+Another angle for testing is to **isolate each class and service** by [mocking or stubbing](https://www.martinfowler.com/articles/mocksArentStubs.html#TheDifferenceBetweenMocksAndStubs) their dependencies and **test them individually**. This is known as **unit testing** and it starts the pyramid of tests, meaning this is where most effort should be put.
 
+### mocha
 
+If you are familiar with the [mocha framework](https://www.npmjs.com/package/mocha), you know that it is **simple to implement**, widely used and it supports many - crucial for this project - **asynchronous features**.
 
-The [mocha framework](https://www.npmjs.com/package/mocha) was chosen for its simplicity.
-For each source file of the project a corresponding test file is created.
+For each source file of the project a corresponding test file is created, for instance: [`handlers/custom.js`](https://github.com/ArnaudBuchholz/reserve/blob/master/handlers/custom.js) is tested by [`tests/mocha/handlers/custom.test.js`](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/mocha/handlers/custom.test.js).
+This pattern makes the configuration of mocha easier since you just need to setup the spec file pattern to `*.test.js`.
+
+When running, it produces a report that helps you identify which **test case failed**.
 
 ![Mocha execution excerpt](mocha%20tests%20%28excerpt%29.png)
 <u>*Mocha execution excerpt*</u>
 
+### Isolation in a nutshell
 
-It is possible to mock Node.js modules (such as fs, http, ...) using [mock-require](https://www.npmjs.com/package/mock-require). This tools allows you to predefine a module particular mocked object
+I have to admit that the project didn't start with the [tests first](https://en.wikipedia.org/wiki/Test-driven_development). As a result, the code is heavily relying on Node.js native APIs *(no encapsulation was done)*:
+* [fs](https://nodejs.org/dist/latest/docs/api/fs.html) for accessing the file system
+* [http](https://nodejs.org/dist/latest/docs/api/http.html) / [https](https://nodejs.org/dist/latest/docs/api/https.html) to create the actual server
+* The [`request`](https://nodejs.org/api/http.html#http_class_http_incomingmessage) and [`response`](https://nodejs.org/api/http.html#http_class_http_serverresponse) objects
 
-### Mocking the file system
+Luckily, it is possible to **substitute any Node.js modules** *(including the native ones)* using [mock-require](https://www.npmjs.com/package/mock-require). This simple API allows you to predefine a module with a mocked version.
 
-Talk about windows / unix differences
-Only the required APIs are mocked
+>>>>>>>>>TODO
 
-### Mocking of requests & responses
+#### Mocking the file system
 
-Streams !
+Something that was not mentioned is the fact that the file system differences between POSIX and non POSIX has a significant impact on REserve. Indeed, a web server running on a unix-like environment would be case sensitive with the URLs. On windows, it might not.
+
+Since REserve uses only a subset of the fs APIs, a custom mocked version was build that redefines only the APIs that are really used.
+
+The whole file system is virtualize thanks to a dictionary where member are either files (if they contain a content property) or a folder (when no content is found).
+
+EXAMPLE
+
+#### Mocking of requests & responses
+
+REserve provides two classes to simulate the request and response objects. They both implement streams so they can be used to also test handlers.
+
 
 ## Continuous integration
 
