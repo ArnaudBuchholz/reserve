@@ -37,4 +37,23 @@ describe('handlers/status', () => {
         assert(() => response.toString() === '')
       })
   })
+
+  it('can be used for redirections', () => {
+    const response = new Response()
+    const mapping = {
+      headers: {
+        Location: '$1'
+      }
+    }
+    const match = [undefined, 'https://www.npmjs.com/package/reserve']
+    return statusHandler.redirect({ mapping, match, response, redirect: 302 })
+      .then(async value => {
+        assert(() => value === undefined)
+        await response.waitForFinish()
+        assert(() => response.statusCode === 302)
+        assert(() => response.headers['Content-Type'] === textMimeType)
+        assert(() => response.toString() === '')
+        assert(() => response.headers.Location === 'https://www.npmjs.com/package/reserve')
+      })
+  })
 })
