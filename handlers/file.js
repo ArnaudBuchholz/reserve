@@ -45,6 +45,10 @@ module.exports = {
     'case-sensitive': {
       type: 'boolean',
       defaultValue: false
+    },
+    'ignore-if-not-found': {
+      type: 'boolean',
+      defaultValue: false
     }
   },
   method: 'GET',
@@ -64,13 +68,17 @@ module.exports = {
         }
         const isDirectory = stat.isDirectory()
         if (isDirectory ^ directoryAccess) {
-          return 404
+          return 404 // Can't ignore if not found
         }
         if (isDirectory) {
           return sendIndex(response, filePath)
         }
         return sendFile(response, filePath, stat)
       })
-      .catch(() => 404)
+      .catch(() => {
+        if (!mapping['ignore-if-not-found']) {
+          return 404
+        }
+      })
   }
 }
