@@ -1,6 +1,7 @@
 'use strict'
 
 const logError = require('./logError')
+const interpolate = require('./interpolate')
 const {
   $configurationInterface,
   $configurationRequests,
@@ -84,19 +85,6 @@ function redirecting ({ mapping, match, handler, type, redirect, url, index = 0 
   } catch (e) {
     return error.call(this, e)
   }
-}
-
-function interpolate (match, redirect) {
-  if (typeof redirect === 'string') {
-    return redirect.replace(/\$(\d+|\$)/g, (token, sIndex) => {
-      if (sIndex === '$') {
-        return '$'
-      } else {
-        return match[sIndex] || ''
-      }
-    })
-  }
-  return redirect
 }
 
 function tryMatch (mapping, method, url) {
