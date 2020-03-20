@@ -90,6 +90,8 @@ Go to this [page](https://github.com/ArnaudBuchholz/reserve/tree/master/doc/READ
 |1.4.0|More [documentation](https://github.com/ArnaudBuchholz/reserve/tree/master/doc/README.md) |
 ||Exposes simple body reader (`require('reserve').body`)|
 ||Adds `method` specification *(handlers & mappings)*|
+|1.5.0||`headers` option in **status** handler|
+||`ignore-if-not-found` option in **file** handler|
 
 # Usage
 
@@ -329,6 +331,7 @@ Example :
 | option | type | default | description |
 |---|---|---|---|
 | `case-sensitive` | Boolean | `false` | *(for Windows)* when `true`, the file path is tested case sensitively. Since it has an impact on **performances**, use carefully. |
+| `ignore-if-not-found` | Boolean | `false` | If the mapping does not resolve to a file or a folder, the handler does not end the request with status `404`. |
 
 ## url
 
