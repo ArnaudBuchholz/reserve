@@ -303,4 +303,77 @@ describe('handlers/file', () => {
       fs.setCaseSensitive(true)
     })
   })
+
+  describe('ignore-if-not-found', function () {
+    it('does not fail with 404 if the file does not exist', () => {
+      const request = new Request()
+      const response = new Response()
+      return fileHandler.redirect({
+        request,
+        response,
+        mapping: {
+          cwd: '/',
+          'ignore-if-not-found': true
+        },
+        redirect: './not-found'
+      })
+        .then(value => {
+          assert(() => value === undefined)
+          assert(() => response.isInitial())
+        })
+    })
+
+    it('does not fail with 404 if the folder does not exist', () => {
+      const request = new Request()
+      const response = new Response()
+      return fileHandler.redirect({
+        request,
+        response,
+        mapping: {
+          cwd: '/',
+          'ignore-if-not-found': true
+        },
+        redirect: './not-a-folder/not-found'
+      })
+        .then(value => {
+          assert(() => value === undefined)
+          assert(() => response.isInitial())
+        })
+    })
+
+    it('still fails for incorrect folder access (url must end with /)', () => {
+      const request = new Request()
+      const response = new Response()
+      return fileHandler.redirect({
+        request,
+        response,
+        mapping: {
+          cwd: '/',
+          'ignore-if-not-found': true
+        },
+        redirect: './folder'
+      })
+        .then(value => {
+          assert(() => value === 404)
+        })
+    })
+
+    it('does not fail with 404 if the folder does not have index.html', () => {
+      const request = new Request()
+      const response = new Response()
+      return fileHandler.redirect({
+        request,
+        response,
+        mapping: {
+          cwd: '/',
+          'ignore-if-not-found': true
+        },
+        redirect: './no-index/'
+      })
+        .then(value => {
+          assert(() => value === undefined)
+          assert(() => response.isInitial())
+        })
+    })
+  })
 })
