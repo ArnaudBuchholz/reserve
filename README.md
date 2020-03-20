@@ -90,8 +90,8 @@ Go to this [page](https://github.com/ArnaudBuchholz/reserve/tree/master/doc/READ
 |1.4.0|More [documentation](https://github.com/ArnaudBuchholz/reserve/tree/master/doc/README.md) |
 ||Exposes simple body reader (`require('reserve').body`)|
 ||Adds `method` specification *(handlers & mappings)*|
-|1.5.0||`headers` option in **status** handler|
-||`ignore-if-not-found` option in **file** handler|
+|1.5.0|`headers` option in **status** handler *(enables HTTP redirect)*|
+||`ignore-if-not-found` option in **file** handler *(enables folder browsing with a separate handler)*|
 
 # Usage
 
@@ -407,8 +407,8 @@ Example :
 
 * Supports [all HTTP methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods)
 * Accepts only Numbers
-* Used when an internal redirection to a Number occurs
-* Capturing groups are ignored
+* Also used when an internal redirection to a Number occurs
+* Capturing groups can be used in the headers' values
 * End the response with the given status and, if defined, with a textual message :
 
 | status | message |
@@ -419,6 +419,10 @@ Example :
 | 500 | Internal Server Error |
 | 501 | Not Implemented |
 | 508 | Loop Detected |
+
+| option | type | default | description |
+|---|---|---|---|
+| `headers` | Object | `{}` | Additional response headers (capturing groups can be used as substitution parameters in values) |
 
 ## use
 
