@@ -63,4 +63,10 @@ module.exports = class Response extends Duplex {
   waitForFinish () {
     return this._waitForFinish
   }
+
+  isInitial () {
+    return this._buffer.length === 0 &&
+      !this._headersSent &&
+      Object.keys(this._headers).length === 0
+  }
 }
