@@ -79,29 +79,65 @@ I have to admit that the project didn't start with the [tests first](https://en.
 
 Luckily, it is possible to **substitute any Node.js modules** *(including the native ones)* using [mock-require](https://www.npmjs.com/package/mock-require). This simple API allows you to predefine a module with a mocked version.
 
->>>>>>>>>TODO
-
 #### Mocking the file system
 
-Something that was not mentioned is the fact that the file system differences between POSIX and non POSIX has a significant impact on REserve. Indeed, a web server running on a unix-like environment would be case sensitive with the URLs. On windows, it might not.
+The **file system differences** between POSIX and non POSIX has a **significant impact** on REserve. Indeed, a web server running on a UNIX-like operating system would be **case sensitive** with the URLs. On windows, it might not.
 
-Since REserve uses only a subset of the fs APIs, a custom mocked version was build that redefines only the APIs that are really used.
+As the development environment is different from the continuous integration platform one, a **fine control of the file system behavior** is required.
 
-The whole file system is virtualize thanks to a dictionary where member are either files (if they contain a content property) or a folder (when no content is found).
+REserve uses only a **subset of the fs APIs**, a [custom mocked version](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/mocha/mocked_modules/fs.js) was build to redefine **only the APIs that are really used**.
 
-EXAMPLE
+The whole file system is **virtualized** thanks to a dictionary where members are either files *(when they contain a `content` property)* or a folder *(when no `content` is found)*.
 
-#### Mocking of requests & responses
+An additional API was added to control **whether the file system is case sensitive** or not.
 
-REserve provides two classes to simulate the request and response objects. They both implement streams so they can be used to also test handlers.
+```JavaScript
+let caseSensitive = true
 
+function getEntry (entryPath) {
+  if (!caseSensitive) {
+    entryPath = entryPath.toLowerCase()
+  }
+  if (entryPath === '/') {
+    return entries
+  }
+  return entryPath.split(path.sep).slice(1).reduce((folder, name) => {
+    if (!folder || folder.content) {
+      return folder
+    }
+    return folder[name]
+  }, entries)
+}
+```
+<u>*The main function of the virtual file system*</u>
 
-## Continuous integration
+#### Mocking of http, requests & responses
 
-Every push triggers a job that runs the tests and updates coverage info.
+>>>>> TODO
+
+What is the difference between http and https modules ? For what REserve is interested for, not much. Actually, only two methods are used on these modules: createServer and request.
+
+In order to maximize the coverage, the request method builds a response with a predefined content.
+
+As the handlers can be tested individually, a Request class is also implemented to pass information to the handler to test.
+
+REserve provides two classes to simulate the request and response objects. They both implement streams so they can be used to test handlers.
+
+Implementations can be found in:
+* [request](https://github.com/ArnaudBuchholz/reserve/blob/master/mock/Request.js)
+* [response](https://github.com/ArnaudBuchholz/reserve/blob/master/mock/Resposne.js)
+
+## Quality tools
+
+### Continuous integration
+
+Every push triggers a job that **runs the tests** and **updates coverage info**.
+The
 Travis https://travis-ci.org/ArnaudBuchholz/reserve
+Configuration is done through a [`.travis.yml`](https://github.com/ArnaudBuchholz/reserve/blob/master/.travis.yml) file
 
-## Code coverage with Istanbul
+
+### Code coverage with Istanbul
 
 Code coverage measurement is made simple
 thanks to [nyc](https://www.npmjs.com/package/nyc)
@@ -111,7 +147,7 @@ https://coveralls.io/github/ArnaudBuchholz/reserve
 
 npm run cover and a sample output
 
-## Code smells
+### Code smells
 
 Code Climate online platform performs code analysis to detect maintainability issues
 https://codeclimate.com/github/ArnaudBuchholz/reserve
