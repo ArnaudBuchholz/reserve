@@ -92,6 +92,7 @@ Go to this [page](https://github.com/ArnaudBuchholz/reserve/tree/master/doc/READ
 ||Adds `method` specification *(handlers & mappings)*|
 |1.5.0|`headers` option in **status** handler *(enables HTTP redirect)*|
 ||`ignore-if-not-found` option in **file** handler *(enables folder browsing with a separate handler)*|
+|1.6.0|Implements `$%1` and `$&1` substitution parameters *(see [Custom handlers](#custom-handlers))*|
 
 # Usage
 
@@ -479,6 +480,13 @@ A custom handler object may define:
   - **redirect** the value associated with the handler prefix in the mapping. Capturing groups **are** substituted.
   - **request** Node.js' [http.IncomingMessage](https://nodejs.org/api/http.html#http_class_http_incomingmessage)
   - **response** Node.js' [http.ServerResponse](https://nodejs.org/api/http.html#http_class_http_serverresponse)
+
+**NOTE** : Capturing groups are identified with the following syntax: `$<capturing group index in the regular expression (1-based)>`, for instance: `$1`.
+
+It is possible to decode the captured text using:
+* `$&<index>` to decode with [decodeURI](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURI)
+* `$%<index>` to decode with [decodeURIComponent](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent)
+
 
 ### Schema
 
