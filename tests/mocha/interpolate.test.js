@@ -17,7 +17,7 @@ function compare (result, expected) {
   })
 }
 
-const match = [0, 'a', 'b']
+const match = [0, 'a', 'b', '%26', '%20']
 
 describe('interpolate', () => {
   describe('string', () => {
@@ -26,7 +26,7 @@ describe('interpolate', () => {
     })
 
     it('ignores non captured groups', () => {
-      assert(() => interpolate(match, '$1$3$2') === 'ab')
+      assert(() => interpolate(match, '$1$99$2') === 'ab')
     })
 
     it('substitutes all occurrences of capturing groups', () => {
@@ -35,6 +35,16 @@ describe('interpolate', () => {
 
     it('unescapes $$', () => {
       assert(() => interpolate(match, '$1$$$2') === 'a$b')
+    })
+
+    describe('decoding capturing groups', () => {
+      it('decodes with decodeURI ($&3)', () => {
+        assert(() => interpolate(match, '$&1$&2$&3$&4') === 'ab%26 ')
+      })
+
+      it('decodes with decodeURIComponent ($%3)', () => {
+        assert(() => interpolate(match, '$%1$%2$%3$%4') === 'ab& ')
+      })
     })
   })
 
