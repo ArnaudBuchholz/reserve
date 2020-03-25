@@ -1,12 +1,20 @@
 'use strict'
 
+const unescape = {
+  '&': decodeURI,
+  '%': decodeURIComponent
+}
+
 const types = {
-  string: (match, value) => value.replace(/\$(\d+|\$)/g, (token, sIndex) => {
-    if (sIndex === '$') {
+  string: (match, value) => value.replace(/\$(%|&)?(\d+)|\$\$/g, (token, sUnescapeType, sIndex) => {
+    if (!sIndex) {
       return '$'
-    } else {
-      return match[sIndex] || ''
     }
+    const string = match[sIndex] || ''
+    if (sUnescapeType) {
+      return unescape[sUnescapeType](string)
+    }
+    return string
   }),
 
   object: (match, object) => {
