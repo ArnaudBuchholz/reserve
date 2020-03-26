@@ -93,6 +93,7 @@ Go to this [page](https://github.com/ArnaudBuchholz/reserve/tree/master/doc/READ
 |1.5.0|`headers` option in **status** handler *(enables HTTP redirect)*|
 ||`ignore-if-not-found` option in **file** handler *(enables folder browsing with a separate handler)*|
 |1.6.0|Implements `$%1` and `$&1` substitution parameters *(see [Custom handlers](#custom-handlers))*|
+|1.6.1|Exposes `require('reserve').interpolate` *(see [Custom handlers](#custom-handlers))*|
 
 # Usage
 
@@ -481,12 +482,21 @@ A custom handler object may define:
   - **request** Node.js' [http.IncomingMessage](https://nodejs.org/api/http.html#http_class_http_incomingmessage)
   - **response** Node.js' [http.ServerResponse](https://nodejs.org/api/http.html#http_class_http_serverresponse)
 
-**NOTE** : Capturing groups are identified with the following syntax: `$<capturing group index in the regular expression (1-based)>`, for instance: `$1`.
+### Capturing groups and interpolation
 
-It is possible to decode the captured text using:
-* `$&<index>` to decode with [decodeURI](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURI)
-* `$%<index>` to decode with [decodeURIComponent](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent)
+By default, the handler prefix is **interpolated**. Identified **placeholders are substituted** with values coming from the capturing groups of the matching regular expression.
 
+Three syntaxes are accepted for placeholders, `<index>` represents the capturing group index in the regular expression (1-based):
+* `$<index>` value is replaced **as-is**
+* `$&<index>` value is first **decoded** with [decodeURI](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURI)
+* `$%<index>` value is first **decoded** with [decodeURIComponent](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent)
+
+When writing an handler, it is possible to **reuse the mechanism** by importing the function `require('reserve').interpolate`. It accepts two parameters:
+* **match** the regular expression [exec result](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec)
+* **value** accepting multiple types :
+  - `string` : value is interpolated and the result returned
+  - `object` : property values are interpolated **recursively** and a new object is returned
+  - otherwise the value is returned **as-is**
 
 ### Schema
 
