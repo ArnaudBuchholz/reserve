@@ -47,6 +47,7 @@ if (require.main === module) {
   module.exports = {
     body: require('./body'),
     check: require('./configuration').check,
+    interpolate: require('./interpolate'),
     log,
     mock: require('./mock'),
     read,
