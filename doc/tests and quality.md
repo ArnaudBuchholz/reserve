@@ -92,7 +92,7 @@ The **file system differences** between operating systems has a **significant im
 
 REserve uses only a **subset of the fs APIs**, a [custom mocked version](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/mocha/mocked_modules/fs.js) was build to redefine **only the APIs that are really used**.
 
-The whole file system is **virtualized** thanks to a dictionary where members are either files *(when they contain a `content` property)* or a folder *(when no `content` is found)*.
+The whole file system is **virtualized** against a dictionary where object members are either files *(when they contain a `content` property)* or a folder *(when no `content` is found)*.
 
 An additional API was added to control **whether the file system is case sensitive** or not.
 
@@ -118,11 +118,19 @@ function getEntry (entryPath) {
 
 #### Mocking of http, requests & responses
 
+What is the **difference** between the [http](https://nodejs.org/dist/latest/docs/api/http.html) and the [https](https://nodejs.org/dist/latest/docs/api/https.html) modules ? According to REserve, not much.
+
+Actually, only two methods are used :
+* [createServer](https://nodejs.org/api/http.html#http_http_createserver_options_requestlistener) to initiate the HTTP(s) server
+* [request](https://nodejs.org/api/http.html#http_http_request_url_options_callback) to forward the an incoming request to a distant URL (`url` handler)
+
 >>>>> TODO
 
-What is the difference between http and https modules ? For what REserve is interested for, not much. Actually, only two methods are used on these modules: createServer and request.
+Since we can trust that these modules are doing their job right and as the unit tests will not go through a real http server, the mocking was made to ...
 
 In order to maximize the coverage, the request method builds a response with a predefined content.
+
+
 
 As the handlers can be tested individually, a Request class is also implemented to pass information to the handler to test.
 
