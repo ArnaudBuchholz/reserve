@@ -1,14 +1,14 @@
 # Tests & Quality
 
-After drafting the first version of [REserve](https://npmjs.com/package/reserve), some of the remaining **challenges** included **behavior validation** and **quality assessment**. This article will detail the different **strategies** adopted for **testing** as well as the **tooling** used to ensure the **quality** of the project.
+After drafting the first working version of [REserve](https://npmjs.com/package/reserve), the remaining **challenges** were to include **behavior validation** and **quality assessment**. This article will detail the different **strategies** adopted for **testing** as well as the **tooling** used to ensure the **quality** of the project.
 
 ## Basic testing
 
-There are many ways to deal with web application testing. On one hand, you may use one of the [selenium-based tools](https://www.guru99.com/automated-testing-tools.html) (or any [alternative](https://www.guru99.com/selenium-alternatives.html)) to **automate a browser**, run a given set of **scenarios** and assess the **expected results**. On the other hand, you may leverage a simpler **http client** *(for instance [curl](https://curl.haxx.se/) or Node.js' [request](https://www.npmjs.com/package/request))* and **analyze the responses**.
+There are many ways to deal with web application testing. On one hand, you may use some [selenium-based tools](https://www.guru99.com/automated-testing-tools.html) (or any [alternative](https://www.guru99.com/selenium-alternatives.html)) to **automate a browser**, run a given set of **scenarios** and assess the **expected results**. On the other hand, you may leverage a simpler **http client** *(for instance [curl](https://curl.haxx.se/) or Node.js' [request](https://www.npmjs.com/package/request))* and **analyze the responses**.
 
-With regards to this project, the most important thing is to validate the way the **server behaves** according to its configuration. Since it is very **flexible**, every possible combination should be tested and the error management should be finely controlled.
+With regards to this project, the most important thing was to validate the way the **server behaves** according to its configuration. Since it is very **flexible**, every possible combination had to be tested and the error management finely controlled.
 
-When the project started, an initial - not to say basic - test was created by building a **small website illustrating most of the features**. First, a [mappings.json](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/mappings.json) file contains a mix of different handlers and mappings. Then, two additional files extend this definition to  expose it through [http](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/http.json) and [https](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/https.json).
+When the project started, an initial - not to say basic - test was created by building a **small website illustrating most of the features**. First, a mix of different handlers and mappings was consolidated inside a [mappings.json](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/mappings.json) file. Then, two extension files exposed this definition through [http](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/http.json) and [https](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/https.json).
 
 ```json
 {
@@ -41,16 +41,17 @@ When the project started, an initial - not to say basic - test was created by bu
 ```
 <u>*http.json file used to expose mappings through http*</u>
 
-A [web page](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/index.html) is designed to leverage the different mappings and the result is validated with a list of [assertions](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/assertions.js) *(thanks to the [gpf-js http](https://arnaudbuchholz.github.io/gpf/doc/gpf.http.html) helper)*.
+Finally, a [web page](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/index.html) was designed to leverage the different mappings and the result was validated with a list of [assertions](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/assertions.js) *(thanks to the [gpf-js http](https://arnaudbuchholz.github.io/gpf/doc/gpf.http.html) helper)*.
 
 ![test result](localhost_5000.png)
+
 <u>*Basic tests executed in a browser*</u>
 
-However, this can hardly be **automated** *(or I am too lazy to use selenium)*.
+However, this can hardly be **automated** *(or the lazy me did not want to go with selenium)*.
 
 This is the reason why the **Node.js command line** [all.js](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/all.js) was introduced.
 
- It **runs** the different configuration files *(http & https)* by creating a **child process** with [child_process.fork](https://nodejs.org/api/child_process.html#child_process_child_process_fork_modulepath_args_options) and relies on REserve's [parent process notification feature](https://github.com/ArnaudBuchholz/reserve/blob/master/index.js#L41) to wait for the server startup. Once synchronized, it **executes all the assertions** and then **stops** the server *(by killing the process)*.
+ It **runs** the different configuration files *(http & https)* by creating a **child process** with [child_process.fork](https://nodejs.org/api/child_process.html#child_process_child_process_fork_modulepath_args_options). It relies on REserve's [parent process notification feature](https://github.com/ArnaudBuchholz/reserve/blob/master/index.js#L41) to **wait for the server startup**. Once synchronized, it **executes all the assertions** and then **stops** the server *(by killing the process)*.
 
 ## In-depth testing
 
@@ -62,28 +63,32 @@ Another angle for testing is to **isolate each class and service** by [mocking o
 
 If you are familiar with the [mocha framework](https://www.npmjs.com/package/mocha), you know that it is **simple to implement**, widely used and it supports many - crucial for this project - **asynchronous features**.
 
-For each source file of the project a corresponding test file is created, for instance: [`handlers/custom.js`](https://github.com/ArnaudBuchholz/reserve/blob/master/handlers/custom.js) is tested by [`tests/mocha/handlers/custom.test.js`](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/mocha/handlers/custom.test.js).
+For each source file of the project a **corresponding** test file is created, for instance: [`handlers/custom.js`](https://github.com/ArnaudBuchholz/reserve/blob/master/handlers/custom.js) is tested by [`tests/mocha/handlers/custom.test.js`](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/mocha/handlers/custom.test.js). The directory structure is also recreated under the [moch tests folder](https://github.com/ArnaudBuchholz/reserve/tree/master/tests/mocha).
+
 This pattern makes the configuration of mocha easier since you just need to setup the spec file pattern to `*.test.js`.
 
 When running, it produces a report that helps you identify which **test case failed**.
 
 ![Mocha execution excerpt](mocha%20tests%20%28excerpt%29.png)
+
 <u>*Mocha execution excerpt*</u>
 
 ### Isolation in a nutshell
 
-I have to admit that the project didn't start with the [tests first](https://en.wikipedia.org/wiki/Test-driven_development). As a result, the code is heavily relying on Node.js native APIs *(no encapsulation was done)*:
-* [fs](https://nodejs.org/dist/latest/docs/api/fs.html) for accessing the file system
-* [http](https://nodejs.org/dist/latest/docs/api/http.html) / [https](https://nodejs.org/dist/latest/docs/api/https.html) to create the actual server
+I have to admit that, as explained before, the project didn't start with the [tests first](https://en.wikipedia.org/wiki/Test-driven_development). As a result, no encapsulation was done and the code is heavily relying on Node.js native APIs. In particular :
+* [fs](https://nodejs.org/dist/latest/docs/api/fs.html) module for accessing the **file system**
+* [http](https://nodejs.org/dist/latest/docs/api/http.html) / [https](https://nodejs.org/dist/latest/docs/api/https.html) modules to create the actual **server**
 * The [`request`](https://nodejs.org/api/http.html#http_class_http_incomingmessage) and [`response`](https://nodejs.org/api/http.html#http_class_http_serverresponse) objects
 
 Luckily, it is possible to **substitute any Node.js modules** *(including the native ones)* using [mock-require](https://www.npmjs.com/package/mock-require). This simple API allows you to predefine a module with a mocked version.
 
 #### Mocking the file system
 
-The **file system differences** between POSIX and non POSIX has a **significant impact** on REserve. Indeed, a web server running on a UNIX-like operating system would be **case sensitive** with the URLs. On windows, it might not.
+Mocking the file system is **not really mandatory**: using a **dedicated directory structure** in the project could have been enough.
 
-As the development environment is different from the continuous integration platform one, a **fine control of the file system behavior** is required.
+However, the project aims to be run on **any platform**. And, actually, the development environment *(Windows)* is  different from the continuous integration platform one *(Linux)*.
+
+The **file system differences** between operating systems has a **significant impact** on REserve. Indeed, a web server running on a UNIX-like operating system would be **case sensitive** with the URLs. On windows, it might **not**.
 
 REserve uses only a **subset of the fs APIs**, a [custom mocked version](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/mocha/mocked_modules/fs.js) was build to redefine **only the APIs that are really used**.
 
