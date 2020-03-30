@@ -1,0 +1,10 @@
+{
+  "port": 8080,
+  "mappings": [{
+    "match": "^/$",
+    "file": "./webapp/static.html"
+  }, {
+    "match": "^/(.*)",
+    "file": "./webapp/$1"
+  }]
+}
