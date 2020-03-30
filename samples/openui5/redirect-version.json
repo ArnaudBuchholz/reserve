@@ -1,0 +1,13 @@
+{
+  "port": 8080,
+  "mappings": [{
+    "match": "/resources/(.*)",
+    "custom": "./redirect-version.js"
+  }, {
+    "match": "^/$",
+    "file": "./webapp/index.html"
+  }, {
+    "match": "^/(.*)",
+    "file": "./webapp/$1"
+  }]
+}
