@@ -4,7 +4,7 @@
     "match": "/resources/(.*)",
     "custom": "./redirect-version.js"
   }, {
-    "match": "^/$",
+    "match": "^/(\\?.*)?$",
     "file": "./webapp/index.html"
   }, {
     "match": "^/(.*)",
