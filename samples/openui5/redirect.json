@@ -7,7 +7,7 @@
     },
     "status": 302
   }, {
-    "match": "^/$",
+    "match": "^/(\\?.*)?$",
     "file": "./webapp/index.html"
   }, {
     "match": "^/(.*)",
