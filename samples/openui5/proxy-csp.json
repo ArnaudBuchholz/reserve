@@ -6,7 +6,7 @@
   }, {
     "custom": "./csp.js"
   }, {
-    "match": "^/$",
+    "match": "^/(\\?.*)?$",
     "file": "./webapp/index.html"
   }, {
     "match": "^/(.*)",
