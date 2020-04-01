@@ -3,46 +3,116 @@
 The best way to explain **what REserve can do** is to demonstrate some of its features through a **concrete use case**.
 In this article, we will illustrate how one can quickly setup a server to **facilitate the development of OpenUI5 applications**.
 
-## Quick overview of OpenUI5
+## Quick presentation of OpenUI5
+
+### Overview
 
 ![UI5](https://raw.githubusercontent.com/SAP/ui5-tooling/master/docs/images/UI5_logo_wide.png)
 
 [OpenUI5](https://openui5.org/) is a **free** and **open source** JavaScript framework to develop **enterprise-grade** and **responsive** applications.
 
-It implements some **standard** key concepts, such as :
+It offers some **efficient** development concepts, such as :
 * The Model View Controller (**MVC**) pattern
 * **XML** definition of views
 * Two-way **bindings**
 * Controls development with **fast rendering**
+* ODATA integration
+* Testing helpers (qUnit / [OPA](https://youtu.be/HiZq-kuIbt0))
+* ...
 
-A CDN is provided
-you access the latest version by bootstraping your app with
-https://openui5.hana.ondemand.com/resources/sap-ui-core.js
+More information can be found in [the documentation](https://openui5.hana.ondemand.com/).
 
-The community is growing and several tools are provided to help with the application development.
-https://www.npmjs.com/search?q=openui5
+### Building an OpenUI5 application
 
-In particular, if you want to build an application, you may get at least the following NPM packages locally :
+The community around the framework is **growing** and **several tools** are publicly available in the [NPM repository](https://www.npmjs.com/search?q=openui5).
 
-* [@ui5/cli](https://www.npmjs.com/package/@ui5/cli) : it contains the required tooling to serve and build your application. It cumulates [27 MB](https://packagephobia.now.sh/result?p=@ui5/cli) of dependencies.
-* [@openui5/sap.ui.core](https://www.npmjs.com/package/@openui5/sap.ui.core) : this is the core namespace of UI5. It takes [26.4 MB](https://packagephobia.now.sh/result?p=@openui5/sap.ui.core).
-* [@openui5/sap.m](https://www.npmjs.com/package/@openui5/sap.m) : this is the responsive namespace of  which requires [10.2 MB](https://packagephobia.now.sh/result?p=@openui5/sap.m) to install
-* [@openui5/themelib_sap_fiori_3](https://www.npmjs.com/package/@openui5/themelib_sap_fiori_3) which requires [4.2 MB](https://packagephobia.now.sh/result?p=@openui5/themelib_sap_fiori_3) to install
+In particular, when it comes to building an application, you must add the following NPM packages to your project :
 
-So roughly a total of 60 MB to develop the app... and then you are bound to the version of OpenUI5 you downloaded. If you want to switch the version, you have to clean the package list and install a new one.
+* [@ui5/cli](https://www.npmjs.com/package/@ui5/cli) : it contains the required **[tooling](https://github.com/SAP/ui5-tooling#ui5-tooling) to initiate, serve and build your application**.<br />It cumulates [27 MB](https://packagephobia.now.sh/result?p=@ui5/cli) of files *(including dependencies)*.
 
-## Quick overview of OpenUI5
+* [@openui5/sap.ui.core](https://www.npmjs.com/package/@openui5/sap.ui.core) : this is the UI5 **core runtime**.<br /> It takes [26.4 MB](https://packagephobia.now.sh/result?p=@openui5/sap.ui.core).
 
+* [@openui5/sap.m](https://www.npmjs.com/package/@openui5/sap.m) : this is the main UI5 control library, with responsive controls that can be used in touch devices as well as desktop browsers.<br /> It weights [10.2 MB](https://packagephobia.now.sh/result?p=@openui5/sap.m).
 
+* [@openui5/themelib_sap_fiori_3](https://www.npmjs.com/package/@openui5/themelib_sap_fiori_3) : the default theme *(including specific fonts)*. <br /> It requires [4.2 MB](https://packagephobia.now.sh/result?p=@openui5/themelib_sap_fiori_3).
 
+In the end, you basically need a total of **60 MB of packages** to start coding your application. Such a **digital footprint is quite common** for a standard Node.js development environment in which you can handle the **full lifecycle of your application** (serving, validating, minifying...).
+
+Once the **application is finalized**, depending on **its dependencies**, the deployment will live in a **fraction of this size**.
+
+There is one **little drawback** to this model. After installing all these packages, the project is **bound to the downloaded version of OpenUI5**. Since a new release of UI5 is done almost **every month**, it might be interesting to **switch between versions**.
+
+However, this means **cleaning the package list and install new ones**.
+
+That can be a **tedious process**.
+
+### OpenUI5 Content Delivery Network
+
+Luckily, the framework is built on top of a [smart dependency management model](https://openui5.hana.ondemand.com/api/sap.ui#methods/sap.ui.define) that is capable of loading the missing dependencies when needed. To put it in a nutshell, these **additional libraries** are usually **relative to the location where the [UI5 bootstrap](https://openui5.hana.ondemand.com/1.76.0/resources/sap-ui-core.js)** is obtained.
+
+Furthermore, each released version of UI5 is available from the public CDN:
+* 1.76.0 is available under [https://openui5.hana.ondemand.com/1.76.0/resources/](https://openui5.hana.ondemand.com/1.76.0/resources/sap-ui-version.json)
+* 1.75.0 is available under [https://openui5.hana.ondemand.com/1.75.0/resources/](https://openui5.hana.ondemand.com/1.75.0/resources/sap-ui-version.json)
+* 1.74.0 is available under [https://openui5.hana.ondemand.com/1.74.0/resources/](https://openui5.hana.ondemand.com/1.74.0/resources/sap-ui-version.json)
+* ...
+
+## Sample application
+
+>>>> TODO
+
+This leads to the development of this simple demonstration application that consists in one view and one button.
+
+As explained before, the UI5 framework is loaded from the CDN.
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>OpenUI5 Demo App</title>
+  <script id="sap-ui-bootstrap"
+    src="https://openui5.hana.ondemand.com/1.76.0/resources/sap-ui-core.js"
+    data-sap-ui-theme="sap_fiori_3"
+    data-sap-ui-libs="sap.m"
+    data-sap-ui-resourceroots='{"Demo": "./"}'
+    data-sap-ui-onInit="module:Demo/index"
+    data-sap-ui-compatVersion="edge"
+    data-sap-ui-async="true">
+  </script>
+</head>
+<body class="sapUiBody" id="content"></body>
+</html>
+```
+
+When opening this file in the browser, the application does not load.
+
+![static](openui5/file%20access.png)
+
+### REserve to the rescue
 
 Installation:
 `npm install reserve -g`
 
-## The sample application
-
-## Opening the file
-
 ![File access](openui5/file%20access.png)
 
-## Static web site
+## Variations of the UI5 version
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>OpenUI5 Demo App</title>
+  <script id="sap-ui-bootstrap"
+    src="./resources/sap-ui-core.js"
+    data-sap-ui-theme="sap_fiori_3"
+    data-sap-ui-libs="sap.m"
+    data-sap-ui-resourceroots='{"Demo": "./"}'
+    data-sap-ui-onInit="module:Demo/index"
+    data-sap-ui-compatVersion="edge"
+    data-sap-ui-async="true">
+  </script>
+</head>
+<body class="sapUiBody" id="content"></body>
+</html>
+```
