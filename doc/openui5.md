@@ -94,7 +94,22 @@ If  opening this file in the browser, the application does not load.
 Installation:
 `npm install reserve -g`
 
-![File access](openui5/file%20access.png)
+```json
+{
+  "port": 8080,
+  "mappings": [{
+    "match": "^/(\\?.*)?$",
+    "file": "./webapp/static.html"
+  }, {
+    "match": "^/(.*)",
+    "file": "./webapp/$1"
+  }]
+}
+```
+
+![File access](openui5/static.png)
+
+![File access](openui5/static%20cmd.png)
 
 ## Variations of the UI5 version
 
@@ -117,3 +132,155 @@ Installation:
 <body class="sapUiBody" id="content"></body>
 </html>
 ```
+
+### redirect
+
+```json
+{
+  "port": 8080,
+  "mappings": [{
+    "match": "/resources/(.*)",
+    "headers": {
+      "Location": "https://openui5.hana.ondemand.com/1.76.0/resources/$1"
+    },
+    "status": 302
+  }, {
+    "match": "^/(\\?.*)?$",
+    "file": "./webapp/index.html"
+  }, {
+    "match": "^/(.*)",
+    "file": "./webapp/$1"
+  }]
+}
+```
+
+![redirect](openui5/redirect.png)
+
+![redirect](openui5/redirect%20cmd.png)
+
+### redirect-version
+
+```json
+{
+  "port": 8080,
+  "mappings": [{
+    "match": "/resources/(.*)",
+    "custom": "./redirect-version.js"
+  }, {
+    "match": "^/(\\?.*)?$",
+    "file": "./webapp/index.html"
+  }, {
+    "match": "^/(.*)",
+    "file": "./webapp/$1"
+  }]
+}
+```
+
+```JavaScript
+module.exports = async function (request, response, ui5Path) {
+  const { referer } = request.headers
+  const version = (/\bversion\b=(\d+\.\d+\.\d+)/.exec(referer) || [0, '1.76.0'])[1]
+  response.writeHead(302, {
+    Location: `https://openui5.hana.ondemand.com/${version}/resources/${ui5Path}`
+  })
+  response.end()
+}
+```
+
+![redirect](openui5/redirect-version.png)
+
+![redirect](openui5/redirect-version%20cmd.png)
+
+### redirect-csp
+
+```json
+{
+  "port": 8080,
+  "mappings": [{
+    "match": "/resources/(.*)",
+    "headers": {
+      "Location": "https://openui5.hana.ondemand.com/1.76.0/resources/$1"
+    },
+    "status": 302
+  }, {
+    "custom": "./csp.js"
+  }, {
+    "match": "^/(\\?.*)?$",
+    "file": "./webapp/index.html"
+  }, {
+    "match": "^/(.*)",
+    "file": "./webapp/$1"
+  }]
+}
+```
+
+```JavaScript
+module.exports = async function (request, response) {
+  response.setHeader('Content-Security-Policy', 'default-src \'self\'')
+}
+```
+
+![redirect](openui5/redirect-csp.png)
+
+![redirect](openui5/redirect-csp%20cmd.png)
+
+### proxy-csp
+
+```json
+{
+  "port": 8080,
+  "mappings": [{
+    "match": "/resources/(.*)",
+    "url": "https://openui5.hana.ondemand.com/1.76.0/resources/$1"
+  }, {
+    "custom": "./csp.js"
+  }, {
+    "match": "^/(\\?.*)?$",
+    "file": "./webapp/index.html"
+  }, {
+    "match": "^/(.*)",
+    "file": "./webapp/$1"
+  }]
+}
+```
+
+![redirect](openui5/proxy-csp.png)
+
+![redirect](openui5/proxy-csp%20cmd.png)
+
+### proxy-csp-version
+
+```json
+{
+  "port": 8080,
+  "mappings": [{
+    "match": "/@openui5/([^/]*)/(.*)",
+    "url": "https://openui5.hana.ondemand.com/$1/resources/$2"
+  }, {
+    "match": "/resources/(.*)",
+    "custom": "./proxy-version.js"
+  }, {
+    "custom": "./csp.js"
+  }, {
+    "match": "^/(\\?.*)?$",
+    "file": "./webapp/index.html"
+  }, {
+    "match": "^/(.*)",
+    "file": "./webapp/$1"
+  }]
+}
+```
+
+```JavaScript
+module.exports = async function (request, response, ui5Path) {
+  const { referer } = request.headers
+  const version = (/\bversion\b=(\d+\.\d+\.\d+)/.exec(referer) || [0, '1.76.0'])[1]
+  return `/@openui5/${version}/${ui5Path}`
+}
+```
+
+![redirect](openui5/proxy-csp-version.png)
+
+![redirect](openui5/proxy-csp-version%20cmd.png)
+
+## Conclusion
