@@ -58,11 +58,13 @@ Furthermore, each released version of UI5 is available from the public CDN:
 
 ## Sample application
 
-Let's consider a **simple demonstration application** that consists in one view and one button. The **current version of OpenUI5** is displayed in the title.
+Let's consider a **simple demonstration application** that consists in one view and one button. The **current version of OpenUI5** is displayed in the title as shown below. The source of the application can be found in the [REserve repository](https://github.com/ArnaudBuchholz/reserve/tree/master/samples/openui5/webapp).
 
 ![sample app](openui5/sample%20app.png)
 
-First, the UI5 framework is loaded from the CDN.
+<u>*Sample demonstration application*</u>
+
+In its first version (`static.html`), the UI5 framework is **loaded from the CDN**.
 
 ```html
 <!DOCTYPE html>
@@ -84,26 +86,29 @@ First, the UI5 framework is loaded from the CDN.
 </html>
 ```
 
->>>>> TODO
+<u>*OpenUI5 is loaded from the CDN as specified in the `static.html` bootstrap*</u>
 
-When opening this file in a browser, the application fails to load. This is because it tries to load some resources from the file system using the XMLHttpRequest object.
+When opening this **file directly in a browser**, the application **fails to load**. This is because it tries to load some resources from the file system using the [XMLHttpReques](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) object.
 
 ![static](openui5/file%20access.png)
 
-To work properly, the application must be served from the web.
+<u>*Loading the application from the file system fails*</u>
+
+To work properly, the application must be served using the **http protocol**.
 
 ### REserve to the rescue
 
-This is where REserve can help
-
-Installation:
-`npm install reserve -g`
+Let see the steps to build a minimalistic web server using [REserve](https://www.npmjs.com/package/reserve).
+1. First you need to [install Node.js](https://nodejs.org/en/download/)
+2. Node.js comes with [NPM](https://www.npmjs.com/get-npm) but it may be updated separately using `npm install npm@latest -g`
+3. Install REserve *globally* using `npm install reserve -g` *(it is not mandatory to make it global but this is the fastest way to use it)*
+4. Define a **configuration file** that describes how the incoming requests must be served *(all paths are relative to the file)*
 
 ```json
 {
   "port": 8080,
   "mappings": [{
-    "match": "^/(\\?.*)?$",
+    "match": "^/$",
     "file": "./webapp/static.html"
   }, {
     "match": "^/(.*)",
@@ -112,9 +117,28 @@ Installation:
 }
 ```
 
+<u>*`static.json` configuration file*</u>
+
+The above configuration contains only two mappings:
+* The first handles requests accessing **the root of the website** and serves them with the file `static.html`
+* The second one **[captures](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Groups_and_Ranges) the URL** and map it directly to the **file system** using the substitution parameter `$1` *(see [Capturing groups and interpolation](https://www.npmjs.com/package/reserve#capturing-groups-and-interpolation))*
+
+To start the server, simply execute `reserve --config static.json`.
+
+Then you can open the browser to [`http://localhost:8080`](http://localhost:8080).
+
 ![File access](openui5/static.png)
 
+<u>*The application running with REserve*</u>
+
+By default, REserve traces all the request it receives *(colors are available if you also install globally the [colors](https://www.npmjs.com/package/colors) package)*.
+
 ![File access](openui5/static%20cmd.png)
+
+<u>*Console output of REserve*</u>
+
+>>>>> TODO
+
 
 ## Variations of the UI5 version
 
