@@ -62,7 +62,7 @@ Let's consider a **simple demonstration application** that consists in one view 
 
 ![sample app](openui5/sample%20app.png)
 
-As explained before, the UI5 framework is loaded from the CDN.
+First, the UI5 framework is loaded from the CDN.
 
 ```html
 <!DOCTYPE html>
@@ -83,13 +83,18 @@ As explained before, the UI5 framework is loaded from the CDN.
 <body class="sapUiBody" id="content"></body>
 </html>
 ```
-If  opening this file in the browser, the application does not load.
-
-![static](openui5/file%20access.png)
 
 >>>>> TODO
 
+When opening this file in a browser, the application fails to load. This is because it tries to load some resources from the file system using the XMLHttpRequest object.
+
+![static](openui5/file%20access.png)
+
+To work properly, the application must be served from the web.
+
 ### REserve to the rescue
+
+This is where REserve can help
 
 Installation:
 `npm install reserve -g`
