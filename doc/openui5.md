@@ -44,11 +44,11 @@ There is one **little drawback** to this model. After installing all these packa
 
 However, this means **cleaning the package list and install new ones**.
 
-That can be a **tedious process**.
+That can be a **tedious process** but, good news, the [version 2 of the cli tools](https://youtu.be/v6ImEbZRRlg) offers a mechanism to **simplify** it.
 
 ### OpenUI5 Content Delivery Network
 
-Luckily, the framework is built on top of a [smart dependency management model](https://openui5.hana.ondemand.com/api/sap.ui#methods/sap.ui.define) that is capable of loading the missing dependencies when needed. To put it in a nutshell, these **additional libraries** are usually **relative to the location where the [UI5 bootstrap](https://openui5.hana.ondemand.com/1.76.0/resources/sap-ui-core.js)** is obtained.
+The framework is built on top of a [smart dependency management model](https://openui5.hana.ondemand.com/api/sap.ui#methods/sap.ui.define) that is capable of loading the missing dependencies when needed. To put it in a nutshell, these **additional modules** are usually **relative to the location where the [UI5 bootstrap](https://openui5.hana.ondemand.com/1.76.0/resources/sap-ui-core.js)** is obtained.
 
 Furthermore, each released version of UI5 is available from the public CDN:
 * 1.76.0 is available under [https://openui5.hana.ondemand.com/1.76.0/resources/](https://openui5.hana.ondemand.com/1.76.0/resources/sap-ui-version.json)
@@ -58,9 +58,9 @@ Furthermore, each released version of UI5 is available from the public CDN:
 
 ## Sample application
 
->>>> TODO
+Let's consider a **simple demonstration application** that consists in one view and one button. The **current version of OpenUI5** is displayed in the title.
 
-This leads to the development of this simple demonstration application that consists in one view and one button.
+![sample app](openui5/sample%20app.png)
 
 As explained before, the UI5 framework is loaded from the CDN.
 
@@ -83,10 +83,11 @@ As explained before, the UI5 framework is loaded from the CDN.
 <body class="sapUiBody" id="content"></body>
 </html>
 ```
-
-When opening this file in the browser, the application does not load.
+If  opening this file in the browser, the application does not load.
 
 ![static](openui5/file%20access.png)
+
+>>>>> TODO
 
 ### REserve to the rescue
 
