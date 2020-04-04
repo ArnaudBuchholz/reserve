@@ -102,7 +102,7 @@ Let see the steps to build a minimalistic web server using [REserve](https://www
 1. First you need to [install Node.js](https://nodejs.org/en/download/)
 2. Node.js comes with [NPM](https://www.npmjs.com/get-npm) but it may be updated separately using `npm install npm@latest -g`
 3. Install REserve *globally* using `npm install reserve -g` *(it is not mandatory to make it global but this is the fastest way to use it)*
-4. Define a **configuration file** that describes how the incoming requests must be served *(all paths are relative to the file)*
+4. Define a [**configuration file**](https://www.npmjs.com/package/reserve#configuration) that describes how the incoming requests must be served *(all paths are relative to the file)*
 
 ```json
 {
@@ -120,27 +120,30 @@ Let see the steps to build a minimalistic web server using [REserve](https://www
 <u>*`static.json` configuration file*</u>
 
 The above configuration contains only two mappings:
-* The first handles requests accessing **the root of the website** and serves them with the file `static.html`
-* The second one **[captures](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Groups_and_Ranges) the URL** and map it directly to the **file system** using the substitution parameter `$1` *(see [Capturing groups and interpolation](https://www.npmjs.com/package/reserve#capturing-groups-and-interpolation))*
+* The first handles requests accessing **the root of the website** and serves them using the [file handler](https://www.npmjs.com/package/reserve#file) configured with the file `static.html`
+* The second one **[captures](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Groups_and_Ranges) the URL** and **map it directly** to the file system using the **substitution parameter** `$1` *(see [Capturing groups and interpolation](https://www.npmjs.com/package/reserve#capturing-groups-and-interpolation))*
 
 To start the server, simply execute `reserve --config static.json`.
 
-Then you can open the browser to [`http://localhost:8080`](http://localhost:8080).
+Then, when the browser points to [`http://localhost:8080`](http://localhost:8080), the application **loads properly** as shown below.
 
 ![File access](openui5/static.png)
 
 <u>*The application running with REserve*</u>
 
-By default, REserve traces all the request it receives *(colors are available if you also install globally the [colors](https://www.npmjs.com/package/colors) package)*.
+In the meantime, REserve **traces all the request it receives** *(colors are available if you also install globally the [colors](https://www.npmjs.com/package/colors) package)*.
 
 ![File access](openui5/static%20cmd.png)
 
 <u>*Console output of REserve*</u>
 
->>>>> TODO
+## Changing the UI5 version
 
+What if we would like to test the application with a **different version of OpenUI5** ? On one hand, the hard coded URL in the `static.html` file **could be changed**. On the other hand, we could **decouple** the HTML bootstrap file from a given version and **rely on REserve to provide this information**.
 
-## Variations of the UI5 version
+In the following bootstrap file, OpenUI5 file is loaded through a **relative URL** (`./resources/sap-ui-core.js`). If you inspect the [directory structure](https://github.com/ArnaudBuchholz/reserve/tree/master/samples/openui5/webapp), such **path does not exist**.
+
+REserve will **fill the gap**.
 
 ```html
 <!DOCTYPE html>
@@ -162,7 +165,13 @@ By default, REserve traces all the request it receives *(colors are available if
 </html>
 ```
 
-### redirect
+<u>*OpenUI5 is loaded through a virtual URL in the `index.html` bootstrap*</u>
+
+### Using HTTP redirect
+
+>>>>> TODO
+
+[status handler](https://www.npmjs.com/package/reserve#status)
 
 ```json
 {
@@ -182,6 +191,9 @@ By default, REserve traces all the request it receives *(colors are available if
   }]
 }
 ```
+
+<u>*`redirect.json`*</u>
+
 
 ![redirect](openui5/redirect.png)
 
