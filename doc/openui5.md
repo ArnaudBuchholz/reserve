@@ -268,7 +268,9 @@ As far as the traces are concerned, this does not change the output of REserve.
 
 ### Content Security Policy
 
-What happens if the website hosting the application is configured to forbid the execution of remote code ? This condition is testable by adding a new handler that would inject the Content-Security
+What happens if the website hosting the application is **configured to forbid the execution of remote code** ? This condition is easily testable by adding a new mapping that injects the [Content-Security-Policy header](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP).
+
+This new mapping has no `match` specification, meaning **it applies to all requests going through it**. But, in the end, only the one serving the bootstrap file is relevant.
 
 ```json
 {
@@ -293,7 +295,7 @@ What happens if the website hosting the application is configured to forbid the 
 
 <u>*`redirect-csp.json` configuration file*</u>
 
-The file `csp.js` below adds the content security policy header to only allow files coming from the same website that served the `index.html` one.
+The file `csp.js`, detailed below, adds the `Content-Security-Policy` header to tell the browser to trust only code coming from the website that served the `index.html` file.
 
 ```JavaScript
 module.exports = async function (request, response) {
@@ -303,17 +305,21 @@ module.exports = async function (request, response) {
 
 <u>*`csp.js` custom code file*</u>
 
-Since OpenUI5 is served from the CDN after the request is being redirected, it leads to an error as shown in the network traces.
+Since **OpenUI5 resources are served from a CDN** after the request is being redirected, it leads to an **error** as shown in the network traces and the application **fails to load**.
 
 ![redirect](openui5/redirect-csp.png)
 
 <u>*The network traces show the request is blocked*</u>
 
-As a consequence, the application is not loaded and only few traces are dumped.
+As a consequence, only few traces are dumped in the REserve console.
 
 ![redirect](openui5/redirect-csp%20cmd.png)
 
-### proxy-csp
+<u>*Only two requests reached REserve*</u>
+
+### Proxy
+
+The [url handler](https://www.npmjs.com/package/reserve#url) is capable of **forwarding an incoming request to any URL** and **tunnel the answer back to the client**. Thus, the mapping doing the **redirect is replaced with a new one** as shown below.
 
 ```json
 {
@@ -333,7 +339,13 @@ As a consequence, the application is not loaded and only few traces are dumped.
 }
 ```
 
+<u>*`proxy-csp.json` configuration file*</u>
+
+When running this new configuration file, the application is **back to normal**. The network traces show that **all resources are served by `localhost`** as illustrated below.
+
 ![redirect](openui5/proxy-csp.png)
+
+<u>*The application runs as if all resources are local*</u>
 
 ![redirect](openui5/proxy-csp%20cmd.png)
 
@@ -364,7 +376,10 @@ As a consequence, the application is not loaded and only few traces are dumped.
 module.exports = async function (request, response, ui5Path) {
   const { referer } = request.headers
   const version = (/\bversion\b=(\d+\.\d+\.\d+)/.exec(referer) || [0, '1.76.0'])[1]
-  return `/@openui5/${version}/${ui5Path}`
+  response.writeHead(302, {
+    Location: `/@openui5/${version}/${ui5Path}`
+  })
+  response.end()
 }
 ```
 
