@@ -44,7 +44,7 @@ There is one **little drawback** to this model. After installing all these packa
 
 However, this means **cleaning the package list and install new ones**.
 
-That can be a **tedious process** but, good news, the [version 2 of the cli tools](https://youtu.be/v6ImEbZRRlg) offers a mechanism to **simplify** it.
+That can be a **tedious process** but, good news, the [version 2 of the cli tools](https://youtu.be/v6ImEbZRRlg) offers a mechanism to **simplify** this step.
 
 ### OpenUI5 Content Delivery Network
 
@@ -53,7 +53,8 @@ The framework is built on top of a [smart dependency management model](https://o
 Furthermore, each released version of UI5 is available from the public CDN:
 * 1.76.0 is available under [https://openui5.hana.ondemand.com/1.76.0/resources/](https://openui5.hana.ondemand.com/1.76.0/resources/sap-ui-version.json)
 * 1.75.0 is available under [https://openui5.hana.ondemand.com/1.75.0/resources/](https://openui5.hana.ondemand.com/1.75.0/resources/sap-ui-version.json)
-* 1.74.0 is available under [https://openui5.hana.ondemand.com/1.74.0/resources/](https://openui5.hana.ondemand.com/1.74.0/resources/sap-ui-version.json)
+* ...
+* 1.65.0 is available under [https://openui5.hana.ondemand.com/1.65.0/resources/](https://openui5.hana.ondemand.com/1.65.0/resources/sap-ui-version.json)
 * ...
 
 ## Sample application
@@ -64,7 +65,7 @@ Let's consider a **simple demonstration application** that consists in one view 
 
 <u>*Sample demonstration application*</u>
 
-In its first version (`static.html`), the UI5 framework is **loaded from the CDN**.
+In the first version of the bootstrap (`static.html`), the UI5 framework is **loaded from the CDN**.
 
 ```html
 <!DOCTYPE html>
@@ -98,11 +99,11 @@ To work properly, the application must be served using the **http protocol**.
 
 ### REserve to the rescue
 
-Let see the steps to build a minimalistic web server using [REserve](https://www.npmjs.com/package/reserve).
+Here are the steps to build a web server using [REserve](https://www.npmjs.com/package/reserve).
 1. First you need to [install Node.js](https://nodejs.org/en/download/)
 2. Node.js comes with [NPM](https://www.npmjs.com/get-npm) but it may be updated separately using `npm install npm@latest -g`
 3. Install REserve *globally* using `npm install reserve -g` *(it is not mandatory to make it global but this is the fastest way to use it)*
-4. Define a [**configuration file**](https://www.npmjs.com/package/reserve#configuration) that describes how the incoming requests must be served *(all paths are relative to the file)*
+4. Define a [**configuration file**](https://www.npmjs.com/package/reserve#configuration) that describes how the incoming requests must be served *(all paths are relative to the configuration file)*
 
 ```json
 {
@@ -208,13 +209,11 @@ However, **only the requests** hitting REserve are traced, as shown below.
 
 <u>*REserve traces showing the HTTP Status 302 answers*</u>
 
->>> TODO
-
 ### Changing the version dynamically
 
-Whenever a browser makes a request, it usually transmits **additional information** to give context. In particular, the **[Referer header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer)** contains the address of the **web page from which a resource is accessed**.
+Whenever a browser makes a request, it usually transmits **additional information** to give context. In particular, the **[Referer header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer)** contains the address of the **web page accessing the resource**.
 
-Based on this **standard feature**, the code can be adjusted to **extract an URL parameter** and redirect to the **expected version** of OpenUI5. The [custom handler](https://www.npmjs.com/package/reserve#custom) allows custom code extensions to REserve.
+Based on this **standard feature**, the code can be adjusted to **extract an URL parameter** and redirect to the **expected version** of OpenUI5. Fortunately, the [custom handler](https://www.npmjs.com/package/reserve#custom) allows custom code extensions to REserve.
 
 ```json
 {
@@ -234,10 +233,10 @@ Based on this **standard feature**, the code can be adjusted to **extract an URL
 
 <u>*`redirect-version.json` configuration file*</u>
 
-The custom handler simplifies the processing by calling an asynchronous function with the request and response objects. Any capturing group is passed as additional parameters.
-REserve knows that the request is answered if the response is finalized by calling .end.
+The custom handler **simplifies the processing** by calling an **asynchronous function** with the [request](https://nodejs.org/api/http.html#http_class_http_incomingmessage) and [response](https://nodejs.org/api/http.html#http_class_http_serverresponse) objects. Any **capturing group value** is passed as **additional parameters**.
+REserve knows that the request is **fully answered** when the response is **finalized by calling [`end`](https://nodejs.org/api/http.html#http_response_end_data_encoding_callback)**.
 
-In the following code, the request object is used to extract the Referer header, then the version parameter is extracted (if any) and the HTTP 302 is built using response.writeHead.
+In the following code, the request object is used to **extract the Referer header**, then the **`version` parameter is captured** *(if any)* and the **HTTP 302 response** is built using [`response.writeHead`](https://nodejs.org/dist/latest/docs/api/http.html#http_response_writehead_statuscode_statusmessage_headers).
 
 ```JavaScript
 module.exports = async function (request, response, ui5Path) {
@@ -252,7 +251,7 @@ module.exports = async function (request, response, ui5Path) {
 
 <u>*`redirect-version.js` custom code*</u>
 
-When running this new configuration file, one can now specify a version number inside the URL such as `localhost:8080?version=1.65.0` as demonstrated below.
+When running this new configuration file, one can now specify a **version number inside the URL** such as `localhost:8080?version=1.65.0` as demonstrated below.
 
 ![redirect](openui5/redirect-version.png)
 
@@ -263,6 +262,9 @@ As far as the traces are concerned, this does not change the output of REserve.
 ![redirect](openui5/redirect-version%20cmd.png)
 
 <u>*REserve traces showing the HTTP Status 302 answers*</u>
+
+
+>>>>> TODO
 
 ### Content Security Policy
 
