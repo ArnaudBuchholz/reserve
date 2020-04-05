@@ -30,9 +30,9 @@ In particular, when it comes to building an application, you must add the follow
 
 * [@ui5/cli](https://www.npmjs.com/package/@ui5/cli) : it contains the required **[tooling](https://github.com/SAP/ui5-tooling#ui5-tooling) to initiate, serve and build your application**.<br />It cumulates [27 MB](https://packagephobia.now.sh/result?p=@ui5/cli) of files *(including dependencies)*.
 
-* [@openui5/sap.ui.core](https://www.npmjs.com/package/@openui5/sap.ui.core) : this is the UI5 **core runtime**.<br /> It takes [26.4 MB](https://packagephobia.now.sh/result?p=@openui5/sap.ui.core).
+* [@openui5/sap.ui.core](https://www.npmjs.com/package/@openui5/sap.ui.core) : this is the OpenUI5 **core runtime**.<br /> It takes [26.4 MB](https://packagephobia.now.sh/result?p=@openui5/sap.ui.core).
 
-* [@openui5/sap.m](https://www.npmjs.com/package/@openui5/sap.m) : this is the main UI5 control library, with responsive controls that can be used in touch devices as well as desktop browsers.<br /> It weights [10.2 MB](https://packagephobia.now.sh/result?p=@openui5/sap.m).
+* [@openui5/sap.m](https://www.npmjs.com/package/@openui5/sap.m) : this is the main OpenUI5 control library, with responsive controls that can be used in touch devices as well as desktop browsers.<br /> It weights [10.2 MB](https://packagephobia.now.sh/result?p=@openui5/sap.m).
 
 * [@openui5/themelib_sap_fiori_3](https://www.npmjs.com/package/@openui5/themelib_sap_fiori_3) : the default theme *(including specific fonts)*. <br /> It requires [4.2 MB](https://packagephobia.now.sh/result?p=@openui5/themelib_sap_fiori_3).
 
@@ -40,7 +40,7 @@ In the end, you basically need a total of **60 MB of packages** to start coding 
 
 Once the **application is finalized**, depending on **its dependencies**, the deployment will live in a **fraction of this size**.
 
-There is one **little drawback** to this model. After installing all these packages, the project is **bound to the downloaded version of OpenUI5**. Since a new release of UI5 is done almost **every month**, it might be interesting to **switch between versions**.
+There is one **little drawback** to this model. After installing all these packages, the project is **bound to the downloaded version of OpenUI5**. Since a new release of OpenUI5 is done almost **every month**, it might be interesting to **switch between versions**.
 
 However, this means **cleaning the package list and install new ones**.
 
@@ -48,14 +48,16 @@ That can be a **tedious process** but, good news, the [version 2 of the cli tool
 
 ### OpenUI5 Content Delivery Network
 
-The framework is built on top of a [smart dependency management model](https://openui5.hana.ondemand.com/api/sap.ui#methods/sap.ui.define) that is capable of loading the missing dependencies when needed. To put it in a nutshell, these **additional modules** are usually **relative to the location where the [UI5 bootstrap](https://openui5.hana.ondemand.com/1.76.0/resources/sap-ui-core.js)** is obtained.
+The framework is built on top of a [smart dependency management model](https://openui5.hana.ondemand.com/api/sap.ui#methods/sap.ui.define) that is capable of loading the missing dependencies when needed. To put it in a nutshell, these **additional modules** are usually **relative to the location where the [OpenUI5 bootstrap](https://openui5.hana.ondemand.com/1.76.0/resources/sap-ui-core.js)** is obtained.
 
-Furthermore, each released version of UI5 is available from the public CDN:
+Furthermore, each released version of OpenUI5 is available from a public CDN:
 * 1.76.0 is available under [https://openui5.hana.ondemand.com/1.76.0/resources/](https://openui5.hana.ondemand.com/1.76.0/resources/sap-ui-version.json)
 * 1.75.0 is available under [https://openui5.hana.ondemand.com/1.75.0/resources/](https://openui5.hana.ondemand.com/1.75.0/resources/sap-ui-version.json)
 * ...
 * 1.65.0 is available under [https://openui5.hana.ondemand.com/1.65.0/resources/](https://openui5.hana.ondemand.com/1.65.0/resources/sap-ui-version.json)
 * ...
+
+Hence, it is **possible to run an application** by loading the **OpenUI5 resources from the CDN**.
 
 ## Sample application
 
@@ -65,7 +67,7 @@ Let's consider a **simple demonstration application** that consists in one view 
 
 <u>*Sample demonstration application*</u>
 
-In the first version of the bootstrap (`static.html`), the UI5 framework is **loaded from the CDN**.
+In the first version of the bootstrap (`static.html`), the OpenUI5 framework is **loaded from the CDN**.
 
 ```html
 <!DOCTYPE html>
@@ -89,7 +91,7 @@ In the first version of the bootstrap (`static.html`), the UI5 framework is **lo
 
 <u>*OpenUI5 is loaded from the CDN as specified in the `static.html` bootstrap*</u>
 
-When opening this **file directly in a browser**, the application **fails to load**. This is because it tries to load some resources from the file system using the [XMLHttpReques](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) object.
+When opening this **file directly in a browser**, the application **fails to load**. Since scripts running via `file://` have **limited support for [Cross-Origin Resource Sharing](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)**, it is unable to load some resources from the file system using the [XMLHttpReques](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) object.
 
 ![static](openui5/file%20access.png)
 
@@ -121,8 +123,8 @@ Here are the steps to build a web server using [REserve](https://www.npmjs.com/p
 <u>*`static.json` configuration file*</u>
 
 The above configuration contains only two mappings:
-* The first handles requests accessing **the root of the website** and serves them using the [file handler](https://www.npmjs.com/package/reserve#file) configured with the file `static.html`
-* The second one **[captures](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Groups_and_Ranges) the URL** and **map it directly** to the file system using the **substitution parameter** `$1` *(see [Capturing groups and interpolation](https://www.npmjs.com/package/reserve#capturing-groups-and-interpolation))*
+* The first mapping intercepts requests accessing **the root of the website** and **delivers the content of `static.html`** thanks to the [file handler](https://www.npmjs.com/package/reserve#file).
+* The second one **[captures](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Groups_and_Ranges) any other URL** and **map them directly** to the file system using the **substitution parameter** `$1` *(see [Capturing groups and interpolation](https://www.npmjs.com/package/reserve#capturing-groups-and-interpolation))*. If the resulting path does not exist, the handler generates a [404 answer](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404).
 
 To start the server, simply execute `reserve --config static.json`.
 
@@ -132,7 +134,7 @@ Then, when the browser points to [`http://localhost:8080`](http://localhost:8080
 
 <u>*The application running with REserve*</u>
 
-In the meantime, REserve **traces all the request it receives** *(colors are available if you also install globally the [colors](https://www.npmjs.com/package/colors) package)*.
+In the meantime, REserve **traces all the received requests** *(colors are available if you also install globally the [colors](https://www.npmjs.com/package/colors) package)*.
 
 ![File access](openui5/static%20cmd.png)
 
@@ -142,7 +144,7 @@ In the meantime, REserve **traces all the request it receives** *(colors are ava
 
 What if we would like to test the application with a **different version of OpenUI5** ? On one hand, a **simple change** in the `static.html` file would be enough. On the other hand, we could **decouple** the HTML bootstrap file from a given version and **rely on REserve to provide this information**.
 
-In the new bootstrap file, OpenUI5 file is loaded through a **relative URL** (`./resources/sap-ui-core.js`). If you inspect the [directory structure](https://github.com/ArnaudBuchholz/reserve/tree/master/samples/openui5/webapp), such **path does not exist**.
+In the new bootstrap file, OpenUI5 file is loaded through a **relative URL** (`./resources/sap-ui-core.js`). If you inspect the [directory structure](https://github.com/ArnaudBuchholz/reserve/tree/master/samples/openui5/webapp), this **path does not exist**.
 
 REserve will **fill the gap**.
 
@@ -170,9 +172,11 @@ REserve will **fill the gap**.
 
 ### Using HTTP redirect
 
-One way to implement this path is to **instruct the browser to get the file from a different URL** when accessing the non existing one. For instance, when `/resources/sap-ui-core.js` is requested, REserve answers with the **[HTTP 302](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/302) status code** and the information to get the resource from `https://openui5.hana.ondemand.com/1.76.0/resources/sap-ui-core.js`.
+One way to implement this path is to **instruct the browser to get the file from a different URL** when accessing the virtual one.
 
-The [status handler](https://www.npmjs.com/package/reserve#status) takes care of answering the request.
+For instance, when `/resources/sap-ui-core.js` is requested, REserve answers with the **[HTTP 302](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/302) status code** and the information to get the resource from `https://openui5.hana.ondemand.com/1.76.0/resources/sap-ui-core.js`.
+
+The [status handler](https://www.npmjs.com/package/reserve#status) takes care of answering the request, the new location is described in the **response header**.
 
 ```json
 {
@@ -195,15 +199,15 @@ The [status handler](https://www.npmjs.com/package/reserve#status) takes care of
 
 <u>*`redirect.json` configuration file*</u>
 
-When running this configuration file, the network traces of the browser show that **those resources involve two requests** :
-* The first ones gets status 302 from REserve
-* The second ones gets the resources from the CDN
+When running this configuration file, the network traces of the browser show that **OpenUI5 resources involve two requests** :
+* The first ones gets status `302` from REserve,
+* The second ones gets the corresponding resource from the CDN.
 
 ![redirect](openui5/redirect.png)
 
 <u>*The network traces show the redirect mechanism*</u>
 
-However, **only the requests** hitting REserve are traced, as shown below.
+However, **only the requests** served by REserve are traced, as shown below.
 
 ![redirect](openui5/redirect%20cmd.png)
 
@@ -211,9 +215,11 @@ However, **only the requests** hitting REserve are traced, as shown below.
 
 ### Changing the version dynamically
 
-Whenever a browser makes a request, it usually transmits **additional information** to give context. In particular, the **[Referer header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer)** contains the address of the **web page accessing the resource**.
+Whenever a browser connects to a server, it usually transmits **additional information** to give the **context of the request**. In particular, the **[Referer header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer)** contains the address of the **web page accessing the resource**.
 
-Based on this **standard feature**, the code can be adjusted to **extract an URL parameter** and redirect to the **expected version** of OpenUI5. Fortunately, the [custom handler](https://www.npmjs.com/package/reserve#custom) allows custom code extensions to REserve.
+Based on this **standard feature**, the server can be adjusted to **extract an URL parameter** and **redirect to the expected version** of OpenUI5.
+
+The [custom handler](https://www.npmjs.com/package/reserve#custom) enables custom code extensions to REserve.
 
 ```json
 {
@@ -233,10 +239,10 @@ Based on this **standard feature**, the code can be adjusted to **extract an URL
 
 <u>*`redirect-version.json` configuration file*</u>
 
-The custom handler **simplifies the processing** by calling an **asynchronous function** with the [request](https://nodejs.org/api/http.html#http_class_http_incomingmessage) and [response](https://nodejs.org/api/http.html#http_class_http_serverresponse) objects. Any **capturing group value** is passed as **additional parameters**.
+The custom handler **simplifies the request processing** by calling an **asynchronous function** with the Node.js' **native [request](https://nodejs.org/api/http.html#http_class_http_incomingmessage) and [response](https://nodejs.org/api/http.html#http_class_http_serverresponse) objects**. Any **capturing group value** is passed as **additional parameters**.
 REserve knows that the request is **fully answered** when the response is **finalized by calling [`end`](https://nodejs.org/api/http.html#http_response_end_data_encoding_callback)**.
 
-In the following code, the request object is used to **extract the Referer header**, then the **`version` parameter is captured** *(if any)* and the **HTTP 302 response** is built using [`response.writeHead`](https://nodejs.org/dist/latest/docs/api/http.html#http_response_writehead_statuscode_statusmessage_headers).
+In the following code, the request object is used to **extract the Referer header**, then the **`version` parameter is captured** *(if any)* and the proper **HTTP 302 response** is built using [`response.writeHead`](https://nodejs.org/dist/latest/docs/api/http.html#http_response_writehead_statuscode_statusmessage_headers).
 
 ```JavaScript
 module.exports = async function (request, response, ui5Path) {
@@ -251,7 +257,7 @@ module.exports = async function (request, response, ui5Path) {
 
 <u>*`redirect-version.js` custom code*</u>
 
-When running this new configuration file, one can now specify a **version number inside the URL** such as `localhost:8080?version=1.65.0` as demonstrated below.
+When running this new configuration file, one can now specify a **version number inside the URL** such as `localhost:8080?version=1.65.0`. This makes the application runs with the **requested OpenUI5 version** as demonstrated below.
 
 ![redirect](openui5/redirect-version.png)
 
@@ -263,14 +269,11 @@ As far as the traces are concerned, this does not change the output of REserve.
 
 <u>*REserve traces showing the HTTP Status 302 answers*</u>
 
-
->>>>> TODO
-
 ### Content Security Policy
 
-What happens if the website hosting the application is **configured to forbid the execution of remote code** ? This condition is easily testable by adding a new mapping that injects the [Content-Security-Policy header](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP).
+What happens if the website hosting the application is **configured to forbid the execution of external code** ? This condition is easily testable by adding a new mapping that injects a [Content-Security-Policy header](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP).
 
-This new mapping has no `match` specification, meaning **it applies to all requests going through it**. But, in the end, only the one serving the bootstrap file is relevant.
+As listed below, this new mapping has **no `match` specification**. Therefore **it applies to all requests going through it**. But, in the end, only the one serving the bootstrap file is relevant.
 
 ```json
 {
@@ -295,7 +298,7 @@ This new mapping has no `match` specification, meaning **it applies to all reque
 
 <u>*`redirect-csp.json` configuration file*</u>
 
-The file `csp.js`, detailed below, adds the `Content-Security-Policy` header to tell the browser to trust only code coming from the website that served the `index.html` file.
+The file `csp.js`, detailed below, adds the `Content-Security-Policy` header to tell the browser to **trust only the code loaded from the website**.
 
 ```JavaScript
 module.exports = async function (request, response) {
@@ -305,13 +308,13 @@ module.exports = async function (request, response) {
 
 <u>*`csp.js` custom code file*</u>
 
-Since **OpenUI5 resources are served from a CDN** after the request is being redirected, it leads to an **error** as shown in the network traces and the application **fails to load**.
+Since **OpenUI5 resources are served from a CDN** after the request is being redirected, it leads to an **error** as shown in the network traces below and the application **fails to load**.
 
 ![redirect](openui5/redirect-csp.png)
 
-<u>*The network traces show the request is blocked*</u>
+<u>*The network traces show the blocked request*</u>
 
-As a consequence, only few traces are dumped in the REserve console.
+As a consequence, the **application loading is stopped** and only **few traces are dumped** in the REserve console.
 
 ![redirect](openui5/redirect-csp%20cmd.png)
 
@@ -319,7 +322,11 @@ As a consequence, only few traces are dumped in the REserve console.
 
 ### Proxy
 
-The [url handler](https://www.npmjs.com/package/reserve#url) is capable of **forwarding an incoming request to any URL** and **tunnel the answer back to the client**. Thus, the mapping doing the **redirect is replaced with a new one** as shown below.
+To solve this problem, the **OpenUI5 resources must be served by the application website**.
+
+REserve offers an elegant solution: the [url handler](https://www.npmjs.com/package/reserve#url) is capable of **forwarding an incoming request to any URL** and **tunnel the answer back to the client transparently**.
+
+Thus, the **redirect mapping is replaced with a new one** as shown below.
 
 ```json
 {
@@ -341,15 +348,21 @@ The [url handler](https://www.npmjs.com/package/reserve#url) is capable of **for
 
 <u>*`proxy-csp.json` configuration file*</u>
 
-When running this new configuration file, the application is **back to normal**. The network traces show that **all resources are served by `localhost`** as illustrated below.
+When running this configuration file, the **application is loading again** despite the CSP specification. The browser network traces show that **all resources are served by `localhost`**, as illustrated below.
 
 ![redirect](openui5/proxy-csp.png)
 
 <u>*The application runs as if all resources are local*</u>
 
+In the console, all the requests are completed with the status `200`.
+
 ![redirect](openui5/proxy-csp%20cmd.png)
 
-### proxy-csp-version
+### A versioned proxy
+
+>>> TODO
+
+In this last configuration file, the version selection is enabled thanks to two mappings
 
 ```json
 {
