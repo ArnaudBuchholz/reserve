@@ -206,9 +206,15 @@ However, **only the requests** hitting REserve are traced, as shown below.
 
 ![redirect](openui5/redirect%20cmd.png)
 
+<u>*REserve traces showing the HTTP Status 302 answers*</u>
+
 >>> TODO
 
-### redirect-version
+### Changing the version dynamically
+
+Whenever a browser makes a request, it usually transmits **additional information** to give context. In particular, the **[Referer header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer)** contains the address of the **web page from which a resource is accessed**.
+
+Based on this **standard feature**, the code can be adjusted to **extract an URL parameter** and redirect to the **expected version** of OpenUI5. The [custom handler](https://www.npmjs.com/package/reserve#custom) allows custom code extensions to REserve.
 
 ```json
 {
@@ -226,6 +232,13 @@ However, **only the requests** hitting REserve are traced, as shown below.
 }
 ```
 
+<u>*`redirect-version.json` configuration file*</u>
+
+The custom handler simplifies the processing by calling an asynchronous function with the request and response objects. Any capturing group is passed as additional parameters.
+REserve knows that the request is answered if the response is finalized by calling .end.
+
+In the following code, the request object is used to extract the Referer header, then the version parameter is extracted (if any) and the HTTP 302 is built using response.writeHead.
+
 ```JavaScript
 module.exports = async function (request, response, ui5Path) {
   const { referer } = request.headers
@@ -237,11 +250,23 @@ module.exports = async function (request, response, ui5Path) {
 }
 ```
 
+<u>*`redirect-version.js` custom code*</u>
+
+When running this new configuration file, one can now specify a version number inside the URL such as `localhost:8080?version=1.65.0` as demonstrated below.
+
 ![redirect](openui5/redirect-version.png)
+
+<u>*The demonstration application running with version 1.65.0 of OpenUI5*</u>
+
+As far as the traces are concerned, this does not change the output of REserve.
 
 ![redirect](openui5/redirect-version%20cmd.png)
 
-### redirect-csp
+<u>*REserve traces showing the HTTP Status 302 answers*</u>
+
+### Content Security Policy
+
+What happens if the website hosting the application is configured to forbid the execution of remote code ? This condition is testable by adding a new handler that would inject the Content-Security
 
 ```json
 {
@@ -264,13 +289,25 @@ module.exports = async function (request, response, ui5Path) {
 }
 ```
 
+<u>*`redirect-csp.json` configuration file*</u>
+
+The file `csp.js` below adds the content security policy header to only allow files coming from the same website that served the `index.html` one.
+
 ```JavaScript
 module.exports = async function (request, response) {
   response.setHeader('Content-Security-Policy', 'default-src \'self\'')
 }
 ```
 
+<u>*`csp.js` custom code file*</u>
+
+Since OpenUI5 is served from the CDN after the request is being redirected, it leads to an error as shown in the network traces.
+
 ![redirect](openui5/redirect-csp.png)
+
+<u>*The network traces show the request is blocked*</u>
+
+As a consequence, the application is not loaded and only few traces are dumped.
 
 ![redirect](openui5/redirect-csp%20cmd.png)
 
