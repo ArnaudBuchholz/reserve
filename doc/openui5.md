@@ -358,11 +358,15 @@ In the console, all the requests are completed with the status `200`.
 
 ![redirect](openui5/proxy-csp%20cmd.png)
 
+<u>*REserve appears to serve all the requests 'locally'*</u>
+
 ### A versioned proxy
 
->>> TODO
+Finally, to re-enable the version selection, one last configuration file is required.
 
-In this last configuration file, the version selection is enabled thanks to two mappings
+As shown below, **two mappings** are necessary :
+* The fist one defines a **virtual path** `/@openui5/<version>/<resource>` based on the url handler to **map the OpenUI5 CDN**.
+* The second one requires **custom code** to extract the expected version from the `Referer` header and **redirect to the virtual path**.
 
 ```json
 {
@@ -385,6 +389,10 @@ In this last configuration file, the version selection is enabled thanks to two 
 }
 ```
 
+<u>*`proxy-csp-version.json` configuration file*</u>
+
+The custom code is almost the **same as `redirect-version.js`** but with a **different location**.
+
 ```JavaScript
 module.exports = async function (request, response, ui5Path) {
   const { referer } = request.headers
@@ -396,8 +404,24 @@ module.exports = async function (request, response, ui5Path) {
 }
 ```
 
+<u>*`proxy-version.js` custom code*</u>
+
+As expected, the **application runs** and the **OpenUI5 version can be changed** using the URL parameter `version=`.
+
 ![redirect](openui5/proxy-csp-version.png)
+
+<u>*The demonstration application running with version 1.65.0 of OpenUI5 served locally*</u>
+
+Again, the console is similar to the previous example.
 
 ![redirect](openui5/proxy-csp-version%20cmd.png)
 
+<u>*REserve appears to serve all the requests 'locally'*</u>
+
 ## Conclusion
+
+Not only REserve is designed to be **lightweight** *(less than [60 kB in version 1.6.1](https://packagephobia.now.sh/result?p=reserve@1.6.1))* but it is also **flexible and powerful**. It solves complex problems with its **specialized handlers** and it can be easily **extended** with custom code.
+
+Through the article, **five websites with different behaviors** were setup with only **few lines of configuration / code**.
+
+It enabled the use of the OpenUI5 framework **without downloading 60 MB of modules**. Hence if you plan to try it, it can be a **fast alternative**.
