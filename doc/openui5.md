@@ -139,9 +139,9 @@ In the meantime, REserve **traces all the request it receives** *(colors are ava
 
 ## Changing the UI5 version
 
-What if we would like to test the application with a **different version of OpenUI5** ? On one hand, the hard coded URL in the `static.html` file **could be changed**. On the other hand, we could **decouple** the HTML bootstrap file from a given version and **rely on REserve to provide this information**.
+What if we would like to test the application with a **different version of OpenUI5** ? On one hand, a **simple change** in the `static.html` file would be enough. On the other hand, we could **decouple** the HTML bootstrap file from a given version and **rely on REserve to provide this information**.
 
-In the following bootstrap file, OpenUI5 file is loaded through a **relative URL** (`./resources/sap-ui-core.js`). If you inspect the [directory structure](https://github.com/ArnaudBuchholz/reserve/tree/master/samples/openui5/webapp), such **path does not exist**.
+In the new bootstrap file, OpenUI5 file is loaded through a **relative URL** (`./resources/sap-ui-core.js`). If you inspect the [directory structure](https://github.com/ArnaudBuchholz/reserve/tree/master/samples/openui5/webapp), such **path does not exist**.
 
 REserve will **fill the gap**.
 
@@ -165,13 +165,13 @@ REserve will **fill the gap**.
 </html>
 ```
 
-<u>*OpenUI5 is loaded through a virtual URL in the `index.html` bootstrap*</u>
+<u>*OpenUI5 is loaded through a non existing path in the `index.html` bootstrap*</u>
 
 ### Using HTTP redirect
 
->>>>> TODO
+One way to implement this path is to **instruct the browser to get the file from a different URL** when accessing the non existing one. For instance, when `/resources/sap-ui-core.js` is requested, REserve answers with the **[HTTP 302](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/302) status code** and the information to get the resource from `https://openui5.hana.ondemand.com/1.76.0/resources/sap-ui-core.js`.
 
-[status handler](https://www.npmjs.com/package/reserve#status)
+The [status handler](https://www.npmjs.com/package/reserve#status) takes care of answering the request.
 
 ```json
 {
@@ -192,12 +192,21 @@ REserve will **fill the gap**.
 }
 ```
 
-<u>*`redirect.json`*</u>
+<u>*`redirect.json` configuration file*</u>
 
+When running this configuration file, the network traces of the browser show that **those resources involve two requests** :
+* The first ones gets status 302 from REserve
+* The second ones gets the resources from the CDN
 
 ![redirect](openui5/redirect.png)
 
+<u>*The network traces show the redirect mechanism*</u>
+
+However, **only the requests** hitting REserve are traced, as shown below.
+
 ![redirect](openui5/redirect%20cmd.png)
+
+>>> TODO
 
 ### redirect-version
 
