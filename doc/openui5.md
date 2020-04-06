@@ -140,7 +140,7 @@ In the meantime, REserve **traces all the received requests** *(colors are avail
 
 <u>*Console output of REserve*</u>
 
-## Changing the UI5 version
+## Changing the OpenUI5 version
 
 What if we would like to test the application with a **different version of OpenUI5** ? On one hand, a **simple change** in the `static.html` file would be enough. On the other hand, we could **decouple** the HTML bootstrap file from a given version and **rely on REserve to provide this information**.
 
