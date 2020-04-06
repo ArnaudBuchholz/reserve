@@ -1,7 +1,7 @@
 # Serving an OpenUI5 application
 
 The best way to explain **what REserve can do** is to demonstrate some of its features through a **concrete use case**.
-In this article, we will illustrate how one can quickly setup a server to **facilitate the development of OpenUI5 applications**.
+In this article, we will illustrate how one can quickly setup a server to **facilitate the execution of OpenUI5 applications**.
 
 ## Quick presentation of OpenUI5
 
@@ -26,13 +26,13 @@ More information can be found in [the documentation](https://openui5.hana.ondema
 
 The community around the framework is **growing** and **several tools** are publicly available in the [NPM repository](https://www.npmjs.com/search?q=openui5).
 
-In particular, when it comes to building an application, you must add the following NPM packages to your project :
+When it comes to building an application, you must add the following NPM packages to your project :
 
 * [@ui5/cli](https://www.npmjs.com/package/@ui5/cli) : it contains the required **[tooling](https://github.com/SAP/ui5-tooling#ui5-tooling) to initiate, serve and build your application**.<br />It cumulates [27 MB](https://packagephobia.now.sh/result?p=@ui5/cli) of files *(including dependencies)*.
 
 * [@openui5/sap.ui.core](https://www.npmjs.com/package/@openui5/sap.ui.core) : this is the OpenUI5 **core runtime**.<br /> It takes [26.4 MB](https://packagephobia.now.sh/result?p=@openui5/sap.ui.core).
 
-* [@openui5/sap.m](https://www.npmjs.com/package/@openui5/sap.m) : this is the main OpenUI5 control library, with responsive controls that can be used in touch devices as well as desktop browsers.<br /> It weights [10.2 MB](https://packagephobia.now.sh/result?p=@openui5/sap.m).
+* [@openui5/sap.m](https://www.npmjs.com/package/@openui5/sap.m) : this is the main OpenUI5 control library, with responsive controls that can be used in touch devices as well as desktop browsers.<br /> It weighs [10.2 MB](https://packagephobia.now.sh/result?p=@openui5/sap.m).
 
 * [@openui5/themelib_sap_fiori_3](https://www.npmjs.com/package/@openui5/themelib_sap_fiori_3) : the default theme *(including specific fonts)*. <br /> It requires [4.2 MB](https://packagephobia.now.sh/result?p=@openui5/themelib_sap_fiori_3).
 
@@ -48,7 +48,7 @@ That can be a **tedious process** but, good news, the [version 2 of the cli tool
 
 ### OpenUI5 Content Delivery Network
 
-The framework is built on top of a [smart dependency management model](https://openui5.hana.ondemand.com/api/sap.ui#methods/sap.ui.define) that is capable of loading the missing dependencies when needed. To put it in a nutshell, these **additional modules** are usually **relative to the location where the [OpenUI5 bootstrap](https://openui5.hana.ondemand.com/1.76.0/resources/sap-ui-core.js)** is obtained.
+The framework is built on top of a [smart dependency management model](https://openui5.hana.ondemand.com/api/sap.ui#methods/sap.ui.define) that can load the missing dependencies when needed. To put it in a nutshell, these **additional modules** are usually **relative to the location where the [OpenUI5 bootstrap](https://openui5.hana.ondemand.com/1.76.0/resources/sap-ui-core.js)** is obtained.
 
 Furthermore, each released version of OpenUI5 is available from a public CDN:
 * 1.76.0 is available under [https://openui5.hana.ondemand.com/1.76.0/resources/](https://openui5.hana.ondemand.com/1.76.0/resources/sap-ui-version.json)
@@ -91,7 +91,7 @@ In the first version of the bootstrap (`static.html`), the OpenUI5 framework is 
 
 <u>*OpenUI5 is loaded from the CDN as specified in the `static.html` bootstrap*</u>
 
-When opening this **file directly in a browser**, the application **fails to load**. Since scripts running via `file://` have **limited support for [Cross-Origin Resource Sharing](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)**, it is unable to load some resources from the file system using the [XMLHttpReques](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) object.
+When opening this **file directly in a browser**, the application **fails to load**. Since scripts running via `file://` have **limited support for [Cross-Origin Resource Sharing](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)**, it is unable to load some resources from the file system using the [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) object.
 
 ![static](openui5/file%20access.png)
 
@@ -99,12 +99,12 @@ When opening this **file directly in a browser**, the application **fails to loa
 
 To work properly, the application must be served using the **http protocol**.
 
-### REserve to the rescue
+### Serving with REserve
 
 Here are the steps to build a web server using [REserve](https://www.npmjs.com/package/reserve).
 1. First you need to [install Node.js](https://nodejs.org/en/download/)
 2. Node.js comes with [NPM](https://www.npmjs.com/get-npm) but it may be updated separately using `npm install npm@latest -g`
-3. Install REserve *globally* using `npm install reserve -g` *(it is not mandatory to make it global but this is the fastest way to use it)*
+3. Install REserve *globally* using `npm install reserve -g` *(it is not mandatory to make it global, but this is the fastest way to use it)*
 4. Define a [**configuration file**](https://www.npmjs.com/package/reserve#configuration) that describes how the incoming requests must be served *(all paths are relative to the configuration file)*
 
 ```json
@@ -168,7 +168,7 @@ REserve will **fill the gap**.
 </html>
 ```
 
-<u>*OpenUI5 is loaded through a non existing path in the `index.html` bootstrap*</u>
+<u>*OpenUI5 is loaded through a non-existing path in the `index.html` bootstrap*</u>
 
 ### Using HTTP redirect
 
@@ -200,8 +200,8 @@ The [status handler](https://www.npmjs.com/package/reserve#status) takes care of
 <u>*`redirect.json` configuration file*</u>
 
 When running this configuration file, the network traces of the browser show that **OpenUI5 resources involve two requests** :
-* The first ones gets status `302` from REserve,
-* The second ones gets the corresponding resource from the CDN.
+* The first one gets status `302` from REserve,
+* The second one gets the corresponding resource from the CDN.
 
 ![redirect](openui5/redirect.png)
 
@@ -273,7 +273,7 @@ As far as the traces are concerned, this does not change the output of REserve.
 
 What happens if the website hosting the application is **configured to forbid the execution of external code** ? This condition is easily testable by adding a new mapping that injects a [Content-Security-Policy header](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP).
 
-As listed below, this new mapping has **no `match` specification**. Therefore **it applies to all requests going through it**. But, in the end, only the one serving the bootstrap file is relevant.
+As listed below, this new mapping has **no `match` specification**. Therefore, **it applies to all requests going through it**. But, in the end, only the one serving the bootstrap file is relevant.
 
 ```json
 {
@@ -314,7 +314,7 @@ Since **OpenUI5 resources are served from a CDN** after the request is being red
 
 <u>*The network traces show the blocked request*</u>
 
-As a consequence, the **application loading is stopped** and only **few traces are dumped** in the REserve console.
+Consequently, the **application loading is stopped** and only **few traces are dumped** in the REserve console.
 
 ![redirect](openui5/redirect-csp%20cmd.png)
 
@@ -324,7 +324,7 @@ As a consequence, the **application loading is stopped** and only **few traces a
 
 To solve this problem, the **OpenUI5 resources must be served by the application website**.
 
-REserve offers an elegant solution: the [url handler](https://www.npmjs.com/package/reserve#url) is capable of **forwarding an incoming request to any URL** and **tunnel the answer back to the client transparently**.
+REserve offers an elegant solution: the [url handler](https://www.npmjs.com/package/reserve#url) can **forward an incoming request to any URL** and **tunnel the answer back to the client transparently**.
 
 Thus, the **redirect mapping is replaced with a new one** as shown below.
 
@@ -365,7 +365,7 @@ In the console, all the requests are completed with the status `200`.
 Finally, to re-enable the version selection, one last configuration file is required.
 
 As shown below, **two mappings** are necessary :
-* The fist one defines a **virtual path** `/@openui5/<version>/<resource>` based on the url handler to **map the OpenUI5 CDN**.
+* The first one defines a **virtual path** `/@openui5/<version>/<resource>` based on the url handler to **map the OpenUI5 CDN**.
 * The second one requires **custom code** to extract the expected version from the `Referer` header and **redirect to the virtual path**.
 
 ```json
@@ -412,7 +412,7 @@ As expected, the **application runs** and the **OpenUI5 version can be changed**
 
 <u>*The demonstration application running with version 1.65.0 of OpenUI5 served locally*</u>
 
-Again, the console is similar to the previous example.
+Again, the console looks like the previous example.
 
 ![redirect](openui5/proxy-csp-version%20cmd.png)
 
@@ -420,7 +420,7 @@ Again, the console is similar to the previous example.
 
 ## Conclusion
 
-Not only REserve is designed to be **lightweight** *(less than [60 kB in version 1.6.1](https://packagephobia.now.sh/result?p=reserve@1.6.1))* but it is also **flexible and powerful**. It solves complex problems with its **specialized handlers** and it can be easily **extended** with custom code.
+Not only REserve is designed to be **lightweight** *(less than [60 kB in version 1.6.1](https://packagephobia.now.sh/result?p=reserve@1.6.1))* but it is also **flexible and powerful**. It solves complex problems with its **specialized handlers**, and it can be easily **extended** with custom code.
 
 Through the article, **five websites with different behaviors** were setup with only **few lines of configuration / code**.
 
