@@ -1,12 +1,12 @@
 # Tests & Quality
 
-After drafting the first working version of [REserve](https://npmjs.com/package/reserve), the remaining **challenges** were to include **behavior validation** and **quality assessment**. This article will detail the different **strategies** adopted for **testing** as well as the **tooling** used to ensure the **quality** of the project.
+After drafting the first working version of [REserve](https://npmjs.com/package/reserve), **behavior validation** and **quality assessment** were some of the remaining **challenges**. This article will detail the different **strategies** adopted for **testing** as well as the **tooling** used to ensure the **quality** of the project.
 
 ## Basic testing
 
-There are many ways to deal with web application testing. On one hand, you may use some [selenium-based tools](https://www.guru99.com/automated-testing-tools.html) (or any [alternative](https://www.guru99.com/selenium-alternatives.html)) to **automate a browser**, run a given set of **scenarios** and assess the **expected results**. On the other hand, you may leverage a simpler **http client** *(for instance [curl](https://curl.haxx.se/) or Node.js' [request](https://www.npmjs.com/package/request))* and **analyze the responses**.
+There are many ways to deal with web application testing. On one hand, you may use some [selenium-based tools](https://www.guru99.com/automated-testing-tools.html) (or any [alternative](https://www.guru99.com/selenium-alternatives.html)) to **automate a browser**, run a given set of **scenarios** and assess the **expected results**. On the other hand, you may leverage a simpler **http client** *(for instance [curl](https://curl.haxx.se/) or Node.js' helpers such as [request](https://www.npmjs.com/package/request), [got](https://www.npmjs.com/package/got) or [superagent](https://www.npmjs.com/package/superagent))* and **analyze the responses**.
 
-With regards to this project, the most important thing was to validate the way the **server behaves** according to its configuration. Since it is very **flexible**, every possible combination had to be tested and the error management finely controlled.
+With regards to this project, the most important thing is to validate the way the **server behaves** according to its configuration. Since it is very **flexible**, every possible combination must be tested and the error management finely controlled.
 
 When the project started, an initial - not to say basic - test was created by building a **small website illustrating most of the features**. First, a mix of different handlers and mappings was consolidated inside a [mappings.json](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/mappings.json) file. Then, two extension files exposed this definition through [http](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/http.json) and [https](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/https.json).
 
@@ -33,6 +33,10 @@ When the project started, an initial - not to say basic - test was created by bu
 ```
 <u>*Initial mappings used to prototype REserve*</u>
 
+* The first mapping is a typical **proxy** that enables any request on a **remote website**
+* The second *(and third)* mapping uses the **custom handler** with a **capturing group**
+* The last handler maps the remaining requests to the **file system**
+
 ```json
 {
   "extend": "./mappings.json",
@@ -55,7 +59,7 @@ This is the reason why the **Node.js command line** [all.js](https://github.com/
 
 ## In-depth testing
 
-The previous approach consisted in considering the **whole project** as a standalone - monolithic - component and test it by leveraging **a client**. This is also known as **end to end testing**. If you understand the **[pyramid of test](https://martinfowler.com/articles/practical-test-pyramid.html)**, we are almost on the top of it... Meaning that this should be the place where the least effort is being put.
+The previous approach considers the **whole project** as a standalone - monolithic - component and tests it by leveraging **a client**. This is also known as **end to end testing**. If you understand the **[pyramid of test](https://martinfowler.com/articles/practical-test-pyramid.html)**, this kind of test is situated almost on the top of it... Meaning that this should be the place where the least effort is being put.
 
 Another angle for testing is to **isolate each class and service** by [mocking or stubbing](https://www.martinfowler.com/articles/mocksArentStubs.html#TheDifferenceBetweenMocksAndStubs) their dependencies and **test them individually**. This is known as **unit testing** and it starts the pyramid of tests, meaning this is where most effort should be put.
 
@@ -65,7 +69,7 @@ If you are familiar with the [mocha framework](https://www.npmjs.com/package/moc
 
 For each source file of the project a **corresponding** test file is created, for instance: [`handlers/custom.js`](https://github.com/ArnaudBuchholz/reserve/blob/master/handlers/custom.js) is tested by [`tests/mocha/handlers/custom.test.js`](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/mocha/handlers/custom.test.js). The directory structure is also recreated under the [moch tests folder](https://github.com/ArnaudBuchholz/reserve/tree/master/tests/mocha).
 
-This pattern makes the configuration of mocha easier since you just need to setup the spec file pattern to `*.test.js`.
+This pattern makes the **configuration of mocha easier** since you just need to setup the spec file pattern to `*.test.js`.
 
 When running, it produces a report that helps you identify which **test case failed**.
 
@@ -75,12 +79,12 @@ When running, it produces a report that helps you identify which **test case fai
 
 ### Isolation in a nutshell
 
-I have to admit that, as explained before, the project didn't start with the [tests first](https://en.wikipedia.org/wiki/Test-driven_development). As a result, no encapsulation was done and the code is heavily relying on Node.js native APIs. In particular :
+As explained before, the project didn't start with the [tests first](https://en.wikipedia.org/wiki/Test-driven_development). As a result, **no encapsulation** was done and the code is heavily relying on **Node.js native APIs**. In particular :
 * [fs](https://nodejs.org/dist/latest/docs/api/fs.html) module for accessing the **file system**
 * [http](https://nodejs.org/dist/latest/docs/api/http.html) / [https](https://nodejs.org/dist/latest/docs/api/https.html) modules to create the actual **server**
 * The [`request`](https://nodejs.org/api/http.html#http_class_http_incomingmessage) and [`response`](https://nodejs.org/api/http.html#http_class_http_serverresponse) objects
 
-Luckily, it is possible to **substitute any Node.js modules** *(including the native ones)* using [mock-require](https://www.npmjs.com/package/mock-require). This simple API allows you to predefine a module with a mocked version.
+It is possible to **substitute any Node.js modules** *(including the native ones)* using [mock-require](https://www.npmjs.com/package/mock-require). This simple API allows you to **predefine a module with a mocked version**.
 
 #### Mocking the file system
 
@@ -90,11 +94,11 @@ However, the project aims to be run on **any platform**. And, actually, the deve
 
 The **file system differences** between operating systems has a **significant impact** on REserve. Indeed, a web server running on a UNIX-like operating system would be **case sensitive** with the URLs. On windows, it might **not**.
 
-REserve uses only a **subset of the fs APIs**, a [custom mocked version](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/mocha/mocked_modules/fs.js) was build to redefine **only the APIs that are really used**.
+Since REserve uses only a **subset of the fs APIs**, a [custom mocked version](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/mocha/mocked_modules/fs.js) was build to redefine **only the APIs that are really used**.
 
-The whole file system is **virtualized** against a dictionary where object members are either files *(when they contain a `content` property)* or a folder *(when no `content` is found)*.
+The whole file system is **virtualized** thanks to a dictionary where members are object representing either files *(when they contain a `content` property)* or folders *(when no `content` is found)*.
 
-An additional API was added to control **whether the file system is case sensitive** or not.
+A specific API was added to control **whether the file system is case sensitive** or not.
 
 ```JavaScript
 let caseSensitive = true
@@ -118,17 +122,15 @@ function getEntry (entryPath) {
 
 #### Mocking of http, requests & responses
 
-What is the **difference** between the [http](https://nodejs.org/dist/latest/docs/api/http.html) and the [https](https://nodejs.org/dist/latest/docs/api/https.html) modules ? According to REserve, not much.
-
-Actually, only two methods are used :
+According to REserve, there is not much **differences** between the [http](https://nodejs.org/dist/latest/docs/api/http.html) and the [https](https://nodejs.org/dist/latest/docs/api/https.html) modules. Actually, only two methods are used :
 * [createServer](https://nodejs.org/api/http.html#http_http_createserver_options_requestlistener) to initiate the HTTP(s) server
-* [request](https://nodejs.org/api/http.html#http_http_request_url_options_callback) to forward the an incoming request to a distant URL (`url` handler)
+* [request](https://nodejs.org/api/http.html#http_http_request_url_options_callback) to forward the an incoming request to a distant URL *(used by the `url` handler)*
 
->>>>> TODO
-
-Since we can trust that these modules are doing their job right and as the unit tests will not go through a real http server, the mocking was made to ...
+Since we can trust that these modules are doing their job right and considering that the unit tests will not go through a real http(s) server, the mocking was made to ...
 
 In order to maximize the coverage, the request method builds a response with a predefined content.
+
+>>>>> TODO
 
 
 
