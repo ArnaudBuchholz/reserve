@@ -29,6 +29,7 @@ const defaults = {
   hostname: undefined,
   port: 5000,
   'max-redirect': 10,
+  plugins: [],
   mappings: [{
     match: /^\/proxy\/(https?)\/(.*)/,
     url: '$1://$2',
