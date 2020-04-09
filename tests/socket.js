@@ -15,5 +15,5 @@ serve({
   }]
 })
   .on('ready', ({ url }) => {
-      console.log(`Server running at ${url}`)
+    console.log(`Server running at ${url}`)
   })
