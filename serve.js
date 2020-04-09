@@ -18,8 +18,13 @@ function createServer (configuration, requestHandler) {
 
 function createServerAsync (configuration, requestHandler) {
   return new Promise((resolve, reject) => {
-    createServer(configuration, requestHandler)
-      .listen(configuration.port, configuration.hostname, err => err ? reject(err) : resolve())
+    const server = createServer(configuration, requestHandler)
+    configuration.plugins.forEach(plugin => {
+      if (plugin.alterHttpServer) {
+        plugin.alterHttpServer(server, configuration)
+      }
+    })
+    server.listen(configuration.port, configuration.hostname, err => err ? reject(err) : resolve())
   })
 }
 
