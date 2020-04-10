@@ -16,14 +16,10 @@ function createServer (configuration, requestHandler) {
   return http.createServer(requestHandler)
 }
 
-function createServerAsync (configuration, requestHandler) {
+function createServerAsync (eventEmitter, configuration, dispatcher) {
   return new Promise((resolve, reject) => {
-    const server = createServer(configuration, requestHandler)
-    configuration.plugins.forEach(plugin => {
-      if (plugin.alterHttpServer) {
-        plugin.alterHttpServer(server, configuration)
-      }
-    })
+    const server = createServer(configuration, dispatcher.bind(eventEmitter, configuration))
+    eventEmitter.emit('server-created', { server })
     server.listen(configuration.port, configuration.hostname, err => err ? reject(err) : resolve())
   })
 }
@@ -31,13 +27,15 @@ function createServerAsync (configuration, requestHandler) {
 module.exports = jsonConfiguration => {
   const eventEmitter = new EventEmitter()
   check(jsonConfiguration)
-    .then(configuration => createServerAsync(configuration, dispatcher.bind(eventEmitter, configuration))
-      .then(() => {
-        eventEmitter.emit('ready', {
-          url: `${configuration.protocol}://${configuration.hostname || '0.0.0.0'}:${configuration.port}/`
+    .then(configuration => {
+      configuration.plugins.forEach(plugin => plugin(eventEmitter))
+      return createServerAsync(eventEmitter, configuration, dispatcher)
+        .then(() => {
+          eventEmitter.emit('ready', {
+            url: `${configuration.protocol}://${configuration.hostname || '0.0.0.0'}:${configuration.port}/`
+          })
         })
-      })
-    )
+    })
     .catch(reason => eventEmitter.emit('error', { reason }))
   return eventEmitter
 }
