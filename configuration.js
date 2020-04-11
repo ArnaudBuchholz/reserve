@@ -29,7 +29,7 @@ const defaults = {
   hostname: undefined,
   port: 5000,
   'max-redirect': 10,
-  plugins: [],
+  listeners: [],
   mappings: [{
     match: /^\/proxy\/(https?)\/(.*)/,
     url: '$1://$2',
@@ -97,6 +97,12 @@ function setHandlers (configuration) {
   }
   Object.keys(configuration.handlers).forEach(validateHandler.bind(configuration))
   configuration.handler = getHandler.bind(null, configuration.handlers, Object.keys(configuration.handlers))
+}
+
+function checkListeners (configuration) {
+  if (!Array.isArray(configuration.listeners)) {
+    throw new Error('Invalid listeners member, must be an array')
+  }
 }
 
 async function readSslFile (configuration, filePath) {
@@ -171,6 +177,7 @@ module.exports = {
     const checkedConfiguration = Object.assign({}, configuration)
     applyDefaults(checkedConfiguration)
     setHandlers(checkedConfiguration)
+    checkListeners(checkedConfiguration)
     await checkProtocol(checkedConfiguration)
     await checkMappings(checkedConfiguration)
     checkedConfiguration[$configurationRequests] = {
