@@ -27,7 +27,7 @@ function html (content, request, response) {
 
 serve({
   port: 8081,
-  plugins: [socket],
+  listeners: [socket],
   mappings: [{
     match: /^\/$/,
     custom: html.bind(null, `<!doctype html>
