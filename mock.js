@@ -11,6 +11,11 @@ module.exports = (jsonConfiguration, mockedHandlers = {}) => {
   return check(jsonConfiguration)
     .then(configuration => {
       Object.assign(configuration.handlers, mockedHandlers)
+      configuration.listeners.forEach(listener => listener(eventEmitter))
+      eventEmitter.emit('server-created', {
+        configuration: configuration[$configurationInterface],
+        server: null
+      })
       const dispatch = dispatcher.bind(eventEmitter, configuration)
       eventEmitter.request = (method, url, headers = {}, body = '') => {
         const request = new Request(method, url, headers, body)
