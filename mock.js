@@ -5,6 +5,7 @@ const dispatcher = require('./dispatcher')
 const EventEmitter = require('events')
 const Request = require('./mock/Request')
 const Response = require('./mock/Response')
+const { $configurationInterface } = require('./symbols')
 
 module.exports = (jsonConfiguration, mockedHandlers = {}) => {
   const eventEmitter = new EventEmitter()
