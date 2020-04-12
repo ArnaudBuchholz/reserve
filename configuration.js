@@ -100,8 +100,9 @@ function setHandlers (configuration) {
 }
 
 function checkListeners (configuration) {
-  if (!Array.isArray(configuration.listeners)) {
-    throw new Error('Invalid listeners member, must be an array')
+  const listeners = configuration.listeners
+  if (!Array.isArray(listeners) || !listeners.every(register => typeof register === 'function')) {
+    throw new Error('Invalid listeners member, must be an array of functions')
   }
 }
 
