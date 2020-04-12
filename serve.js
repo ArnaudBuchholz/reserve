@@ -29,7 +29,7 @@ module.exports = jsonConfiguration => {
   const eventEmitter = new EventEmitter()
   check(jsonConfiguration)
     .then(configuration => {
-      configuration.listeners.forEach(listener => listener(eventEmitter))
+      configuration.listeners.forEach(register => register(eventEmitter))
       return createServerAsync(eventEmitter, configuration, dispatcher)
         .then(() => {
           eventEmitter.emit('ready', {
