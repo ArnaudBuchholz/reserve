@@ -93,7 +93,7 @@ function setHandlers (configuration) {
     // Default hanlders can't be overridden
     configuration.handlers = Object.assign({}, configuration.handlers, defaultHandlers)
   } else {
-    configuration.handlers = defaultHandlers
+    configuration.handlers = Object.assign({}, defaultHandlers)
   }
   Object.keys(configuration.handlers).forEach(validateHandler.bind(configuration))
   configuration.handler = getHandler.bind(null, configuration.handlers, Object.keys(configuration.handlers))
