@@ -64,4 +64,30 @@ describe('mock', () => {
       })
     )
   })
+
+  describe('with listeners', () => {
+    it('partly enables listeners', () => {
+      const events = []
+      return read('/reserve.json')
+        .then(configuration => {
+          configuration.listeners = [
+            function register (eventEmitter) {
+              eventEmitter.on('server-created', ({ configuration, server }) => {
+                assert(() => !!configuration)
+                assert(() => server === null) // Can't have a server
+                events.push('server-created')
+              })
+            }
+          ]
+          return mock(configuration)
+        })
+        .then(mocked => mocked.request('GET', '/file.txt'))
+        .then(response => {
+          assert(() => response.statusCode === 200)
+          assert(() => response.toString() === 'Hello World!')
+          assert(() => events.length === 1)
+          assert(() => events[0] === 'server-created')
+        })
+    })
+  })
 })
