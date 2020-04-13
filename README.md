@@ -94,6 +94,9 @@ Go to this [page](https://github.com/ArnaudBuchholz/reserve/tree/master/doc/READ
 ||`ignore-if-not-found` option in **file** handler *(enables folder browsing with a separate handler)*|
 |1.6.0|Implements `$%1` and `$&1` substitution parameters *(see [Custom handlers](#custom-handlers))*|
 |1.6.1|Exposes `require('reserve').interpolate` *(see [Custom handlers](#custom-handlers))*|
+|1.7.0|Adds `listeners` configuration option|
+||Adds `server-created` event available only to listeners|
+||Secures events processing against exceptions|
 
 # Usage
 
@@ -152,8 +155,9 @@ reserve({
 
 The resulting object implements the [EventEmitter](https://nodejs.org/api/events.html) class and throws the following events with parameters :
 
-| Event | Parameter (object containing members) | Description |
+| Event | Parameter *(object containing members)* | Description |
 |---|---|---|
+| **server-created** | `server` *([`http.server`](https://nodejs.org/api/http.html#http_class_http_server) or [`https.server`](https://nodejs.org/api/https.html#https_class_https_server))*, `configuration` *([configuration interface](#configuration-interface))*| Only available to listeners, this event is triggered after the HTTP(S) server is **created** and before it **accepts requests**.
 | **ready** | `url` *(String, example : `'http://0.0.0.0:8080/'`)*| The server is listening and ready to receive requests, hostname is replaced with `0.0.0.0` when **unspecified**.
 | **incoming** | `method` *(String, example : `'GET'`)*, `url` *(String)*, `start` *(Date)* | New request received, these parameters are also transmitted to **error**, **redirecting** and **redirected** events |
 | **error** | `reason` *(Any)* | Error reason, contains **incoming** parameters if related to a request |
