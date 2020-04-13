@@ -20,7 +20,7 @@ function promisify (configuration, callback) {
   })
 }
 
-function promisifyError (configuration, checkError) {
+function promisifyWithError (configuration, checkError) {
   return new Promise((resolve, reject) => {
     serve(configuration)
       .on('error', ({ reason }) => {
@@ -50,13 +50,13 @@ describe('serve', () => {
     }))
   )
 
-  it('transmits server creation error', () => promisifyError({
+  it('transmits server creation error', () => promisifyWithError({
     hostname: 'error'
   }, reason => {
     assert(() => reason.message === 'error')
   }))
 
-  it('fails if a listener registration throws an exception', () => promisifyError({
+  it('fails if a listener registration throws an exception', () => promisifyWithError({
     listeners: [eventEmitter => {
       throw new Error('immediate')
     }],
@@ -66,7 +66,7 @@ describe('serve', () => {
     assert(() => reason.message === 'immediate')
   }))
 
-  it('fails if a listener throws an exception during server-create', () => promisifyError({
+  it('fails if a listener throws an exception during server-create', () => promisifyWithError({
     listeners: [eventEmitter => {
       eventEmitter.on('server-created', () => {
         throw new Error('server-created')
