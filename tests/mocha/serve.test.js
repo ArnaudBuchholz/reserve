@@ -6,13 +6,8 @@ const { read } = require('../../configuration')
 
 function promisify (configuration, callback) {
   return new Promise((resolve, reject) => {
-    /* istanbul ignore next */ // We don't expect it to happen !
-    function unexpectedError (parameters) {
-      reject(parameters.error)
-    }
-
     serve(configuration)
-      .on('error', unexpectedError)
+      .on('error', reject)
       .on('ready', parameters => {
         try {
           callback(parameters)
@@ -22,6 +17,22 @@ function promisify (configuration, callback) {
           reject(e)
         }
       })
+  })
+}
+
+function promisifyError (configuration, checkError) {
+  return new Promise((resolve, reject) => {
+    serve(configuration)
+      .on('error', ({ reason }) => {
+        try {
+          checkError(reason)
+          resolve()
+        } catch (e) {
+          /* istanbul ignore next */ // We don't expect it to happen !
+          reject(e)
+        }
+      })
+      .on('ready', reject)
   })
 }
 
@@ -39,24 +50,43 @@ describe('serve', () => {
     }))
   )
 
-  it('transmits server creation error', done => {
-    /* istanbul ignore next */ // We don't expect it to happen !
-    function unexpectedReady () {
-      done(new Error('unexpected'))
-    }
+  it('transmits server creation error', () => promisifyError({
+    hostname: 'error'
+  }, reason => {
+    assert(() => reason.message === 'error')
+  }))
 
-    serve({
-      hostname: 'error'
-    })
-      .on('error', parameters => {
-        try {
-          assert(() => parameters.reason.message === 'error')
-          done()
-        } catch (e) {
-          /* istanbul ignore next */ // We don't expect it to happen !
-          done(e)
-        }
+  it('fails if a listener registration throws an exception', () => promisifyError({
+    listeners: [eventEmitter => {
+      throw new Error('immediate')
+    }],
+    hostname: '127.0.0.1',
+    port: 3475
+  }, reason => {
+    assert(() => reason.message === 'immediate')
+  }))
+
+  it('fails if a listener throws an exception during server-create', () => promisifyError({
+    listeners: [eventEmitter => {
+      eventEmitter.on('server-created', () => {
+        throw new Error('server-created')
       })
-      .on('ready', unexpectedReady)
-  })
+    }],
+    hostname: '127.0.0.1',
+    port: 3475
+  }, reason => {
+    assert(() => reason.message === 'server-created')
+  }))
+
+  it('provides server instance to listeners (server-created)', () => promisify({
+    listeners: [eventEmitter => {
+      eventEmitter.on('server-created', ({ server }) => {
+        assert(() => !!server)
+      })
+    }],
+    hostname: '127.0.0.1',
+    port: 3475
+  }, ({ url }) => {
+    assert(() => url === 'http://127.0.0.1:3475/')
+  }))
 })
