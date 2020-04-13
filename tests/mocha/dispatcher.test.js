@@ -359,5 +359,49 @@ describe('dispatcher', () => {
         })
       )
     })
+
+    describe('listeners', () => {
+      const eventsThatBreakTheRequest = [/*'incoming'/*, */'redirecting']
+      eventsThatBreakTheRequest.forEach(event => {
+          it(`fails the request if the '${event}' listener fails`, async () => {
+            const sampleConf = await sampleConfPromise
+            const request = new Request('GET', '/file.txt')
+            const response = new Response()
+            const emitter = new RecordedEventEmitter()
+            emitter.on(event, () => {
+              throw new Error('FAIL')
+            })
+            const promise = promisifyWithError(emitter, async (parameters, errorThrown) => {
+              assert(() => errorThrown)
+              assert(() => response.statusCode === 500)
+            })
+            dispatcher.call(emitter, sampleConf, request, response)
+            return promise
+          })
+      })
+
+/*
+      const eventsThatDoNOTBreakTheRequest = ['error', 'redirected']
+      eventsThatDoNOTBreakTheRequest.forEach(event => {
+          it(`does not fail the request if the '${event}' listener fails`, async () => {
+            const sampleConf = await sampleConfPromise
+            const request = new Request('GET', '/file.txt')
+            const response = new Response()
+            const emitter = new RecordedEventEmitter()
+            // emitter.on(event, () => {
+            //   throw new Error('FAIL')
+            // })
+            const promise = promisify(emitter, async parameters => {
+              await response.waitForFinish()
+              assert(() => response.statusCode === 200)
+              assert(() => response.headers['Content-Type'] === textMimeType)
+              assert(() => response.toString() === 'Hello World!')
+            })
+            dispatcher.call(emitter, sampleConf, request, response)
+            return promise
+          })
+      })
+*/
+    })
   })
 })
