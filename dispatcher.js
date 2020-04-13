@@ -31,7 +31,11 @@ function redirected () {
     timeSpent: end - this.emitParameters.start,
     statusCode: this.response.statusCode
   })
-  this.eventEmitter.emit('redirected', redirectedInfos)
+  try {
+    this.eventEmitter.emit('redirected', redirectedInfos)
+  } catch (e) {
+    logError(errorParameters) // Too late to impact the request
+  }
   this.resolve(redirectedInfos)
 }
 
@@ -46,8 +50,7 @@ function error (reason) {
   try {
     this.eventEmitter.emit('error', errorParameters)
   } catch (e) {
-    // Unhandled error
-    logError(errorParameters)
+    logError(errorParameters) // Unhandled error
   }
   if (this.failed) {
     // Error during error: finalize the response (whatever it means)
@@ -59,8 +62,8 @@ function error (reason) {
 }
 
 function redirecting ({ mapping, match, handler, type, redirect, url, index = 0 }) {
-  this.eventEmitter.emit('redirecting', Object.assign(this.emitParameters, { type, redirect }))
   try {
+    this.eventEmitter.emit('redirecting', Object.assign(this.emitParameters, { type, redirect }))
     return handler.redirect({
       configuration: this.configuration[$configurationInterface],
       mapping,
@@ -119,14 +122,20 @@ module.exports = function (configuration, request, response) {
   const emitParameters = { method: request.method, url: request.url, start: new Date() }
   let promiseResolver
   const requestPromise = new Promise(resolve => { promiseResolver = resolve })
-  this.emit('incoming', emitParameters)
+  const context = { eventEmitter: this, emitParameters, configuration, request, response, resolve: promiseResolver }
   request[$requestPromise] = requestPromise
   request[$requestRedirectCount] = 0
+  try {
+    this.emit('incoming', emitParameters)
+  } catch (reason) {
+    error.call(context, reason)
+    return requestPromise
+  }
   const configurationRequests = configuration[$configurationRequests]
   return configurationRequests.hold
     .then(() => {
       configurationRequests.promises.push(requestPromise)
-      dispatch.call({ eventEmitter: this, emitParameters, configuration, request, response, resolve: promiseResolver }, request.url)
+      dispatch.call(context, request.url)
       return requestPromise
     })
     .then(() => {
