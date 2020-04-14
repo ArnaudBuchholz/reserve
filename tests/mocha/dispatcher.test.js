@@ -106,9 +106,9 @@ describe('dispatcher', () => {
         .on('error', () => {
           errorThrown = true
         })
-        .on('redirected', parameters => {
+        .on('redirected', async parameters => {
           try {
-            callback(parameters, errorThrown)
+            await callback(parameters, errorThrown)
             resolve()
           } catch (e) {
             /* istanbul ignore next */ // We don't expect it to happen !
@@ -361,47 +361,68 @@ describe('dispatcher', () => {
     })
 
     describe('listeners', () => {
-      const eventsThatBreakTheRequest = [/*'incoming'/*, */'redirecting']
-      eventsThatBreakTheRequest.forEach(event => {
-          it(`fails the request if the '${event}' listener fails`, async () => {
-            const sampleConf = await sampleConfPromise
-            const request = new Request('GET', '/file.txt')
-            const response = new Response()
-            const emitter = new RecordedEventEmitter()
-            emitter.on(event, () => {
-              throw new Error('FAIL')
-            })
-            const promise = promisifyWithError(emitter, async (parameters, errorThrown) => {
-              assert(() => errorThrown)
-              assert(() => response.statusCode === 500)
-            })
-            dispatcher.call(emitter, sampleConf, request, response)
-            return promise
+      it('fails the request if the \'incoming\' listener fails', async () => {
+        const sampleConf = await sampleConfPromise
+        const request = new Request('GET', '/file.txt')
+        const response = new Response()
+        const emitter = new RecordedEventEmitter()
+        emitter.on('incoming', () => {
+          throw new Error('FAIL')
+        })
+        const promise = promisifyWithError(emitter, async (parameters, errorThrown) => {
+          assert(() => errorThrown)
+          assert(() => response.statusCode === 500)
+        })
+        dispatcher.call(emitter, sampleConf, request, response)
+        return promise
+      })
+
+      it('fails the request if the \'redirecting\' listener fails', async () => {
+        const sampleConf = await sampleConfPromise
+        const request = new Request('GET', '/file.txt')
+        const response = new Response()
+        const emitter = new RecordedEventEmitter()
+        emitter.on('redirecting', () => {
+          throw new Error('FAIL')
+        })
+        const promise = promisifyWithError(emitter, async (parameters, errorThrown) => {
+          assert(() => errorThrown)
+          assert(() => response.statusCode === undefined) // Because it never completes the request
+        })
+        dispatcher.call(emitter, sampleConf, request, response)
+        return promise
+      })
+
+      it('does not fail the request if the \'error\' listener fails', async () => {
+        const sampleConf = await sampleConfPromise
+        const request = new Request('GET', '/fail')
+        const response = new Response()
+        const emitter = new RecordedEventEmitter()
+        emitter.on('error', () => {
+          throw new Error('FAIL')
+        })
+        return dispatcher.call(emitter, sampleConf, request, response)
+          .then(() => {
+            assert(() => response.statusCode === 500)
           })
       })
 
-/*
-      const eventsThatDoNOTBreakTheRequest = ['error', 'redirected']
-      eventsThatDoNOTBreakTheRequest.forEach(event => {
-          it(`does not fail the request if the '${event}' listener fails`, async () => {
-            const sampleConf = await sampleConfPromise
-            const request = new Request('GET', '/file.txt')
-            const response = new Response()
-            const emitter = new RecordedEventEmitter()
-            // emitter.on(event, () => {
-            //   throw new Error('FAIL')
-            // })
-            const promise = promisify(emitter, async parameters => {
-              await response.waitForFinish()
-              assert(() => response.statusCode === 200)
-              assert(() => response.headers['Content-Type'] === textMimeType)
-              assert(() => response.toString() === 'Hello World!')
-            })
-            dispatcher.call(emitter, sampleConf, request, response)
-            return promise
+      it('does not fail the request if the \'redirected\' listener fails', async () => {
+        const sampleConf = await sampleConfPromise
+        const request = new Request('GET', '/file.txt')
+        const response = new Response()
+        const emitter = new RecordedEventEmitter()
+        emitter.on('redirected', () => {
+          throw new Error('FAIL')
+        })
+        return dispatcher.call(emitter, sampleConf, request, response)
+          .then(async () => {
+            await response.waitForFinish()
+            assert(() => response.statusCode === 200)
+            assert(() => response.headers['Content-Type'] === textMimeType)
+            assert(() => response.toString() === 'Hello World!')
           })
       })
-*/
     })
   })
 })
