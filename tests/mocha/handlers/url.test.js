@@ -20,64 +20,65 @@ describe('handlers/url', () => {
     assert(() => typeof result.then === 'function')
   })
 
-  it('pipes URL content', () => {
+  it('pipes URL content', async () => {
     const request = new Request('GET', 'http://example.com/whatever', {
       'x-status-code': 200,
       'x-value-1': 'test',
       host: 'http://example.com'
     }, 'Hello World!')
     const response = new Response()
-    return urlHandler.redirect({
+    const mapping = {}
+    await urlHandler.validate(mapping)
+    const vallue = await urlHandler.redirect({
       request,
       response,
-      mapping: {},
+      mapping,
       redirect: http.urls.echo
     })
-      .then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 200)
-        assert(() => response.headers['x-value-1'] === 'test')
-        assert(() => response.headers.host === undefined)
-        assert(() => response.toString() === 'Hello World!')
-      })
+    assert(() => value === undefined)
+    assert(() => response.statusCode === 200)
+    assert(() => response.headers['x-value-1'] === 'test')
+    assert(() => response.headers.host === undefined)
+    assert(() => response.toString() === 'Hello World!')
   })
 
-  it('pipes URL content (https)', () => {
+  it('pipes URL content (https)', async () => {
     const request = new Request('GET', 'http://example.com/whatever', {
       'x-status-code': 200
     }, 'Hello World!')
     const response = new Response()
-    return urlHandler.redirect({
+    const mapping = {}
+    await urlHandler.validate(mapping)
+    const value = await urlHandler.redirect({
       request,
       response,
-      mapping: {},
+      mapping,
       redirect: http.urls.echos
     })
-      .then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 200)
-        assert(() => response.toString() === 'Hello World!')
-      })
+    assert(() => value === undefined)
+    assert(() => response.statusCode === 200)
+    assert(() => response.toString() === 'Hello World!')
   })
 
-  it('unsecures cookies', () => {
+  it('unsecures cookies', async () => {
     const request = new Request('GET', 'http://example.com/abwhatever', {
       'x-status-code': 200,
       'Set-Cookie': ['name=value; Secure;']
     })
     const response = new Response()
-    return urlHandler.redirect({
+    const mapping = {
+      'unsecure-cookies': true
+    }
+    await urlHandler.validate(mapping)
+    const value = await urlHandler.redirect({
       request,
       response,
-      mapping: {
-        'unsecure-cookies': true
-      },
+      mapping,
       redirect: http.urls.echos
     })
-      .then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 200)
-        assert(() => response.headers['Set-Cookie'][0] === 'name=value;')
-      })
+    assert(() => value === undefined)
+    assert(() => response.statusCode === 200)
+    assert(() => response.headers['Set-Cookie'][0] === 'name=value;')
   })
+
 })
