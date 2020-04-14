@@ -18,21 +18,41 @@ function unsecureCookies (headers) {
   })
 }
 
+function noop () {}
+
+function validateHook (mapping, hookName) {
+  if (typeof mapping[hookName] === 'string') {
+    mapping[hookName] = require(mapping[hookName])
+    if (typeof mapping[hookName] !== 'function') {
+      throw new Error(`Invalid value for hook '${hookName}', expected a function`)
+    }
+  }
+}
+
 module.exports = {
   schema: {
     'unsecure-cookies': {
       type: 'boolean',
       defaultValue: false
+    },
+    'before-request': {
+      types: ['function', 'string'],
+      defaultValue: noop
     }
   },
-  redirect: ({ mapping, redirect, request, response }) => new Promise((resolve, reject) => {
-    const url = redirect
-    const {
-      method,
-      headers
-    } = request
+  validate: async mapping => {
+    validateHook(mapping, 'before-request')
+  },
+  redirect: ({ mapping, redirect: url, request: { method, headers }, response }) => new Promise((resolve, reject) => {
     delete headers.host // Some websites rely on the host header
-    const redirectedRequest = protocol(url).request(url, { method, headers }, redirectedResponse => {
+    const request = {
+      method,
+      url,
+      headers
+    }
+console.log(mapping)
+    mapping['before-request']()
+    const redirectedRequest = protocol(request.url).request(request.url, request, redirectedResponse => {
       if (mapping['unsecure-cookies']) {
         unsecureCookies(redirectedResponse.headers)
       }
