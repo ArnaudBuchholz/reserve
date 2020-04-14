@@ -33,8 +33,8 @@ function redirected () {
   })
   try {
     this.eventEmitter.emit('redirected', redirectedInfos)
-  } catch (e) {
-    logError(errorParameters) // Too late to impact the request
+  } catch (reason) {
+    logError({ ...this.emitParameters, reason }) // Too late to impact the request
   }
   this.resolve(redirectedInfos)
 }
@@ -46,11 +46,10 @@ function error (reason) {
   } else {
     statusCode = 500
   }
-  const errorParameters = { ...this.emitParameters, reason }
   try {
-    this.eventEmitter.emit('error', errorParameters)
+    this.eventEmitter.emit('error', { ...this.emitParameters, reason })
   } catch (e) {
-    logError(errorParameters) // Unhandled error
+    logError({ ...this.emitParameters, reason: e }) // Unhandled error
   }
   if (this.failed) {
     // Error during error: finalize the response (whatever it means)
