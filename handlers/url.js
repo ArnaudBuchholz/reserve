@@ -43,16 +43,19 @@ module.exports = {
   validate: async mapping => {
     validateHook(mapping, 'before-request')
   },
-  redirect: ({ mapping, redirect: url, request: { method, headers }, response }) => new Promise((resolve, reject) => {
+  redirect: ({ mapping, redirect: url, request, response }) => new Promise(async (resolve, reject) => {
+    const {
+      method,
+      headers
+    } = request
     delete headers.host // Some websites rely on the host header
-    const request = {
+    const options = {
       method,
       url,
       headers
     }
-console.log(mapping)
-    mapping['before-request']()
-    const redirectedRequest = protocol(request.url).request(request.url, request, redirectedResponse => {
+    await mapping['before-request']({ request: options })
+    const redirectedRequest = protocol(options.url).request(options.url, options, redirectedResponse => {
       if (mapping['unsecure-cookies']) {
         unsecureCookies(redirectedResponse.headers)
       }
