@@ -6,15 +6,17 @@ const assert = require('../assert')
 const Request = require('../../../mock/Request')
 const Response = require('../../../mock/Response')
 const urlHandler = require('../../../handlers/url')
+const initMapping = require('./initMapping.js')(urlHandler)
 
 describe('handlers/url', () => {
-  it('returns a promise', () => {
+  it('returns a promise', async () => {
     const request = new Request()
     const response = new Response()
+    const mapping = await initMapping({})
     const result = urlHandler.redirect({
       request,
       response,
-      mapping: {},
+      mapping,
       redirect: http.urls.empty
     })
     assert(() => typeof result.then === 'function')
@@ -27,9 +29,8 @@ describe('handlers/url', () => {
       host: 'http://example.com'
     }, 'Hello World!')
     const response = new Response()
-    const mapping = {}
-    await urlHandler.validate(mapping)
-    const vallue = await urlHandler.redirect({
+    const mapping = await initMapping({})
+    const value = await urlHandler.redirect({
       request,
       response,
       mapping,
@@ -47,8 +48,7 @@ describe('handlers/url', () => {
       'x-status-code': 200
     }, 'Hello World!')
     const response = new Response()
-    const mapping = {}
-    await urlHandler.validate(mapping)
+    const mapping = await initMapping({})
     const value = await urlHandler.redirect({
       request,
       response,
@@ -66,10 +66,9 @@ describe('handlers/url', () => {
       'Set-Cookie': ['name=value; Secure;']
     })
     const response = new Response()
-    const mapping = {
+    const mapping = await initMapping({
       'unsecure-cookies': true
-    }
-    await urlHandler.validate(mapping)
+    })
     const value = await urlHandler.redirect({
       request,
       response,
@@ -80,5 +79,4 @@ describe('handlers/url', () => {
     assert(() => response.statusCode === 200)
     assert(() => response.headers['Set-Cookie'][0] === 'name=value;')
   })
-
 })
