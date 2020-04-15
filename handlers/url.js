@@ -23,9 +23,6 @@ function noop () {}
 function validateHook (mapping, hookName) {
   if (typeof mapping[hookName] === 'string') {
     mapping[hookName] = require(mapping[hookName])
-    if (typeof mapping[hookName] !== 'function') {
-      throw new Error(`Invalid value for hook '${hookName}', expected a function`)
-    }
   }
 }
 
@@ -35,40 +32,51 @@ module.exports = {
       type: 'boolean',
       defaultValue: false
     },
-    'before-request': {
+    'before-forward': {
+      types: ['function', 'string'],
+      defaultValue: noop
+    },
+    'after-forward': {
       types: ['function', 'string'],
       defaultValue: noop
     }
   },
   validate: async mapping => {
-    validateHook(mapping, 'before-request')
+    validateHook(mapping, 'before-forward')
+    validateHook(mapping, 'after-forward')
   },
-  redirect: ({ mapping, redirect: url, request, response }) => new Promise(async (resolve, reject) => {
-    const {
-      method,
-      headers
-    } = request
+  redirect: async ({ mapping, redirect: url, request, response }) => {
+    let done
+    let fail
+    const promise = new Promise((resolve, reject) => {
+      done = resolve
+      fail = reject
+    })
+    const { method, headers } = request
     delete headers.host // Some websites rely on the host header
     const options = {
       method,
       url,
       headers
     }
-    await mapping['before-request']({ request: options })
-    const redirectedRequest = protocol(options.url).request(options.url, options, redirectedResponse => {
+    await mapping['before-forward']({ request: options })
+    const redirectedRequest = protocol(options.url).request(options.url, options, async redirectedResponse => {
       if (mapping['unsecure-cookies']) {
         unsecureCookies(redirectedResponse.headers)
       }
-      response.writeHead(redirectedResponse.statusCode, redirectedResponse.headers)
+      const { headers: responseHeaders } = redirectedResponse
+      await mapping['after-forward']({ headers: responseHeaders })
+      response.writeHead(redirectedResponse.statusCode, responseHeaders)
       redirectedResponse
-        .on('error', reject)
-        .on('end', resolve)
+        .on('error', fail)
+        .on('end', done)
         .pipe(response)
     })
-    redirectedRequest.on('error', reject)
+    redirectedRequest.on('error', fail)
     request
       .on('data', chunk => redirectedRequest.write(chunk))
-      .on('error', reject)
+      .on('error', fail)
       .on('end', () => { redirectedRequest.end() })
-  })
+    return promise
+  }
 }
