@@ -97,6 +97,7 @@ Go to this [page](https://github.com/ArnaudBuchholz/reserve/tree/master/doc/READ
 |1.7.0|Adds `listeners` configuration option|
 ||Adds `server-created` event available only to listeners|
 ||Secures events processing against exceptions|
+||Adds `forward-request` and `forward-response` options for the `url` handler|
 
 # Usage
 
@@ -157,7 +158,7 @@ The resulting object implements the [EventEmitter](https://nodejs.org/api/events
 
 | Event | Parameter *(object containing members)* | Description |
 |---|---|---|
-| **server-created** | `server` *([`http.server`](https://nodejs.org/api/http.html#http_class_http_server) or [`https.server`](https://nodejs.org/api/https.html#https_class_https_server))*, `configuration` *([configuration interface](#configuration-interface))*| Only available to listeners, this event is triggered after the HTTP(S) server is **created** and before it **accepts requests**.
+| **server-created** | `server` *([`http.server`](https://nodejs.org/api/http.html#http_class_http_server) or [`https.server`](https://nodejs.org/api/https.html#https_class_https_server))*, `configuration` *([configuration interface](#configuration-interface))*| Only available to `listeners`, this event is triggered after the HTTP(S) server is **created** and **before it accepts requests**.
 | **ready** | `url` *(String, example : `'http://0.0.0.0:8080/'`)*| The server is listening and ready to receive requests, hostname is replaced with `0.0.0.0` when **unspecified**.
 | **incoming** | `method` *(String, example : `'GET'`)*, `url` *(String)*, `start` *(Date)* | New request received, these parameters are also transmitted to **error**, **redirecting** and **redirected** events |
 | **error** | `reason` *(Any)* | Error reason, contains **incoming** parameters if related to a request |
@@ -284,6 +285,10 @@ For instance :
 module.exports = async (request, response) => response.setHeader('Access-Control-Allow-Origin', '*')
 ```
 
+## listeners
+
+An array of **functions** or **module names exporting a function** which will be called with the **REserve [EventEmitter](https://nodejs.org/api/events.html) object**. The purpose is to allow events registration before the server starts and give access to the `server-created` event.
+
 ## extend
 
 *Only for JSON configuration*
@@ -361,6 +366,10 @@ Example :
 | option | type | default | description |
 |---|---|---|---|
 | `unsecure-cookies` | Boolean | `false` | when `true`, the secured cookies are converted to unsecure ones. Hence, the browser will keep them even if not running on https |
+| `forward-request` | String or Function | - | when specified, the function is called **before** generating the forward request. The expected signature is  `function ({ mapping, request: { method, url, headers }})`. Changing the request settings will **impact** the forward request.
+| `forward-response` | String or Function | - | when specified, the function is called **after** sending the forward request but **before** writing the current request's response. The expected signature is `function ({ mapping, headers })`. Changing the headers will directly impact the current request's response.
+
+When a string is used for `forward-request` or `forward-response`, the corresponding function is loaded with [require](https://nodejs.org/api/modules.html#modules_require_id).
 
 ## custom
 
