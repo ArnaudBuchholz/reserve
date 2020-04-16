@@ -99,11 +99,26 @@ function setHandlers (configuration) {
   configuration.handler = getHandler.bind(null, configuration.handlers, Object.keys(configuration.handlers))
 }
 
+function invalidListeners () {
+  throw new Error('Invalid listeners member, must be an array of functions')
+}
+
 function checkListeners (configuration) {
   const listeners = configuration.listeners
-  if (!Array.isArray(listeners) || !listeners.every(register => typeof register === 'function')) {
-    throw new Error('Invalid listeners member, must be an array of functions')
+  if (!Array.isArray(listeners)) {
+    invalidListeners()
   }
+  configuration.listeners = listeners.map(register => {
+    let registerType = typeof register
+    if (registerType === 'string') {
+      register = require(register)
+      registerType = typeof register
+    }
+    if (registerType === 'function') {
+      return register
+    }
+    invalidListeners()
+  })
 }
 
 async function readSslFile (configuration, filePath) {
