@@ -98,6 +98,7 @@ Go to this [page](https://github.com/ArnaudBuchholz/reserve/tree/master/doc/READ
 ||Adds `server-created` event available only to listeners|
 ||Secures events processing against exceptions|
 ||Adds `forward-request` and `forward-response` options for the `url` handler|
+|1.7.1|Adds more context to `forward-request` and `forward-response` callbacks|
 
 # Usage
 
@@ -366,10 +367,12 @@ Example :
 | option | type | default | description |
 |---|---|---|---|
 | `unsecure-cookies` | Boolean | `false` | when `true`, the secured cookies are converted to unsecure ones. Hence, the browser will keep them even if not running on https |
-| `forward-request` | String or Function | - | when specified, the function is called **before** generating the forward request. The expected signature is  `function ({ mapping, request: { method, url, headers }})`. Changing the request settings will **impact** the forward request.
-| `forward-response` | String or Function | - | when specified, the function is called **after** sending the forward request but **before** writing the current request's response. The expected signature is `function ({ mapping, headers })`. Changing the headers will directly impact the current request's response.
+| `forward-request` | String or Function | - | when specified, the function is called **before** generating the forward request. The expected signature is  `function ({ configuration, context, mapping, match, request: { method, url, headers }})`. Changing the request settings will **impact** the forward request.
+| `forward-response` | String or Function | - | when specified, the function is called **after** sending the forward request but **before** writing the current request's response. The expected signature is `function ({ configuration, context, mapping, match, headers })`. Changing the headers will directly impact the current request's response.
 
-When a string is used for `forward-request` or `forward-response`, the corresponding function is loaded with [require](https://nodejs.org/api/modules.html#modules_require_id).
+**NOTE** : When a string is used for `forward-request` or `forward-response`, the corresponding function is loaded with [require](https://nodejs.org/api/modules.html#modules_require_id).
+
+**NOTE** : The `context` parameter is a unique object *(one per request)* allocated to link the `forward-request` and `forward-response` callbacks. It enables **request-centric communication** between the two: whatever members you add on it during the `forward-request` callback will be kept and transmitted to the `forward-response` callback.
 
 ## custom
 
