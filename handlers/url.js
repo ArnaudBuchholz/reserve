@@ -32,18 +32,18 @@ module.exports = {
       type: 'boolean',
       defaultValue: false
     },
-    'before-forward': {
+    'forward-request': {
       types: ['function', 'string'],
       defaultValue: noop
     },
-    'after-forward': {
+    'forward-response': {
       types: ['function', 'string'],
       defaultValue: noop
     }
   },
   validate: async mapping => {
-    validateHook(mapping, 'before-forward')
-    validateHook(mapping, 'after-forward')
+    validateHook(mapping, 'forward-request')
+    validateHook(mapping, 'forward-response')
   },
   redirect: async ({ mapping, redirect: url, request, response }) => {
     let done
@@ -59,13 +59,13 @@ module.exports = {
       url,
       headers
     }
-    await mapping['before-forward']({ request: options })
+    await mapping['forward-request']({ mapping, request: options })
     const redirectedRequest = protocol(options.url).request(options.url, options, async redirectedResponse => {
       if (mapping['unsecure-cookies']) {
         unsecureCookies(redirectedResponse.headers)
       }
       const { headers: responseHeaders } = redirectedResponse
-      await mapping['after-forward']({ headers: responseHeaders })
+      await mapping['forward-response']({ mapping, headers: responseHeaders })
       response.writeHead(redirectedResponse.statusCode, responseHeaders)
       redirectedResponse
         .on('error', fail)
