@@ -86,10 +86,14 @@ describe('handlers/url', () => {
       Cookie: 'name=value;'
     })
     const response = new Response()
+    const configuration = {}
+    const match = {}
     const mapping = await initMapping({
-      'unsecure-cookies': true,
-      'forward-request': async ({ mapping: receivedMapping, request }) => {
+      'forward-request': async ({ configuration: receivedConfiguration, context, mapping: receivedMapping, match: receivedMatch, request }) => {
+        assert(() => receivedConfiguration === configuration)
         assert(() => receivedMapping === mapping)
+        assert(() => receivedMatch === match)
+        assert(() => context && typeof context === 'object')
         assert(() => request.method === 'GET')
         assert(() => request.url === http.urls.echos)
         assert(() => request.headers['x-status-code'] === 200)
@@ -98,6 +102,8 @@ describe('handlers/url', () => {
       }
     })
     const value = await urlHandler.redirect({
+      configuration,
+      match,
       request,
       response,
       mapping,
@@ -108,23 +114,29 @@ describe('handlers/url', () => {
     assert(() => response.headers.Cookie === 'a=b;c=d;')
   })
 
-  it('manipulates request headers (forward-response)', async () => {
+  it('manipulates response headers (forward-response)', async () => {
     const request = new Request('GET', 'http://example.com/abwhatever', {
       'x-status-code': 200,
       Cookie: 'name=value;'
     })
     const response = new Response()
-    mockRequire('/url.forward-response.js', ({ mapping: receivedMapping, headers }) => {
+    const configuration = {}
+    const match = {}
+    mockRequire('/url.forward-response.js', ({ configuration: receivedConfiguration, context, mapping: receivedMapping, match: receivedMatch, headers }) => {
+      assert(() => receivedConfiguration === configuration)
       assert(() => receivedMapping === mapping)
+      assert(() => receivedMatch === match)
+      assert(() => context && typeof context === 'object')
       assert(() => headers['x-status-code'] === 200)
       assert(() => headers.Cookie === 'name=value;')
       headers.Cookie = 'a=b;c=d;'
     })
     const mapping = await initMapping({
-      'unsecure-cookies': true,
       'forward-response': '/url.forward-response.js'
     })
     const value = await urlHandler.redirect({
+      configuration,
+      match,
       request,
       response,
       mapping,
@@ -133,5 +145,49 @@ describe('handlers/url', () => {
     assert(() => value === undefined)
     assert(() => response.statusCode === 200)
     assert(() => response.headers.Cookie === 'a=b;c=d;')
+  })
+
+  it('provides a unique context to link forward-request and forward-response', async () => {
+    const request1 = new Request('GET', 'http://example.com/abwhatever', {
+      'x-status-code': 200,
+      'x-id': 1
+    })
+    const response1 = new Response()
+    const request2 = new Request('GET', 'http://example.com/abwhatever', {
+      'x-status-code': 200,
+      'x-id': 2
+    })
+    const response2 = new Response()
+    let contextId = 0
+    const checks = {}
+    const mapping = await initMapping({
+      'forward-request': ({ context, request }) => {
+        assert(() => context.id === undefined)
+        context.id = ++contextId
+        context.requestId = request.headers['x-id']
+        assert(() => context.requestId)
+        assert(() => checks[context.id] === undefined)
+        checks[context.id] = context.requestId
+      },
+      'forward-response': ({ context }) => {
+        assert(() => context.id !== undefined)
+        assert(() => context.requestId !== undefined)
+        assert(() => checks[context.id] === context.requestId)
+      }
+    })
+    return Promise.all([
+      urlHandler.redirect({
+        request: request1,
+        response: response1,
+        mapping,
+        redirect: http.urls.echos
+      }),
+      urlHandler.redirect({
+        request: request2,
+        response: response2,
+        mapping,
+        redirect: http.urls.echos
+      })
+    ])
   })
 })
