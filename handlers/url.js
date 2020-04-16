@@ -45,7 +45,7 @@ module.exports = {
     validateHook(mapping, 'forward-request')
     validateHook(mapping, 'forward-response')
   },
-  redirect: async ({ mapping, redirect: url, request, response }) => {
+  redirect: async ({ configuration, mapping, match, redirect: url, request, response }) => {
     let done
     let fail
     const promise = new Promise((resolve, reject) => {
@@ -59,13 +59,14 @@ module.exports = {
       url,
       headers
     }
-    await mapping['forward-request']({ mapping, request: options })
+    const context = {}
+    await mapping['forward-request']({ configuration, context, mapping, match, request: options })
     const redirectedRequest = protocol(options.url).request(options.url, options, async redirectedResponse => {
       if (mapping['unsecure-cookies']) {
         unsecureCookies(redirectedResponse.headers)
       }
       const { headers: responseHeaders } = redirectedResponse
-      await mapping['forward-response']({ mapping, headers: responseHeaders })
+      await mapping['forward-response']({ configuration, context, mapping, match, headers: responseHeaders })
       response.writeHead(redirectedResponse.statusCode, responseHeaders)
       redirectedResponse
         .on('error', fail)
