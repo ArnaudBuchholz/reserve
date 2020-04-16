@@ -80,7 +80,7 @@ describe('handlers/url', () => {
     assert(() => response.headers['Set-Cookie'][0] === 'name=value;')
   })
 
-  it('manipulates request details (before-forward)', async () => {
+  it('manipulates request details (forward-request)', async () => {
     const request = new Request('GET', 'http://example.com/abwhatever', {
       'x-status-code': 200,
       Cookie: 'name=value;'
@@ -88,7 +88,8 @@ describe('handlers/url', () => {
     const response = new Response()
     const mapping = await initMapping({
       'unsecure-cookies': true,
-      'before-forward': async ({ request }) => {
+      'forward-request': async ({ mapping: receivedMapping, request }) => {
+        assert(() => receivedMapping === mapping)
         assert(() => request.method === 'GET')
         assert(() => request.url === http.urls.echos)
         assert(() => request.headers['x-status-code'] === 200)
@@ -107,20 +108,21 @@ describe('handlers/url', () => {
     assert(() => response.headers.Cookie === 'a=b;c=d;')
   })
 
-  it('manipulates request headers (after-forward)', async () => {
+  it('manipulates request headers (forward-response)', async () => {
     const request = new Request('GET', 'http://example.com/abwhatever', {
       'x-status-code': 200,
       Cookie: 'name=value;'
     })
     const response = new Response()
-    mockRequire('/url.after-forward.js', ({ headers }) => {
+    mockRequire('/url.forward-response.js', ({ mapping: receivedMapping, headers }) => {
+      assert(() => receivedMapping === mapping)
       assert(() => headers['x-status-code'] === 200)
       assert(() => headers.Cookie === 'name=value;')
       headers.Cookie = 'a=b;c=d;'
     })
     const mapping = await initMapping({
       'unsecure-cookies': true,
-      'after-forward': '/url.after-forward.js'
+      'forward-response': '/url.forward-response.js'
     })
     const value = await urlHandler.redirect({
       request,
