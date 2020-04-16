@@ -313,6 +313,16 @@ describe('configuration', () => {
       it('validates listener values (Symbol)', () => shouldFail(check({
         listeners: [Symbol('test')]
       })))
+
+      it('allows injecting listeners through require', () => {
+        require('mock-require')('mocked-listener', shouldFail)
+        return check({
+          listeners: ['mocked-listener']
+        })
+          .then(configuration => {
+            assert(() => configuration.listeners[0] === shouldFail)
+          })
+      })
     })
   })
 })
