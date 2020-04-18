@@ -140,25 +140,25 @@ As a result :
 * the [`createServer`](https://github.com/ArnaudBuchholz/reserve/blob/d72e24c28be010828101201f7890762b255c726d/tests/mocha/http.js#L36) API is **reduced to a single condition** that triggers an error when needed.
 * the [`request`](https://github.com/ArnaudBuchholz/reserve/blob/d72e24c28be010828101201f7890762b255c726d/tests/mocha/http.js#L17) API **copy** the request content to the response.
 
-
-
-As the handlers can be tested individually, a Request class is also implemented to pass information to the handler to test.
-
-REserve provides two classes to simulate the request and response objects. They both implement streams so they can be used to test handlers.
+And to enable **individual handlers testing**, REserve provides two classes to **simulate the request and response objects**. They both implement **streams**.
 
 Implementations can be found in:
 * [request](https://github.com/ArnaudBuchholz/reserve/blob/master/mock/Request.js)
 * [response](https://github.com/ArnaudBuchholz/reserve/blob/master/mock/Resposne.js)
 
+Those classes are **part of the NPM module together with the mock helper**: it provides a **simple test framework** to develop new **custom handlers**.
+
 ## Quality tools
 
-### Continuous integration
+>>> TODO
 
-Every push triggers a job that **runs the tests** and **updates coverage info**.
-The
-Travis https://travis-ci.org/ArnaudBuchholz/reserve
-Configuration is done through a [`.travis.yml`](https://github.com/ArnaudBuchholz/reserve/blob/master/.travis.yml) file
+Having lots of tests does not mean that the code is correctly tested or easily maintainable. There are many way to enforce and control the code quality :
+*
 
+### Static checks
+
+Standardjs
+https://standardjs.com/
 
 ### Code coverage with Istanbul
 
@@ -169,6 +169,13 @@ Results are uploaded to and memorized by Coveralls platform Coveralls
 https://coveralls.io/github/ArnaudBuchholz/reserve
 
 npm run cover and a sample output
+
+### Continuous integration
+
+Every push triggers a job that **runs the tests** and **updates coverage info**.
+The
+Travis https://travis-ci.org/ArnaudBuchholz/reserve
+Configuration is done through a [`.travis.yml`](https://github.com/ArnaudBuchholz/reserve/blob/master/.travis.yml) file
 
 ### Code smells
 
