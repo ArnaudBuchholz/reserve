@@ -59,13 +59,21 @@ This is the reason why the **Node.js command line** [all.js](https://github.com/
 
 ## In-depth testing
 
-The previous approach considers the **whole project** as a standalone - monolithic - component and tests it by leveraging **a client**. This is also known as **end to end testing**. If you understand the **[pyramid of test](https://martinfowler.com/articles/practical-test-pyramid.html)**, this kind of test is situated almost on the top of it... Meaning that this should be the place where the least effort is being put.
+The previous approach considers the **whole project** as a standalone - monolithic - component and tests it by leveraging **a client**. This is also known as **end to end testing**. If you understand the **[pyramid of test](https://martinfowler.com/articles/practical-test-pyramid.html)**, this category of test is situated almost on the top of it... Meaning that this should be the place where the least effort is being put.
 
-Another angle for testing is to **isolate each class and service** by [mocking or stubbing](https://www.martinfowler.com/articles/mocksArentStubs.html#TheDifferenceBetweenMocksAndStubs) their dependencies and **test them individually**. This is known as **unit testing** and it starts the pyramid of tests, meaning this is where most effort should be put.
+![Test pyramid](test-pyramid.png)
+
+<u>*A simplified version of the pyramid of tests*</u>
+
+Another angle for testing is to **isolate each class and service** by [mocking or stubbing](https://www.martinfowler.com/articles/mocksArentStubs.html#TheDifferenceBetweenMocksAndStubs) their dependencies and **test them individually**. This is known as **unit testing**. It begins the pyramid of tests, meaning this is where most effort should be put.
 
 ### mocha
 
-If you are familiar with the [mocha framework](https://www.npmjs.com/package/mocha), you know that it is **simple to implement**, widely used and it supports many - crucial for this project - **asynchronous features**.
+If you are familiar with the [mocha framework](https://www.npmjs.com/package/mocha), you know that it is **simple to implement**, widely used and it supports **asynchronous features** such as promises.
+
+[![Mocha](mocha.svg)](https://mochajs.org/)
+
+<u>*Mocha framework logo*</u>
 
 For each source file of the project a **corresponding** test file is created, for instance: [`handlers/custom.js`](https://github.com/ArnaudBuchholz/reserve/blob/master/handlers/custom.js) is tested by [`tests/mocha/handlers/custom.test.js`](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/mocha/handlers/custom.test.js). The directory structure is also recreated under the [moch tests folder](https://github.com/ArnaudBuchholz/reserve/tree/master/tests/mocha).
 
@@ -84,21 +92,21 @@ As explained before, the project didn't start with the [tests first](https://en.
 * [http](https://nodejs.org/dist/latest/docs/api/http.html) / [https](https://nodejs.org/dist/latest/docs/api/https.html) modules to create the actual **server**
 * The [`request`](https://nodejs.org/api/http.html#http_class_http_incomingmessage) and [`response`](https://nodejs.org/api/http.html#http_class_http_serverresponse) objects
 
-It is possible to **substitute any Node.js modules** *(including the native ones)* using [mock-require](https://www.npmjs.com/package/mock-require). This simple API allows you to **predefine a module with a mocked version**.
+It is possible to **substitute any Node.js modules** *(including the native ones)* using [mock-require](https://www.npmjs.com/package/mock-require). This simple API allows you to **predefine a module with a mocked version**. Consequently, whenever the [`require`](https://nodejs.org/api/modules.html#modules_require_id) API is used, the mocked object is returned.
 
 #### Mocking the file system
 
 Mocking the file system is **not really mandatory**: using a **dedicated directory structure** in the project could have been enough.
 
-However, the project aims to be run on **any platform**. And, actually, the development environment *(Windows)* is  different from the continuous integration platform one *(Linux)*.
+However, the project aims to run on **any platform**. And, actually, the development environment *(Windows)* is  different from the continuous integration platform one *(Linux)*.
 
 The **file system differences** between operating systems has a **significant impact** on REserve. Indeed, a web server running on a UNIX-like operating system would be **case sensitive** with the URLs. On windows, it might **not**.
 
 Since REserve uses only a **subset of the fs APIs**, a [custom mocked version](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/mocha/mocked_modules/fs.js) was build to redefine **only the APIs that are really used**.
 
-The whole file system is **virtualized** thanks to a dictionary where members are object representing either files *(when they contain a `content` property)* or folders *(when no `content` is found)*.
+The whole file system is **virtualized** with a dictionary where members are object representing either files *(when they contain a `content` property)* or folders *(when no `content` is found)*.
 
-A specific API was added to control **whether the file system is case sensitive** or not.
+A specific API controls **whether the file system is case sensitive** or not.
 
 ```JavaScript
 let caseSensitive = true
@@ -126,11 +134,11 @@ According to REserve, there is not much **differences** between the [http](https
 * [createServer](https://nodejs.org/api/http.html#http_http_createserver_options_requestlistener) to initiate the HTTP(s) server
 * [request](https://nodejs.org/api/http.html#http_http_request_url_options_callback) to forward the an incoming request to a distant URL *(used by the `url` handler)*
 
-Since we can trust that these modules are doing their job right and considering that the unit tests will not go through a real http(s) server, the mocking was made to ...
+Since these modules are **widely used**, there is **no value** in testing them again. The same way, we want to **simplify the tests** and **avoid going through the http(s)** layer.
 
-In order to maximize the coverage, the request method builds a response with a predefined content.
-
->>>>> TODO
+As a result :
+* the [`createServer`](https://github.com/ArnaudBuchholz/reserve/blob/d72e24c28be010828101201f7890762b255c726d/tests/mocha/http.js#L36) API is **reduced to a single condition** that triggers an error when needed.
+* the [`request`](https://github.com/ArnaudBuchholz/reserve/blob/d72e24c28be010828101201f7890762b255c726d/tests/mocha/http.js#L17) API **copy** the request content to the response.
 
 
 
