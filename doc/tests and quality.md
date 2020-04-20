@@ -150,20 +150,26 @@ Those classes are **part of the NPM module together with the mock helper**: it p
 
 ## Quality tools
 
->>> TODO
-
-Having lots of tests does not mean that the code is correctly tested or easily maintainable. There are many way to enforce and control the code quality :
-*
+How do you make sure that the **code is maintainable** ? **How many tests** are necessary to ensure that the **code works** as expected ?
+Different **tools** are available to answer those questions.
 
 ### Static checks
 
-Standardjs
-https://standardjs.com/
+A linter can **analyze the codebase statically** and **report on common errors**. Most of them provide **settings** to define **what must be verified** and how the findings must be treated in terms of **severity**.
+
+A linter can also **check the formatting** being used through the sources, such as the choice between tabs and spaces, how strings should be delimited... This guarantees **consistency when reading** the code and **improves maintainability**.
+
+REserve project uses **[standardJS](https://standardjs.com/)**, a linter based on [ESLint](https://eslint.org/) with a **predefined configuration**.
+
+>>> TODO
 
 ### Code coverage with Istanbul
 
-Code coverage measurement is made simple
-thanks to [nyc](https://www.npmjs.com/package/nyc)
+The best way to know if the tests are executing every line of code is to measure the code coverage.
+
+Thresholds are defined to
+
+Code coverage measurement is made simple with [nyc](https://www.npmjs.com/package/nyc). It somehow
 
 Results are uploaded to and memorized by Coveralls platform Coveralls
 https://coveralls.io/github/ArnaudBuchholz/reserve
