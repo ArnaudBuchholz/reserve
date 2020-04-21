@@ -26,9 +26,16 @@ More information can be found in [the documentation](https://openui5.hana.ondema
 
 The community around the framework is **growing** and **several tools** are publicly available in the [NPM repository](https://www.npmjs.com/search?q=openui5).
 
-When it comes to building an application, you must add the following NPM packages to your project :
+When it comes to building an application, you must include the following NPM package to your project :
 
-* [@ui5/cli](https://www.npmjs.com/package/@ui5/cli) : it contains the required **[tooling](https://github.com/SAP/ui5-tooling#ui5-tooling) to initiate, serve and build your application**.<br />It cumulates [27 MB](https://packagephobia.now.sh/result?p=@ui5/cli) of files *(including dependencies)*.
+* [@ui5/cli](https://www.npmjs.com/package/@ui5/cli) : it contains the required **UI5 tooling**.<br />It cumulates [27 MB](https://packagephobia.now.sh/result?p=@ui5/cli) of files *(including dependencies)*.
+
+The [UI5 tooling](https://sap.github.io/ui5-tooling/) helps the developer handle the **full lifecycle of the application** :
+* **Initiate and configure** the project *(including the UI5 dependencies)*
+* **Serve** the project locally
+* **Build** a **ready-to-deploy** application by consolidating and minifying all the dependencies
+
+A minimalist application includes these dependencies :
 
 * [@openui5/sap.ui.core](https://www.npmjs.com/package/@openui5/sap.ui.core) : this is the OpenUI5 **core runtime**.<br /> It takes [26.4 MB](https://packagephobia.now.sh/result?p=@openui5/sap.ui.core).
 
@@ -36,7 +43,7 @@ When it comes to building an application, you must add the following NPM package
 
 * [@openui5/themelib_sap_fiori_3](https://www.npmjs.com/package/@openui5/themelib_sap_fiori_3) : the default theme *(including specific fonts)*. <br /> It requires [4.2 MB](https://packagephobia.now.sh/result?p=@openui5/themelib_sap_fiori_3).
 
-In the end, you basically need a total of **60 MB of packages** to start coding your application. Such a **digital footprint is quite common** for a standard Node.js development environment in which you can handle the **full lifecycle of your application** (serving, validating, minifying...).
+In the end, you basically need a total of **60 MB of packages** to start coding your application. Such a **digital footprint is quite common** for a standard Node.js development environment.
 
 Once the **application is finalized**, depending on **its dependencies**, the deployment will live in a **fraction of this size**.
 
