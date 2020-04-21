@@ -150,12 +150,13 @@ Those classes are **part of the NPM module together with the mock helper**: it p
 
 ## Quality tools
 
-How do you make sure that the **code is maintainable** ? **How many tests** are necessary to ensure that the **code works** as expected ?
+How do you make sure that the **code is [maintainable](https://softwareengineering.stackexchange.com/questions/134855/what-characteristics-or-features-make-code-maintainable)** ? **How many tests** are **necessary** to ensure that the **code works** as expected ?
+
 Different **tools** are available to answer those questions.
 
 ### Static checks
 
-A linter can **analyze the codebase statically** and **report on common errors**. Most of them provide **settings** to define **what must be verified** and how the findings must be treated in terms of **severity**.
+A linter can **analyze the codebase statically** and **report on common errors**. It usually provides **settings** to define **what must be verified** and how the findings must be treated in terms of **severity**. Sometimes, the linter may even automatically **fix** some of the findings.
 
 A linter can also **check the formatting** being used through the sources, such as the choice between tabs and spaces, how strings should be delimited... This guarantees **consistency when reading** the code and **improves maintainability**.
 
@@ -165,11 +166,42 @@ REserve project uses **[standardJS](https://standardjs.com/)**, a linter based o
 
 ### Code coverage with Istanbul
 
-The best way to know if the tests are executing every line of code is to measure the code coverage.
+One way to check if the tests are **relevant** is to quantify **how many lines of the codebase** are executed. This operation is called the **code coverage measurement**.
 
-Thresholds are defined to
+However, I will not try to convince you that your tests **must** at least cover 100% of your code. As a matter of fact, this is a *minimum* to me.
 
-Code coverage measurement is made simple with [nyc](https://www.npmjs.com/package/nyc). It somehow
+For instance, let's consider the following code :
+```JavaScript
+function divide (a, b) {
+  return a / b;
+}
+```
+<u>*An example of code*</u>
+
+The test below covers it completely :
+```JavaScript
+assert.equal(divide(2,1) === 1)
+```
+<u>*An example of test*</u>
+
+However, among the acceptance criteria of the story, the following **questions are not answered by the tests** :
+* What happens if you divide by 0 ?
+* What if you do ```divide(1, 3) * 3``` ?
+* What if you pass parameters that are not numbers ?
+
+
+There are many tools to realize this operation and most of them requires to **instrument the code base** first. Luckily this step is transparent.
+
+Depending on the tool, the granularity of the measurement may include :
+* files
+* lines
+* conditions
+
+Finally, some thresholds can be defined to fail when the percentage does not reach the expectations.
+
+REserve uses [nyc](https://www.npmjs.com/package/nyc) which, itself, is an evolution of [istanbul](https://www.npmjs.com/package/istanbul).
+
+Code coverage measurement is made simple with . It somehow
 
 Results are uploaded to and memorized by Coveralls platform Coveralls
 https://coveralls.io/github/ArnaudBuchholz/reserve
