@@ -31,9 +31,9 @@ When it comes to building an application, you must include the following NPM pac
 * [@ui5/cli](https://www.npmjs.com/package/@ui5/cli) : it contains the required **UI5 tooling**.<br />It cumulates [27 MB](https://packagephobia.now.sh/result?p=@ui5/cli) of files *(including dependencies)*.
 
 The [UI5 tooling](https://sap.github.io/ui5-tooling/) helps the developer handle the **full lifecycle of the application** :
-* **Initiate and configure** the project *(including the UI5 dependencies)*
-* **Serve** the project locally
-* **Build** a **ready-to-deploy** application by consolidating and minifying all the dependencies
+* **Initiate and configure** the project *(including the UI5 dependencies)*.
+* **Serve** the project locally.
+* **Build** a **ready-to-deploy** application by consolidating and minifying all the dependencies.
 
 A minimalist application includes these dependencies :
 
