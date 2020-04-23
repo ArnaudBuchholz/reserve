@@ -158,6 +158,8 @@ Different **tools** are available to answer those questions.
 
 A [linter](https://blog.logrocket.com/four-options-to-help-you-get-started-linting-your-javascript-b4b829828648/) can **analyze the codebase statically** and **report on common errors**. It usually provides **settings** to define **what must be verified** and how the findings must be treated in terms of **severity**. Sometimes, the linter may even automatically **fix** some of the findings.
 
+For instance :
+
 ```JavaScript
 if (parameter = '--config') {
   return false
@@ -180,7 +182,7 @@ REserve project uses **[standardJS](https://standardjs.com/)**, a linter based o
 
 ### Code coverage with Istanbul
 
-One way to check if the tests are **relevant** is to quantify **how many lines of the codebase** are executed. This operation is called the **code coverage measurement**.
+One way to check if the tests are **relevant** is to quantify **how many lines of the codebase** are executed during the tests. This operation is called the **code coverage measurement**.
 
 #### The 100% paradox
 
@@ -214,30 +216,52 @@ So, to put it in a nutshell, a coverage of **100% does not guarantee that everyt
 
 #### Tools
 
-There are many tools to realize this operation and most of them requires to **instrument the code base** first. Luckily this step is transparent.
+There are many tools to measure the code coverage and most of them requires to **instrument the code base** first. Luckily this step is usually **transparent**.
 
-Depending on the tool, the granularity of the measurement may include :
-* files
-* lines
-* conditions
+After the tests execution, the tool produces a **report** that contains :
+* The files that were loaded
+* The lines that were executed
 
-Finally, some thresholds can be defined to fail when the percentage does not reach the expectations.
+And depending on the **granularity** :
+* The functions that were called
+* The branches that were evaluated *(not all tools provide this information)*
 
-REserve uses [nyc](https://www.npmjs.com/package/nyc) which, itself, is an evolution of [istanbul](https://www.npmjs.com/package/istanbul).
+This report is important to easily **identify which part of the code needs more tests**.
 
-Code coverage measurement is made simple with . It somehow
+These metrics are consolidated and **expressed in percentage** of coverage for each category.
+**Thresholds** can be defined to **fail** the process when the **percentage does not reach the expectations**.
 
-Results are uploaded to and memorized by Coveralls platform Coveralls
-https://coveralls.io/github/ArnaudBuchholz/reserve
+REserve uses **[nyc](https://www.npmjs.com/package/nyc)** which, itself, relies / is an evolution of [istanbul](https://www.npmjs.com/package/istanbul). The **whole process is easy** since nyc supports the execution of an external command and it **takes care of everything transparently**. Consequently, the code coverage is triggered with `nyc mocha`.
 
-npm run cover and a sample output
+```command
+------------------------------------|---------|----------|---------|---------|-------------------
+File                                | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+------------------------------------|---------|----------|---------|---------|-------------------
+All files                           |     100 |      100 |     100 |     100 |
+ reserve                            |     100 |      100 |     100 |     100 |
+  body.js                           |     100 |      100 |     100 |     100 |
+  checkMethod.js                    |     100 |      100 |     100 |     100 |
+  configuration.js                  |     100 |      100 |     100 |     100 |
+  dispatcher.js                     |     100 |      100 |     100 |     100 |
+  iconfiguration.js                 |     100 |      100 |     100 |     100 |
+  index.js                          |     100 |      100 |     100 |     100 |
+  interpolate.js                    |     100 |      100 |     100 |     100 |
+  mapping.js                        |     100 |      100 |     100 |     100 |
+  mock.js                           |     100 |      100 |     100 |     100 |
+  schema.js                         |     100 |      100 |     100 |     100 |
+  serve.js                          |     100 |      100 |     100 |     100 |
+```
+<u>*Excerpt of the coverage report*</u>
 
 ### Continuous integration
 
-Every push triggers a job that **runs the tests** and **updates coverage info**.
-The
-Travis https://travis-ci.org/ArnaudBuchholz/reserve
-Configuration is done through a [`.travis.yml`](https://github.com/ArnaudBuchholz/reserve/blob/master/.travis.yml) file
+>>> TODO
+
+Tests, static checks and code coverage are good ways to assess the quality of the code but **they work only if they run**. A **continuous integration automated pipeline** ensures that **whenever the code is pushed** to the code repository, these **tools are executed**.
+
+REserve leverages the **[Travis CI](https://travis-ci.org/ArnaudBuchholz/reserve) platform** where the tests are run and the code coverage measured.
+
+During this step, the **code coverage results are uploaded** to the [Coveralls platform](https://coveralls.io/github/ArnaudBuchholz/reserve).
 
 ### Code smells
 
