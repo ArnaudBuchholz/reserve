@@ -75,7 +75,7 @@ If you are familiar with the [mocha framework](https://www.npmjs.com/package/moc
 
 <u>*Mocha framework logo*</u>
 
-For each source file of the project a **corresponding** test file is created, for instance: [`handlers/custom.js`](https://github.com/ArnaudBuchholz/reserve/blob/master/handlers/custom.js) is tested by [`tests/mocha/handlers/custom.test.js`](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/mocha/handlers/custom.test.js). The directory structure is also recreated under the [moch tests folder](https://github.com/ArnaudBuchholz/reserve/tree/master/tests/mocha).
+For each source file of the project a **corresponding** test file is created, for instance: [`handlers/custom.js`](https://github.com/ArnaudBuchholz/reserve/blob/master/handlers/custom.js) is tested by [`tests/mocha/handlers/custom.test.js`](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/mocha/handlers/custom.test.js). The directory structure is also recreated under the [mocha tests folder](https://github.com/ArnaudBuchholz/reserve/tree/master/tests/mocha).
 
 This pattern makes the **configuration of mocha easier** since you just need to setup the spec file pattern to `*.test.js`.
 
@@ -100,7 +100,7 @@ Mocking the file system is **not really mandatory**: using a **dedicated directo
 
 However, the project aims to run on **any platform**. And, actually, the development environment *(Windows)* is  different from the continuous integration platform one *(Linux)*.
 
-The **file system differences** between operating systems has a **significant impact** on REserve. Indeed, a web server running on a UNIX-like operating system would be **case sensitive** with the URLs. On windows, it might **not**.
+The **file system differences** between operating systems have a **significant impact** on REserve. Indeed, a web server running on a UNIX-like operating system would be **case sensitive** with the URLs. On windows, it might **not**.
 
 Since REserve uses only a **subset of the fs APIs**, a [custom mocked version](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/mocha/mocked_modules/fs.js) was build to redefine **only the APIs that are really used**.
 
@@ -130,7 +130,7 @@ function getEntry (entryPath) {
 
 #### Mocking of http, requests & responses
 
-According to REserve, there is not much **differences** between the [http](https://nodejs.org/dist/latest/docs/api/http.html) and the [https](https://nodejs.org/dist/latest/docs/api/https.html) modules. Actually, only two methods are used :
+According to REserve, there are not much **differences** between the [http](https://nodejs.org/dist/latest/docs/api/http.html) and the [https](https://nodejs.org/dist/latest/docs/api/https.html) modules. Actually, only two methods are used :
 * [createServer](https://nodejs.org/api/http.html#http_http_createserver_options_requestlistener) to initiate the HTTP(s) server
 * [request](https://nodejs.org/api/http.html#http_http_request_url_options_callback) to forward the an incoming request to a distant URL *(used by the `url` handler)*
 
@@ -196,7 +196,7 @@ function divide (a, b) {
 ```
 <u>*An example of function to be tested*</u>
 
-The test below executes the function and, as a result, it is **enough** to get a **coverage of 100%**.
+The test below executes the function and, as a result, it is **enough** to **cover it completely**.
 ```JavaScript
 assert.strictEqual(divide(4,2), 2)
 ```
@@ -204,7 +204,7 @@ assert.strictEqual(divide(4,2), 2)
 
 Since we reached **100% of coverage**, does it mean that the **function is fully tested** ?
 
-Actually, **no** because it really depends on the **specification** of the function.
+Actually, **no**. It really depends on the **specification** of the function.
 
 For instance, the following **questions are not answered by the test** :
 * What happens if you divide by 0 ?
@@ -212,11 +212,11 @@ For instance, the following **questions are not answered by the test** :
 * What happens if you pass parameters that are not numbers ?
 * ...
 
-So, to put it in a nutshell, a coverage of **100% does not guarantee that everything is tested** but, on the contrary, if **it does not reach 100% of coverage** it means that **some parts are not tested**.
+So, to put it in a nutshell, **100% of coverage does not guarantee that everything is tested** but, on the contrary, if **it does not reach 100% of coverage** it means that **some parts are not tested**.
 
 #### Tools
 
-There are many tools to measure the code coverage and most of them requires to **instrument the code base** first. Luckily this step is usually **transparent**.
+There are many tools to measure the code coverage and most of them require **instrumenting the code base** first. Luckily this step is usually **transparent**.
 
 After the tests execution, the tool produces a **report** that contains :
 * The files that were loaded
@@ -255,22 +255,20 @@ All files                           |     100 |      100 |     100 |     100 |
 
 ### Continuous integration
 
->>> TODO
+Tests, static checks and code coverage are good ways to assess the quality of the code but **they work only if executed**. A **continuous integration automated pipeline** ensures that **whenever the code is pushed** to the code repository, these **tools are executed**.
 
-Tests, static checks and code coverage are good ways to assess the quality of the code but **they work only if they run**. A **continuous integration automated pipeline** ensures that **whenever the code is pushed** to the code repository, these **tools are executed**.
+REserve leverages the **[Travis CI](https://travis-ci.org/ArnaudBuchholz/reserve) platform** and all these tools are triggered during the build.
 
-REserve leverages the **[Travis CI](https://travis-ci.org/ArnaudBuchholz/reserve) platform** where the tests are run and the code coverage measured.
-
-During this step, the **code coverage results are uploaded** to the [Coveralls platform](https://coveralls.io/github/ArnaudBuchholz/reserve).
+Also, the **code coverage results are uploaded** to the [Coveralls platform](https://coveralls.io/github/ArnaudBuchholz/reserve).
 
 ### Code smells
 
-Code Climate online platform performs code analysis to detect maintainability issues
-https://codeclimate.com/github/ArnaudBuchholz/reserve
+Last but not least, the project is also **registered on [Code Climate](https://codeclimate.com/github/ArnaudBuchholz/reserve)**.
 
-## Publishing
+This **online platform** performs **code analysis** and detects **maintainability issues** *(usual code smells such as duplicated code, oversized function, code complexity...)*.
 
-This project is my first experience
-with NPM support.
+The result is **quantified** with a badge [![Maintainability](https://api.codeclimate.com/v1/badges/49e3adbc8f31ae2febf3/maintainability)](https://codeclimate.com/github/ArnaudBuchholz/reserve/maintainability) as well as an **estimated cleaning time**.
 
-The name was taken by an empty project, it has been reassigned after contacting the original owner.
+## Conclusion
+
+To conclude, the project is **fully tested** and its **quality is constantly controlled and measured**.
