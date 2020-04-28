@@ -9,6 +9,9 @@ This article will detail the reasons of the creation of [REserve](https://www.np
 
 Based on a **clean concept**, the development of [REserve](https://www.npmjs.com/package/reserve) follows a **simple architecture** that enables **flexibility** and **extensibility**. This article provides keys to understand the **modular structure** of the implementation.
 
+## [Tests & Quality](tests%20and%20quality.md)
+After drafting the first working version of [REserve](https://npmjs.com/package/reserve), **behavior validation** and **quality assessment** were some of the remaining **challenges**. This article will detail the different **strategies** adopted for **testing** as well as the **tooling** used to ensure the **quality** of the project.
+
 ## [Serving an OpenUI5 application](openui5.md)
 
 The best way to explain **what REserve can do** is to demonstrate some of its features through a **concrete use case**.
