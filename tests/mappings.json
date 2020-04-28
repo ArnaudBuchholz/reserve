@@ -7,6 +7,8 @@
       "saveUninitialized": true
     }
   }, {
+    "custom": "./cors.js"
+  }, {
     "match": "^/proxy/(https?)/(.*)",
     "url": "$1://$2",
     "unsecure-cookies": true
