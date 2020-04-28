@@ -271,4 +271,4 @@ The result is **quantified** with a badge [![Maintainability](https://api.codecl
 
 ## Conclusion
 
-To conclude, the project is **fully tested** and its **quality is constantly controlled and measured**.
+To conclude, the project is **fully tested** and its **quality is constantly controlled and measured**. But, still, it can be **improved**. For instance, in terms of **project management**, there are **no stories** or **acceptance criteria** documented. Also, the **tests quality** can be assessed using **[mutation testing](https://en.wikipedia.org/wiki/Mutation_testing)**.
