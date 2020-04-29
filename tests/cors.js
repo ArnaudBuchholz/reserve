@@ -65,7 +65,7 @@ if (require.main === module) {
       console.log(`Run the http.json configuration and then connect to ${url}`)
     })
 } else {
-  module.exports = (request, response, status) => {
+  module.exports = (request, response) => {
     if (request.method === 'OPTIONS') {
       response.writeHead(200, {
         'Access-Control-Allow-Origin': '*',
