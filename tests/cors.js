@@ -2,6 +2,8 @@
 
 'use strict'
 
+const url = require('url')
+
 function html (content, request, response) {
   response.writeHead(200, {
     'Content-Type': 'text/html',
@@ -24,6 +26,7 @@ if (require.main === module) {
       console.log(method, url, headers, async)
       return new Promise(resolve => {
         const xhr = new XMLHttpRequest()
+        xhr.withCredentials = true
         xhr.open(method, url, async)
         Object.keys(headers).forEach(name => xhr.setRequestHeader(name, headers[name]))
         xhr.onload = () => {
@@ -53,6 +56,8 @@ if (require.main === module) {
         }
       })
       await request('POST', 'http://localhost:5000/echo/hello')
+      await request('POST', 'http://localhost:8080')
+      await request('GET', 'http://localhost:8080')
     }
       </script>
       <body onload="test()">
@@ -66,15 +71,22 @@ if (require.main === module) {
     })
 } else {
   module.exports = (request, response) => {
+    const origin = request.headers.origin
     if (request.method === 'OPTIONS') {
+      console.log(`CORS preflight from ${origin}`)
       response.writeHead(200, {
-        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Origin': origin,
+        'Vary': 'Origin',
         'Access-Control-Allow-Headers': '*',
-        'Access-Control-Allow-Methods': '*'
+        'Access-Control-Allow-Methods': '*',
+        'Access-Control-Allow-Credentials': '*'
       })
       response.end()
-    } else {
-      response.setHeader('Access-Control-Allow-Origin', '*')
+    } else if (origin) {
+      console.log(`CORS from ${origin}`)
+      response.setHeader('Access-Control-Allow-Origin', origin)
+      response.setHeader('Vary', 'Origin')
+      response.setHeader('Access-Control-Allow-Credentials', 'true')
     }
   }
 }
