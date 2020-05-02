@@ -10,9 +10,11 @@ serve({
     match: /favicon\.ico/,
     status: 404
   }, {
+    custom: './cors.js'
+  }, {
     custom: (request, response) => {
       ++count
-      const cookies = request.headers.cookie.split(';')
+      const cookies = (request.headers.cookie || '').split(';')
       const html = `<html>
   <body>
     ${cookies.join('<br />')}
