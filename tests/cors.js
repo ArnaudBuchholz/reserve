@@ -2,8 +2,6 @@
 
 'use strict'
 
-const url = require('url')
-
 function html (content, request, response) {
   response.writeHead(200, {
     'Content-Type': 'text/html',
@@ -76,7 +74,7 @@ if (require.main === module) {
       console.log(`CORS preflight from ${origin}`)
       response.writeHead(200, {
         'Access-Control-Allow-Origin': origin,
-        'Vary': 'Origin',
+        Vary: 'Origin',
         'Access-Control-Allow-Headers': '*',
         'Access-Control-Allow-Methods': '*',
         'Access-Control-Allow-Credentials': '*'
