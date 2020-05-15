@@ -46,6 +46,7 @@ if (require.main === module) {
 } else {
   module.exports = {
     body: require('./body'),
+    capture: require('./capture'),
     check: require('./configuration').check,
     interpolate: require('./interpolate'),
     log,
