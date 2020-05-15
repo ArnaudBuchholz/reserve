@@ -15,9 +15,9 @@ function sendFile (response, filePath, stat) {
       'Content-Type': mime.getType(path.extname(filePath)) || defaultMimeType,
       'Content-Length': stat.size
     })
+    response.on('finish', resolve)
     fs.createReadStream(filePath)
       .on('error', reject)
-      .on('end', resolve)
       .pipe(response)
   })
 }
