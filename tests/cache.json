@@ -1,0 +1,11 @@
+{
+    "port": 8005,
+    "mappings": [{
+      "method": "GET",
+      "custom": "./cache"
+    }, {
+      "match": "^\\/(.*)",
+      "url": "http://facetheforce.today/$1"
+    }]
+  }
+  
