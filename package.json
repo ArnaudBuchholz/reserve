@@ -1,6 +1,6 @@
 {
   "name": "reserve",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "description": "Lightweight http server statically configurable using regular expressions",
   "main": "./index.js",
   "files": [
@@ -55,7 +55,7 @@
     "lodash": "^4.17.15",
     "mime": "^2.4.4",
     "minimist": ">=1.2.3",
-    "mocha": "^7.0.0",
+    "mocha": "^7.1.2",
     "mock-require": "^3.0.3",
     "nyc": "^15.0.0",
     "passport": "^0.4.1",
