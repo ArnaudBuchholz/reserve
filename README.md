@@ -99,6 +99,8 @@ Go to this [page](https://github.com/ArnaudBuchholz/reserve/tree/master/doc/READ
 ||Secures events processing against exceptions|
 ||Adds `forward-request` and `forward-response` options for the `url` handler|
 |1.7.1|Adds more context to `forward-request` and `forward-response` callbacks|
+|1.7.2|Improves end of streaming detection in `file` and `url` handlers|
+||`capture` helper (experimental)|
 
 # Usage
 
