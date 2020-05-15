@@ -68,9 +68,9 @@ module.exports = {
       const { headers: responseHeaders } = redirectedResponse
       await mapping['forward-response']({ configuration, context, mapping, match, headers: responseHeaders })
       response.writeHead(redirectedResponse.statusCode, responseHeaders)
+      response.on('finish', done)
       redirectedResponse
         .on('error', fail)
-        .on('end', done)
         .pipe(response)
     })
     redirectedRequest.on('error', fail)
