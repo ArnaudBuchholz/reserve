@@ -28,6 +28,22 @@ function selectDecoder (headers) {
   }
 }
 
+function _getParameters (forEnd, args) {
+  let [data, encoding, callback = () => {}] = args
+  if (forEnd && typeof data === 'function') {
+    callback = data
+    data = undefined
+    encoding = undefined
+  } else if (typeof encoding === 'function') {
+    callback = encoding
+    encoding = undefined
+  }
+  return { data, encoding, callback }
+}
+
+const writeParameters = _getParameters.bind(null, false)
+const endParameters = _getParameters.bind(null, true)
+
 function capture (response, headers, writableStream) {
   const { done, fail, promise } = defer()
   const { end, write } = response
@@ -51,18 +67,12 @@ function capture (response, headers, writableStream) {
     }
     response.on('error', onError)
 
-    const { close } = out
-    out.close = function () {
-      if (out !== writableStream) {
-        writableStream.close()
-      }
-      close.apply(out, arguments)
-      done()
-    }
+    writableStream.on('finish', () => done())
 
     let pendingDrain = false
 
-    response.write = function (data, encoding, callback) {
+    response.write = function () {
+      const { data, encoding, callback } = writeParameters(arguments)
       let flushCount = 0
       function flush () {
         if (--flushCount === 0) {
@@ -86,16 +96,27 @@ function capture (response, headers, writableStream) {
       return flushCount === 0
     }
 
-    response.end = function (data, encoding, callback) {
-      function doEnd () {
+    response.end = function () {
+      const { data, encoding, callback } = endParameters(arguments)
+      function endWritableStream () {
         if (out !== writableStream) {
           pipeline(out, writableStream, () => {
             out.close()
+            writableStream.end()
           })
         } else {
-          out.close()
+          writableStream.end()
         }
-        end.apply(response, arguments)
+      }
+      function doEnd () {
+        end.call(response, data, encoding, function () {
+          if (pendingDrain) {
+            response.on('drain', endWritableStream)
+          } else {
+            endWritableStream()
+          }
+          callback.apply(this, arguments)
+        })
       }
       if (pendingDrain) {
         response.on('drain', doEnd)
@@ -113,7 +134,7 @@ function capture (response, headers, writableStream) {
 module.exports = (response, writableStream) => {
   const { done, fail, promise } = defer()
   const { writeHead } = response
-  response.writeHead = function (status, headers) {
+  response.writeHead = function (status, headers = {}) {
     if (status === 200) {
       done(capture(response, headers, writableStream))
     } else {
