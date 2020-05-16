@@ -95,6 +95,7 @@
     "exclude": [
       "tests/*.js",
       "tests/mocha/assert.js",
+      "tests/cache/**",
       "log.js",
       "logError.js",
       "coverage/**",
