@@ -35,6 +35,7 @@ describe('capture', () => {
     promise
       .then(() => {
         assert(() => writableStream.toString() === helloWorld)
+        return response.waitForFinish()
       })
       .then(() => {
         assert(() => response.statusCode === 200)
@@ -52,6 +53,7 @@ describe('capture', () => {
     promise
       .then(() => {
         assert(() => writableStream.toString() === helloWorld)
+        return response.waitForFinish()
       })
       .then(() => {
         assert(() => response.statusCode === 200)
