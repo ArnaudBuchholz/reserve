@@ -1,6 +1,10 @@
 {
     "port": 8005,
     "mappings": [{
+      "match": "^\\/(.*)",
+      "file": "./cache/$1",
+      "ignore-if-not-found": true
+    }, {
       "method": "GET",
       "custom": "./cache"
     }, {
@@ -8,4 +12,3 @@
       "url": "http://facetheforce.today/$1"
     }]
   }
-  
