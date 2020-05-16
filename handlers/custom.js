@@ -25,6 +25,9 @@ module.exports = {
     } else {
       mapping[$customCallback] = mapping.custom
     }
+    if (typeof mapping[$customCallback] !== 'function') {
+      throw new Error('Invalid custom handler, expected a function')
+    }
   },
   redirect: async ({ mapping, match, request, response }) => {
     if (mapping[$customTimestamp]) {
