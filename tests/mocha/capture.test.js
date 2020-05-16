@@ -29,7 +29,24 @@ describe('capture', () => {
     response.end(notImplemented)
   })
 
-  it('copies response content', done => {
+  it('copies response content (on write)', done => {
+    const { response, writableStream, promise } = setup()
+    const helloWorld = 'Hello World!'
+    promise
+      .then(() => {
+        assert(() => writableStream.toString() === helloWorld)
+      })
+      .then(() => {
+        assert(() => response.statusCode === 200)
+        assert(() => response.toString() === helloWorld)
+      })
+      .then(done, done)
+    response.writeHead(200)
+    response.write(helloWorld)
+    response.end()
+  })
+
+  it('copies response content (on end)', done => {
     const { response, writableStream, promise } = setup()
     const helloWorld = 'Hello World!'
     promise
