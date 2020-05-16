@@ -1,6 +1,6 @@
 'use strict'
 
-const { createWriteStream, mkdir, readdir } = require('fs')
+const { createWriteStream, mkdir } = require('fs')
 const { dirname, join } = require('path')
 const capture = require('../capture')
 
