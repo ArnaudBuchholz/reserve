@@ -8,7 +8,7 @@ module.exports = class Response extends Duplex {
     this.push(null)
   }
 
-  _write (chunk, encoding, onwrite) {
+  _write (chunk, encoding, onwrite = () => {}) {
     this._headersSent = true
     this._buffer.push(chunk.toString())
     onwrite()
