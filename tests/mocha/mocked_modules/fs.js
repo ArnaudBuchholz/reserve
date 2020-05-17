@@ -1,6 +1,7 @@
 'use strict'
 
-const path = require('path')
+const { join, sep } = require('path')
+const { readFileSync } = require('fs')
 const Readable = require('stream').Readable
 
 let fakeNow = 0
@@ -17,6 +18,9 @@ const entries = {
   },
   'file$1.txt': {
     content: '$1'
+  },
+  'lorem ipsum.txt': {
+    content: readFileSync(join(__dirname, '../lorem ipsum.txt'))
   },
   folder: {
     'index.html': {
@@ -114,7 +118,7 @@ function getEntry (entryPath) {
   if (entryPath === '/') {
     return entries
   }
-  return entryPath.split(path.sep).slice(1).reduce((folder, name) => {
+  return entryPath.split(sep).slice(1).reduce((folder, name) => {
     if (!folder || folder.content) {
       return folder
     }
