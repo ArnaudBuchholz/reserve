@@ -14,6 +14,18 @@ function unexpectedCall () {
 }
 
 describe('handlers/custom', () => {
+  it('validates the custom function', async () => {
+    let exceptionCaught
+    try {
+      await customHandler.validate({
+        custom: false
+      })
+    } catch (e) {
+      exceptionCaught = e
+    }
+    assert(() => !!exceptionCaught)
+  })
+
   it('returns a promise', () => {
     const request = new Request()
     const response = new Response()
