@@ -6,8 +6,11 @@ const { pipeline } = require('stream')
 const decoderFactories = {
   gzip: zlib.createGunzip,
   deflate: zlib.createDeflate,
-  br: zlib.createBrotliDecompress,
   default: encoding => { throw new Error(`Unsupported encoding: ${encoding}`) }
+}
+
+if (zlib.createBrotliDecompress) {
+  decoderFactories.br = zlib.createBrotliDecompress
 }
 
 function defer () {
