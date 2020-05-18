@@ -11,7 +11,11 @@ module.exports = class Response extends Duplex {
   _write (chunk, encoding, onwrite) {
     this._headersSent = true
     this._buffer.push(chunk.toString())
-    onwrite()
+    if (this._asynchronous) {
+      setTimeout(onwrite, 0)
+    } else {
+      onwrite()
+    }
   }
 
   setHeader (name, value) {
@@ -68,5 +72,9 @@ module.exports = class Response extends Duplex {
     return this._buffer.length === 0 &&
       !this._headersSent &&
       Object.keys(this._headers).length === 0
+  }
+
+  setAsynchronous () {
+    this._asynchronous = true
   }
 }
