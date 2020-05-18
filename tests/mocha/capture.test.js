@@ -5,7 +5,6 @@ const capture = require('../../capture')
 const Response = require('../../mock/Response')
 const { readFile } = require('fs')
 const zlib = require('zlib')
-const { pipeline } = require('stream')
 
 const readFileAsync = require('util').promisify(readFile)
 
