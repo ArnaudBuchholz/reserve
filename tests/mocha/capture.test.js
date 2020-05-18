@@ -23,9 +23,7 @@ describe('capture', () => {
     loremIpsum = (await readFileAsync('/lorem ipsum.txt')).toString()
   })
 
-  const it_ = () => {}
-
-  it_('fails if the response status is not 200', done => {
+  it('fails if the response status is not 200', done => {
     const { response, promise } = setup()
     promise
       .then(assert.notExpected, reason => {
@@ -41,7 +39,7 @@ describe('capture', () => {
     response.end(loremIpsum)
   })
 
-  it_('copies response content (on write)', done => {
+  it('copies response content (on write)', done => {
     const { response, writableStream, promise } = setup()
     promise
       .then(() => {
@@ -58,7 +56,7 @@ describe('capture', () => {
     response.end()
   })
 
-  it_('copies response content (on end)', done => {
+  it('copies response content (on end)', done => {
     const { response, writableStream, promise } = setup()
     promise
       .then(() => {
@@ -75,7 +73,7 @@ describe('capture', () => {
   })
 
   describe('encoding', () => {
-    it_('fails on unsupported encoding', done => {
+    it('fails on unsupported encoding', done => {
       const { response, promise } = setup()
       promise
         .then(assert.notExpected, reason => {
@@ -102,7 +100,7 @@ describe('capture', () => {
         })
         .then(() => {
           assert(() => response.statusCode === 200)
-          assert(() => response.toString() === loremIpsum)
+          assert(() => response.toString() !== loremIpsum) // because encoded
         })
         .then(done, done)
       response.writeHead(200, {
@@ -119,7 +117,7 @@ describe('capture', () => {
     })
 
     it('supports deflate', done => {
-      testWithEncoding('deflate', zlib.createInflateRaw(), done)
+      testWithEncoding('deflate', zlib.createDeflate(), done)
     })
 
     if (zlib.createBrotliCompress) {
