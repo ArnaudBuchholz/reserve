@@ -38,37 +38,43 @@ describe('capture', () => {
     response.end(loremIpsum)
   })
 
-  it('copies response content (on write)', done => {
-    const { response, writableStream, promise } = setup()
-    promise
-      .then(() => {
-        assert(() => writableStream.toString() === loremIpsum)
-        return response.waitForFinish()
-      })
-      .then(() => {
-        assert(() => response.statusCode === 200)
-        assert(() => response.toString() === loremIpsum)
-      })
-      .then(done, done)
-    response.writeHead(200)
-    response.write(loremIpsum)
-    response.end()
-  })
+  function checkWriteAndEnd (label, testSetup = setup) {
+    it(`${label} (on write)`, done => {
+      const { response, writableStream, promise } = testSetup()
+      promise
+        .then(() => {
+          assert(() => writableStream.toString() === loremIpsum)
+          return response.waitForFinish()
+        })
+        .then(() => {
+          assert(() => response.statusCode === 200)
+          assert(() => response.toString() === loremIpsum)
+        })
+        .then(done, done)
+      response.writeHead(200)
+      response.write(loremIpsum)
+      response.end()
+    })
+  
+    it(`${label} (on end)`, done => {
+      const { response, writableStream, promise } = testSetup()
+      promise
+        .then(() => {
+          assert(() => writableStream.toString() === loremIpsum)
+          return response.waitForFinish()
+        })
+        .then(() => {
+          assert(() => response.statusCode === 200)
+          assert(() => response.toString() === loremIpsum)
+        })
+        .then(done, done)
+      response.writeHead(200)
+      response.end(loremIpsum)
+    })
+  }
 
-  it('copies response content (on end)', done => {
-    const { response, writableStream, promise } = setup()
-    promise
-      .then(() => {
-        assert(() => writableStream.toString() === loremIpsum)
-        return response.waitForFinish()
-      })
-      .then(() => {
-        assert(() => response.statusCode === 200)
-        assert(() => response.toString() === loremIpsum)
-      })
-      .then(done, done)
-    response.writeHead(200)
-    response.end(loremIpsum)
+  describe('synchronous streams', () => {
+    checkWriteAndEnd('copies content to writable stream')
   })
 
   describe('encoding', () => {
@@ -119,5 +125,13 @@ describe('capture', () => {
     if (zlib.createBrotliCompress) {
       testWithEncoding('br', zlib.createBrotliCompress())
     }
+  })
+
+  describe('Asynchronous streams', () => {
+    checkWriteAndEnd('waits for writable stream', () => {
+      const { response, writableStream, promise } = setup()
+      writableStream.setAsynchronous()
+      return { response, writableStream, promise }
+    })
   })
 })
