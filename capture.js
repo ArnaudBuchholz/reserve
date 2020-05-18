@@ -5,7 +5,7 @@ const { pipeline } = require('stream')
 
 const decoderFactories = {
   gzip: zlib.createGunzip,
-  deflate: zlib.createDeflate,
+  deflate: zlib.createInflate,
   default: encoding => { throw new Error(`Unsupported encoding: ${encoding}`) }
 }
 
@@ -104,9 +104,9 @@ function capture (response, headers, writableStream) {
       function endWritableStream () {
         if (out !== writableStream) {
           pipeline(out, writableStream, () => {
-            out.close()
             writableStream.end()
           })
+          out.end()
         } else {
           writableStream.end()
         }
