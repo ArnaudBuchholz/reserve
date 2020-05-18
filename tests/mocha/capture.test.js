@@ -55,7 +55,7 @@ describe('capture', () => {
       response.write(loremIpsum)
       response.end()
     })
-  
+
     it(`${label} (on end)`, done => {
       const { response, writableStream, promise } = testSetup()
       promise
