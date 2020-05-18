@@ -91,39 +91,34 @@ describe('capture', () => {
       response.end(loremIpsum)
     })
 
-    function testWithEncoding (contentEncoding, encoder, done) {
-      const { response, writableStream, promise } = setup()
-      promise
-        .then(() => {
-          assert(() => writableStream.toString() === loremIpsum)
-          return response.waitForFinish()
+    function testWithEncoding (contentEncoding, encoder) {
+      it(`supports ${contentEncoding}`, done => {
+        const { response, writableStream, promise } = setup()
+        promise
+          .then(() => {
+            assert(() => writableStream.toString() === loremIpsum)
+            return response.waitForFinish()
+          })
+          .then(() => {
+            assert(() => response.statusCode === 200)
+            assert(() => response.toString() !== loremIpsum) // because encoded
+          })
+          .then(done, done)
+        response.writeHead(200, {
+          'content-encoding': contentEncoding
         })
-        .then(() => {
-          assert(() => response.statusCode === 200)
-          assert(() => response.toString() !== loremIpsum) // because encoded
+        encoder.pipe(response)
+        encoder.write(loremIpsum, () => {
+          encoder.end()
         })
-        .then(done, done)
-      response.writeHead(200, {
-        'content-encoding': contentEncoding
-      })
-      encoder.pipe(response)
-      encoder.write(loremIpsum, () => {
-        encoder.end()
       })
     }
 
-    it('supports gzip', done => {
-      testWithEncoding('gzip', zlib.createGzip(), done)
-    })
-
-    it('supports deflate', done => {
-      testWithEncoding('deflate', zlib.createDeflate(), done)
-    })
-
+    testWithEncoding('gzip', zlib.createGzip())
+    testWithEncoding('deflate', zlib.createDeflate())
+    /* istanbul ignore else */
     if (zlib.createBrotliCompress) {
-      it('supports br', done => {
-        testWithEncoding('br', zlib.createBrotliCompress(), done)
-      })
+      testWithEncoding('br', zlib.createBrotliCompress())
     }
   })
 })
