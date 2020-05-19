@@ -26,7 +26,7 @@ function defer () {
 
 function selectDecoder (headers) {
   const encoding = headers['content-encoding']
-  if (encoding) {
+  if (encoding && encoding !== 'identity') {
     const factory = decoderFactories[encoding] || decoderFactories.default
     return factory(encoding)
   }
