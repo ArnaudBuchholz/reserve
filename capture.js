@@ -50,7 +50,7 @@ const endParameters = _getParameters.bind(null, true)
 
 function capture (response, headers, writableStream) {
   const { done, fail, promise } = defer()
-  const { end, write } = response
+  const { emit, end, write } = response
 
   function release () {
     response.write = write
@@ -78,12 +78,19 @@ function capture (response, headers, writableStream) {
       let flushCount = 0
       function flush () {
         if (--flushCount === 0) {
+          response.emit = emit
           response.emit('drain')
         }
       }
       function needDrain (writeResult) {
         if (!writeResult) {
-          ++flushCount
+          if (++flushCount === 1) {
+            response.emit = function (eventName) {
+              if (eventName !== 'drain') {
+                return emit.apply(response, arguments)
+              }
+            }
+          }
         }
       }
       needDrain(out.write(data, encoding, flush))
