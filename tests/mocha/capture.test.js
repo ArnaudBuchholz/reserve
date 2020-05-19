@@ -8,13 +8,19 @@ const zlib = require('zlib')
 
 const readFileAsync = require('util').promisify(readFile)
 
-function setup () {
+function allocateResponse (isAsynchronous) {
   const response = new Response({
-    highWaterMark: 256 // Minimize buffer
+    highWaterMark: isAsynchronous ? 255 : undefined
   })
-  const writableStream = new Response({
-    highWaterMark: 256 // Minimize buffer
-  })
+  if (isAsynchronous) {
+    response.setAsynchronous()
+  }
+  return response
+}
+
+function setup ({ isResponseAsynchronous, isWritableStreamAsynchronous } = { isResponseAsynchronous:false, isWritableStreamAsynchronous: false }) {
+  const response = allocateResponse(isResponseAsynchronous)
+  const writableStream = allocateResponse(isWritableStreamAsynchronous)
   const promise = capture(response, writableStream)
   return { response, writableStream, promise }
 }
@@ -161,8 +167,10 @@ describe('capture', () => {
 
   describe('Asynchronous streams', () => {
     checkWriteAndEnd('waits for writable stream', () => {
-      const { response, writableStream, promise } = setup()
-      writableStream.setAsynchronous()
+      const { response, writableStream, promise } = setup({
+        isWritableStreamAsynchronous: true
+      })
+      debugger
       return { response, writableStream, promise, steps: 5 }
     })
   })
