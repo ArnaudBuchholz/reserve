@@ -9,10 +9,45 @@ const zlib = require('zlib')
 const readFileAsync = require('util').promisify(readFile)
 
 function setup () {
-  const response = new Response()
-  const writableStream = new Response()
+  const response = new Response({
+    highWaterMark: 256 // Minimize buffer
+  })
+  const writableStream = new Response({
+    highWaterMark: 256 // Minimize buffer
+  })
   const promise = capture(response, writableStream)
   return { response, writableStream, promise }
+}
+
+function write (stream, content, steps, useEnd) {
+  let offset = 0
+  let size = Math.floor(content.length / steps)
+  function end () {
+    if (useEnd) {
+      stream.end(content.substring(offset))
+    } else {
+      stream.write(content.substring(offset), () => {
+        stream.end()
+      })
+    }
+  }
+  function loop () {
+    if (steps === 1) {
+      end()
+    } else {
+      const noWait = stream.write(content.substring(offset, offset + size), () => {
+        if (!noWait) {
+          loop()
+        }
+      })
+      offset += size
+      --steps
+      if (noWait) {
+        loop()
+      }
+    }
+  }
+  loop()
 }
 
 describe('capture', () => {
@@ -40,7 +75,7 @@ describe('capture', () => {
 
   function checkWriteAndEnd (label, testSetup = setup) {
     it(`${label} (on write)`, done => {
-      const { response, writableStream, promise } = testSetup()
+      const { response, writableStream, promise, steps = 5 } = testSetup()
       promise
         .then(() => {
           assert(() => writableStream.toString() === loremIpsum)
@@ -52,12 +87,11 @@ describe('capture', () => {
         })
         .then(done, done)
       response.writeHead(200)
-      response.write(loremIpsum)
-      response.end()
+      write(response, loremIpsum, steps, false)
     })
 
     it(`${label} (on end)`, done => {
-      const { response, writableStream, promise } = testSetup()
+      const { response, writableStream, promise, steps = 5 } = testSetup()
       promise
         .then(() => {
           assert(() => writableStream.toString() === loremIpsum)
@@ -69,7 +103,7 @@ describe('capture', () => {
         })
         .then(done, done)
       response.writeHead(200)
-      response.end(loremIpsum)
+      write(response, loremIpsum, steps, true)
     })
   }
 
@@ -113,9 +147,7 @@ describe('capture', () => {
           'content-encoding': contentEncoding
         })
         encoder.pipe(response)
-        encoder.write(loremIpsum, () => {
-          encoder.end()
-        })
+        write(encoder, loremIpsum, 5, false)
       })
     }
 
@@ -131,7 +163,7 @@ describe('capture', () => {
     checkWriteAndEnd('waits for writable stream', () => {
       const { response, writableStream, promise } = setup()
       writableStream.setAsynchronous()
-      return { response, writableStream, promise }
+      return { response, writableStream, promise, steps: 5 }
     })
   })
 })
