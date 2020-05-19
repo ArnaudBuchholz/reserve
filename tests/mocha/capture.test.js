@@ -76,7 +76,50 @@ describe('capture', () => {
       })
       .then(done, done)
     response.writeHead(500)
-    response.end(loremIpsum)
+    response.write(loremIpsum)
+    response.end()
+  })
+
+  it('fails if the capturing stream fails', done => {
+    const { response, writableStream, promise, steps = 5 } = setup()
+    let numberOfWrites = 0
+    writableStream._write = (chunk, encoding, onwrite) => {
+      ++numberOfWrites
+      onwrite(new Error('Simulated error'))
+    }
+    promise
+      .then(assert.notExpected, reason => {
+        assert(() => reason.message === 'Simulated error')
+        assert(() => numberOfWrites === 1)
+        return response.waitForFinish()
+      })
+      .then(() => {
+        assert(() => response.statusCode === 200)
+        assert(() => response.toString() === loremIpsum)
+      })
+      .then(done, done)
+    response.writeHead(200)
+    write(response, loremIpsum, steps, false)
+  })
+
+  it('works transparently with streams (callbacks)', done => {
+    const { response, writableStream, promise } = setup()
+    let onEnd
+    const reachedEnd = new Promise(resolve => {
+      onEnd = resolve
+    })
+    promise
+      .then(() => {
+        assert(() => writableStream.toString() === loremIpsum)
+        return Promise.all([response.waitForFinish(), reachedEnd])
+      })
+      .then(() => {
+        assert(() => response.statusCode === 200)
+        assert(() => response.toString() === loremIpsum)
+      })
+      .then(done, done)
+    response.writeHead(200)
+    response.write(loremIpsum, () => response.end(onEnd))
   })
 
   function checkWriteAndEnd (label, testSetup = setup) {
@@ -169,6 +212,21 @@ describe('capture', () => {
     checkWriteAndEnd('waits for writable stream', () => {
       const { response, writableStream, promise } = setup({
         isWritableStreamAsynchronous: true
+      })
+      return { response, writableStream, promise, steps: 5 }
+    })
+
+    checkWriteAndEnd('waits for response', () => {
+      const { response, writableStream, promise } = setup({
+        isResponseAsynchronous: true
+      })
+      return { response, writableStream, promise, steps: 5 }
+    })
+
+    checkWriteAndEnd('waits for both', () => {
+      const { response, writableStream, promise } = setup({
+        isWritableStreamAsynchronous: true,
+        isResponseAsynchronous: true
       })
       return { response, writableStream, promise, steps: 5 }
     })
