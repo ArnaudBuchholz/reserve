@@ -21,7 +21,7 @@ function setup () {
 
 function write (stream, content, steps, useEnd) {
   let offset = 0
-  let size = Math.floor(content.length / steps)
+  const size = Math.floor(content.length / steps)
   function end () {
     if (useEnd) {
       stream.end(content.substring(offset))
