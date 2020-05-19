@@ -9,6 +9,7 @@ const decoderFactories = {
   default: encoding => { throw new Error(`Unsupported encoding: ${encoding}`) }
 }
 
+/* istanbul ignore else */
 if (zlib.createBrotliDecompress) {
   decoderFactories.br = zlib.createBrotliDecompress
 }
@@ -72,28 +73,22 @@ function capture (response, headers, writableStream) {
 
     writableStream.on('finish', () => done())
 
-    let pendingDrain = false
-
     response.write = function () {
       const { data, encoding, callback } = writeParameters(arguments)
       let flushCount = 0
       function flush () {
         if (--flushCount === 0) {
           response.emit('drain')
-          pendingDrain = false
         }
       }
       function needDrain (writeResult) {
         if (!writeResult) {
-          pendingDrain = true
           ++flushCount
         }
       }
       needDrain(out.write(data, encoding, flush))
       needDrain(write.call(response, data, encoding, function () {
-        if (callback) {
-          callback.apply(this, arguments)
-        }
+        callback.apply(this, arguments)
         flush()
       }))
       return flushCount === 0
@@ -111,21 +106,10 @@ function capture (response, headers, writableStream) {
           writableStream.end()
         }
       }
-      function doEnd () {
-        end.call(response, data, encoding, function () {
-          if (pendingDrain) {
-            response.on('drain', endWritableStream)
-          } else {
-            endWritableStream()
-          }
-          callback.apply(this, arguments)
-        })
-      }
-      if (pendingDrain) {
-        response.on('drain', doEnd)
-      } else {
-        doEnd()
-      }
+      end.call(response, data, encoding, function () {
+        endWritableStream()
+        callback.apply(this, arguments)
+      })
       return this
     }
   } catch (e) {
