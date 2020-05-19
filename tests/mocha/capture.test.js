@@ -18,7 +18,7 @@ function allocateResponse (isAsynchronous) {
   return response
 }
 
-function setup ({ isResponseAsynchronous, isWritableStreamAsynchronous } = { isResponseAsynchronous:false, isWritableStreamAsynchronous: false }) {
+function setup ({ isResponseAsynchronous, isWritableStreamAsynchronous } = { isResponseAsynchronous: false, isWritableStreamAsynchronous: false }) {
   const response = allocateResponse(isResponseAsynchronous)
   const writableStream = allocateResponse(isWritableStreamAsynchronous)
   const promise = capture(response, writableStream)
@@ -170,7 +170,6 @@ describe('capture', () => {
       const { response, writableStream, promise } = setup({
         isWritableStreamAsynchronous: true
       })
-      debugger
       return { response, writableStream, promise, steps: 5 }
     })
   })
