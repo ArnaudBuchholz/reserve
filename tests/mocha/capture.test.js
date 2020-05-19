@@ -118,7 +118,9 @@ describe('capture', () => {
         assert(() => response.toString() === loremIpsum)
       })
       .then(done, done)
-    response.writeHead(200)
+    response.writeHead(200, {
+      'content-encoding': 'identity'
+    })
     response.write(loremIpsum, () => response.end(onEnd))
   })
 
