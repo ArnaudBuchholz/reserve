@@ -36,8 +36,8 @@ module.exports = class Response extends Duplex {
     return super.end.apply(this, arguments)
   }
 
-  constructor () {
-    super()
+  constructor (options) {
+    super(options)
     this._buffer = []
     this._headers = {}
     this._headersSent = false
