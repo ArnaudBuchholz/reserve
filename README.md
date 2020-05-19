@@ -532,6 +532,41 @@ async function customHandler (request, response) {
 }
 ```
 
+## capture
+
+Since version 1.8.0, the package offers a mechanism to **capture the response stream** and **duplicate its content** to another **writable stream**.
+
+**NOTE** : The content is decoded if the [`content-encoding`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding) header contains: `gzip`, `deflate` or `br` *(only one, no combination is supported)*.
+
+**NOTE** : Check the [version of Node.js](https://nodejs.org/api/zlib.html#zlib_class_zlib_brotlicompress) to enable `br` compression support.
+
+For instance, it enables the caching of downloaded resources :
+
+```JavaScript
+mappings: [{
+  match: /^\/(.*)/,
+  file: './cache/$1',
+  'ignore-if-not-found': true
+}, {
+  method: 'GET',
+  custom: async (request, response) => {
+    if (/\.(js|css|svg|jpg)$/.exec(request.url)) {
+      const cachePath = join(cacheBasePath, '.' + request.url)
+      const cacheFolder = dirname(cachePath)
+      await mkdirAsync(cacheFolder, { recursive: true })
+      const file = createWriteStream(cachePath) // auto closed
+      capture(response, file)
+        .catch(reason => {
+          console.error(`Unable to cache ${cachePath}`, reason)
+        })
+    }
+  }
+}, {
+  match: /^\/(.*)/,
+  url: 'http://your.website.domain/$1'
+}]
+```
+
 # Mocking
 
 Since version 1.1.0, the package includes the helper `reserve/mock` to build tests. This method receives a configuration (like `reserve/serve`) and returns a promise resolving to an [EventEmitter](https://nodejs.org/api/events.html)  augmented with a `request` method :
@@ -620,7 +655,7 @@ require('reserve/mock')({
 ||Prevents infinite loops during internal redirection (see `max-redirect`)|
 |1.2.1|Fixes coloring in command line usage|
 |1.3.0|Fixes infinite loop in the error handler|
-||Adds experimental `use` handler for [express middleware functions](https://www.npmjs.com/search?q=keywords%3Aexpress%20keywords%3Amiddleware)|
+||Adds *experimental* `use` handler for [express middleware functions](https://www.npmjs.com/search?q=keywords%3Aexpress%20keywords%3Amiddleware)|
 ||Makes the mapping `match` member optional|
 |1.4.0|More [documentation](https://github.com/ArnaudBuchholz/reserve/tree/master/doc/README.md) |
 ||Exposes simple body reader (`require('reserve').body`)|
@@ -634,6 +669,6 @@ require('reserve/mock')({
 ||Secures events processing against exceptions|
 ||Adds `forward-request` and `forward-response` options for the `url` handler|
 |1.7.1|Adds more context to `forward-request` and `forward-response` callbacks|
-|1.7.2|Improves end of streaming detection in `file` and `url` handlers|
-||`capture` helper (experimental)|
+|1.8.0|Improves end of streaming detection in `file` and `url` handlers|
+||`capture` helper *(experimental)*|
 ||`custom` handler validation *(improved)*|
