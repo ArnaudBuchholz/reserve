@@ -2,14 +2,13 @@
 
 const { createWriteStream, mkdir } = require('fs')
 const { dirname, join } = require('path')
-const capture = require('../capture')
+const { capture, log, serve } = require('..')
 
 const mkdirAsync = require('util').promisify(mkdir)
 
 const cacheBasePath = join(__dirname, 'cache')
 mkdirAsync(cacheBasePath, { recursive: true }) // Should wait for completion
 
-const { log, serve } = require('..')
 log(serve({
   port: 8005,
   mappings: [{
@@ -19,7 +18,7 @@ log(serve({
   }, {
     method: 'GET',
     custom: async (request, response) => {
-      if (/\.(js|css|svg|jpg)$/.exec(request.url)) {
+      if (/\.(ico|js|css|svg|jpe?g)$/.exec(request.url)) {
         const cachePath = join(cacheBasePath, '.' + request.url)
         const cacheFolder = dirname(cachePath)
         await mkdirAsync(cacheFolder, { recursive: true })
