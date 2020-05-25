@@ -12,7 +12,7 @@ mkdirAsync(cacheBasePath, { recursive: true }) // Should wait for completion
 log(serve({
   port: 8080,
   mappings: [{
-    match: /^\/http:\/\/([^/]*)\/(.*)/,
+    match: /^http:\/\/([^/]*)\/(.*)/,
     file: './cache/$1/$2',
     'ignore-if-not-found': true
   }, {
