@@ -16,3 +16,7 @@ After drafting the first working version of [REserve](https://npmjs.com/package/
 
 The best way to explain **what REserve can do** is to demonstrate some of its features through a **concrete use case**.
 In this article, we will illustrate how one can quickly setup a server to **facilitate the execution of OpenUI5 applications**.
+
+## [Cache and Proxy](cache%20and%20proxy.md)
+
+With version 1.8.0, [REserve](https://www.npmjs.com/package/reserve) offers **the capture helper** that enables the **copy of the response content while processing a request**. In this article, an example will be presented in two different flavors to illustrate the **new possibilities** introduced by this tool.
