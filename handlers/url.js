@@ -60,7 +60,7 @@ module.exports = {
       headers
     }
     const context = {}
-    await mapping['forward-request']({ configuration, context, mapping, match, request: options })
+    await mapping['forward-request']({ configuration, context, mapping, match, request: options, incoming: request })
     const redirectedRequest = protocol(options.url).request(options.url, options, async redirectedResponse => {
       if (mapping['unsecure-cookies']) {
         unsecureCookies(redirectedResponse.headers)
