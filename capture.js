@@ -66,48 +66,50 @@ function capture (response, headers, writableStream) {
     const out = selectDecoder(headers) || writableStream
 
     out.on('error', onError)
-    if (writableStream !== out) {
+
+    if (out !== writableStream) {
       writableStream.on('error', onError)
+      pipeline(out, writableStream, () => {
+        writableStream.end()
+      })
     }
+
     response.on('error', onError)
 
     writableStream.on('finish', () => done())
 
     response.write = function () {
       const { data, encoding, callback } = writeParameters(arguments)
-      let flushCount = 0
-      function flush () {
-        if (--flushCount === 0) {
+      let waitForDrain = 0
+      function drained () {
+        if (--waitForDrain === 0) {
           response.emit = emit
           response.emit('drain')
         }
       }
-      function needDrain (writeResult) {
-        if (!writeResult) {
-          if (++flushCount === 1) {
-            response.emit = function (eventName) {
-              if (eventName !== 'drain') {
-                return emit.apply(response, arguments)
-              }
-            }
-          }
-        }
+      if (!out.write(data, encoding)) {
+        ++waitForDrain
+        out.once('drain', drained)
       }
-      needDrain(out.write(data, encoding, flush))
-      needDrain(write.call(response, data, encoding, function () {
-        callback.apply(this, arguments)
-        flush()
-      }))
-      return flushCount === 0
+      if (!write.call(response, data, encoding, callback)) {
+        ++waitForDrain
+      }
+      if (waitForDrain) {
+        response.emit = function (eventName) {
+          if (eventName !== 'drain') {
+            return emit.apply(response, arguments)
+          }
+          drained()
+        }
+        return false
+      }
+      return true
     }
 
     response.end = function () {
       const { data, encoding, callback } = endParameters(arguments)
       function endWritableStream () {
         if (out !== writableStream) {
-          pipeline(out, writableStream, () => {
-            writableStream.end()
-          })
           out.end()
         } else {
           writableStream.end()
