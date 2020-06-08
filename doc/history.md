@@ -38,4 +38,4 @@
 ||`custom` handler validation *(improved)*|
 |1.8.1|Improves the `forward-request` callback to pass the incoming request|
 ||Reorganized documentation to enable frequent updates *(that do not require publishing)*|
-|1.8.2|Fix `capture` for big streams *(decoder was not drained)*|
+|1.8.2|Fix `capture` helper for big streams *(decoder was not drained)*|
