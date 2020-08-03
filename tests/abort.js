@@ -1,7 +1,6 @@
 'use strict'
 
 const { log, serve } = require('..')
-const colors = require('../detect/colors')
 
 function html (content, request, response) {
   response.writeHead(200, {
@@ -21,7 +20,8 @@ log(serve({
     <title>Abort example</title>
   </head>
   <body>
-    <button>Test</button>
+    <button>Test</button><br>
+    open the console
     <script>
       const button = document.querySelector('button')
       let xhr
@@ -35,9 +35,9 @@ log(serve({
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4) {
                 if (xhr.status === 200) {
-                    alert('Got it')
+                    console.log('Got it')
                 } else {
-                    alert('Failed')
+                    console.log('Failed')
                 }
                 button.innerHTML = 'Test'
                 xhr = null
@@ -54,17 +54,11 @@ log(serve({
     custom: (request, response) => new Promise(resolve => {
       setTimeout(() => {
         response.writeHead(200, {
-            'Content-Type': 'application/json'
-          })
-          response.end('true')
-          resolve()
+          'Content-Type': 'application/json'
+        })
+        response.end('true')
+        resolve()
       }, 5000) // 5s
     })
   }]
-}), true)
-  .on('incoming', ({ method, url }) => {
-    console.log(colors.gray('INCMG'), colors.gray(method), colors.gray(url))
-  })
-  .on('closed', ({ method, url }) => {
-    console.log(colors.magenta('CLOSE'), colors.gray(method), colors.gray(url))
-  })
+}), process.argv.includes('--verbose'))
