@@ -1,40 +1,48 @@
 'use strict'
 
-const colors = require('./detect/colors')
+const { gray, green, magenta, red, yellow } = require('./detect/colors')
+const logCommon = require('./logCommon')
 const logError = require('./logError')
 
-const onRedirected = ({ method, url, statusCode, timeSpent }) => {
-  let report
+const onRedirected = (verbose, event) => {
+  const statusCode = event.statusCode
+  let statusText
   if (!statusCode) {
-    report = colors.red('N/A')
+    statusText = red('N/A')
   } else if (statusCode > 399) {
-    report = colors.red(statusCode.toString())
+    statusText = red(statusCode.toString())
   } else {
-    report = colors.green(statusCode.toString())
+    statusText = green(statusCode.toString())
   }
-  report += colors.magenta(` ${timeSpent} ms`)
-  console.log(colors.magenta('SERVE'), colors.gray(method), colors.gray(url), report)
+  logCommon.call(event, 'SERVE', verbose, statusText, magenta(`${event.timeSpent} ms`))
 }
 
-const onRedirecting = ({ method, url, type, redirect }) => {
+const onIncoming = event => logCommon.call(event, 'INCMG', true, gray(event.method), gray(event.url))
+
+const onEvent = (type, event) => logCommon.call(event, type, true)
+
+const onRedirecting = event => {
+  const redirect = event.redirect
   let redirectLabel
   if (typeof redirect === 'function') {
-    redirectLabel = '(function)'
+    redirectLabel = redirect.name || 'anonymous'
   } else {
     redirectLabel = redirect.toString()
   }
-  console.log(colors.gray('RDRCT'), colors.gray(method), colors.gray(url), colors.gray('\n\\____'), colors.gray(type),
-    colors.gray(redirectLabel))
+  logCommon.call(event, 'RDRCT', true, gray(event.type), gray(redirectLabel))
 }
 
 module.exports = (serve, verbose) => {
   serve
     .on('ready', ({ url }) => {
-      console.log(colors.yellow(`Server running at ${url}`))
+      console.log(yellow(`Server running at ${url}`))
     })
     .on('error', logError)
-    .on('redirected', onRedirected)
+    .on('redirected', onRedirected.bind(null, verbose))
   if (verbose) {
+    serve.on('incoming', onIncoming)
+    serve.on('aborted', onEvent.bind(null, 'ABORT'))
+    serve.on('closed', onEvent.bind(null, 'CLOSE'))
     serve.on('redirecting', onRedirecting)
   }
   return serve
