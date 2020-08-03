@@ -118,19 +118,25 @@ function dispatch (url, index = 0) {
 }
 
 module.exports = function (configuration, request, response) {
-  const emitParameters = { method: request.method, url: request.url, start: new Date() }
+  const configurationRequests = configuration[$configurationRequests]
+  const emitParameters = { id: ++configurationRequests.lastId, method: request.method, url: request.url, start: new Date() }
   let promiseResolver
   const requestPromise = new Promise(resolve => { promiseResolver = resolve })
   const context = { eventEmitter: this, emitParameters, configuration, request, response, resolve: promiseResolver }
   request[$requestPromise] = requestPromise
   request[$requestRedirectCount] = 0
+  request.on('aborted', () => {
+    this.emit('aborted', { ...emitParameters })
+  })
+  request.on('close', () => {
+    this.emit('closed', { ...emitParameters })
+  })
   try {
     this.emit('incoming', emitParameters)
   } catch (reason) {
     error.call(context, reason)
     return requestPromise
   }
-  const configurationRequests = configuration[$configurationRequests]
   return configurationRequests.hold
     .then(() => {
       configurationRequests.promises.push(requestPromise)
