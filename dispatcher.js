@@ -24,19 +24,22 @@ function hookEnd (response) {
   return response
 }
 
+function emit (event, emitParameters, additionalParameters) {
+  this.emit(event, { ...emitParameters, ...additionalParameters })
+}
+
 function redirected () {
   const end = new Date()
-  const redirectedInfos = Object.assign(this.emitParameters, {
-    end,
-    timeSpent: end - this.emitParameters.start,
-    statusCode: this.response.statusCode
-  })
   try {
-    this.eventEmitter.emit('redirected', redirectedInfos)
+    emit.call(this.eventEmitter, 'redirected', this.emitParameters, {
+      end,
+      timeSpent: end - this.emitParameters.start,
+      statusCode: this.response.statusCode
+    })
   } catch (reason) {
     logError({ ...this.emitParameters, reason }) // Too late to impact the request
   }
-  this.resolve(redirectedInfos)
+  this.resolve()
 }
 
 function error (reason) {
@@ -47,7 +50,7 @@ function error (reason) {
     statusCode = 500
   }
   try {
-    this.eventEmitter.emit('error', { ...this.emitParameters, reason })
+    emit.call(this.eventEmitter, 'error', this.emitParameters, { reason })
   } catch (e) {
     logError({ ...this.emitParameters, reason: e }) // Unhandled error
   }
@@ -62,7 +65,7 @@ function error (reason) {
 
 function redirecting ({ mapping, match, handler, type, redirect, url, index = 0 }) {
   try {
-    this.eventEmitter.emit('redirecting', Object.assign(this.emitParameters, { type, redirect }))
+    emit.call(this.eventEmitter, 'redirecting', this.emitParameters, { type, redirect })
     return handler.redirect({
       configuration: this.configuration[$configurationInterface],
       mapping,
@@ -125,14 +128,10 @@ module.exports = function (configuration, request, response) {
   const context = { eventEmitter: this, emitParameters, configuration, request, response, resolve: promiseResolver }
   request[$requestPromise] = requestPromise
   request[$requestRedirectCount] = 0
-  request.on('aborted', () => {
-    this.emit('aborted', { ...emitParameters })
-  })
-  request.on('close', () => {
-    this.emit('closed', { ...emitParameters })
-  })
+  request.on('aborted', emit.bind(this, 'aborted', emitParameters))
+  request.on('close', emit.bind(this, 'closed', emitParameters))
   try {
-    this.emit('incoming', emitParameters)
+    emit.call(this, 'incoming', emitParameters)
   } catch (reason) {
     error.call(context, reason)
     return requestPromise
