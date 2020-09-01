@@ -7,6 +7,7 @@ const {
   $configurationRequests,
   $dispatcherEnd,
   $mappingMethod,
+  $requestId,
   $requestPromise,
   $requestRedirectCount,
   $responseEnded
@@ -126,6 +127,7 @@ module.exports = function (configuration, request, response) {
   let promiseResolver
   const requestPromise = new Promise(resolve => { promiseResolver = resolve })
   const context = { eventEmitter: this, emitParameters, configuration, request, response, resolve: promiseResolver }
+  request[$requestId] = emitParameters.id
   request[$requestPromise] = requestPromise
   request[$requestRedirectCount] = 0
   request.on('aborted', emit.bind(this, 'aborted', emitParameters))
