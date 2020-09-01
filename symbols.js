@@ -14,6 +14,7 @@ module.exports = {
   $handlerSchema: Symbol(`${ns}handler.schema`),
   $mappingChecked: Symbol(`${ns}mapping.checked`),
   $mappingMethod: Symbol(`${ns}mapping.method`),
+  $requestId: Symbol(`${ns}request.id`),
   $requestPromise: Symbol(`${ns}request.promise`),
   $requestRedirectCount: Symbol(`${ns}request.redirectCount`),
   $responseEnded: Symbol(`${ns}response.ended`),
