@@ -1,6 +1,7 @@
 'use strict'
 
 const { log, serve } = require('..')
+const { $requestId } = require('../symbols')
 
 function html (content, request, response) {
   response.writeHead(200, {
@@ -53,6 +54,9 @@ log(serve({
     match: /^\/ajax/,
     custom: (request, response) => new Promise(resolve => {
       setTimeout(() => {
+        if (request.aborted) {
+          console.log(`Request ${request[$requestId]} was aborted`)
+        }
         response.writeHead(200, {
           'Content-Type': 'application/json'
         })
@@ -61,4 +65,4 @@ log(serve({
       }, 5000) // 5s
     })
   }]
-}), process.argv.includes('--verbose'))
+}), true)
