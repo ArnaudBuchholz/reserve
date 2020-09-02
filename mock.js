@@ -18,8 +18,8 @@ module.exports = (jsonConfiguration, mockedHandlers = {}) => {
         server: null
       })
       const dispatch = dispatcher.bind(eventEmitter, configuration)
-      eventEmitter.request = (method, url, headers = {}, body = '') => {
-        const request = new Request(method, url, headers, body)
+      eventEmitter.request = function () {
+        const request = new Request(...arguments)
         const response = new Response()
         const finished = response.waitForFinish()
         return dispatch(request, response)
