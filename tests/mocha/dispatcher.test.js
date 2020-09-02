@@ -75,6 +75,10 @@ class RecordedEventEmitter extends EventEmitter {
       parameters: Object.assign({}, args[0])
     })
   }
+
+  get emitted () {
+    return this._emitted
+  }
 }
 
 describe('dispatcher', () => {
@@ -117,6 +121,62 @@ describe('dispatcher', () => {
         })
     })
   }
+
+  describe('events', () => {
+    let firstRequestId
+
+    it('provides request information on incoming and redirecting', async () => {
+      const sampleConf = await sampleConfPromise
+      const request = new Request('GET', '/redirect')
+      const response = new Response()
+      const emitter = new RecordedEventEmitter()
+      const promise = promisify(emitter, async parameters => {
+        await response.waitForFinish()
+        assert(() => response.statusCode === 200)
+        assert(() => response.headers['Content-Type'] === textMimeType)
+        assert(() => response.toString() === 'Hello World!')
+      })
+      dispatcher.call(emitter, sampleConf, request, response)
+      return promise.then(() => {
+        const [incoming, redirecting] = emitter.emitted
+        assert(() => incoming.eventName === 'incoming')
+        assert(() => incoming.parameters.method === 'GET')
+        assert(() => incoming.parameters.url === '/redirect')
+        assert(() => typeof incoming.parameters.id === 'number')
+        assert(() => incoming.parameters.start instanceof Date)
+        firstRequestId = incoming.parameters.id
+        assert(() => redirecting.eventName === 'redirecting')
+        assert(() => redirecting.parameters.id === firstRequestId)
+      })
+    })
+
+    it('detects request abortion', async () => {
+      const sampleConf = await sampleConfPromise
+      const request = new Request('GET', '/redirect')
+      const response = new Response()
+      const emitter = new RecordedEventEmitter()
+      const promise = promisify(emitter, async parameters => {
+        await response.waitForFinish()
+        assert(() => response.statusCode === 200)
+        assert(() => response.headers['Content-Type'] === textMimeType)
+        assert(() => response.toString() === 'Hello World!')
+      })
+      dispatcher.call(emitter, sampleConf, request, response)
+      request.abort()
+      return promise.then(() => {
+        const [incoming, aborted] = emitter.emitted
+        assert(() => incoming.eventName === 'incoming')
+        assert(() => incoming.parameters.method === 'GET')
+        assert(() => incoming.parameters.url === '/redirect')
+        assert(() => typeof incoming.parameters.id === 'number')
+        assert(() => incoming.parameters.id !== firstRequestId)
+        assert(() => incoming.parameters.start instanceof Date)
+        const secondRequestId = incoming.parameters.id
+        assert(() => aborted.eventName === 'aborted')
+        assert(() => aborted.parameters.id === secondRequestId)
+      })
+    })
+  })
 
   describe('redirection', () => {
     it('supports internal redirection', async () => {
