@@ -27,4 +27,9 @@ module.exports = class Request extends Readable {
   get headers () {
     return this._headers
   }
+
+  abort () {
+    this.aborted = true
+    this.emit('aborted')
+  }
 }
