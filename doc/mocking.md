@@ -14,7 +14,12 @@ read('/reserve.json')
   })
 ```
 
-Call the `request` method to simulate an incoming request, it returns a promise resolving to a mocked response exposing the following members :
+Call the `request` method to simulate an incoming request, it supports two different signatures :
+
+* `(method, url, headers = {}, body = '', properties = undefined)`
+* `({ method, url, headers = {}, body = '', properties = undefined})`
+
+The method returns a promise resolving to a mocked response exposing the following members :
 
 | Member | Type | Description |
 |---|---|---|
