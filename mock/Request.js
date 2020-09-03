@@ -17,7 +17,7 @@ module.exports = class Request extends Readable {
       Object.assign(this, properties)
     }
   }
-  
+
   _fromParams (method, url, headers, body, properties) {
     if (typeof body === 'object') {
       properties = body
