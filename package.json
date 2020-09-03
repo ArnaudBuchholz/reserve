@@ -77,8 +77,7 @@
   "mocha": {
     "spec": [
       "tests/mocha/*.test.js",
-      "tests/mocha/handlers/*.test.js",
-      "tests/mocha/detect/*.test.js"
+      "tests/mocha/**/*.test.js"
     ],
     "require": [
       "tests/mocha/mocked_modules/path.js",
