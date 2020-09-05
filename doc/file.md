@@ -10,7 +10,7 @@ Example :
 }
 ```
 
-* Only supports [GET](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET)
+* Supports [GET](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET) and [HEAD](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD)
 * Capturing groups can be used as substitution parameters
 * Absolute or relative to the handler's `cwd` member *(see [mappings](configuration.md#mappings))*
 * Incoming URL parameters are automatically stripped out to simplify the matching expression
