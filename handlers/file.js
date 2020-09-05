@@ -9,23 +9,28 @@ const defaultMimeType = mime.getType('bin')
 const statAsync = util.promisify(fs.stat)
 const readdirAsync = util.promisify(fs.readdir)
 
-function sendFile (response, filePath, stat) {
+function sendFile (request, response, filePath, stat) {
   return new Promise((resolve, reject) => {
     response.writeHead(200, {
       'Content-Type': mime.getType(path.extname(filePath)) || defaultMimeType,
       'Content-Length': stat.size
     })
-    response.on('finish', resolve)
-    fs.createReadStream(filePath)
-      .on('error', reject)
-      .pipe(response)
+    if (request.method === 'HEAD') {
+      response.end()
+      resolve()
+    } else {
+      response.on('finish', resolve)
+      fs.createReadStream(filePath)
+        .on('error', reject)
+        .pipe(response)
+    }
   })
 }
 
-function sendIndex (response, folderPath) {
+function sendIndex (request, response, folderPath) {
   const indexPath = path.join(folderPath, 'index.html')
   return statAsync(indexPath)
-    .then(stat => sendFile(response, indexPath, stat))
+    .then(stat => sendFile(request, response, indexPath, stat))
 }
 
 async function checkCaseSensitivePath (filePath) {
@@ -71,9 +76,9 @@ module.exports = {
           return 404 // Can't ignore if not found
         }
         if (isDirectory) {
-          return sendIndex(response, filePath)
+          return sendIndex(request, response, filePath)
         }
-        return sendFile(response, filePath, stat)
+        return sendFile(request, response, filePath, stat)
       })
       .catch(() => {
         if (!mapping['ignore-if-not-found']) {
