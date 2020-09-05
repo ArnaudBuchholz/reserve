@@ -42,3 +42,4 @@
 |1.9.0|Allocates unique ID per requests|
 ||Introduces `aborted` and `closed` events|
 ||Improves verbose logger (based on request IDs)|
+||Improves mocking by offering additional properties merged to the request|
