@@ -130,7 +130,28 @@ describe('handlers/file', () => {
         assert(() => value === undefined)
         assert(() => response.statusCode === 200)
         assert(() => response.headers['Content-Type'] === htmlMimeType)
+        assert(() => response.headers['Content-Length'] === 8)
         assert(() => response.toString() === '<html />')
+      })
+  })
+
+  it('sends index.html if accessing a folder (HEAD)', () => {
+    const request = new Request('HEAD')
+    const response = new Response()
+    return fileHandler.redirect({
+      request,
+      response,
+      mapping: {
+        cwd: '/'
+      },
+      redirect: './folder/'
+    })
+      .then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 200)
+        assert(() => response.headers['Content-Type'] === htmlMimeType)
+        assert(() => response.headers['Content-Length'] === 8)
+        assert(() => response.toString() === '')
       })
   })
 
