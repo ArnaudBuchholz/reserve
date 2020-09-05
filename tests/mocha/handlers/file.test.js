@@ -221,7 +221,28 @@ describe('handlers/file', () => {
           assert(() => value === undefined)
           assert(() => response.statusCode === 200)
           assert(() => response.headers['Content-Type'] === textMimeType)
+          assert(() => response.headers['Content-Length'] === 12)
           assert(() => response.toString() === 'Hello World!')
+        })
+    })
+
+    it('finds the file even if the file name does not match case sensitively (HEAD)', () => {
+      const request = new Request('HEAD')
+      const response = new Response()
+      return fileHandler.redirect({
+        request,
+        response,
+        mapping: {
+          cwd: '/'
+        },
+        redirect: '/File.txt'
+      })
+        .then(value => {
+          assert(() => value === undefined)
+          assert(() => response.statusCode === 200)
+          assert(() => response.headers['Content-Type'] === textMimeType)
+          assert(() => response.headers['Content-Length'] === 12)
+          assert(() => response.toString() === '')
         })
     })
 
@@ -258,7 +279,29 @@ describe('handlers/file', () => {
           assert(() => value === undefined)
           assert(() => response.statusCode === 200)
           assert(() => response.headers['Content-Type'] === textMimeType)
+          assert(() => response.headers['Content-Length'] === 12)
           assert(() => response.toString() === 'Hello World!')
+        })
+    })
+
+    it('finds the file case sensitively when requested (HEAD)', () => {
+      const request = new Request('HEAD')
+      const response = new Response()
+      return fileHandler.redirect({
+        request,
+        response,
+        mapping: {
+          cwd: '/',
+          'case-sensitive': true
+        },
+        redirect: '/file.txt'
+      })
+        .then(value => {
+          assert(() => value === undefined)
+          assert(() => response.statusCode === 200)
+          assert(() => response.headers['Content-Type'] === textMimeType)
+          assert(() => response.headers['Content-Length'] === 12)
+          assert(() => response.toString() === '')
         })
     })
 
