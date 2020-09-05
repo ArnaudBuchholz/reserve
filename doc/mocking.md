@@ -19,6 +19,8 @@ Call the `request` method to simulate an incoming request, it supports two diffe
 * `(method, url, headers = {}, body = '', properties = undefined)`
 * `({ method, url, headers = {}, body = '', properties = undefined})`
 
+*`properties` is a dictionary merged to the mocked request to simulate members like `socket`*
+
 The method returns a promise resolving to a mocked response exposing the following members :
 
 | Member | Type | Description |
