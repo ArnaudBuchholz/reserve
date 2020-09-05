@@ -56,7 +56,7 @@ module.exports = {
       defaultValue: false
     }
   },
-  method: 'GET',
+  method: 'GET,HEAD',
   redirect: ({ request, mapping, redirect, response }) => {
     let filePath = /([^?#]+)/.exec(unescape(redirect))[1] // filter URL parameters & hash
     if (!path.isAbsolute(filePath)) {
