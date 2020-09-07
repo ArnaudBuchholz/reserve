@@ -11,7 +11,7 @@ const textMimeType = mime.getType('text')
 const htmlMimeType = mime.getType('html')
 const defaultMimeType = mime.getType('bin')
 
-function test (redirect, mapping = { cwd: '/' }, method = 'GET') {
+function test (redirect, mapping = { cwd: '/' }, method = 'GET') {
   const request = new Request(method)
   const response = new Response()
   return fileHandler.validate(mapping)
@@ -115,6 +115,12 @@ describe('handlers/file', () => {
   )
 
   it('fails with 404 if the folder does not have index.html', () => test('./no-index/')
+    .then(({ promise }) => promise.then(value => {
+      assert(() => value === 404)
+    }))
+  )
+
+  it('fails with 404 if the folder contains a sub folder named index.html', () => test('./wrong-index/')
     .then(({ promise }) => promise.then(value => {
       assert(() => value === 404)
     }))
