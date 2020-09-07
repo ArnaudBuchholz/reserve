@@ -39,4 +39,23 @@ Example :
 |---|---|---|---|
 | `case-sensitive` | Boolean | `false` | *(for Windows)* when `true`, the file path is tested case sensitively. Since it has an impact on **performances**, use carefully. |
 | `ignore-if-not-found` | Boolean | `false` | If the mapping does not resolve to a file or a folder, the handler does not end the request with status `404`. |
+| `custom-file-system` | String or Object | undefined | Provides custom file system API *(see below)*. |
 
+## Custom File System
+
+The custom file system object must expose the following methods :
+
+### async readdir (folderPath)
+
+Must return an array of names listing the file or folder names contained in the folderPath
+
+### async stat (filePath)
+
+Must return an object exposing
+
+isDirectory
+size
+
+### async createReadStream (filePath, options)
+
+Must return a read stream
