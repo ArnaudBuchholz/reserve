@@ -100,6 +100,9 @@ const entries = {
     })
   },
   'no-index': {},
+  'wrong-index': {
+    'index.html': {}
+  },
   'now.js': {
     content: ''
   },
