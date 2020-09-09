@@ -2,8 +2,6 @@
 
 const assert = require('../assert')
 const mime = require('../../../detect/mime')
-const Request = require('../../../mock/Request')
-const Response = require('../../../mock/Response')
 const fileHandler = require('../../../handlers/file')
 const handle = require('./handle')(fileHandler, { mapping: { cwd: '/' } })
 const fs = require('fs')
@@ -185,7 +183,7 @@ describe('handlers/file', () => {
     )
 
     it('finds the file case sensitively when requested', () => handle({
-      request: '/file.txt', 
+      request: '/file.txt',
       mapping: {
         cwd: '/',
         'case-sensitive': true
