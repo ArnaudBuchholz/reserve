@@ -9,7 +9,7 @@ module.exports = (handler, defaults = {}) => function test ({ request, mapping, 
   }
   request = new Request(request)
   const response = new Response()
-  mapping = { ...defaults.mapping, ...mapping }
+  mapping = { ...defaults.mapping, ...mapping }
   let mappingReady
   if (handler.validate) {
     mappingReady = handler.validate(mapping)
@@ -29,4 +29,3 @@ module.exports = (handler, defaults = {}) => function test ({ request, mapping, 
       return { promise, response }
     })
 }
-  
