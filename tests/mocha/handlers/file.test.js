@@ -11,10 +11,11 @@ const htmlMimeType = mime.getType('html')
 const defaultMimeType = mime.getType('bin')
 
 describe('handlers/file', () => {
-  it('returns a promise', async () => {
-    const { promise } = await handle('./file.txt')
-    assert(() => typeof promise.then === 'function')
-  })
+  it('returns a promise', () => handle('./file.txt')
+    .then(({ promise }) => {
+      assert(() => typeof promise.then === 'function')
+    })
+  )
 
   it('pipes file content (relative path)', () => handle({
     request: './file.txt'
