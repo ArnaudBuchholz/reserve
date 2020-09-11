@@ -2,17 +2,19 @@
 
 const Request = require('../../../mock/Request')
 const Response = require('../../../mock/Response')
+const { check } = require('../../../mapping')
 
-module.exports = (handler, defaults = {}) => function test ({ request, mapping, configuration, match, redirect } = {}) {
+module.exports = (handler, defaults = {}) => function test ({ request, mapping, configuration, match, redirect }) {
   if (typeof request === 'string') {
     request = { method: 'GET', url: request }
   }
   request = new Request(request)
   const response = new Response()
-  mapping = { ...defaults.mapping, ...mapping }
+  configuration = { ...defaults.configuration, ...configuration, handler: () => { return { handler } } }
   let mappingReady
-  if (handler.validate) {
-    mappingReady = handler.validate(mapping)
+  if (mapping !== null) {
+    mapping = { ...defaults.mapping, ...mapping }
+    mappingReady = check(configuration, mapping)
   } else {
     mappingReady = Promise.resolve()
   }
