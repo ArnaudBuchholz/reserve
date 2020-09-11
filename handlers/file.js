@@ -67,7 +67,7 @@ module.exports = {
     },
     [cfs]: {
       type: 'object',
-      defaultValue: null
+      defaultValue: nodeFs
     },
     'ignore-if-not-found': {
       type: 'boolean',
@@ -76,16 +76,12 @@ module.exports = {
   },
   method: 'GET,HEAD',
   validate: async mapping => {
-    if (!mapping[cfs]) {
-      mapping[cfs] = nodeFs
-    } else {
-      if (typeof mapping[cfs] === 'string') {
-        mapping[cfs] = require(mapping[cfs])
-      }
-      const types = [typeof mapping[cfs].stat, typeof mapping[cfs].readdir, typeof mapping[cfs].createReadStream]
-      if (types.some(type => type !== 'function')) {
-        throw new Error('Invalid custom-file-system specification')
-      }
+    if (typeof mapping[cfs] === 'string') {
+      mapping[cfs] = require(mapping[cfs])
+    }
+    const types = [typeof mapping[cfs].stat, typeof mapping[cfs].readdir, typeof mapping[cfs].createReadStream]
+    if (types.some(type => type !== 'function')) {
+      throw new Error('Invalid custom-file-system specification')
     }
   },
   redirect: ({ request, mapping, redirect, response }) => {
