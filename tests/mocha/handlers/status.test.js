@@ -29,7 +29,7 @@ describe('handlers/status', () => {
     }))
   )
 
-  it('sends an empty response for unknonw codes',  () => handle({
+  it('sends an empty response for unknonw codes', () => handle({
     mapping: null,
     redirect: 418
   })
@@ -40,8 +40,8 @@ describe('handlers/status', () => {
       assert(() => response.toString() === '')
     }))
   )
-  
-  it('can be used for redirections',  () => handle({
+
+  it('can be used for redirections', () => handle({
     mapping: {
       status: 302,
       headers: {
@@ -49,7 +49,7 @@ describe('handlers/status', () => {
       }
     },
     redirect: 302,
-    match: [undefined, 'https://www.npmjs.com/package/reserve']    
+    match: [undefined, 'https://www.npmjs.com/package/reserve']
   })
     .then(({ promise, response }) => promise.then(value => {
       assert(() => value === undefined)
