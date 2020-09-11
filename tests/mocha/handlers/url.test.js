@@ -3,8 +3,6 @@
 const mockRequire = require('mock-require')
 const http = require('../http')
 const assert = require('../assert')
-const Request = require('../../../mock/Request')
-const Response = require('../../../mock/Response')
 const urlHandler = require('../../../handlers/url')
 const handle = require('./handle')(urlHandler)
 
@@ -63,7 +61,7 @@ describe('handlers/url', () => {
       }
     },
     mapping: {
-      'unsecure-cookies': true      
+      'unsecure-cookies': true
     }
   })
     .then(({ promise, response }) => promise.then(value => {
