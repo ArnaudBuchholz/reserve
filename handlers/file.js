@@ -7,6 +7,10 @@ const path = require('path')
 
 const defaultMimeType = mime.getType('bin')
 
+const cfs = 'custom-file-system'
+const matchcase = 'case-sensitive'
+const i404 = 'ignore-if-not-found'
+
 const nodeFs = {
   stat: util.promisify(fs.stat),
   readdir: util.promisify(fs.readdir),
@@ -34,34 +38,31 @@ function sendFile ({ request, response, fs, filePath }, stat) {
   })
 }
 
-function sendIndex (context) {
+async function sendIndex (context) {
   const filePath = path.join(context.filePath, 'index.html')
-  return context.fs.stat(filePath)
-    .then(stat => {
-      if (stat.isDirectory()) {
-        throw new Error('index.html not a file')
-      }
-      return sendFile({ ...context, filePath }, stat)
-    })
+  await context.checkCaseSensitivePath(filePath)
+  const stat = context.fs.stat(filePath)
+  if (stat.isDirectory()) {
+    throw new Error('index.html not a file')
+  }
+  return sendFile({ ...context, filePath }, stat)
 }
 
-async function checkCaseSensitivePath (fs, filePath) {
+async function checkCaseSensitivePath (filePath) {
   const folderPath = path.dirname(filePath)
   if (folderPath && folderPath !== filePath) {
     const name = path.basename(filePath)
-    const names = await fs.readdir(folderPath)
+    const names = await this.fs.readdir(folderPath)
     if (!names.includes(name)) {
       throw new Error('Not found')
     }
-    return checkCaseSensitivePath(fs, folderPath)
+    return checkCaseSensitivePath.call(this, folderPath)
   }
 }
 
-const cfs = 'custom-file-system'
-
 module.exports = {
   schema: {
-    'case-sensitive': {
+    [matchcase]: {
       type: 'boolean',
       defaultValue: false
     },
@@ -69,7 +70,7 @@ module.exports = {
       type: 'object',
       defaultValue: nodeFs
     },
-    'ignore-if-not-found': {
+    [i404]: {
       type: 'boolean',
       defaultValue: false
     }
@@ -99,11 +100,14 @@ module.exports = {
       fs: mapping[cfs],
       filePath
     }
+    if (mapping[matchcase]) {
+      context.checkCaseSensitivePath = checkCaseSensitivePath
+    } else {
+      context.checkCaseSensitivePath = async () => {}
+    }
     return context.fs.stat(filePath)
       .then(async stat => {
-        if (mapping['case-sensitive']) {
-          await checkCaseSensitivePath(context.fs, filePath)
-        }
+        await context.checkCaseSensitivePath(filePath)
         const isDirectory = stat.isDirectory()
         if (isDirectory ^ directoryAccess) {
           return 404 // Can't ignore if not found
@@ -114,7 +118,7 @@ module.exports = {
         return sendFile(context, stat)
       })
       .catch(() => {
-        if (!mapping['ignore-if-not-found']) {
+        if (!mapping[i404]) {
           return 404
         }
       })
