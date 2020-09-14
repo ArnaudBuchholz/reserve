@@ -43,19 +43,28 @@ Example :
 
 ## Custom File System
 
-The custom file system object must expose the following methods :
+The custom file system is an **object** exposing several **asynchronous** methods.
 
-### async readdir (folderPath)
+Some are mandatory, others depend on the **settings** of the mapping.
 
-Must return an array of names listing the file or folder names contained in the folderPath
+### *optional* `async readdir (folderPath)`
 
-### async stat (filePath)
+This is the asynchronous equivalent of [fs.readdir](https://nodejs.org/api/fs.html#fs_fs_readdir_path_options_callback). No option is transmitted.
 
-Must return an object exposing
+It must return a promise resolved to an array of names listing the files or folders contained in the `folderPath`.
 
-isDirectory
-size
+It is mandatory only if the `case-sensitive` option is set on the mapping.
 
-### async createReadStream (filePath, options)
+### *mandatory* `async stat (filePath)`
 
-Must return a read stream
+This is the asynchronous equivalent of [fs.stat](https://nodejs.org/api/fs.html#fs_fs_stat_path_options_callback). No option is transmitted.
+
+It must return an object equivalent to [fs.Stats](https://nodejs.org/api/fs.html#fs_class_fs_stats) but **limited** to :
+* [`isDirectory()`](https://nodejs.org/api/fs.html#fs_stats_isdirectory)
+* [`size`](https://nodejs.org/api/fs.html#fs_stats_size)
+
+### *mandatory* async createReadStream (filePath, options)
+
+This is the asynchronous equivalent of [fs.createReadStream](https://nodejs.org/api/fs.html#fs_fs_createreadstream_path_options).  When `options` is specified, it contains only `start` and `end`.
+
+It  must return a [readable stream](https://nodejs.org/api/fs.html#stream_class_stream_readable).
