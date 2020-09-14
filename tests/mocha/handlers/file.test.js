@@ -5,6 +5,8 @@ const mime = require('../../../detect/mime')
 const fileHandler = require('../../../handlers/file')
 const handle = require('./handle')(fileHandler, { mapping: { cwd: '/' } })
 const fs = require('fs')
+const { promisify } = require('util')
+const mockRequire = require('mock-require')
 
 const textMimeType = mime.getType('text')
 const htmlMimeType = mime.getType('html')
@@ -300,6 +302,44 @@ describe('handlers/file', () => {
         assert(() => value === undefined)
         assert(() => response.isInitial())
       }))
+    )
+  })
+
+  describe('custom file system', () => {
+    const customFs = {
+      stat: promisify(fs.stat),
+      readdir: promisify(fs.readdir),
+      createReadStream: (path, options) => Promise.resolve(fs.createReadStream(path, options))
+    }
+
+    it('allows external module', () => {
+      mockRequire('/cfs.js', customFs)
+      return handle({
+        request: './file.txt',
+        mapping: {
+          'custom-file-system': '/cfs.js'
+        }
+      })
+        .then(({ promise, response }) => promise.then(value => {
+          assert(() => value === undefined)
+          assert(() => response.statusCode === 200)
+          assert(() => response.headers['Content-Type'] === textMimeType)
+          assert(() => response.toString() === 'Hello World!')
+        }))
+    })
+
+    it('validates custom file system methods', () => handle({
+      request: './file.txt',
+      mapping: {
+        'custom-file-system': {
+          stat: 0,
+          readdir: promisify(fs.readdir)
+        }
+      }
+    })
+      .then(assert.notExpected, reason => {
+        assert(() => !!reason)
+      })
     )
   })
 })
