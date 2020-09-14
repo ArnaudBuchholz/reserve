@@ -7,7 +7,9 @@ const urlHandler = require('../../../handlers/url')
 const handle = require('./handle')(urlHandler)
 
 describe('handlers/url', () => {
-  it('returns a promise', () => handle(http.urls.echo)
+  it('returns a promise', () => handle({
+    request: http.urls.echo
+  })
     .then(({ promise }) => {
       assert(() => typeof promise.then === 'function')
     })
