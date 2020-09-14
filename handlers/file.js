@@ -1,7 +1,7 @@
 'use strict'
 
 const fs = require('fs')
-const util = require('util')
+const { promisify } = require('util')
 const mime = require('../detect/mime')
 const path = require('path')
 
@@ -12,8 +12,8 @@ const matchcase = 'case-sensitive'
 const i404 = 'ignore-if-not-found'
 
 const nodeFs = {
-  stat: util.promisify(fs.stat),
-  readdir: util.promisify(fs.readdir),
+  stat: promisify(fs.stat),
+  readdir: promisify(fs.readdir),
   createReadStream: (path, options) => Promise.resolve(fs.createReadStream(path, options))
 }
 
@@ -41,7 +41,7 @@ function sendFile ({ request, response, fs, filePath }, stat) {
 async function sendIndex (context) {
   const filePath = path.join(context.filePath, 'index.html')
   await context.checkCaseSensitivePath(filePath)
-  const stat = context.fs.stat(filePath)
+  const stat = await context.fs.stat(filePath)
   if (stat.isDirectory()) {
     throw new Error('index.html not a file')
   }
@@ -67,7 +67,7 @@ module.exports = {
       defaultValue: false
     },
     [cfs]: {
-      type: 'object',
+      types: ['string', 'object'],
       defaultValue: nodeFs
     },
     [i404]: {
@@ -80,9 +80,13 @@ module.exports = {
     if (typeof mapping[cfs] === 'string') {
       mapping[cfs] = require(mapping[cfs])
     }
-    const types = [typeof mapping[cfs].stat, typeof mapping[cfs].readdir, typeof mapping[cfs].createReadStream]
-    if (types.some(type => type !== 'function')) {
-      throw new Error('Invalid custom-file-system specification')
+    const apis = ['stat', 'createReadStream']
+    if (mapping[matchcase]) {
+      apis.push('readdir')
+    }
+    const invalids = apis.filter(name => typeof mapping[cfs][name] !== 'function')
+    if (invalids.length) {
+      throw new Error(`Invalid custom-file-system specification (${invalids.join(', ')})`)
     }
   },
   redirect: ({ request, mapping, redirect, response }) => {
