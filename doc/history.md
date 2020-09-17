@@ -43,3 +43,4 @@
 ||Introduces `aborted` and `closed` events|
 ||Improves verbose logger (based on request IDs)|
 ||Improves mocking by offering additional properties merged to the request|
+||mp4 mime type|
