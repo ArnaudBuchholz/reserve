@@ -17,18 +17,48 @@ const nodeFs = {
   createReadStream: (path, options) => Promise.resolve(fs.createReadStream(path, options))
 }
 
-function sendFile ({ request, response, fs, filePath }, stat) {
+function sendFile ({ request, response, fs, filePath }, { size }) {
   return new Promise((resolve, reject) => {
-    response.writeHead(200, {
+    let bytesRange = /bytes=(\d+)\-(\d+)?(,)?/.exec(request.headers.range)
+    let start
+    let end
+    let rangeHeader
+    let status
+    let length
+    if (bytesRange && bytesRange[3]) {
+      bytesRange = null // Multi-part not supportd
+    }
+    if (bytesRange) {
+      start = parseInt(bytesRange[1], 10)
+      if (bytesRange[2]) {
+        end = parseInt(bytesRange[2], 10)
+      } else {
+        end = size - 1
+      }
+      if (start > end) {
+        end = start
+      }
+      rangeHeader = {
+        'Content-Range': `bytes ${start}-${end}/${size}`
+      }
+      status = 206
+      length = end - start + 1
+    } else {
+      status = 200
+      length = size
+    }
+    response.writeHead(status, {
       'Content-Type': mime.getType(path.extname(filePath)) || defaultMimeType,
-      'Content-Length': stat.size
+      'Content-Length': length,
+      'Accept-Ranges': 'bytes',
+      ...rangeHeader
     })
     if (request.method === 'HEAD') {
       response.end()
       resolve()
     } else {
       response.on('finish', resolve)
-      fs.createReadStream(filePath)
+      fs.createReadStream(filePath, { start, end })
         .then(stream => {
           stream
             .on('error', reject)
