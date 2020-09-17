@@ -28,6 +28,7 @@ Example :
 |jpeg|image/jpeg|
 |jpg|image/jpeg|
 |js|application/javascript|
+|mp4|video/mp4|
 |pdf|application/pdf|
 |png|image/png|
 |svg|image/svg+xml|
