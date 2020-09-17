@@ -5,6 +5,7 @@ const { promisify } = require('util')
 const { join } = require('path')
 const get = require('https').get
 const { pipeline } = require('stream')
+const { log, serve } = require('..')
 
 const videoSource = 'https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_1920_18MG.mp4'
 
@@ -35,6 +36,35 @@ async function main () {
     await pipelineAsync(source, dest)
     console.log('Downloaded.')
   }
+
+  function html (content, request, response) {
+    response.writeHead(200, {
+      'Content-Type': 'text/html',
+      'Content-Legth': content.length
+    })
+    response.end(content)
+  }
+  
+  log(serve({
+    port: 8081,
+    mappings: [{
+      match: /^\/movie\.mp4$/,
+      file: videoPath
+    }, {
+      match: /^\/$/,
+      custom: html.bind(null, `<!doctype html>
+  <html>
+    <head>
+      <title>Video player</title>
+    <body>
+      <video width="320" height="240" controls>
+        <source src="movie.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </body>
+  </html>`)
+    }]
+  }), true)
 }
 
 main().catch(reason => console.error(reason))
