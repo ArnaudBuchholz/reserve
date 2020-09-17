@@ -20,6 +20,7 @@ const types = {
   jpeg,
   jpg: jpeg,
   js: `${app}/javascript`,
+  mp4: 'video/mp4',
   pdf: `${app}/pdf`,
   png: 'image/png',
   svg: 'image/svg+xml',
