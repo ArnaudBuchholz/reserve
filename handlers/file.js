@@ -17,39 +17,30 @@ const nodeFs = {
   createReadStream: (path, options) => Promise.resolve(fs.createReadStream(path, options))
 }
 
+function processBytesRange (request, size) {
+  const bytesRange = /bytes=(\d+)-(\d+)?(,)?/.exec(request.headers.range)
+  if (bytesRange && !bytesRange[3]) { // Multipart not supported
+    const start = parseInt(bytesRange[1], 10)
+    let end
+    if (bytesRange[2]) {
+      end = parseInt(bytesRange[2], 10)
+    } else {
+      end = size - 1
+    }
+    if (start > end) {
+      end = start
+    }
+    return { start, end, rangeHeader: { 'Content-Range': `bytes ${start}-${end}/${size}` }, status: 206, contentLength: end - start + 1 }
+  }
+  return { status: 200, contentLength: size }
+}
+
 function sendFile ({ request, response, fs, filePath }, { size }) {
   return new Promise((resolve, reject) => {
-    let bytesRange = /bytes=(\d+)\-(\d+)?(,)?/.exec(request.headers.range)
-    let start
-    let end
-    let rangeHeader
-    let status
-    let length
-    if (bytesRange && bytesRange[3]) {
-      bytesRange = null // Multi-part not supportd
-    }
-    if (bytesRange) {
-      start = parseInt(bytesRange[1], 10)
-      if (bytesRange[2]) {
-        end = parseInt(bytesRange[2], 10)
-      } else {
-        end = size - 1
-      }
-      if (start > end) {
-        end = start
-      }
-      rangeHeader = {
-        'Content-Range': `bytes ${start}-${end}/${size}`
-      }
-      status = 206
-      length = end - start + 1
-    } else {
-      status = 200
-      length = size
-    }
+    const { start, end, rangeHeader, status, contentLength } = processBytesRange(request, size)
     response.writeHead(status, {
       'Content-Type': mime.getType(path.extname(filePath)) || defaultMimeType,
-      'Content-Length': length,
+      'Content-Length': contentLength,
       'Accept-Ranges': 'bytes',
       ...rangeHeader
     })
@@ -57,12 +48,26 @@ function sendFile ({ request, response, fs, filePath }, { size }) {
       response.end()
       resolve()
     } else {
+      let aborted = false
+      let allocatedStream
+      const abort = () => {
+        aborted = true
+        if (allocatedStream) {
+          allocatedStream.destroy()
+        }
+        response.end()
+        resolve()
+      }
+      request.on('aborted', abort)
       response.on('finish', resolve)
       fs.createReadStream(filePath, { start, end })
         .then(stream => {
-          stream
-            .on('error', reject)
-            .pipe(response)
+          if (aborted) {
+            stream.destroy()
+          } else {
+            allocatedStream = stream
+            stream.on('error', reject).pipe(response)
+          }
         })
     }
   })
