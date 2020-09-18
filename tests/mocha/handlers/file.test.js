@@ -342,4 +342,111 @@ describe('handlers/file', () => {
       })
     )
   })
+
+  describe('range request', () => {
+    it('supports range request', () => handle({
+      request: './file.txt'
+    })
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 200)
+        assert(() => response.headers['Accept-Ranges'] === 'bytes')
+        assert(() => response.headers['Content-Range'] === undefined)
+        assert(() => response.toString() === 'Hello World!')
+      }))
+    )
+
+    it('does not support multipart range request', () => handle({
+      request: {
+        method: 'GET',
+        url: './file.txt',
+        headers: {
+          Range: 'bytes=0-2,5-6'
+        }
+      }
+    })
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 200)
+        assert(() => response.headers['Content-Type'] === textMimeType)
+        assert(() => response.toString() === 'Hello World!')
+      }))
+    )
+
+    it('returns only the request bytes (start)', () => handle({
+      request: {
+        method: 'GET',
+        url: './file.txt',
+        headers: {
+          Range: 'bytes=0-4'
+        }
+      }
+    })
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 206)
+        assert(() => response.headers['Content-Type'] === textMimeType)
+        assert(() => response.headers['Content-Range'] === 'bytes 0-4/12')
+        assert(() => response.headers['Content-Length'] === 5)
+        assert(() => response.toString() === 'Hello')
+      }))
+    )
+
+    it('returns only the request bytes (middle)', () => handle({
+      request: {
+        method: 'GET',
+        url: './file.txt',
+        headers: {
+          Range: 'bytes=6-10'
+        }
+      }
+    })
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 206)
+        assert(() => response.headers['Content-Type'] === textMimeType)
+        assert(() => response.headers['Content-Range'] === 'bytes 6-10/12')
+        assert(() => response.headers['Content-Length'] === 5)
+        assert(() => response.toString() === 'World')
+      }))
+    )
+
+    it('returns only the request bytes (end)', () => handle({
+      request: {
+        method: 'GET',
+        url: './file.txt',
+        headers: {
+          Range: 'bytes=6-'
+        }
+      }
+    })
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 206)
+        assert(() => response.headers['Content-Type'] === textMimeType)
+        assert(() => response.headers['Content-Range'] === 'bytes 6-11/12')
+        assert(() => response.headers['Content-Length'] === 6)
+        assert(() => response.toString() === 'World!')
+      }))
+    )
+
+    it('adjust range when going over the file size', () => handle({
+      request: {
+        method: 'GET',
+        url: './file.txt',
+        headers: {
+          Range: 'bytes=12-'
+        }
+      }
+    })
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 206)
+        assert(() => response.headers['Content-Type'] === textMimeType)
+        assert(() => response.headers['Content-Range'] === 'bytes 12-12/12')
+        assert(() => response.headers['Content-Length'] === 0)
+        assert(() => response.toString() === '')
+      }))
+    )
+  })
 })
