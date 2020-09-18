@@ -44,7 +44,7 @@ async function main () {
     })
     response.end(content)
   }
-  
+
   log(serve({
     port: 8081,
     mappings: [{
