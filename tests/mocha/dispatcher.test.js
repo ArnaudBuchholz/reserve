@@ -159,7 +159,7 @@ describe('dispatcher', () => {
         await response.waitForFinish()
         assert(() => response.statusCode === 200)
         assert(() => response.headers['Content-Type'] === textMimeType)
-        assert(() => response.toString() === 'Hello World!')
+        assert(() => response.toString() === '')
       })
       dispatcher.call(emitter, sampleConf, request, response)
       request.abort()
