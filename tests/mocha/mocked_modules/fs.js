@@ -155,17 +155,17 @@ require('mock-require')('fs', {
     }
   },
 
-  createReadStream (entryPath) {
+  createReadStream (entryPath, options) {
     const entry = getEntry(entryPath)
+    const { start, end } = options
+    let { content } = entry
+    if (start !== undefined && end !== undefined) {
+      content = content.substring(start, end + 1)
+    }
     const stream = new Readable()
-    let contentSent = false
     stream._read = () => {
-      if (contentSent) {
-        stream.push(null)
-      } else {
-        stream.push(entry.content)
-      }
-      contentSent = true
+      stream.push(content)
+      stream.push(null)
     }
     return stream
   },
@@ -181,10 +181,6 @@ require('mock-require')('fs', {
 
   readdir (entryPath, callback) {
     const entry = getEntry(entryPath)
-    // if (entry && !entry.content) {
     callback(null, Object.keys(entry))
-    // } else {
-    //   callback(new Error('not found'))
-    // }
   }
 })
