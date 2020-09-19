@@ -42,5 +42,8 @@
 |1.9.0|Allocates unique ID per requests|
 ||Introduces `aborted` and `closed` events|
 ||Improves verbose logger (based on request IDs)|
-||Improves mocking by offering additional properties merged to the request|
-||mp4 mime type|
+||Improves mocking by offering additional properties merged to the request *(enables socket mocking)*|
+||`mp4` mime type|
+||**file** handler supports request abortion|
+||**file** handler supports [`HEAD` HTTP method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD)|
+||**file** handler supports [`Range` HTTP header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range)|
