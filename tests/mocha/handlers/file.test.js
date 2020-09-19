@@ -378,7 +378,7 @@ describe('handlers/file', () => {
         method: 'GET',
         url: './file.txt',
         headers: {
-          Range: 'bytes=0-4'
+          range: 'bytes=0-4'
         }
       }
     })
@@ -397,7 +397,7 @@ describe('handlers/file', () => {
         method: 'GET',
         url: './file.txt',
         headers: {
-          Range: 'bytes=6-10'
+          range: 'bytes=6-10'
         }
       }
     })
@@ -416,7 +416,7 @@ describe('handlers/file', () => {
         method: 'GET',
         url: './file.txt',
         headers: {
-          Range: 'bytes=6-'
+          range: 'bytes=6-'
         }
       }
     })
@@ -430,23 +430,93 @@ describe('handlers/file', () => {
       }))
     )
 
-    it('adjust range when going over the file size', () => handle({
+    it('fails with invalid range (start over the file size)', () => handle({
       request: {
         method: 'GET',
         url: './file.txt',
         headers: {
-          Range: 'bytes=12-'
+          range: 'bytes=12-'
         }
       }
     })
       .then(({ promise, response }) => promise.then(value => {
         assert(() => value === undefined)
-        assert(() => response.statusCode === 206)
+        assert(() => response.statusCode === 416)
         assert(() => response.headers['Content-Type'] === textMimeType)
-        assert(() => response.headers['Content-Range'] === 'bytes 12-12/12')
         assert(() => response.headers['Content-Length'] === 0)
         assert(() => response.toString() === '')
       }))
     )
+
+    it('fails with invalid range (start over end)', () => handle({
+      request: {
+        method: 'GET',
+        url: './file.txt',
+        headers: {
+          range: 'bytes=5-2'
+        }
+      }
+    })
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 416)
+        assert(() => response.headers['Content-Type'] === textMimeType)
+        assert(() => response.headers['Content-Length'] === 0)
+        assert(() => response.toString() === '')
+      }))
+    )
+  })
+
+  describe('request abortion', () => {
+    it('stops transfer if request is aborted', () => handle({
+      request: {
+        method: 'GET',
+        url: './file.txt'
+      }
+    })
+      .then(({ promise, request, response }) => {
+        request.abort()
+        return promise
+          .then(value => {
+            assert(() => value === undefined)
+            assert(() => response.statusCode === 200)
+            assert(() => response.headers['Content-Type'] === textMimeType)
+            assert(() => response.headers['Content-Length'] === 12)
+            assert(() => response.toString() === '')
+          })
+      })
+    )
+
+    it('stops transfer if request is aborted (after createReadStream)', () => {
+      let allocatedRequest
+      const customFs = {
+        stat: promisify(fs.stat),
+        readdir: promisify(fs.readdir),
+        createReadStream: (path, options) => {
+          allocatedRequest.abort()
+          return Promise.resolve(fs.createReadStream(path, options))
+        }
+      }
+      return handle({
+        request: {
+          method: 'GET',
+          url: './file.txt'
+        },
+        mapping: {
+          'custom-file-system': customFs
+        }
+      })
+        .then(({ promise, request, response }) => {
+          allocatedRequest = request
+          return promise
+            .then(value => {
+              assert(() => value === undefined)
+              assert(() => response.statusCode === 200)
+              assert(() => response.headers['Content-Type'] === textMimeType)
+              assert(() => response.headers['Content-Length'] === 12)
+              assert(() => response.toString() === '')
+            })
+        })
+    })
   })
 })
