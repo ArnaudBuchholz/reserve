@@ -28,6 +28,6 @@ module.exports = (handler, defaults = {}) => function test ({ request, mapping, 
         mapping,
         redirect: redirect || request.url
       })
-      return { promise, response }
+      return { promise, request, response }
     })
 }
