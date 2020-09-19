@@ -27,8 +27,8 @@ function processBytesRange (request, size) {
     } else {
       end = size - 1
     }
-    if (start > end) {
-      end = start
+    if (start > end || start >= size) {
+      return { status: 416, contentLength: 0 }
     }
     return { start, end, rangeHeader: { 'Content-Range': `bytes ${start}-${end}/${size}` }, status: 206, contentLength: end - start + 1 }
   }
@@ -44,32 +44,22 @@ function sendFile ({ request, response, fs, filePath }, { size }) {
       'Accept-Ranges': 'bytes',
       ...rangeHeader
     })
-    if (request.method === 'HEAD') {
+    if (request.method === 'HEAD' || contentLength === 0 || request.aborted) {
       response.end()
       resolve()
-    } else {
-      let aborted = false
-      let allocatedStream
-      const abort = () => {
-        aborted = true
-        if (allocatedStream) {
-          allocatedStream.destroy()
-        }
-        response.end()
-        resolve()
-      }
-      request.on('aborted', abort)
-      response.on('finish', resolve)
-      fs.createReadStream(filePath, { start, end })
-        .then(stream => {
-          if (aborted) {
-            stream.destroy()
-          } else {
-            allocatedStream = stream
-            stream.on('error', reject).pipe(response)
-          }
-        })
+      return
     }
+    response.on('finish', resolve)
+    fs.createReadStream(filePath, { start, end })
+      .then(stream => {
+        if (request.aborted) {
+          stream.destroy()
+          response.end()
+          resolve()
+        } else {
+          stream.on('error', reject).pipe(response)
+        }
+      })
   })
 }
 
