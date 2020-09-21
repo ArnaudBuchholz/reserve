@@ -13,6 +13,7 @@ module.exports = {
   $handlerMethod: Symbol(`${ns}handler.method`),
   $handlerSchema: Symbol(`${ns}handler.schema`),
   $mappingChecked: Symbol(`${ns}mapping.checked`),
+  $mappingMatch: Symbol(`${ns}mapping.match`),
   $mappingMethod: Symbol(`${ns}mapping.method`),
   $requestId: Symbol(`${ns}request.id`),
   $requestPromise: Symbol(`${ns}request.promise`),
