@@ -6,7 +6,7 @@ const {
   $configurationInterface,
   $configurationRequests,
   $dispatcherEnd,
-  $mappingMethod,
+  $mappingMatch,
   $requestId,
   $requestPromise,
   $requestRedirectCount,
@@ -93,13 +93,6 @@ function redirecting ({ mapping, match, handler, type, redirect, url, index = 0 
   }
 }
 
-function tryMatch (mapping, method, url) {
-  if (mapping[$mappingMethod] && !mapping[$mappingMethod].includes(method)) {
-    return null
-  }
-  return mapping.match.exec(url)
-}
-
 function dispatch (url, index = 0) {
   if (typeof url === 'number') {
     return redirecting.call(this, {
@@ -111,7 +104,7 @@ function dispatch (url, index = 0) {
   const length = this.configuration.mappings.length
   while (index < length) {
     const mapping = this.configuration.mappings[index]
-    const match = tryMatch(mapping, this.request.method, url)
+    const match = mapping[$mappingMatch](this.request.method, url)
     if (match) {
       const { handler, redirect, type } = this.configuration.handler(mapping)
       return redirecting.call(this, { mapping, match, handler, type, redirect: interpolate(match, redirect), url, index })
