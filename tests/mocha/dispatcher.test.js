@@ -81,6 +81,26 @@ class RecordedEventEmitter extends EventEmitter {
   }
 }
 
+async function dispatch ({ abort, expectError, request }) {
+  if (typeof request === 'string') {
+    request = { method: 'GET', url: request }
+  }
+  request = new Request(request)
+  const sampleConf = await sampleConfPromise
+  const response = new Response()
+  const emitter = new RecordedEventEmitter()
+  const promise = dispatcher.call(emitter, sampleConf, request, response)
+  if (abort) {
+    request.abort()
+  }
+  await promise
+  return {
+    emitter,
+    request,
+    response
+  }
+}
+
 describe('dispatcher', () => {
   function promisify (emitter, callback) {
     return new Promise((resolve, reject) => {
@@ -125,19 +145,11 @@ describe('dispatcher', () => {
   describe('events', () => {
     let firstRequestId
 
-    it('provides request information on incoming and redirecting', async () => {
-      const sampleConf = await sampleConfPromise
-      const request = new Request('GET', '/redirect')
-      const response = new Response()
-      const emitter = new RecordedEventEmitter()
-      const promise = promisify(emitter, async parameters => {
-        await response.waitForFinish()
+    it('provides request information on incoming and redirecting', () => dispatch({ request: '/redirect' })
+      .then(({ emitter, promise, response }) => {
         assert(() => response.statusCode === 200)
         assert(() => response.headers['Content-Type'] === textMimeType)
         assert(() => response.toString() === 'Hello World!')
-      })
-      dispatcher.call(emitter, sampleConf, request, response)
-      return promise.then(() => {
         const [incoming, redirecting] = emitter.emitted
         assert(() => incoming.eventName === 'incoming')
         assert(() => incoming.parameters.method === 'GET')
@@ -148,22 +160,13 @@ describe('dispatcher', () => {
         assert(() => redirecting.eventName === 'redirecting')
         assert(() => redirecting.parameters.id === firstRequestId)
       })
-    })
+    )
 
-    it('detects request abortion', async () => {
-      const sampleConf = await sampleConfPromise
-      const request = new Request('GET', '/redirect')
-      const response = new Response()
-      const emitter = new RecordedEventEmitter()
-      const promise = promisify(emitter, async parameters => {
-        await response.waitForFinish()
+    it('detects request abortion', () => dispatch({ abort: true, request: '/redirect' })
+      .then(({ emitter, promise, response }) => {
         assert(() => response.statusCode === 200)
         assert(() => response.headers['Content-Type'] === textMimeType)
         assert(() => response.toString() === '')
-      })
-      dispatcher.call(emitter, sampleConf, request, response)
-      request.abort()
-      return promise.then(() => {
         const [incoming, aborted] = emitter.emitted
         assert(() => incoming.eventName === 'incoming')
         assert(() => incoming.parameters.method === 'GET')
@@ -175,24 +178,17 @@ describe('dispatcher', () => {
         assert(() => aborted.eventName === 'aborted')
         assert(() => aborted.parameters.id === secondRequestId)
       })
-    })
+    )
   })
 
   describe('redirection', () => {
-    it('supports internal redirection', async () => {
-      const sampleConf = await sampleConfPromise
-      const request = new Request('GET', '/redirect')
-      const response = new Response()
-      const emitter = new RecordedEventEmitter()
-      const promise = promisify(emitter, async parameters => {
-        await response.waitForFinish()
+    it('supports internal redirection', () => dispatch({ request: '/redirect' })
+      .then(({ response }) => {
         assert(() => response.statusCode === 200)
         assert(() => response.headers['Content-Type'] === textMimeType)
         assert(() => response.toString() === 'Hello World!')
       })
-      dispatcher.call(emitter, sampleConf, request, response)
-      return promise
-    })
+    )
 
     it('supports internal status code', async () => {
       const sampleConf = await sampleConfPromise
