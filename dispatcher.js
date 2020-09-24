@@ -29,6 +29,14 @@ function emit (event, emitParameters, additionalParameters) {
   this.emit(event, { ...emitParameters, ...additionalParameters })
 }
 
+function emitError (reason) {
+  try {
+    emit.call(this.eventEmitter, 'error', this.emitParameters, { reason })
+  } catch (e) {
+    logError({ ...this.emitParameters, reason: e }) // Unhandled error
+  }
+}
+
 function redirected () {
   const end = new Date()
   try {
@@ -38,7 +46,7 @@ function redirected () {
       statusCode: this.response.statusCode
     })
   } catch (reason) {
-    logError({ ...this.emitParameters, reason }) // Too late to impact the request
+    emitError.call(this, reason)
   }
   this.resolve()
 }
@@ -50,11 +58,7 @@ function error (reason) {
   } else {
     statusCode = 500
   }
-  try {
-    emit.call(this.eventEmitter, 'error', this.emitParameters, { reason })
-  } catch (e) {
-    logError({ ...this.emitParameters, reason: e }) // Unhandled error
-  }
+  emitError.call(this, reason)
   if (this.failed) {
     // Error during error: finalize the response (whatever it means)
     this.response.end()
