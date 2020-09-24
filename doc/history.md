@@ -47,3 +47,4 @@
 ||**file** handler supports request abortion|
 ||**file** handler supports [`HEAD` HTTP method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD)|
 ||**file** handler supports [`Range` HTTP header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range)|
+||If an exception occurs during the handling of the `redirected` event, it is now logged *(was previously ignored)*|
