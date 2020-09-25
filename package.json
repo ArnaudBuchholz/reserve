@@ -80,6 +80,7 @@
       "tests/mocha/**/*.test.js"
     ],
     "require": [
+      "tests/mocha/mocked_modules/console.js",
       "tests/mocha/mocked_modules/path.js",
       "tests/mocha/mocked_modules/fs.js",
       "tests/mocha/mocked_modules/http.js",
@@ -95,8 +96,7 @@
       "tests/*.js",
       "tests/mocha/assert.js",
       "tests/cache/**",
-      "log.js",
-      "logError.js",
+      "console.js",
       "coverage/**",
       "samples/**"
     ],
