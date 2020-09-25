@@ -1,6 +1,7 @@
 'use strict'
 
 const { gray, green, magenta, red, yellow } = require('./detect/colors')
+const { log } = require('./console')
 const logCommon = require('./logCommon')
 const logError = require('./logError')
 
@@ -35,7 +36,7 @@ const onRedirecting = event => {
 module.exports = (serve, verbose) => {
   serve
     .on('ready', ({ url }) => {
-      console.log(yellow(`Server running at ${url}`))
+      log(yellow(`Server running at ${url}`))
     })
     .on('error', logError)
     .on('redirected', onRedirected.bind(null, verbose))
