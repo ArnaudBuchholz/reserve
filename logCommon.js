@@ -1,15 +1,16 @@
 'use strict'
 
 const { gray, magenta, red, yellow } = require('./detect/colors')
+const { log, error } = require('./console')
 
 module.exports = function (type, showId, ...text) {
   let method
   const params = []
   if (type === 'ERROR') {
-    method = console.error
+    method = error
     params.push(red(type))
   } else {
-    method = console.log
+    method = log
     params.push(magenta(type))
   }
   if (showId) {
@@ -19,5 +20,5 @@ module.exports = function (type, showId, ...text) {
     params.push(gray(this.method), gray(this.url))
   }
   params.push(text.join(' '))
-  method.apply(console, params)
+  method.call(...params)
 }
