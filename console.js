@@ -1,6 +1,6 @@
 'use strict'
 
-let { log, error } = console
+const { log, error } = console
 
 module.exports = {
   log,
