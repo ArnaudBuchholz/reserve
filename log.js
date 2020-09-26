@@ -38,13 +38,17 @@ module.exports = (serve, verbose) => {
     .on('ready', ({ url }) => {
       log(yellow(`Server running at ${url}`))
     })
-    .on('error', logError)
     .on('redirected', onRedirected.bind(null, verbose))
   if (verbose) {
-    serve.on('incoming', onIncoming)
-    serve.on('aborted', onEvent.bind(null, 'ABORT'))
-    serve.on('closed', onEvent.bind(null, 'CLOSE'))
-    serve.on('redirecting', onRedirecting)
+    serve
+      .on('error', event => { logError(event, true) })
+      .on('incoming', onIncoming)
+      .on('aborted', onEvent.bind(null, 'ABORT'))
+      .on('closed', onEvent.bind(null, 'CLOSE'))
+      .on('redirecting', onRedirecting)
+  } else {
+    serve
+      .on('error', logError)
   }
   return serve
 }
