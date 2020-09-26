@@ -42,7 +42,7 @@ describe('log', () => {
       method: 'METHOD',
       url: 'URL',
       start: new Date(2020, 0, 1, 0, 0, 0, 0),
-      id: 3475
+      id: 3475 // hex is 0D93
     }
 
     it('logs \'redirected\'', () => {
@@ -60,6 +60,42 @@ describe('log', () => {
       assert(() => output[0].text.includes('200'))
       assert(() => output[0].text.includes('100'))
       assert(() => !output[0].text.includes('3475'))
+      assert(() => !output[0].text.includes('D93'))
+    })
+
+    it('logs \'redirected\' (no status code)', () => {
+      emitter.emit('redirected', {
+        ...request,
+        end: new Date(2020, 0, 1, 0, 0, 0, 100),
+        timeSpent: 100
+      })
+      const output = collect()
+      assert(() => output.length === 1)
+      assert(() => output[0].type === 'log')
+      assert(() => output[0].text.includes('METHOD'))
+      assert(() => output[0].text.includes('URL'))
+      assert(() => output[0].text.includes('N/A'))
+      assert(() => output[0].text.includes('100'))
+      assert(() => !output[0].text.includes('3475'))
+      assert(() => !output[0].text.includes('D93'))
+    })
+
+    it('logs \'redirected\' (error status code)', () => {
+      emitter.emit('redirected', {
+        ...request,
+        end: new Date(2020, 0, 1, 0, 0, 0, 100),
+        timeSpent: 100,
+        statusCode: 400
+      })
+      const output = collect()
+      assert(() => output.length === 1)
+      assert(() => output[0].type === 'log')
+      assert(() => output[0].text.includes('METHOD'))
+      assert(() => output[0].text.includes('URL'))
+      assert(() => output[0].text.includes('400'))
+      assert(() => output[0].text.includes('100'))
+      assert(() => !output[0].text.includes('3475'))
+      assert(() => !output[0].text.includes('D93'))
     })
 
     it('logs \'error\'', () => {
@@ -73,6 +109,7 @@ describe('log', () => {
       assert(() => output[0].text.includes('URL'))
       assert(() => output[0].text.includes('REASON'))
       assert(() => !output[0].text.includes('3475'))
+      assert(() => !output[0].text.includes('D93'))
     })
   })
 
@@ -144,6 +181,44 @@ describe('log', () => {
       assert(() => output[0].text.includes('REDIRECT'))
     })
 
+    /* istanbul ignore next */ // Won't be triggered
+    function REDIRECT () {}
+
+    it('logs \'redirecting\' (redirect function)', () => {
+      emitter.emit('redirecting', {
+        ...request,
+        type: 'HANDLER',
+        redirect: REDIRECT
+      })
+      const output = collect()
+      assert(() => output.length === 1)
+      assert(() => output[0].type === 'log')
+      assert(() => !output[0].text.includes('METHOD'))
+      assert(() => !output[0].text.includes('URL'))
+      assert(() => output[0].text.includes('0D93'))
+      assert(() => output[0].text.includes('HANDLER'))
+      assert(() => output[0].text.includes('REDIRECT'))
+    })
+
+    /* istanbul ignore next */ // Won't be triggered
+    const unnamed = (function () { return () => {} }())
+
+    it('logs \'redirecting\' (redirect anonymous function)', () => {
+      emitter.emit('redirecting', {
+        ...request,
+        type: 'HANDLER',
+        redirect: unnamed
+      })
+      const output = collect()
+      assert(() => output.length === 1)
+      assert(() => output[0].type === 'log')
+      assert(() => !output[0].text.includes('METHOD'))
+      assert(() => !output[0].text.includes('URL'))
+      assert(() => output[0].text.includes('0D93'))
+      assert(() => output[0].text.includes('HANDLER'))
+      assert(() => output[0].text.includes('anonymous'))
+    })
+
     it('logs \'redirected\'', () => {
       emitter.emit('redirected', {
         ...request,
@@ -173,6 +248,26 @@ describe('log', () => {
       assert(() => !output[0].text.includes('URL'))
       assert(() => output[0].text.includes('0D93'))
       assert(() => output[0].text.includes('REASON'))
+    })
+
+    it('logs \'aborted\'', () => {
+      emitter.emit('aborted', request)
+      const output = collect()
+      assert(() => output.length === 1)
+      assert(() => output[0].type === 'log')
+      assert(() => !output[0].text.includes('METHOD'))
+      assert(() => !output[0].text.includes('URL'))
+      assert(() => output[0].text.includes('0D93'))
+    })
+
+    it('logs \'closed\'', () => {
+      emitter.emit('closed', request)
+      const output = collect()
+      assert(() => output.length === 1)
+      assert(() => output[0].type === 'log')
+      assert(() => !output[0].text.includes('METHOD'))
+      assert(() => !output[0].text.includes('URL'))
+      assert(() => output[0].text.includes('0D93'))
     })
   })
 })
