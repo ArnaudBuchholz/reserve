@@ -41,14 +41,14 @@ describe('log', () => {
     const request = {
       method: 'METHOD',
       url: 'URL',
-      start: new Date(2020,0,1,0,0,0,0),
+      start: new Date(2020, 0, 1, 0, 0, 0, 0),
       id: 3475
     }
 
     it('logs \'redirected\'', () => {
       emitter.emit('redirected', {
         ...request,
-        end: new Date(2020,0,1,0,0,0,100),
+        end: new Date(2020, 0, 1, 0, 0, 0, 100),
         timeSpent: 100,
         statusCode: 200
       })
@@ -101,7 +101,7 @@ describe('log', () => {
     const request = {
       method: 'METHOD',
       url: 'URL',
-      start: new Date(2020,0,1,0,0,0,0),
+      start: new Date(2020, 0, 1, 0, 0, 0, 0),
       id: 3475 // hex is 0D93
     }
 
@@ -147,7 +147,7 @@ describe('log', () => {
     it('logs \'redirected\'', () => {
       emitter.emit('redirected', {
         ...request,
-        end: new Date(2020,0,1,0,0,0,100),
+        end: new Date(2020, 0, 1, 0, 0, 0, 100),
         timeSpent: 100,
         statusCode: 200
       })
