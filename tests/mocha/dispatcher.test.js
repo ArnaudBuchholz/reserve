@@ -5,7 +5,7 @@ const mime = require('../../detect/mime')
 const EventEmitter = require('events')
 const Request = require('../../mock/Request')
 const Response = require('../../mock/Response')
-const { check, mock, log } = require('../../index')
+const { check } = require('../../index')
 const dispatcher = require('../../dispatcher')
 
 const textMimeType = mime.getType('text')
@@ -195,14 +195,14 @@ describe('dispatcher', () => {
   })
 
   describe('method matching', () => {
-    it('matches the mapping method', () => dispatch({ request: { method: 'INFO' , url: '/file.txt' } })
+    it('matches the mapping method', () => dispatch({ request: { method: 'INFO', url: '/file.txt' } })
       .then(({ emitter, response }) => {
         assert(() => !emitter.hasError)
         assert(() => response.statusCode === 405)
       })
     )
 
-    it('matches the handler method (no matching)', () => dispatch({ request: { method: 'POST' , url: '/file.txt' } })
+    it('matches the handler method (no matching)', () => dispatch({ request: { method: 'POST', url: '/file.txt' } })
       .then(({ emitter, response }) => {
         assert(() => emitter.hasError)
         assert(() => response.statusCode === 501)
@@ -256,22 +256,22 @@ describe('dispatcher', () => {
     })
 
     describe('No handler for the request', () => {
-      it('fails with error 501',  () => dispatch({ request: '/unhandled' })
+      it('fails with error 501', () => dispatch({ request: '/unhandled' })
         .then(({ emitter, response }) => {
           assert(() => emitter.hasError)
           assert(() => response.statusCode === 501)
         })
       )
 
-      it('logs error 501',  () => dispatch({ request: '/unhandled' })
+      it('logs error 501', () => dispatch({ request: '/unhandled' })
         .then(({ emitter, response }) => {
-          const [incoming, redirecting, error] = emitter.emitted
+          const [,, error] = emitter.emitted
           assert(() => error.eventName === 'error')
           assert(() => error.parameters.method === 'GET')
           assert(() => error.parameters.url === '/unhandled')
           assert(() => typeof error.parameters.id === 'number')
           assert(() => error.parameters.reason === 501)
-          })
+        })
       )
     })
 
@@ -310,38 +310,50 @@ describe('dispatcher', () => {
     })
 
     describe('listeners', () => {
-      it('fails the request if the \'incoming\' listener fails', () => dispatch({ request: '/file.txt', events: {
-        error: absorbError,
-        incoming: () => { throw new Error('FAIL') }
-      }})
+      it('fails the request if the \'incoming\' listener fails', () => dispatch({
+        request: '/file.txt',
+        events: {
+          error: absorbError,
+          incoming: () => { throw new Error('FAIL') }
+        }
+      })
         .then(({ emitter, response }) => {
           assert(() => emitter.hasError)
           assert(() => response.statusCode === 500)
         })
       )
 
-      it('fails the request if the \'redirecting\' listener fails', () => dispatch({ request: '/file.txt', events: {
-        error: absorbError,
-        redirecting: () => { throw new Error('FAIL') }
-      }})
+      it('fails the request if the \'redirecting\' listener fails', () => dispatch({
+        request: '/file.txt',
+        events: {
+          error: absorbError,
+          redirecting: () => { throw new Error('FAIL') }
+        }
+      })
         .then(({ emitter, response }) => {
           assert(() => emitter.hasError)
           assert(() => response.statusCode === undefined) // Because it never completes the request
         })
       )
 
-      it('does not fail the request if the \'error\' listener fails', () => dispatch({ request: '/fail', events: {
-        error: () => { throw new Error('FAIL') }
-      }})
+      it('does not fail the request if the \'error\' listener fails', () => dispatch({
+        request: '/fail',
+        events: {
+          error: () => { throw new Error('FAIL') }
+        }
+      })
         .then(({ emitter, response }) => {
           assert(() => response.statusCode === 500)
         })
       )
 
-      it('does not fail the request if the \'redirected\' listener fails',  () => dispatch({ request: '/file.txt', events: {
-        error: absorbError,
-        redirected: () => { throw new Error('FAIL') }
-      }})
+      it('does not fail the request if the \'redirected\' listener fails', () => dispatch({
+        request: '/file.txt',
+        events: {
+          error: absorbError,
+          redirected: () => { throw new Error('FAIL') }
+        }
+      })
         .then(({ emitter, response }) => {
           assert(() => emitter.hasError)
           assert(() => response.statusCode === 200)
