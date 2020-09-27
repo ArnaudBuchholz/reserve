@@ -124,7 +124,7 @@ describe('configuration', () => {
         it(`validates match (${JSON.stringify(invalidMatch)})`, () => shouldFail(check({
           mappings: [{
             match: invalidMatch,
-            invalid: '$1'
+            file: '$1'
           }]
         })))
       })
@@ -132,14 +132,59 @@ describe('configuration', () => {
       it('validates match (function)', () => shouldFail(check({
         mappings: [{
           match: shouldFail,
-          invalid: '$1'
+          file: '$1'
         }]
       })))
 
       it('validates match (Symbol)', () => shouldFail(check({
         mappings: [{
           match: Symbol('test'),
-          invalid: '$1'
+          file: '$1'
+        }]
+      })))
+
+      it('validates invert-match', () => check({
+        mappings: [{
+          match: '^/',
+          'invert-match': true,
+          file: '$1'
+        }]
+      })
+        .then(configuration => {
+          assert(() => configuration.mappings[0]['invert-match'] === true)
+        })
+      )
+
+      const invalidInvertMatches = [
+        false,
+        0,
+        1,
+        {}
+      ]
+
+      invalidInvertMatches.forEach(invalidInvertMatch => {
+        it(`validates invert-match (${JSON.stringify(invalidInvertMatch)})`, () => shouldFail(check({
+          mappings: [{
+            match: '^/',
+            'invert-match': invalidInvertMatch,
+            file: '$1'
+          }]
+        })))
+      })
+
+      it('validates invert-match (function)', () => shouldFail(check({
+        mappings: [{
+          match: '^/',
+          'invert-match': shouldFail,
+          file: '$1'
+        }]
+      })))
+
+      it('validates invert-match (Symbol)', () => shouldFail(check({
+        mappings: [{
+          match: '^/',
+          'invert-match': Symbol('test'),
+          file: '$1'
         }]
       })))
     })
