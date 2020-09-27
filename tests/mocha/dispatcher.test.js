@@ -18,6 +18,10 @@ const defaultConfigurationPromise = check({
     }
   },
   mappings: [{
+    method: 'GET,INFO,POST',
+    'invert-match': true,
+    status: 405
+  }, {
     method: 'INFO',
     custom: async function redirect () {
       return 405
@@ -49,6 +53,12 @@ const defaultConfigurationPromise = check({
     match: '(.*)',
     custom: async function setXFlag (request, response) {
       response.setHeader('x-flag', 'true')
+    }
+  }, {
+    match: '/file.txt',
+    'invert-match': true,
+    custom: async function setXNotFile (request, response) {
+      response.setHeader('x-not-file', 'true')
     }
   }, {
     match: '/subst/(.*)/(.*)',
@@ -210,6 +220,29 @@ describe('dispatcher', () => {
     )
   })
 
+  describe('invert-match', () => {
+    it('protects against unwanted verbs', () => dispatch({ request: { method: 'PUT', url: '/file.txt' } })
+      .then(({ emitter, response }) => {
+        assert(() => !emitter.hasError)
+        assert(() => response.statusCode === 405)
+      })
+    )
+
+    it('enables all but matching', () => dispatch({ request: { method: 'GET', url: '/file2.txt' } })
+      .then(({ emitter, response }) => {
+        assert(() => response.headers['x-not-file'] === 'true')
+        assert(() => response.statusCode === 501)
+      })
+    )
+
+    it('enables all but matching (not matching)', () => dispatch({ request: { method: 'GET', url: '/file.txt' } })
+      .then(({ emitter, response }) => {
+        assert(() => response.headers['x-not-file'] === undefined)
+        assert(() => response.statusCode === 200)
+      })
+    )
+  })
+
   describe('handlers', () => {
     it('redirects a request to the right handler', () => dispatch({ request: '/file.txt' })
       .then(({ emitter, response }) => {
@@ -265,8 +298,7 @@ describe('dispatcher', () => {
 
       it('logs error 501', () => dispatch({ request: '/unhandled' })
         .then(({ emitter, response }) => {
-          const [,, error] = emitter.emitted
-          assert(() => error.eventName === 'error')
+          const error = emitter.emitted.filter(event => event.eventName === 'error')[0]
           assert(() => error.parameters.method === 'GET')
           assert(() => error.parameters.url === '/unhandled')
           assert(() => typeof error.parameters.id === 'number')
