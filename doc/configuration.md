@@ -59,6 +59,7 @@ An array of mappings that is evaluated in the order of declaration.
 Each mapping must contain :
 * `match` *(optional)* : a string (converted to a regular expression) or a regular expression that will be applied to the [request URL](https://nodejs.org/api/http.html#http_message_url), defaulted to `"(.*)"`
 * `method` *(optional)* : a comma separated string or an array of [HTTP verbs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) that is matched with the [request method](https://nodejs.org/api/http.html#http_message_method), defaulted to `undefined` *(meaning all methods are allowed)*.
+* `invert-match` *(optional)* : inverts the matching process when set to `true` *(only allowed value)*. It enables the implementation of an *'all but'* pattern. A typical use forbids unexpected verbs by creating an inverted match on the list of supported verbs.
 * the handler prefix (`custom`, `file`, `status`, `url`, `use` ...) which value may contain capturing groups *(see [Custom handlers](#custom-handlers))*
 * `cwd` *(optional)* : the current working directory to consider for relative path, defaulted to the configuration file directory or the current working directory (when embedding)
 
