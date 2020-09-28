@@ -41,6 +41,10 @@ Example :
 | `case-sensitive` | Boolean | `false` | *(for Windows)* when `true`, the file path is tested case sensitively. Since it has an impact on **performances**, use carefully. |
 | `ignore-if-not-found` | Boolean | `false` | If the mapping does not resolve to a file or a folder, the handler does not end the request with status `404`. |
 | `custom-file-system` | String or Object | undefined | Provides custom file system API *(see below)*. |
+| `caching-strategy` | `'modified'` or Number | 0 | Indicates caching strategy:  |
+|||| `'modified'`: use file last modification date, meaning the response header will contain [`Last-Modified`](https://developer.mozilla.org/fr/docs/Web/HTTP/Headers/Last-Modified) and the handler reacts to request header [`If-Modified-Since`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Modified-Since) |
+|||| any number: hard coded duration (in seconds), based on the response header [`Cache-Control` with `max-age`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) |
+|||| 0 *(default)*: no caching is applied` |
 
 ## Custom File System
 
@@ -63,6 +67,7 @@ This is the asynchronous equivalent of [fs.stat](https://nodejs.org/api/fs.html#
 It must return an object equivalent to [fs.Stats](https://nodejs.org/api/fs.html#fs_class_fs_stats) but **limited** to :
 * [`isDirectory()`](https://nodejs.org/api/fs.html#fs_stats_isdirectory)
 * [`size`](https://nodejs.org/api/fs.html#fs_stats_size)
+* [`mtime`](https://nodejs.org/api/fs.html#fs_stats_mtime)
 
 ### *mandatory* async createReadStream (filePath, options)
 
