@@ -19,9 +19,10 @@ Example :
 
 | option | type | default | description |
 |---|---|---|---|
-| `unsecure-cookies` | Boolean | `false` | when `true`, the secured cookies are converted to unsecure ones. Hence, the browser will keep them even if not running on https |
+| `unsecure-cookies` | Boolean | `false` | when `true`, the secured cookies are converted to unsecure ones. Hence, the browser will keep them even if not running on https. |
 | `forward-request` | String or Function | - | when specified, the function is called **before** generating the forward request. The expected signature is  `function ({ configuration, context, mapping, match, request: { method, url, headers }, incoming })`. Changing the request settings will **impact** the forward request.
 | `forward-response` | String or Function | - | when specified, the function is called **after** sending the forward request but **before** writing the current request's response. The expected signature is `function ({ configuration, context, mapping, match, headers })`. Changing the headers will directly impact the current request's response.
+| `ignore-unverifiable-certificate` | Boolean | `false` | when `true`, the request does not fail when contacting a server which SSL certificate can not be verified. |
 
 **NOTE** : When a string is used for `forward-request` or `forward-response`, the corresponding function is loaded with [require](https://nodejs.org/api/modules.html#modules_require_id).
 
