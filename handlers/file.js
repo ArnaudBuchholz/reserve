@@ -10,6 +10,7 @@ const defaultMimeType = mime.getType('bin')
 const cfs = 'custom-file-system'
 const matchcase = 'case-sensitive'
 const i404 = 'ignore-if-not-found'
+const cache = 'caching-strategy'
 
 const nodeFs = {
   stat: promisify(fs.stat),
@@ -35,14 +36,34 @@ function processBytesRange (request, size) {
   return { status: 200, contentLength: size }
 }
 
-function sendFile ({ request, response, fs, filePath }, { size }) {
+/*
+function processCache (request, cachingStrategy, mtime) {
+  if (cachingStrategy === 'modified') {
+    return {
+      'Last-Modified': mtime
+    }
+  }
+  if (cachingStrategy > 0) {
+    return {
+      'Cache-Control': `public, max-age=${cachingStrategy}, immutable`
+    }
+  }
+  return {
+    'Cache-Control': 'no-store'
+  }
+}
+*/
+
+function sendFile ({ mapping, request, response, fs, filePath }, { mtime, size }) {
   return new Promise((resolve, reject) => {
     const { start, end, rangeHeader, status, contentLength } = processBytesRange(request, size)
+    // const { cacheHeader } = processCache(request, mapping[cache], mtime)
     response.writeHead(status, {
       'Content-Type': mime.getType(path.extname(filePath)) || defaultMimeType,
       'Content-Length': contentLength,
       'Accept-Ranges': 'bytes',
       ...rangeHeader
+      // ,...cacheHeader
     })
     if (request.method === 'HEAD' || contentLength === 0 || request.aborted) {
       response.end()
@@ -98,6 +119,10 @@ module.exports = {
     [i404]: {
       type: 'boolean',
       defaultValue: false
+    },
+    [cache]: {
+      types: ['string', 'number'],
+      defaultValue: 0
     }
   },
   method: 'GET,HEAD',
@@ -112,6 +137,10 @@ module.exports = {
     const invalids = apis.filter(name => typeof mapping[cfs][name] !== 'function')
     if (invalids.length) {
       throw new Error(`Invalid custom-file-system specification (${invalids.join(', ')})`)
+    }
+    const cachingStrategy = mapping[cache]
+    if (typeof cachingStrategy === 'string' && cachingStrategy !== 'modified') {
+      throw new Error('Invalid caching-strategy name')
     }
   },
   redirect: ({ request, mapping, redirect, response }) => {
