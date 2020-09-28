@@ -39,11 +39,14 @@ describe('handlers/url', () => {
   it('pipes URL content (https)', () => handle({
     request: {
       method: 'POST',
-      url: http.urls.echo,
+      url: http.urls.echos,
       headers: {
         'x-status-code': 200
       },
       body: 'Hello World!'
+    },
+    mapping: {
+      'ignore-unverifiable-certificate': true // No real way to validate here (but for coverage)
     }
   })
     .then(({ promise, response }) => promise.then(value => {
