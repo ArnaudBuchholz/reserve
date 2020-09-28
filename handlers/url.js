@@ -3,6 +3,11 @@
 const http = require('http')
 const https = require('https')
 
+const uncook = 'unsecure-cookies'
+const fwdreq = 'forward-request'
+const fwdres = 'forward-response'
+const icert = 'ignore-unverifiable-certificate'
+
 function protocol (url) {
   if (url.startsWith('https')) {
     return https
@@ -11,11 +16,11 @@ function protocol (url) {
 }
 
 function unsecureCookies (headers) {
-  ['Set-Cookie', 'set-cookie'].forEach(name => {
-    if (headers[name]) {
+  Object.keys(headers)
+    .filter(name => name.toLowerCase() === 'set-cookie')
+    .forEach(name => {
       headers[name] = headers[name].map(cookie => cookie.replace(/\s*secure;/i, ''))
-    }
-  })
+    })
 }
 
 function noop () {}
@@ -28,22 +33,26 @@ function validateHook (mapping, hookName) {
 
 module.exports = {
   schema: {
-    'unsecure-cookies': {
+    [uncook]: {
       type: 'boolean',
       defaultValue: false
     },
-    'forward-request': {
+    [fwdreq]: {
       types: ['function', 'string'],
       defaultValue: noop
     },
-    'forward-response': {
+    [fwdres]: {
       types: ['function', 'string'],
       defaultValue: noop
+    },
+    [icert]: {
+      type: 'boolean',
+      defaultValue: false
     }
   },
   validate: async mapping => {
-    validateHook(mapping, 'forward-request')
-    validateHook(mapping, 'forward-response')
+    validateHook(mapping, fwdreq)
+    validateHook(mapping, fwdres)
   },
   redirect: async ({ configuration, mapping, match, redirect: url, request, response }) => {
     let done
@@ -59,14 +68,17 @@ module.exports = {
       url,
       headers
     }
+    if (mapping[icert]) {
+      options.rejectUnauthorized = false
+    }
     const context = {}
-    await mapping['forward-request']({ configuration, context, mapping, match, request: options, incoming: request })
+    await mapping[fwdreq]({ configuration, context, mapping, match, request: options, incoming: request })
     const redirectedRequest = protocol(options.url).request(options.url, options, async redirectedResponse => {
-      if (mapping['unsecure-cookies']) {
+      if (mapping[uncook]) {
         unsecureCookies(redirectedResponse.headers)
       }
       const { headers: responseHeaders } = redirectedResponse
-      await mapping['forward-response']({ configuration, context, mapping, match, headers: responseHeaders })
+      await mapping[fwdres]({ configuration, context, mapping, match, headers: responseHeaders })
       response.writeHead(redirectedResponse.statusCode, responseHeaders)
       response.on('finish', done)
       redirectedResponse
