@@ -49,3 +49,4 @@
 ||**file** handler supports [`Range` HTTP header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range)|
 ||If an exception occurs during the handling of the `redirected` event, it is now logged *(was previously ignored)*|
 ||Introduces `invert-match` on mappings|
+||Adds `ignore-unverifiable-certificate` option for the `url` handler|
