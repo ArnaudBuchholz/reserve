@@ -4,6 +4,7 @@ const fs = require('fs')
 const { promisify } = require('util')
 const mime = require('../detect/mime')
 const path = require('path')
+const { format: formatLastModified } = require('../lastModified')
 
 const defaultMimeType = mime.getType('bin')
 
@@ -18,9 +19,26 @@ const nodeFs = {
   createReadStream: (path, options) => Promise.resolve(fs.createReadStream(path, options))
 }
 
-function processBytesRange (request, size) {
+function processCache (request, cachingStrategy, { mtime }) {
+  if (cachingStrategy === 'modified') {
+    const lastModified = formatLastModified(mtime)
+    const modifiedSince = request.headers['if-modified-since']
+    let status
+    if (modifiedSince && lastModified === modifiedSince) {
+      status = 304
+    }
+    return { header: { 'Last-Modified': lastModified }, status }
+  }
+  if (cachingStrategy > 0) {
+    return { header: { 'Cache-Control': `public, max-age=${cachingStrategy}, immutable` } }
+  }
+  return { header: { 'Cache-Control': 'no-store' } }
+}
+
+function processBytesRange (request, { mtime, size }) {
   const bytesRange = /bytes=(\d+)-(\d+)?(,)?/.exec(request.headers.range)
-  if (bytesRange && !bytesRange[3]) { // Multipart not supported
+  const ifRange = request.headers['if-range']
+  if ((!ifRange || ifRange === formatLastModified(mtime)) && bytesRange && !bytesRange[3] /* Multipart not supported */) {
     const start = parseInt(bytesRange[1], 10)
     let end
     if (bytesRange[2]) {
@@ -31,41 +49,24 @@ function processBytesRange (request, size) {
     if (start > end || start >= size) {
       return { status: 416, contentLength: 0 }
     }
-    return { start, end, rangeHeader: { 'Content-Range': `bytes ${start}-${end}/${size}` }, status: 206, contentLength: end - start + 1 }
+    return { start, end, header: { 'Content-Range': `bytes ${start}-${end}/${size}` }, status: 206, contentLength: end - start + 1 }
   }
   return { status: 200, contentLength: size }
 }
 
-/*
-function processCache (request, cachingStrategy, mtime) {
-  if (cachingStrategy === 'modified') {
-    return {
-      'Last-Modified': mtime
-    }
-  }
-  if (cachingStrategy > 0) {
-    return {
-      'Cache-Control': `public, max-age=${cachingStrategy}, immutable`
-    }
-  }
-  return {
-    'Cache-Control': 'no-store'
-  }
-}
-*/
-
-function sendFile ({ mapping, request, response, fs, filePath }, { mtime, size }) {
+function sendFile ({ cachingStrategy, request, response, fs, filePath }, fileStat) {
   return new Promise((resolve, reject) => {
-    const { start, end, rangeHeader, status, contentLength } = processBytesRange(request, size)
-    // const { cacheHeader } = processCache(request, mapping[cache], mtime)
+    const { header: cacheHeader, status: cacheStatus } = processCache(request, cachingStrategy, fileStat)
+    const { start, end, header: rangeHeader, status: rangeStatus, contentLength } = processBytesRange(request, fileStat)
+    const status = cacheStatus || rangeStatus
     response.writeHead(status, {
       'Content-Type': mime.getType(path.extname(filePath)) || defaultMimeType,
       'Content-Length': contentLength,
       'Accept-Ranges': 'bytes',
-      ...rangeHeader
-      // ,...cacheHeader
+      ...rangeHeader,
+      ...cacheHeader
     })
-    if (request.method === 'HEAD' || contentLength === 0 || request.aborted) {
+    if (request.method === 'HEAD' || contentLength === 0 || request.aborted || status === 304) {
       response.end()
       resolve()
       return
@@ -155,6 +156,7 @@ module.exports = {
     const context = {
       request,
       response,
+      cachingStrategy: mapping[cache],
       fs: mapping[cfs],
       filePath
     }
