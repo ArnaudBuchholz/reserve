@@ -7,6 +7,9 @@ function assert (condition) {
   try {
     nativeAssert(condition(), message)
   } catch (e) {
+    if (e instanceof nativeAssert.AssertionError) {
+      throw e
+    }
     nativeAssert(false, message + '- EXCEPTION ' + e.toString())
   }
 }
