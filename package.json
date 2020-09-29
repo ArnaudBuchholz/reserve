@@ -76,6 +76,7 @@
     ]
   },
   "mocha": {
+    "diff": false,
     "spec": [
       "tests/mocha/*.test.js",
       "tests/mocha/**/*.test.js"
