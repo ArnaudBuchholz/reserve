@@ -4,7 +4,7 @@ const Request = require('../../../mock/Request')
 const Response = require('../../../mock/Response')
 const { check } = require('../../../mapping')
 
-module.exports = (handler, defaults = {}) => function test ({ request, mapping, configuration, match, redirect }) {
+module.exports = (handler, defaults = {}) => function ({ debug, request, mapping, configuration, match, redirect }) {
   if (typeof request === 'string') {
     request = { method: 'GET', url: request }
   }
