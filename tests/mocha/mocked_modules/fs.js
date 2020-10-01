@@ -4,9 +4,10 @@ const { join, sep } = require('path')
 const { readFileSync } = require('fs')
 const Readable = require('stream').Readable
 
-let fakeNow = 0
+let fakeNow = new Date().getTime()
 function fakeNowInMs () {
-  return ++fakeNow
+  fakeNow += 1000
+  return fakeNow
 }
 
 const entries = {
@@ -14,7 +15,8 @@ const entries = {
     content: 'binary'
   },
   'file.txt': {
-    content: 'Hello World!'
+    content: 'Hello World!',
+    mtimeMs: new Date(2020, 8, 30, 18, 51, 0, 0).getTime()
   },
   'file$1.txt': {
     content: '$1'
@@ -138,16 +140,20 @@ require('mock-require')('fs', {
   stat (entryPath, callback) {
     const entry = getEntry(entryPath)
     if (entry) {
+      const mtimeMs = entry.mtimeMs || fakeNowInMs()
+      const mtime = new Date(mtimeMs)
       if (entry.content) {
         callback(null, {
           isDirectory: () => false,
           size: entry.content.length,
-          mtimeMs: entry.mtimeMs || fakeNowInMs()
+          mtimeMs,
+          mtime
         })
       } else {
         callback(null, {
           isDirectory: () => true,
-          mtimeMs: entry.mtimeMs || fakeNowInMs()
+          mtimeMs,
+          mtime
         })
       }
     } else {
