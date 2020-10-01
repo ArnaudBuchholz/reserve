@@ -1,6 +1,7 @@
 'use strict'
 
 const { Readable } = require('stream')
+const headersFactory = require('./headers')
 
 module.exports = class Request extends Readable {
   _read () {
@@ -11,7 +12,7 @@ module.exports = class Request extends Readable {
   _fromObject ({ method, url, headers = {}, body = '', properties }) {
     this._method = method
     this._url = url
-    this._headers = headers
+    this._headers = headersFactory(headers)
     this._body = body
     if (properties) {
       Object.assign(this, properties)
