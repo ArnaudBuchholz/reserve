@@ -1,6 +1,7 @@
 'use strict'
 
 const { Duplex } = require('stream')
+const headersFactory = require('./headers')
 
 module.exports = class Response extends Duplex {
   _read () {
@@ -22,9 +23,11 @@ module.exports = class Response extends Duplex {
     this._headers[name] = value
   }
 
-  writeHead (statusCode, headers) {
+  writeHead (statusCode, headers = {}) {
     this._statusCode = statusCode
-    this._headers = { ...this._headers, ...headers }
+    Object.keys(headers).forEach(header => {
+      this._headers[header] = headers[header]
+    })
   }
 
   flushHeaders () {
@@ -39,7 +42,7 @@ module.exports = class Response extends Duplex {
   constructor (options) {
     super(options)
     this._buffer = []
-    this._headers = {}
+    this._headers = headersFactory()
     this._headersSent = false
     let resolver
     this._waitForFinish = new Promise(resolve => {
