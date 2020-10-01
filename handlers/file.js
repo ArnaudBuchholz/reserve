@@ -27,7 +27,7 @@ function processCache (request, cachingStrategy, { mtime }) {
     if (modifiedSince && lastModified === modifiedSince) {
       status = 304
     }
-    return { header: { 'last-modified': lastModified }, status }
+    return { header: { 'cache-control': 'no-cache', 'last-modified': lastModified }, status }
   }
   if (cachingStrategy > 0) {
     return { header: { 'cache-control': `public, max-age=${cachingStrategy}, immutable` } }
