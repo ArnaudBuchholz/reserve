@@ -50,3 +50,4 @@
 ||If an exception occurs during the handling of the `redirected` event, it is now logged *(was previously ignored)*|
 ||Introduces `invert-match` on mappings|
 ||Adds `ignore-unverifiable-certificate` option for the `url` handler|
+||Headers in mocked `Request` and `Response` are handled case insensitively|
