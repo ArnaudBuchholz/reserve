@@ -605,6 +605,18 @@ describe('handlers/file', () => {
   describe('caching-strategy', () => {
     const verbs = 'HEAD,GET'.split(',')
 
+    describe('Configuration validation', () => {
+      handle({
+        request: './file.txt',
+        mapping: {
+          'caching-strategy': 'unknown'
+        }
+      })
+        .then(assert.notExpected, reason => {
+          assert(reason.toString().includes('Invalid caching-strategy name'))
+        })
+    })
+
     describe('0 - default no caching', () => {
       verbs.forEach(verb => it(`returns proper caching information (${verb})`, () => handle({
         request: {
