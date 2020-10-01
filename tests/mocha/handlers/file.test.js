@@ -539,7 +539,6 @@ describe('handlers/file', () => {
         })
       }))
       .then(({ promise, response }) => promise.then(value => {
-        console.log(value)
         assert(() => value === undefined)
         assert(() => response.statusCode === 200)
         assert(() => response.headers['Content-Type'] === textMimeType)
@@ -600,6 +599,119 @@ describe('handlers/file', () => {
               assert(() => response.toString() === '')
             })
         })
+    })
+  })
+
+  describe('caching-strategy', () => {
+    const verbs = 'HEAD,GET'.split(',')
+
+    describe('0 - default no caching', () => {
+      verbs.forEach(verb => it(`returns proper caching information (${verb})`, () => handle({
+        request: {
+          method: verb,
+          url: './file.txt'
+        },
+        mapping: {
+          'caching-strategy': 0
+        }
+      })
+        .then(({ promise, response }) => promise.then(value => {
+          assert(() => value === undefined)
+          assert(() => response.statusCode === 200)
+          assert(() => response.headers['Cache-Control'] === 'no-store')
+          assert(() => response.headers['Content-Type'] === textMimeType)
+          assert(() => response.headers['Content-Length'] === 12)
+        }))
+      ))
+    })
+
+    describe('Any number - max-age', () => {
+      verbs.forEach(verb => it(`returns proper caching information (${verb})`, () => handle({
+        request: {
+          method: verb,
+          url: './file.txt'
+        },
+        mapping: {
+          'caching-strategy': 3475
+        }
+      })
+        .then(({ promise, response }) => promise.then(value => {
+          assert(() => value === undefined)
+          assert(() => response.statusCode === 200)
+          assert(() => response.headers['Cache-Control'] === 'public, max-age=3475, immutable')
+          assert(() => response.headers['Content-Type'] === textMimeType)
+          assert(() => response.headers['Content-Length'] === 12)
+        }))
+      ))
+    })
+
+    describe('"modified" - last-modified', () => {
+      verbs.forEach(verb => it(`returns proper caching information (${verb})`, () => handle({
+        request: {
+          method: verb,
+          url: './file.txt'
+        },
+        mapping: {
+          'caching-strategy': 'modified'
+        }
+      })
+        .then(({ promise, response }) => promise.then(value => {
+          assert(() => value === undefined)
+          assert(() => response.statusCode === 200)
+          assert(() => response.headers['Cache-Control'] === 'no-cache')
+          assert(() => response.headers['Last-Modified'] === 'Wed, 30 Sep 2020 18:51:00 GMT')
+          assert(() => response.headers['Content-Type'] === textMimeType)
+          assert(() => response.headers['Content-Length'] === 12)
+        }))
+      ))
+
+      verbs.forEach(verb => it(`does not stream the file back if not modified (${verb})`, () => handle({
+        request: {
+          method: verb,
+          url: './file.txt',
+          headers: {
+            'if-modified-since': 'Wed, 30 Sep 2020 18:51:00 GMT'
+          }
+        },
+        mapping: {
+          'caching-strategy': 'modified'
+        }
+      })
+        .then(({ promise, response }) => promise.then(value => {
+          assert(() => value === undefined)
+          assert(() => response.statusCode === 304)
+          assert(() => response.headers['Cache-Control'] === 'no-cache')
+          assert(() => response.headers['Last-Modified'] === 'Wed, 30 Sep 2020 18:51:00 GMT')
+          assert(() => response.headers['Content-Type'] === textMimeType)
+          assert(() => response.headers['Content-Length'] === 12)
+          assert(() => response.toString() === '')
+        }))
+      ))
+
+      verbs.forEach(verb => it(`streams the file back if modified (${verb})`, () => handle({
+        request: {
+          method: verb,
+          url: './file.txt',
+          headers: {
+            'if-modified-since': 'Wed, 30 Sep 2020 18:50:00 GMT'
+          }
+        },
+        mapping: {
+          'caching-strategy': 'modified'
+        }
+      })
+        .then(({ promise, response }) => promise.then(value => {
+          assert(() => value === undefined)
+          assert(() => response.statusCode === 200)
+          assert(() => response.headers['Cache-Control'] === 'no-cache')
+          assert(() => response.headers['Last-Modified'] === 'Wed, 30 Sep 2020 18:51:00 GMT')
+          assert(() => response.headers['Content-Type'] === textMimeType)
+          assert(() => response.headers['Content-Length'] === 12)
+          if (verb === 'GET') {
+            assert(() => response.toString() === 'Hello World!')
+          }
+        }))
+      ))
     })
   })
 })
