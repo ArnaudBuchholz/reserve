@@ -30,6 +30,8 @@ The method returns a promise resolving to a mocked response exposing the followi
 | **finished** | Boolean | `true`
 | **toString()** | String | Gives the response body
 
+**NOTE** : headers are managed **case insensitively** in both `Request` and `Response`.
+
 Example :
 
 ```javascript
