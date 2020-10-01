@@ -16,7 +16,7 @@ const entries = {
   },
   'file.txt': {
     content: 'Hello World!',
-    mtimeMs: new Date(2020, 8, 30, 18, 51, 0, 0).getTime()
+    mtimeMs: new Date(Date.UTC(2020, 8, 30, 18, 51, 0, 0)).getTime()
   },
   'file$1.txt': {
     content: '$1'
