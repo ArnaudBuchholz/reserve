@@ -16,11 +16,10 @@ function protocol (url) {
 }
 
 function unsecureCookies (headers) {
-  Object.keys(headers)
-    .filter(name => name.toLowerCase() === 'set-cookie')
-    .forEach(name => {
-      headers[name] = headers[name].map(cookie => cookie.replace(/\s*secure;/i, ''))
-    })
+  const setCookie = headers['set-cookie']
+  if (setCookie) {
+    headers['set-cookie'] = setCookie.map(cookie => cookie.replace(/\s*secure;/i, ''))
+  }
 }
 
 function noop () {}
