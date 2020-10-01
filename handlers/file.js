@@ -27,12 +27,12 @@ function processCache (request, cachingStrategy, { mtime }) {
     if (modifiedSince && lastModified === modifiedSince) {
       status = 304
     }
-    return { header: { 'Last-Modified': lastModified }, status }
+    return { header: { 'last-modified': lastModified }, status }
   }
   if (cachingStrategy > 0) {
-    return { header: { 'Cache-Control': `public, max-age=${cachingStrategy}, immutable` } }
+    return { header: { 'cache-control': `public, max-age=${cachingStrategy}, immutable` } }
   }
-  return { header: { 'Cache-Control': 'no-store' } }
+  return { header: { 'cache-control': 'no-store' } }
 }
 
 function processBytesRange (request, { mtime, size }) {
@@ -49,7 +49,7 @@ function processBytesRange (request, { mtime, size }) {
     if (start > end || start >= size) {
       return { status: 416, contentLength: 0 }
     }
-    return { start, end, header: { 'Content-Range': `bytes ${start}-${end}/${size}` }, status: 206, contentLength: end - start + 1 }
+    return { start, end, header: { 'content-range': `bytes ${start}-${end}/${size}` }, status: 206, contentLength: end - start + 1 }
   }
   return { status: 200, contentLength: size }
 }
@@ -60,9 +60,9 @@ function sendFile ({ cachingStrategy, request, response, fs, filePath }, fileSta
     const { start, end, header: rangeHeader, status: rangeStatus, contentLength } = processBytesRange(request, fileStat)
     const status = cacheStatus || rangeStatus
     response.writeHead(status, {
-      'Content-Type': mime.getType(path.extname(filePath)) || defaultMimeType,
-      'Content-Length': contentLength,
-      'Accept-Ranges': 'bytes',
+      'content-type': mime.getType(path.extname(filePath)) || defaultMimeType,
+      'content-length': contentLength,
+      'accept-ranges': 'bytes',
       ...rangeHeader,
       ...cacheHeader
     })
