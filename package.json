@@ -6,8 +6,7 @@
   "files": [
     "handlers/*.js",
     "detect/*.js",
-    "mock/Request.js",
-    "mock/Response.js",
+    "mock/*.js",
     "*.js"
   ],
   "bin": {
