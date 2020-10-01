@@ -76,6 +76,25 @@ describe('handlers/url', () => {
     }))
   )
 
+  it('unsecures cookies (no cookies)', () => handle({
+    request: {
+      method: 'GET',
+      url: http.urls.echos,
+      headers: {
+        'x-status-code': 200
+      }
+    },
+    mapping: {
+      'unsecure-cookies': true
+    }
+  })
+    .then(({ promise, response }) => promise.then(value => {
+      assert(() => value === undefined)
+      assert(() => response.statusCode === 200)
+      assert(() => !response.headers['Set-Cookie'])
+    }))
+  )
+
   const uid = Symbol('uid')
 
   it('manipulates request details (forward-request)', () => handle({
