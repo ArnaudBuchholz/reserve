@@ -26,8 +26,8 @@ module.exports = {
     const length = content.length
     const headers = mapping ? mapping.headers : undefined
     response.writeHead(statusCode, {
-      'Content-Type': textMimeType,
-      'Content-Length': length,
+      'content-type': textMimeType,
+      'content-length': length,
       ...interpolate(match, headers)
     })
     response.end(content)
