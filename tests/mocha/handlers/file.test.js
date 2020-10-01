@@ -465,6 +465,89 @@ describe('handlers/file', () => {
         assert(() => response.toString() === '')
       }))
     )
+
+    it('supports \'modified\' caching strategy and \'If-Range\' (matching)', () => handle({
+      request: {
+        method: 'HEAD',
+        url: './file.txt',
+        headers: {
+          range: 'bytes=6-'
+        }
+      },
+      mapping: {
+        'caching-strategy': 'modified'
+      }
+    })
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 206)
+        const lastModified = response.headers['Last-Modified']
+        assert(() => !!lastModified)
+        return handle({
+          request: {
+            method: 'GET',
+            url: './file.txt',
+            headers: {
+              range: 'bytes=6-',
+              'If-Range': lastModified
+            }
+          },
+          mapping: {
+            'caching-strategy': 'modified'
+          }
+        })
+      }))
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 206)
+        assert(() => response.headers['Content-Type'] === textMimeType)
+        assert(() => response.headers['Content-Range'] === 'bytes 6-11/12')
+        assert(() => response.headers['Content-Length'] === 6)
+        assert(() => response.toString() === 'World!')
+      }))
+    )
+
+    it('supports \'modified\' caching strategy and \'If-Range\' (not matching)', () => handle({
+      request: {
+        method: 'HEAD',
+        url: './lorem ipsum.txt',
+        headers: {
+          range: 'bytes=6-'
+        }
+      },
+      mapping: {
+        'caching-strategy': 'modified'
+      }
+    })
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 206)
+        const lastModified = response.headers['Last-Modified']
+        assert(() => !!lastModified)
+        return handle({
+          request: {
+            method: 'GET',
+            url: './lorem ipsum.txt',
+            headers: {
+              range: 'bytes=6-',
+              'If-Range': lastModified
+            }
+          },
+          mapping: {
+            'caching-strategy': 'modified'
+          }
+        })
+      }))
+      .then(({ promise, response }) => promise.then(value => {
+        console.log(value)
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 200)
+        assert(() => response.headers['Content-Type'] === textMimeType)
+        assert(() => !response.headers['Content-Range'])
+        assert(() => response.headers['Content-Length'] === 4124)
+        assert(() => response.toString().startsWith('Lorem ipsum dolor sit amet,'))
+      }))
+    )
   })
 
   describe('request abortion', () => {
