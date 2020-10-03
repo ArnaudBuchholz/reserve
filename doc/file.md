@@ -16,6 +16,7 @@ Example :
 * Incoming URL parameters are automatically stripped out to simplify the matching expression
 * Directory access is internally redirected to the inner `index.html` file *(if any)* or `404` status
 * File access returns `404` status if missing or can't be read
+* Supports [`Range` HTTP header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range) *(only one range)*
 * Mime type computation is based on [`mime`](https://www.npmjs.com/package/mime) **if installed**. Otherwise a limited subset of mime types is used:
 
 |Extension|mime type|
@@ -41,10 +42,10 @@ Example :
 | `case-sensitive` | Boolean | `false` | *(for Windows)* when `true`, the file path is tested case sensitively. Since it has an impact on **performances**, use carefully. |
 | `ignore-if-not-found` | Boolean | `false` | If the mapping does not resolve to a file or a folder, the handler does not end the request with status `404`. |
 | `custom-file-system` | String or Object | undefined | Provides custom file system API *(see below)*. |
-| `caching-strategy` | `'modified'` or Number | 0 | Indicates caching strategy:  |
-|||| `'modified'`: use file last modification date, meaning the response header will contain [`Last-Modified`](https://developer.mozilla.org/fr/docs/Web/HTTP/Headers/Last-Modified) and the handler reacts to request header [`If-Modified-Since`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Modified-Since) |
+| `caching-strategy` | `'modified'` or Number | 0 | Configures caching strategy:  |
+|||| `'modified'`: use file last modification date, meaning the response header will contain [`Last-Modified`](https://developer.mozilla.org/fr/docs/Web/HTTP/Headers/Last-Modified) and the handler reacts to request headers [`If-Modified-Since`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Modified-Since) and [`If-Range`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Range)  |
 |||| any number: hard coded duration (in seconds), based on the response header [`Cache-Control` with `max-age`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) |
-|||| 0 *(default)*: no caching is applied` |
+|||| 0 *(default)*: [`Cache-Control` with `no-store`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) |
 
 ## Custom File System
 
