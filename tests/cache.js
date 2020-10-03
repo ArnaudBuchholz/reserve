@@ -24,7 +24,6 @@ Hello World !`)
       'caching-strategy': 'modified'
     }]
   }), process.argv.includes('--verbose'))
-  
 }
 
 main()
