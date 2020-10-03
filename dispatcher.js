@@ -62,10 +62,20 @@ function error (reason) {
   if (this.failed) {
     // Error during error: finalize the response (whatever it means)
     this.response.end()
-    return redirected.call(this)
+    redirected.call(this)
+  } else {
+    this.failed = true
+    dispatch.call(this, statusCode)
   }
-  this.failed = true
-  return dispatch.call(this, statusCode)
+}
+
+function redispatch (url) {
+  const redirectCount = ++this.request[$requestRedirectCount]
+  if (redirectCount > this.configuration['max-redirect']) {
+    error.call(this, 508)
+  } else {
+    dispatch.call(this, url)
+  }
 }
 
 function redirecting ({ mapping, match, handler, type, redirect, url, index = 0 }) {
@@ -81,23 +91,19 @@ function redirecting ({ mapping, match, handler, type, redirect, url, index = 0 
     })
       .then(result => {
         if (undefined !== result) {
-          const redirectCount = ++this.request[$requestRedirectCount]
-          if (redirectCount > this.configuration['max-redirect']) {
-            return error.call(this, 508)
-          }
-          return dispatch.call(this, result)
+          redispatch.call(this, result)
+        } else if (this.response[$responseEnded]) {
+          redirected.call(this)
+        } else {
+          dispatch.call(this, url, index + 1)
         }
-        if (this.response[$responseEnded]) {
-          return redirected.call(this)
-        }
-        return dispatch.call(this, url, index + 1)
       }, error.bind(this))
   } catch (e) {
-    return error.call(this, e)
+    error.call(this, e)
   }
 }
 
-function dispatch (url, index = 0) {
+async function dispatch (url, index = 0) {
   if (typeof url === 'number') {
     return redirecting.call(this, {
       type: 'status',
@@ -108,14 +114,14 @@ function dispatch (url, index = 0) {
   const length = this.configuration.mappings.length
   while (index < length) {
     const mapping = this.configuration.mappings[index]
-    const match = mapping[$mappingMatch](this.request.method, url)
+    const match = mapping[$mappingMatch](this.request, url)
     if (match) {
       const { handler, redirect, type } = this.configuration.handler(mapping)
       return redirecting.call(this, { mapping, match, handler, type, redirect: interpolate(match, redirect), url, index })
     }
     ++index
   }
-  return error.call(this, 501)
+  error.call(this, 501)
 }
 
 module.exports = function (configuration, request, response) {
