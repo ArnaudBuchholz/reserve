@@ -114,8 +114,16 @@ async function dispatch (url, index = 0) {
   const length = this.configuration.mappings.length
   while (index < length) {
     const mapping = this.configuration.mappings[index]
-    const match = mapping[$mappingMatch](this.request, url)
+    let match
+    try {
+      match = await mapping[$mappingMatch](this.request, url)
+    } catch (reason) {
+      return error.call(this, reason)
+    }
     if (match) {
+      if (['string', 'number'].includes(typeof match)) {
+        return redispatch.call(this, match)
+      }
       const { handler, redirect, type } = this.configuration.handler(mapping)
       return redirecting.call(this, { mapping, match, handler, type, redirect: interpolate(match, redirect), url, index })
     }
