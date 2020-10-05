@@ -26,23 +26,15 @@ module.exports = function (mapping) {
     index += 2
   }
   const matchMethod = methods[index]
-  /*
   const ifMatch = mapping['if-match']
   if (ifMatch) {
-
-    try {
-      const preprocess = await ifMatch(this.request)
-      if (preprocess && preprocess !== true) {
-        return redispatch.call(this, preprocess)
-      } else if (!preprocess) {
-        match = false
+    return function (request, url) {
+      const match = matchMethod.call(this, request, url)
+      if (match) {
+        return ifMatch(request, url, match)
       }
-    } catch (e) {
-      return error.call(this, e)
+      return false
     }
-  } else {
-
   }
-*/
   return matchMethod
 }
