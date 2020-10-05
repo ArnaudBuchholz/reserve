@@ -61,6 +61,19 @@ const defaultConfigurationPromise = check({
       response.setHeader('x-not-file', 'true')
     }
   }, {
+    method: 'GET',
+    match: '/if-match.txt',
+    'if-match': function (request, url, match) {
+      if (request.headers['x-prevent-match']) {
+        return false
+      }
+      return request.headers['x-match-redirect'] || true
+    },
+    custom: async function IfMatch (request, response) {
+      response.writeHead(200, { 'Content-Type': textMimeType })
+      response.end('if-match')
+    }
+  }, {
     match: '/subst/(.*)/(.*)',
     file: '/$1.$2'
   }, {
@@ -241,6 +254,29 @@ describe('dispatcher', () => {
         assert(() => response.statusCode === 200)
       })
     )
+  })
+
+  describe('if-match', () => {
+    it('is not triggered if the mapping does not match', () => dispatch({ request: '/if-not-match.txt' })
+      .then(({ emitter, response }) => {
+        assert(() => emitter.hasError)
+        assert(() => response.statusCode === 501)
+      })
+    )
+
+    it('decides of the final match', () => dispatch({ request: { method: 'GET', url: '/if-match.txt', headers: { 'x-prevent-match': true } } })
+      .then(({ emitter, response }) => {
+        assert(() => emitter.hasError)
+        assert(() => response.statusCode === 501)
+      })
+    )
+
+    it('enables redirect', () => dispatch({ request: { method: 'GET', url: '/if-match.txt', headers: { 'x-match-redirect': 508 } } })
+    .then(({ emitter, response }) => {
+      assert(() => !emitter.hasError)
+      assert(() => response.statusCode === 508)
+    })
+  )
   })
 
   describe('handlers', () => {
