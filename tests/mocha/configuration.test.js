@@ -187,6 +187,45 @@ describe('configuration', () => {
           file: '$1'
         }]
       })))
+
+      it('validates if-match (function)', () => check({
+        mappings: [{
+          match: '^/',
+          'if-match': shouldFail,
+          file: '$1'
+        }]
+      })
+        .then(configuration => {
+          assert(() => configuration.mappings[0]['if-match'] === shouldFail)
+        })
+      )
+
+      const invalidIfMatches = [
+        true,
+        false,
+        0,
+        1,
+        {},
+        'require-is-not-allowed'
+      ]
+
+      invalidIfMatches.forEach(invalidIfMatch => {
+        it(`validates invert-match (${JSON.stringify(invalidIfMatch)})`, () => shouldFail(check({
+          mappings: [{
+            match: '^/',
+            'if-match': invalidIfMatch,
+            file: '$1'
+          }]
+        })))
+      })
+
+      it('validates invert-match (Symbol)', () => shouldFail(check({
+        mappings: [{
+          match: '^/',
+          'if-match': Symbol('test'),
+          file: '$1'
+        }]
+      })))
     })
 
     describe('handlers', () => {
