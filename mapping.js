@@ -53,6 +53,13 @@ function checkInvertMatch (mapping) {
   }
 }
 
+function checkIfMatch (mapping) {
+  const ifMatch = mapping['if-match']
+  if (!['undefined', 'function'].includes(typeof ifMatch)) {
+    throw new Error('Invalid mapping if-match')
+  }
+}
+
 function checkHandler (configuration, mapping) {
   const { handler } = configuration.handler(mapping)
   if (!handler) {
@@ -66,6 +73,7 @@ module.exports = {
     checkCwd(mapping)
     checkMatch(mapping)
     checkInvertMatch(mapping)
+    checkIfMatch(mapping)
     const handler = checkHandler(configuration, mapping)
     checkMethod(mapping, $mappingMethod, handler[$handlerMethod])
     if (handler[$handlerSchema]) {
