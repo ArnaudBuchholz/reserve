@@ -1,17 +1,18 @@
 # Documentation
 
-## [Configuration](configuration.md)
+## Configuration
 
-Whether you write a `reserve.json` **configuration file** or you **embed the server** in your own application, you must define the [**properties required**](configuration.md) to run [REserve](https://www.npmjs.com/package/reserve).
+Whether you write a `reserve.json` **configuration file** or you **embed the server** in your own application, you must define the [**properties required**](configuration.md) to run REserve.
 
 ## Handlers
 
+REserve is published with the following default handlers :
 * [`file`](file.md)
 * [`url`](url.md)
 * [`custom`](custom.md)
 * [`use`](use.md)
 
-The following handlers can be installed separately and plugged through the `handlers` configuration property.
+Some additional handlers can be installed **separately** and plugged through the `handlers` configuration property.
 
 | handler | description |
 |---|---|
@@ -21,20 +22,23 @@ The following handlers can be installed separately and plugged through the `hand
 
 If you plan to build your **own handler**, here is [what you need to know](handler.md).
 
-## [Server events](events.md)
+## Server events
 
-The [REserve](https://www.npmjs.com/package/reserve) server object implements the [EventEmitter](https://nodejs.org/api/events.html) class and throws **events with parameters** to **notify** any listener of **its activity**.
+The REserve server object implements the [EventEmitter](https://nodejs.org/api/events.html) class and throws [**events with parameters**](events.md) to **notify** any listener of **its activity**.
 
 ## Helpers
 
+REserve also offers some helpers to simplify implementation :
 * [`body`](body.md)
 * [`capture`](capture.md)
 
-## [Mocking](mocking.md)
+## Mocking
 
-[REserve](https://www.npmjs.com/package/reserve) also includes an **helper to build tests**. It receives a **configuration** and returns a **promise** resolving to an [EventEmitter](https://nodejs.org/api/events.html) **augmented with a `request` method** to simulate incoming requests.
+REserve includes an [**helper to build tests**](mocking.md). It receives a **configuration** and returns a **promise** resolving to an [EventEmitter](https://nodejs.org/api/events.html) **augmented with a `request` method** to simulate incoming requests.
 
-## [Version history](history.md)
+## Version history
+
+Here is the [**history of versions**](history.md) with their associated changes.
 
 # Articles
 
