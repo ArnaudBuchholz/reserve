@@ -49,6 +49,6 @@
 ||**file** handler supports [`Range` HTTP header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range)|
 ||`caching-strategy` option in **file** handler *(enables `cache-control` and `last-modified` headers)*|
 ||If an exception occurs during the handling of the `redirected` event, it is now logged *(was previously ignored)*|
-||Introduces `invert-match` on mappings|
+||Introduces `invert-match` and `if-match` on mappings|
 ||Adds `ignore-unverifiable-certificate` option for the `url` handler|
 ||Headers in mocked `Request` and `Response` are handled case insensitively|
