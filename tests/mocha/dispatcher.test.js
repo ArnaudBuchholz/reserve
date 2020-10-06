@@ -64,8 +64,12 @@ const defaultConfigurationPromise = check({
     method: 'GET',
     match: '/if-match.txt',
     'if-match': function (request, url, match) {
+      request.ifMatched = true
       if (request.headers['x-prevent-match']) {
         return false
+      }
+      if (request.headers['x-error']) {
+        throw new Error(request.headers['x-error'])
       }
       return request.headers['x-match-redirect'] || true
     },
@@ -258,25 +262,55 @@ describe('dispatcher', () => {
 
   describe('if-match', () => {
     it('is not triggered if the mapping does not match', () => dispatch({ request: '/if-not-match.txt' })
-      .then(({ emitter, response }) => {
+      .then(({ emitter, request, response }) => {
         assert(() => emitter.hasError)
+        assert(() => !request.ifMatched)
         assert(() => response.statusCode === 501)
       })
     )
 
-    it('decides of the final match', () => dispatch({ request: { method: 'GET', url: '/if-match.txt', headers: { 'x-prevent-match': true } } })
-      .then(({ emitter, response }) => {
+    it('decides of the final match (prevent)', () => dispatch({ request: { method: 'GET', url: '/if-match.txt', headers: { 'x-prevent-match': true } } })
+      .then(({ emitter, request, response }) => {
         assert(() => emitter.hasError)
+        assert(() => request.ifMatched)
         assert(() => response.statusCode === 501)
       })
     )
 
-    it('enables redirect', () => dispatch({ request: { method: 'GET', url: '/if-match.txt', headers: { 'x-match-redirect': 508 } } })
-    .then(({ emitter, response }) => {
-      assert(() => !emitter.hasError)
-      assert(() => response.statusCode === 508)
-    })
-  )
+    it('decides of the final match (allow)', () => dispatch({ request: { method: 'GET', url: '/if-match.txt' } })
+      .then(({ emitter, request, response }) => {
+        assert(() => !emitter.hasError)
+        assert(() => request.ifMatched)
+        assert(() => response.statusCode === 200)
+        assert(() => response.toString() === 'if-match')
+      })
+    )
+
+    it('handles errors', () => dispatch({ request: { method: 'GET', url: '/if-match.txt', headers: { 'x-error': 'KO' } } })
+      .then(({ emitter, request, response }) => {
+        assert(() => emitter.hasError)
+        assert(() => request.ifMatched)
+        assert(() => response.statusCode === 500)
+      })
+    )
+
+    it('enables redirect (number)', () => dispatch({ request: { method: 'GET', url: '/if-match.txt', headers: { 'x-match-redirect': 508 } } })
+      .then(({ emitter, request, response }) => {
+        assert(() => !emitter.hasError)
+        assert(() => request.ifMatched)
+        assert(() => response.statusCode === 508)
+      })
+    )
+
+    it('enables redirect (string)', () => dispatch({ request: { method: 'GET', url: '/if-match.txt', headers: { 'x-match-redirect': '/file.txt' } } })
+      .then(({ emitter, request, response }) => {
+        assert(() => !emitter.hasError)
+        assert(() => request.ifMatched)
+        assert(() => response.statusCode === 200)
+        assert(() => response.headers['Content-Type'] === textMimeType)
+        assert(() => response.toString() === 'Hello World!')
+      })
+    )
   })
 
   describe('handlers', () => {
