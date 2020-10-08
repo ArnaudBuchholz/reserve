@@ -1,17 +1,24 @@
 'use strict'
 
+const toLowerCase = key => {
+  if (typeof key === 'string') {
+    return key.toLowerCase()
+  }
+  return key
+}
+
 module.exports = (initial = {}) => {
   const headers = new Proxy({}, {
     get (that, header) {
-      return that[header.toLowerCase()]
+      return that[toLowerCase(header)]
     },
 
     set (that, header, value) {
-      that[header.toLowerCase()] = value
+      that[toLowerCase(header)] = value
       return true
     }
   })
-  Object.keys(initial).forEach(header => {
+  Reflect.ownKeys(initial).forEach(header => {
     headers[header] = initial[header]
   })
   return headers
