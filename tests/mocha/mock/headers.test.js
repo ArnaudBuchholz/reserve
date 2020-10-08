@@ -30,4 +30,32 @@ describe('mock/headers', () => {
     })
     assert(() => headers['content-length'] === 2)
   })
+
+  it('supports number keys (get)', () => {
+    const headers = headersFactory({
+      1: 'OK'
+    })
+    assert(() => headers[1] === 'OK')
+  })
+
+  it('supports number keys (set)', () => {
+    const headers = headersFactory({})
+    headers[1] = 'OK'
+    assert(() => headers['1'] === 'OK')
+  })
+
+  it('supports Symbol keys (get)', () => {
+    const key = Symbol('key')
+    const headers = headersFactory({
+      [key]: 'OK'
+    })
+    assert(() => headers[key] === 'OK')
+  })
+
+  it('supports Sumbol keys (set)', () => {
+    const headers = headersFactory({})
+    const key = Symbol('key')
+    headers[key] = 'OK'
+    assert(() => headers[key] === 'OK')
+  })
 })
