@@ -58,10 +58,15 @@ An array of mappings that is evaluated in the order of declaration.
 
 Each mapping may contain :
 * `match` *(optional)* : a string *(converted to a regular expression)* or a regular expression that will be applied to the [request URL](https://nodejs.org/api/http.html#http_message_url), defaulted to `"(.*)"`
+
 * `method` *(optional)* : a comma separated string or an array of [HTTP verbs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) that is matched with the [request method](https://nodejs.org/api/http.html#http_message_method), defaulted to `undefined` *(meaning all methods are allowed)*.
+
 * `invert-match` *(optional)* : inverts the matching process when set to `true` *(only allowed value)*. It enables the implementation of an *'all but'* pattern. A typical use forbids unexpected verbs by creating an inverted match on the list of supported verbs.
-* `if-match` *(optional)* : a function being executed if the mapping matches (*meaning after applying `match`, `method` and `invert-match`*). It receives the request, the current url *(in case of internal redirections)* and the current match result. It may return a `string` or a `number` to trigger an internal redirection or any other value. If truthy, the mapping is applied otherwise it is ignored.
+
+* `if-match` *(optional)* : a function being executed only if the mapping matches the request (*meaning after applying `match`, `method` and `invert-match`*). It receives the request object, the current url *(in case of internal redirections)* and the current match result. It may return a `string` or a `number` to trigger an internal redirection or any other value. If truthy, the mapping is applied otherwise it is ignored.<br /> **NOTE** : If the mapping handler value relies on captured groups, the `if-match` methods **must** return the match parameter.
+
 * the handler prefix *(required)* : for instance `custom`, `file`, `status`, `url`, `use`... which value may contain capturing groups *(see [Custom handlers](#custom-handlers))*
+
 * `cwd` *(optional)* : the current working directory to consider for relative path, defaulted to the configuration file directory or the current working directory (when embedding)
 
 **NOTE** : when using `custom` in a [JSON](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON) file, since functions can't be used in this format, the expected value is a string referencing the relative or absolute module to load. If relative, the `cwd` member is considered.
