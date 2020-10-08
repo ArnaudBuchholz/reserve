@@ -20,5 +20,5 @@ module.exports = function (type, showId, ...text) {
     params.push(gray(this.method), gray(this.url))
   }
   params.push(text.join(' '))
-  method.call(...params)
+  method(...params)
 }
