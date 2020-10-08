@@ -52,3 +52,5 @@
 ||Introduces `invert-match` and `if-match` on mappings|
 ||Adds `ignore-unverifiable-certificate` option for the `url` handler|
 ||Headers in mocked `Request` and `Response` are handled case insensitively|
+|1.9.1|Fix traces and limit the verbose output to one liners|
+||Headers in mocked `Request` and `Response` supports [Symbols](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol) *(issue found with [nock](https://www.npmjs.com/package/nock) integration)*|
