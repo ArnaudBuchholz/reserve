@@ -126,7 +126,7 @@ function getEntry (entryPath) {
   }
   return entryPath.split(sep).slice(1).reduce((folder, name) => {
     if (!folder || folder.content || !name && ignoreEmptyFolders) {
-        return folder
+      return folder
     }
     return folder[name]
   }, entries)
