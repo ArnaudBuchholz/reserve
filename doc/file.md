@@ -46,6 +46,7 @@ Example :
 |||| `'modified'`: use file last modification date, meaning the response header will contain [`Last-Modified`](https://developer.mozilla.org/fr/docs/Web/HTTP/Headers/Last-Modified) and the handler reacts to request headers [`If-Modified-Since`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Modified-Since) and [`If-Range`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Range)  |
 |||| any number: hard coded duration (in seconds), based on the response header [`Cache-Control` with `max-age`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) |
 |||| 0 *(default)*: [`Cache-Control` with `no-store`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) |
+| `strict` | Boolean | `false` | when `true`, the file path is tested strictly (in particular, duplicated separators like in `foldera//folderb` are not ignored). This option implies `case-sensitive`. Since it has an impact on **performances**, use carefully. |
 
 ## Custom File System
 
@@ -59,7 +60,7 @@ This is the asynchronous equivalent of [fs.readdir](https://nodejs.org/api/fs.ht
 
 It must return a promise resolved to an array of names listing the files or folders contained in the `folderPath`.
 
-It is mandatory only if the `case-sensitive` option is set on the mapping.
+It is mandatory if the `case-sensitive` or `strict` options are set on the mapping.
 
 ### *mandatory* `async stat (filePath)`
 
