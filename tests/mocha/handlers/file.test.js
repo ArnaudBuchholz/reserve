@@ -227,7 +227,7 @@ describe('handlers/file', () => {
         'case-sensitive': true
       }
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ promise }) => promise.then(value => {
         assert(() => value === 404)
       }))
     )
@@ -249,6 +249,111 @@ describe('handlers/file', () => {
 
     after(() => {
       fs.setCaseSensitive(true)
+    })
+  })
+
+  describe('Strict mode', function () {
+    describe('Ensure empty folders are not ignored', () => {
+      before(() => {
+        fs.setIgnoreEmptyFolders(true)
+      })
+
+      it('finds a file even if the path includes empty folders (default)', () => handle({
+        request: '/folder///index.html',
+        mapping: {
+          cwd: '/'
+        }
+      })
+        .then(({ promise, response }) => promise.then(value => {
+          assert(() => value === undefined)
+          assert(() => response.statusCode === 200)
+          assert(() => response.headers['Content-Type'] === htmlMimeType)
+          assert(() => response.toString() === '<html />')
+        }))
+      )
+
+      it('finds a file even if the path includes empty folders (default) (root)', () => handle({
+        request: '///folder/index.html',
+        mapping: {
+          cwd: '/'
+        }
+      })
+        .then(({ promise, response }) => promise.then(value => {
+          assert(() => value === undefined)
+          assert(() => response.statusCode === 200)
+          assert(() => response.headers['Content-Type'] === htmlMimeType)
+          assert(() => response.toString() === '<html />')
+        }))
+      )
+
+      it('finds a file even if the path includes empty folders (default) (folder)', () => handle({
+        request: '/folder///',
+        mapping: {
+          cwd: '/'
+        }
+      })
+        .then(({ promise, response }) => promise.then(value => {
+          assert(() => value === undefined)
+          assert(() => response.statusCode === 200)
+          assert(() => response.headers['Content-Type'] === htmlMimeType)
+          assert(() => response.toString() === '<html />')
+        }))
+      )
+
+      it('fails with 404 if the path includes empty folders and strict mode is used', () => handle({
+        request: '/folder///index.html',
+        mapping: {
+          cwd: '/',
+          strict: true
+        }
+      })
+        .then(({ promise }) => promise.then(value => {
+          assert(() => value === 404)
+        }))
+      )
+
+      it('fails with 404 if the path includes empty folders and strict mode is used (root)', () => handle({
+        request: '///folder/index.html',
+        mapping: {
+          cwd: '/',
+          strict: true
+        }
+      })
+        .then(({ promise }) => promise.then(value => {
+          assert(() => value === 404)
+        }))
+      )
+
+      it('fails with 404 if the path includes empty folders and strict mode is used (folder)', () => handle({
+        request: '/folder///',
+        mapping: {
+          cwd: '/',
+          strict: true
+        }
+      })
+        .then(({ promise }) => promise.then(value => {
+          assert(() => value === 404)
+        }))
+      )
+
+      it('finds the file when the path strictly matches', () => handle({
+        request: '/folder/index.html',
+        mapping: {
+          cwd: '/',
+          strict: true
+        }
+      })
+        .then(({ promise, response }) => promise.then(value => {
+          assert(() => value === undefined)
+          assert(() => response.statusCode === 200)
+          assert(() => response.headers['Content-Type'] === htmlMimeType)
+          assert(() => response.toString() === '<html />')
+        }))
+      )
+
+      after(() => {
+        fs.setIgnoreEmptyFolders(false)
+      })
     })
   })
 
