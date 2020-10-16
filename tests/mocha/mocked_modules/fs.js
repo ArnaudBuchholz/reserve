@@ -115,6 +115,7 @@ const entries = {
 }
 
 let caseSensitive = true
+let ignoreEmptyFolders = false
 
 function getEntry (entryPath) {
   if (!caseSensitive) {
@@ -124,8 +125,8 @@ function getEntry (entryPath) {
     return entries
   }
   return entryPath.split(sep).slice(1).reduce((folder, name) => {
-    if (!folder || folder.content) {
-      return folder
+    if (!folder || folder.content || !name && ignoreEmptyFolders) {
+        return folder
     }
     return folder[name]
   }, entries)
@@ -135,6 +136,10 @@ require('mock-require')('fs', {
 
   setCaseSensitive (value) {
     caseSensitive = value
+  },
+
+  setIgnoreEmptyFolders (value) {
+    ignoreEmptyFolders = value
   },
 
   stat (entryPath, callback) {
