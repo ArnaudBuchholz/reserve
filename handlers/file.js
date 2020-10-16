@@ -95,15 +95,18 @@ async function sendIndex (context) {
   return sendFile({ ...context, filePath }, stat)
 }
 
-async function checkCaseSensitivePath (filePath) {
+async function checkCaseSensitivePath (filePath, strict) {
   const folderPath = path.dirname(filePath)
   if (folderPath && folderPath !== filePath) {
+    if (strict && (folderPath.endsWith('/') && folderPath !== '/' || filePath.endsWith('//'))) {
+      throw new Error('Empty folder')
+    }
     const name = path.basename(filePath)
     const names = await this.fs.readdir(folderPath)
     if (!names.includes(name)) {
       throw new Error('Not found')
     }
-    return checkCaseSensitivePath.call(this, folderPath)
+    return checkCaseSensitivePath.call(this, folderPath, strict)
   }
 }
 
@@ -124,10 +127,17 @@ module.exports = {
     [cache]: {
       types: ['string', 'number'],
       defaultValue: 0
+    },
+    strict: {
+      type: 'boolean',
+      defaultValue: false
     }
   },
   method: 'GET,HEAD',
   validate: async mapping => {
+    if (mapping.strict) {
+      mapping[matchcase] = true
+    }
     if (typeof mapping[cfs] === 'string') {
       mapping[cfs] = require(mapping[cfs])
     }
@@ -167,7 +177,7 @@ module.exports = {
     }
     return context.fs.stat(filePath)
       .then(async stat => {
-        await context.checkCaseSensitivePath(filePath)
+        await context.checkCaseSensitivePath(filePath, mapping.strict)
         const isDirectory = stat.isDirectory()
         if (isDirectory ^ directoryAccess) {
           return 404 // Can't ignore if not found
