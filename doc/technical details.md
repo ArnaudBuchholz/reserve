@@ -24,7 +24,7 @@ Consequently, the following mapping will match the URL `/sample/index.html` and 
 
 REserve is designed on a **simple** architecture summarized by the following [Block diagram](https://blogs.sap.com/2008/02/19/how-to-communicate-architecture-technical-architecture-modeling-at-sap-part-2/)
 
-![TAM Block Diagram](TAM%20Block%20diagram.png)<br/>
+![Overview TAM Block Diagram](overview_block.png)<br/>
 <u>*TAM Block diagram of the technical architecture*</u>
 
 There are 4 main building blocks (a.k.a. agents) namely :
@@ -89,7 +89,7 @@ The dispatcher agent is the **heart** of REserve; it **routes** the received req
 
 This cycle is illustrated in the following activity diagram.
 
-![TAM Activity Diagram](TAM%20Activity%20diagram.png)<br/>
+![Dispatching a request TAM Activity Diagram](dispatching_a_request_activity.png)<br/>
 <u>*TAM Activity diagram of the dispatcher algorithm*</u>
 
 ## Handlers
