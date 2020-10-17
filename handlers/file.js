@@ -87,7 +87,7 @@ function sendFile ({ cachingStrategy, request, response, fs, filePath }, fileSta
 
 async function sendIndex (context) {
   const filePath = path.join(context.filePath, 'index.html')
-  await context.checkCaseSensitivePath(filePath)
+  await context.checkPath(filePath)
   const stat = await context.fs.stat(filePath)
   if (stat.isDirectory()) {
     throw new Error('index.html not a file')
@@ -95,19 +95,23 @@ async function sendIndex (context) {
   return sendFile({ ...context, filePath }, stat)
 }
 
-async function checkCaseSensitivePath (filePath, strict) {
+async function checkCaseSensitivePath (filePath) {
   const folderPath = path.dirname(filePath)
   if (folderPath && folderPath !== filePath) {
-    if (strict && (folderPath.endsWith('/') && folderPath !== '/' || filePath.endsWith('//'))) {
-      throw new Error('Empty folder')
-    }
     const name = path.basename(filePath)
     const names = await this.fs.readdir(folderPath)
     if (!names.includes(name)) {
       throw new Error('Not found')
     }
-    return checkCaseSensitivePath.call(this, folderPath, strict)
+    return checkCaseSensitivePath.call(this, folderPath)
   }
+}
+
+async function checkStrictPath (filePath) {
+  if (filePath.includes('//')) {
+    throw new Error('Empty folder')
+  }
+  return checkCaseSensitivePath.call(this, filePath)
 }
 
 module.exports = {
@@ -135,9 +139,6 @@ module.exports = {
   },
   method: 'GET,HEAD',
   validate: async mapping => {
-    if (mapping.strict) {
-      mapping[matchcase] = true
-    }
     if (typeof mapping[cfs] === 'string') {
       mapping[cfs] = require(mapping[cfs])
     }
@@ -170,14 +171,16 @@ module.exports = {
       fs: mapping[cfs],
       filePath
     }
-    if (mapping[matchcase]) {
-      context.checkCaseSensitivePath = checkCaseSensitivePath
+    if (mapping.strict) {
+      context.checkPath = checkStrictPath
+    } else if (mapping[matchcase]) {
+      context.checkPath = checkCaseSensitivePath
     } else {
-      context.checkCaseSensitivePath = async () => {}
+      context.checkPath = async () => {}
     }
     return context.fs.stat(filePath)
       .then(async stat => {
-        await context.checkCaseSensitivePath(filePath, mapping.strict)
+        await context.checkPath(filePath, mapping.strict)
         const isDirectory = stat.isDirectory()
         if (isDirectory ^ directoryAccess) {
           return 404 // Can't ignore if not found
