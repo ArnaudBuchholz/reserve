@@ -1,5 +1,11 @@
 # Server events
 
+The REserve server object implements the [EventEmitter](https://nodejs.org/api/events.html) class and throws [**events with parameters**](events.md) to **notify** any listener of **its activity**.
+
+When a **request is being dispatched**, the following diagram illustrates the **sequence of events that are emitted**.
+
+![Events TAM State Diagram](events_state.png)
+
 | Event | Parameter *(object containing members)* | Description |
 |---|---|---|
 | **server-created** | `server` *([`http.server`](https://nodejs.org/api/http.html#http_class_http_server) or [`https.server`](https://nodejs.org/api/https.html#https_class_https_server))*, `configuration` *([configuration interface](#configuration-interface))*| Only available to `listeners`, this event is triggered after the HTTP(S) server is **created** and **before it accepts requests**.
