@@ -1,6 +1,6 @@
 # `url` handler
 
-Answers the request by **forwarding** it to a different URL.
+Answers the request by **forwarding** it to a different URL. It does **not use the [HTTP status code 302](https://en.wikipedia.org/wiki/HTTP_302)**. The external URL is **requested internally** and the **response is piped** to the incoming request.
 
 Example :
 ```json
