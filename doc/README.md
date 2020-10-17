@@ -1,18 +1,22 @@
-# Documentation
+# REserve Documentation
 
 ## Configuration
 
-Whether you write a `reserve.json` **configuration file** or you **embed the server** in your own application, you must define the [**properties required**](configuration.md) to run REserve.
+There are two ways to **leverage** REserve :
+* Run as a **standalone command line** with a **configuration file** *(default name is `reserve.json`)*
+* **Embed** with its configuration in a **custom application**
+
+In both cases, the configuration must specify the properties and mappings [documented here](configuration.md).
 
 ## Handlers
 
-REserve is published with the following default handlers :
-* [`file`](file.md)
-* [`url`](url.md)
-* [`custom`](custom.md)
-* [`use`](use.md)
+REserve is **delivered** with the following default handlers :
+* [`file`](file.md) to serve resources from the file system
+* [`url`](url.md) to internally forward the request to any web address
+* [`custom`](custom.md) to enable custom coding
+* [`use`](use.md) *(experimental)* to integrate [express middlewares](https://www.npmjs.com/search?q=keywords%3Aexpress%20keywords%3Amiddleware)
 
-Some additional handlers can be installed **separately** and plugged through the `handlers` configuration property.
+Other additional handlers can be installed **separately** and plugged through the `handlers` configuration property.
 
 | handler | description |
 |---|---|
@@ -24,17 +28,17 @@ If you plan to build your **own handler**, here is [what you need to know](handl
 
 ## Server events
 
-The REserve server object implements the [EventEmitter](https://nodejs.org/api/events.html) class and throws [**events with parameters**](events.md) to **notify** any listener of **its activity**.
+The server object implements the [EventEmitter](https://nodejs.org/api/events.html) class and, during execution, it throws [**events with parameters**](events.md) to **notify** any listener of **its activity**.
 
 ## Helpers
 
 REserve also offers some helpers to simplify implementation :
-* [`body`](body.md)
-* [`capture`](capture.md)
+* [`body`](body.md) to read a request body
+* [`capture`](capture.md) to copy the response stream to another stream *(for instance: to create a cache)*
 
 ## Mocking
 
-REserve includes an [**helper to build tests**](mocking.md). It receives a **configuration** and returns a **promise** resolving to an [EventEmitter](https://nodejs.org/api/events.html) **augmented with a `request` method** to simulate incoming requests.
+REserve includes a [mocking environment](mocking.md) to **simplify the tests**. It takes the **configuration** and asynchronously returns an [EventEmitter](https://nodejs.org/api/events.html) **augmented with a `request` method** to simulate incoming requests.
 
 ## Version history
 
