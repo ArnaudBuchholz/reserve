@@ -52,7 +52,6 @@
     "express-session": "^1.17.0",
     "gpf-js": "^1.0.0",
     "lodash": "^4.17.19",
-    "mime": "^2.4.4",
     "minimist": ">=1.2.3",
     "mocha": "^7.1.2",
     "mock-require": "^3.0.3",
@@ -62,7 +61,9 @@
     "standard": "^14.3.1",
     "start-server-and-test": "^1.10.6"
   },
-  "dependencies": {},
+  "dependencies": {
+    "mime": "^2.4.4"
+  },
   "standard": {
     "globals": [
       "process",
