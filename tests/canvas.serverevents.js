@@ -15,10 +15,11 @@ serve({
   port: 8082,
   mappings: [{
     match: /^\/$/,
+    methods: 'GET',
     custom: html.bind(null, `<!doctype html>
 <html>
   <head>
-    <title>Server Events in a canvas</title>
+    <title>Draw !</title>
     <style>
 html, body {
   width:  100%;
@@ -71,6 +72,47 @@ html, body {
       plot(parseInt(rawX, 10), parseInt(rawY, 10))
     })
   </script>
+</html>`)
+  }, {
+    match: '/display',
+    methods: 'GET',
+    custom: html.bind(null, `
+<html>
+  <head>
+    <title>Display</title>
+    <script>
+      const count = parseInt((location.search.match(/count=(\\d+)/) || [,4])[1])
+      const header = parseInt((location.search.match(/header=(\\d+)/) || [,0])[1])
+      const cols = Math.ceil(Math.sqrt(count))
+      const rows = Math.ceil(count / cols)
+      const features = {
+        height: Math.floor(screen.height / rows) - header,
+        location: 0,
+        menubar: 0,
+        resizable: 0,
+        status: 0,
+        toolbar: 0,
+        width: Math.floor(screen.width / cols)
+      }
+      const windows = []
+      let index = 0
+      while (index < count) {
+        const windowFeatures = Object.keys(features)
+          .map(name => name + '=' + features[name].toString())
+          .concat('left=' + (index % cols) * features.width)
+          .concat('top=' + Math.floor(index / cols) * (features.height + header))
+          .join(',')
+          windows.push(window.open('http://localhost:8082', '_blank', windowFeatures))
+        ++index
+      }
+    </script>
+  </head>
+  <body>
+      <button>close</button>
+      <script>
+        document.querySelector('button').addEventListener('click', () => windows.forEach(wnd => wnd.close()))
+      </script>
+  </body>
 </html>`)
   }, {
     match: '/plots',
