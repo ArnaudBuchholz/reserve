@@ -106,7 +106,7 @@ describe('schema', () => {
 
     describe('defaultValue', () => {
       it('uses value when set', () => {
-        var object = { property: true }
+        const object = { property: true }
         parseAndCheck({
           property: {
             type: 'boolean',
@@ -117,7 +117,7 @@ describe('schema', () => {
       })
 
       it('sets value when missing', () => {
-        var object = {}
+        const object = {}
         parseAndCheck({
           property: {
             type: 'boolean',
