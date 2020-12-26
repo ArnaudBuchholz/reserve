@@ -37,7 +37,7 @@
       .then(function () { return checkFileNotFound('/not-found') })
       .then(function () { return checkFileNotFound('/no-index') })
       .then(function () {
-        var token = encodeURIComponent((new Date()).toString())
+        const token = encodeURIComponent((new Date()).toString())
         return tryLoad('/echo/' + token, function (content) {
           if (content !== token) {
             throw new Error('Echo service is not working')
