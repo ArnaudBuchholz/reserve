@@ -1,7 +1,6 @@
 'use strict'
 
 const { body, serve } = require('..')
-const EventEmitter = require('events')
 
 function html (content, request, response) {
   response.writeHead(200, {
@@ -118,14 +117,22 @@ html, body {
     match: '/plots',
     methods: ['POST', 'GET'],
     custom: async function (request, response) {
-      if (!this.channel) {
-        this.channel = new EventEmitter()
+      if (!this.plots) {
+        this.channels = []
         this.plots = []
+      }
+      const send = function (channel, id, plot) {
+        try {
+          channel.write(`event: plot\nid: ${id}\ndata: ${plot}\n\n`)
+        } catch (e) {
+          // ignore
+        }
       }
       if (request.method === 'POST') {
         const plot = await body(request)
         this.plots.push(plot)
-        this.channel.emit('plot', { id: this.plots.length, plot })
+        const id = this.plots.length
+        this.channels.forEach(channel => send(channel, id, plot))
         response.writeHead(200, {
           'Content-Type': 'text/plain',
           'Cache-Control': 'no-cache',
@@ -139,27 +146,23 @@ html, body {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache'
       })
-      const send = function ({ id, plot }) {
-        console.log(id, plot)
-        this.write(`event: plot\nid: ${id}\ndata: ${plot}\n\n`)
-      }.bind(response)
       const lastId = parseInt(request.headers['Last-Event-ID'] || '-1')
-      this.plots.forEach((plot, id) => {
-        if (id > lastId) {
-          send({ id, plot })
-        }
-      })
-      this.channel.on('plot', send)
+      this.plots.slice(lastId + 1).forEach((plot, id) => send(response, id, plot))
+      this.channels.push(response)
       let resolver
       const promise = new Promise(resolve => {
         resolver = resolve
       })
-      request.on('close', () => {
-        this.channel.off('lot', send)
+      const close = () => {
+        this.channels = this.channels.filter(channel => channel !== response)
         resolver()
-      })
+      }
+      request.on('close', close)
+      request.on('abort', close)
       return promise
     }.bind({})
+  }, {
+    status: 501
   }]
 })
   .on('ready', ({ url }) => {
