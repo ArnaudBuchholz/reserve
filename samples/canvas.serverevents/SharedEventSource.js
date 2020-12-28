@@ -4,13 +4,25 @@
   /* global EventSource */
 
   const title = document.title
-  const id = parseInt(localStorage['SharedEventSource.id'] || '0', 10) + 1
-  localStorage['SharedEventSource.id'] = id
 
-  document.title = `[${id}] ${title}`
+  // Assuming the following algorithm generate a unique ID
+  const id = parseInt(localStorage['SharedEventSource.lastId'] || '0', 10) + 1
+  localStorage['SharedEventSource.lastId'] = id
+
+  let isMaster = false
+
+  localStorage['SharedEventSource.master'] = id
+  document.title = `[${id} - master] ${title}`
 
   window.addEventListener('storage', event => {
-
+    if (event.key === 'SharedEventSource.master') {
+      if (parseInt(event.newValue, 10) < id) {
+        document.title = `[${id}] ${title}`
+      } else {
+        localStorage['SharedEventSource.master'] = id
+        document.title = `[${id} - master] ${title}`
+      }
+    }
   })
 
   class SharedEventSource {
