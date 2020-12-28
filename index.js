@@ -7,6 +7,17 @@ const { read } = require('./configuration')
 const log = require('./log')
 const serve = require('./serve')
 
+module.exports = {
+  body: require('./body'),
+  capture: require('./capture'),
+  check: require('./configuration').check,
+  interpolate: require('./interpolate'),
+  log,
+  mock: require('./mock'),
+  read,
+  serve
+}
+
 /* istanbul ignore if */ // Only used for command line
 if (require.main === module) {
   const configurationFileName = process.argv.reduce((name, parameter) => {
@@ -43,15 +54,4 @@ if (require.main === module) {
         }
       })
     })
-} else {
-  module.exports = {
-    body: require('./body'),
-    capture: require('./capture'),
-    check: require('./configuration').check,
-    interpolate: require('./interpolate'),
-    log,
-    mock: require('./mock'),
-    read,
-    serve
-  }
 }
