@@ -1,29 +1,74 @@
 (function () {
   'use strict'
 
-  /* global EventSource */
+  /* global EventSource, localStorage */
 
   const title = document.title
 
-  // Assuming the following algorithm generate a unique ID
-  const id = parseInt(localStorage['SharedEventSource.lastId'] || '0', 10) + 1
-  localStorage['SharedEventSource.lastId'] = id
+  const $prefix = 'SharedEventSource.'
+  const $lastId = `${$prefix}lastId`
+  const $master = `${$prefix}master`
+  const $ping = `${$prefix}ping`
 
-  let isMaster = false
+  let isMaster
+  let timer
 
-  localStorage['SharedEventSource.master'] = id
-  document.title = `[${id} - master] ${title}`
+  function tick () {
+    if (timer !== undefined) {
+      clearTimeout(timer)
+    }
+    timer = setTimeout(() => {
+      timer = undefined
+      if (isMaster) {
+        localStorage[$ping] = localStorage[$ping] === '0' ? '1' : '0'
+        tick()
+      } else {
+        setMaster(true)
+      }
+    }, isMaster ? 100 : 200)
+  }
+
+  function setMaster (value) {
+    if (value) {
+      document.title = `[${id} - master] ${title}`
+    } else {
+      document.title = `[${id}] ${title}`
+    }
+    if (isMaster !== value) {
+      isMaster = value
+      tick()
+    }
+    if (isMaster) {
+      localStorage[$master] = id
+    }
+  }
+
+  const handlers = {
+    [$master]: event => {
+      const candidateId = parseInt(event.newValue, 10)
+      if (candidateId < id) {
+        setMaster(false)
+      } else {
+        setMaster(true)
+      }
+    },
+    [$ping]: event => {
+      tick()
+    }
+  }
 
   window.addEventListener('storage', event => {
-    if (event.key === 'SharedEventSource.master') {
-      if (parseInt(event.newValue, 10) < id) {
-        document.title = `[${id}] ${title}`
-      } else {
-        localStorage['SharedEventSource.master'] = id
-        document.title = `[${id} - master] ${title}`
-      }
+    const handler = handlers[event.key]
+    if (handler) {
+      handler(event)
     }
   })
+
+  // Assuming the following algorithm generate a unique ID
+  const id = parseInt(localStorage[$lastId] || '0', 10) + 1
+  localStorage[$lastId] = id
+
+  setMaster(true)
 
   class SharedEventSource {
     constructor (url) {
