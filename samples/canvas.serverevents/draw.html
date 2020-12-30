@@ -53,8 +53,15 @@ html, body {
     }
     const shared = !!location.search.match(/shared=true/)
     if (shared) {
+      const lastEventId = parseInt(localStorage['plot.lastEventId'] || '0', 10)
+      for (let id = 0; id <= lastEventId; ++id) {
+        const data = localStorage[`plot#${id}`]
+        if (data) {
+          plot(data)
+        }
+      }
       window.addEventListener('storage', event => {
-        if (event.key === 'plot') {
+        if (event.key.startsWith('plot#')) {
           plot(event.newValue)
         }
       })
