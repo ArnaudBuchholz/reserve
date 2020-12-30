@@ -21,7 +21,9 @@
       if (shared) {
         const plotsSource = new EventSource('/plots')
         plotsSource.addEventListener('plot', e => {
-          localStorage['plot'] = e.data
+          const { data, lastEventId } = e
+          localStorage[`plot#${lastEventId}`] = data
+          localStorage[`plot.lastEventId`] = lastEventId
         })
       }
       while (index < count) {
