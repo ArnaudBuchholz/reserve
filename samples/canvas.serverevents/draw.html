@@ -13,7 +13,6 @@ html, body {
   <body>
     <canvas></canvas>
   </body>
-  <script src="SharedEventSource.js"></script>
   <script>
     const canvas = document.querySelector('canvas')
     const context = canvas.getContext("2d")
@@ -44,15 +43,26 @@ html, body {
     canvas.addEventListener('mouseup', event => {
       draw = false
     })
-    function plot(x, y) {
+    function plot(coords) {
+      const [rawX, rawY] = coords.split(',')
+      const x = parseInt(rawX, 10)
+      const y = parseInt(rawY, 10)
       context.beginPath()
       context.arc(x, y, 10, 0, 2 * Math.PI)
       context.stroke()
     }
-    const plotsSource = new SharedEventSource('/plots')
-    plotsSource.addEventListener('plot', e => {
-      const [rawX, rawY] = e.data.split(',')
-      plot(parseInt(rawX, 10), parseInt(rawY, 10))
-    })
+    const shared = !!location.search.match(/shared=true/)
+    if (shared) {
+      window.addEventListener('storage', event => {
+        if (event.key === 'plot') {
+          plot(event.newValue)
+        }
+      })
+    } else {
+      const plotsSource = new EventSource('/plots')
+      plotsSource.addEventListener('plot', e => {
+        plot(e.data)
+      })
+    }
   </script>
 </html>
