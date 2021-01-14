@@ -43,13 +43,17 @@ html, body {
     canvas.addEventListener('mouseup', event => {
       draw = false
     })
-    function plot(coords) {
+    const colors = ['#ff0000', '#ffa500', '#ffff00', '#008000', '#0000ff', '#4b0082' , '#ee82ee']
+    function plot(id, coords) {
+      const color = parseInt(id, 10)
       const [rawX, rawY] = coords.split(',')
       const x = parseInt(rawX, 10)
       const y = parseInt(rawY, 10)
+      context.fillStyle = colors[color % colors.length]
       context.beginPath()
       context.arc(x, y, 10, 0, 2 * Math.PI)
       context.stroke()
+      context.fill()
     }
     const shared = !!location.search.match(/shared=true/)
     if (shared) {
@@ -57,18 +61,18 @@ html, body {
       for (let id = 0; id <= lastEventId; ++id) {
         const data = localStorage[`plot#${id}`]
         if (data) {
-          plot(data)
+          plot(id, data)
         }
       }
       window.addEventListener('storage', event => {
         if (event.key.startsWith('plot#')) {
-          plot(event.newValue)
+          plot(event.key.substring(5), event.newValue)
         }
       })
     } else {
       const plotsSource = new EventSource('/plots')
       plotsSource.addEventListener('plot', e => {
-        plot(e.data)
+        plot(e.lastEventId, e.data)
       })
     }
   </script>
