@@ -44,6 +44,13 @@ describe('serve', () => {
     assert(() => url === 'http://127.0.0.1:3475/')
   }))
 
+  it('allocates a port', () => promisify({
+    hostname: '127.0.0.1',
+    port: 'auto'
+  }, ({ url }) => {
+    assert(() => url === 'http://127.0.0.1:34750/')
+  }))
+
   it('allocates https server', () => read('/folder/reserve-with-another-port.json')
     .then(configuration => promisify(configuration, ({ url }) => {
       assert(() => url === 'https://0.0.0.0:220103/')
