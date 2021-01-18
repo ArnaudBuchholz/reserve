@@ -28,14 +28,20 @@ module.exports = {
   },
 
   createServer: () => {
+    const simulatedAddress = {}
     return {
       listen: (port, hostname, callback) => {
+        if (port === 0) {
+          port = 34750
+        }
+        simulatedAddress.port = port
         if (hostname === 'error') {
           callback(new Error('error'))
         } else {
           callback(null)
         }
-      }
+      },
+      address: () => simulatedAddress
     }
   }
 }
