@@ -55,3 +55,5 @@
 |1.9.1|Fix traces and limit the verbose output to one liners|
 ||Headers in mocked `Request` and `Response` supports [Symbols](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol) *(issue found with [nock](https://www.npmjs.com/package/nock) integration)*|
 |1.9.2|`strict` option in **file** handler *(enables strict path matching)*|
+|1.9.3|Fixes a coding issue that prevented requires of REserve exports when run through the command line ([#16](https://github.com/ArnaudBuchholz/reserve/issues/16))|
+||Automatic port allocation (`port` set to `'auto'` or `0`)|
