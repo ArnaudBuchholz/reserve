@@ -21,7 +21,11 @@ function createServerAsync (eventEmitter, configuration, dispatcher) {
   return new Promise((resolve, reject) => {
     const server = createServer(configuration, dispatcher.bind(eventEmitter, configuration))
     eventEmitter.emit('server-created', { configuration: configuration[$configurationInterface], server })
-    server.listen(configuration.port, configuration.hostname, err => err ? reject(err) : resolve())
+    let { port } = configuration
+    if (port === 'auto') {
+      port = 0
+    }
+    server.listen(port, configuration.hostname, err => err ? reject(err) : resolve(server))
   })
 }
 
@@ -31,9 +35,11 @@ module.exports = jsonConfiguration => {
     .then(configuration => {
       configuration.listeners.forEach(register => register(eventEmitter))
       return createServerAsync(eventEmitter, configuration, dispatcher)
-        .then(() => {
+        .then(server => {
+          const port = server.address().port
           eventEmitter.emit('ready', {
-            url: `${configuration.protocol}://${configuration.hostname || '0.0.0.0'}:${configuration.port}/`
+            url: `${configuration.protocol}://${configuration.hostname || '0.0.0.0'}:${port}/`,
+            port
           })
         })
     })
