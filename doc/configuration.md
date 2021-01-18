@@ -10,6 +10,8 @@ Default is `undefined`.
 
 Used to set the `port` parameter when calling http(s) server's [listen](https://nodejs.org/api/net.html#net_server_listen).
 
+From version 1.9.3, the value `auto` allocates automatically a free port (equivalent to passing `0` to [listen](https://nodejs.org/api/net.html#net_server_listen)).
+
 Default is `5000`.
 
 ## max-redirect *(optional)*
