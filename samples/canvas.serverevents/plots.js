@@ -41,7 +41,11 @@ module.exports = async function (request, response) {
   })
   const close = () => {
     this.channels = this.channels.filter(channel => channel !== response)
-    resolver()
+    try {
+      response.end()
+    } finally {
+      resolver()
+    }
   }
   request.on('close', close)
   request.on('abort', close)
