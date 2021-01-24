@@ -57,3 +57,4 @@
 |1.9.2|`strict` option in **file** handler *(enables strict path matching)*|
 |1.9.3|Fixes a coding issue that prevented requires of REserve exports when run through the command line ([#16](https://github.com/ArnaudBuchholz/reserve/issues/16))|
 ||Automatic port allocation (`port` set to `'auto'` or `0`)|
+|1.10.0 **(wip)**|Enables redirection within the `url` handler (through `forward-request` and `forward-response` hooks)|
