@@ -2,8 +2,6 @@
 
 const http = require('http')
 const https = require('https')
-const { PassThrough } = require('stream')
-const { $requestBodyBackup } = require('../symbols')
 
 function protocol (url) {
   if (url.startsWith('https')) {
@@ -68,27 +66,31 @@ module.exports = {
       options.rejectUnauthorized = false
     }
     const context = {}
-    const saveBody = await mapping['forward-request']({
+    const hookParams = {
       configuration,
       context,
       mapping,
       match,
       request: options,
       incoming: request
-    })
+    }
+    await mapping['forward-request'](hookParams)
     const redirectedRequest = protocol(options.url).request(options.url, options, async redirectedResponse => {
       if (mapping['unsecure-cookies']) {
         unsecureCookies(redirectedResponse.headers)
       }
       const { headers: responseHeaders } = redirectedResponse
       const result = await mapping['forward-response']({
-        configuration,
-        context,
-        mapping,
-        match,
+        ...hookParams,
         statusCode: redirectedResponse.statusCode,
         headers: responseHeaders
       })
+      if (result !== undefined) {
+        if (!['GET', 'HEAD'].includes(request.method)) {
+          return fail(new Error('Internal redirection impossible because the body is already consumed'))
+        }
+        return done(result)
+      }
       response.writeHead(redirectedResponse.statusCode, responseHeaders)
       response.on('finish', () => done(result))
       redirectedResponse
@@ -96,13 +98,9 @@ module.exports = {
         .pipe(response)
     })
     redirectedRequest.on('error', fail)
-    const requestBody = request[$requestBodyBackup] || request
-    requestBody.pipe(redirectedRequest)
+    request
       .on('error', fail)
-    if (saveBody) {
-      request.$requestBodyBackup = new PassThrough()
-      requestBody.pipe(request.$requestBodyBackup)
-    }
+      .pipe(redirectedRequest)
     return promise
   }
 }
