@@ -2,7 +2,7 @@
 
 'use strict'
 
-const { serve } = require('..')
+const { serve } = require('../..')
 
 function socket (eventEmitter) {
   eventEmitter.on('server-created', ({ server }) => {
@@ -29,6 +29,9 @@ serve({
   port: 8081,
   listeners: [socket],
   mappings: [{
+    match: /favicon\.ico/,
+    file: "favicon.ico"
+  }, {
     match: /^\/$/,
     custom: html.bind(null, `<!doctype html>
 <html>

@@ -1,6 +1,6 @@
 'use strict'
 
-const { body, serve } = require('..')
+const { body, serve } = require('../..')
 const EventEmitter = require('events')
 
 function html (content, request, response) {
@@ -28,6 +28,9 @@ const channel = new Channel()
 serve({
   port: 8081,
   mappings: [{
+    match: /favicon\.ico/,
+    file: "favicon.ico"
+  }, {
     match: /^\/$/,
     custom: html.bind(null, `<!doctype html>
 <html>
@@ -104,7 +107,11 @@ serve({
       })
       request.on('close', () => {
         channel.off('message', listener)
-        resolver()
+        try {
+          response.end()
+        } finally {
+          resolver()
+        }
       })
       return promise
     }
