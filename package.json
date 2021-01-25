@@ -1,6 +1,6 @@
 {
   "name": "reserve",
-  "version": "1.9.3",
+  "version": "1.10.0",
   "description": "Lightweight http server statically configurable using regular expressions",
   "main": "./index.js",
   "files": [
@@ -44,7 +44,7 @@
   },
   "homepage": "https://github.com/ArnaudBuchholz/reserve#readme",
   "devDependencies": {
-    "autocannon": "^7.0.1",
+    "autocannon": "^7.0.3",
     "colors": "^1.4.0",
     "coveralls": "^3.1.0",
     "eslint-utils": "^2.1.0",

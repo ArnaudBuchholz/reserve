@@ -2,11 +2,8 @@
 
 const http = require('http')
 const https = require('https')
-
-const uncook = 'unsecure-cookies'
-const fwdreq = 'forward-request'
-const fwdres = 'forward-response'
-const icert = 'ignore-unverifiable-certificate'
+const { PassThrough } = require('stream')
+const { $requestBodyBackup } = require('../symbols')
 
 function protocol (url) {
   if (url.startsWith('https')) {
@@ -32,26 +29,26 @@ function validateHook (mapping, hookName) {
 
 module.exports = {
   schema: {
-    [uncook]: {
+    'unsecure-cookies': {
       type: 'boolean',
       defaultValue: false
     },
-    [fwdreq]: {
+    'forward-request': {
       types: ['function', 'string'],
       defaultValue: noop
     },
-    [fwdres]: {
+    'forward-response': {
       types: ['function', 'string'],
       defaultValue: noop
     },
-    [icert]: {
+    'ignore-unverifiable-certificate': {
       type: 'boolean',
       defaultValue: false
     }
   },
   validate: async mapping => {
-    validateHook(mapping, fwdreq)
-    validateHook(mapping, fwdres)
+    validateHook(mapping, 'forward-request')
+    validateHook(mapping, 'forward-response')
   },
   redirect: async ({ configuration, mapping, match, redirect: url, request, response }) => {
     let done
@@ -67,28 +64,45 @@ module.exports = {
       url,
       headers
     }
-    if (mapping[icert]) {
+    if (mapping['ignore-unverifiable-certificate']) {
       options.rejectUnauthorized = false
     }
     const context = {}
-    await mapping[fwdreq]({ configuration, context, mapping, match, request: options, incoming: request })
+    const saveBody = await mapping['forward-request']({
+      configuration,
+      context,
+      mapping,
+      match,
+      request: options,
+      incoming: request
+    })
     const redirectedRequest = protocol(options.url).request(options.url, options, async redirectedResponse => {
-      if (mapping[uncook]) {
+      if (mapping['unsecure-cookies']) {
         unsecureCookies(redirectedResponse.headers)
       }
       const { headers: responseHeaders } = redirectedResponse
-      await mapping[fwdres]({ configuration, context, mapping, match, headers: responseHeaders })
+      const result = await mapping['forward-response']({
+        configuration,
+        context,
+        mapping,
+        match,
+        statusCode: redirectedResponse.statusCode,
+        headers: responseHeaders
+      })
       response.writeHead(redirectedResponse.statusCode, responseHeaders)
-      response.on('finish', done)
+      response.on('finish', () => done(result))
       redirectedResponse
         .on('error', fail)
         .pipe(response)
     })
     redirectedRequest.on('error', fail)
-    request
-      .on('data', chunk => redirectedRequest.write(chunk))
+    const requestBody = request[$requestBodyBackup] || request
+    requestBody.pipe(redirectedRequest)
       .on('error', fail)
-      .on('end', () => { redirectedRequest.end() })
+    if (saveBody) {
+      request.$requestBodyBackup = new PassThrough()
+      requestBody.pipe(request.$requestBodyBackup)
+    }
     return promise
   }
 }

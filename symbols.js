@@ -18,6 +18,7 @@ module.exports = {
   $requestId: Symbol(`${ns}request.id`),
   $requestPromise: Symbol(`${ns}request.promise`),
   $requestRedirectCount: Symbol(`${ns}request.redirectCount`),
+  $requestBodyBackup: Symbol(`${ns}request.bodyBackup`),
   $responseEnded: Symbol(`${ns}response.ended`),
   $useMiddleware: Symbol(`${ns}use.middleware`)
 }
