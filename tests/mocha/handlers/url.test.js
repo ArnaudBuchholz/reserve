@@ -206,4 +206,54 @@ describe('handlers/url', () => {
       }).then(({ promise }) => promise)
     ])
   })
+
+  describe('internal redirection', () => {
+    it('enables internal redirection through the forward-response hook', () => {
+      return handle({
+        request: {
+          method: 'GET',
+          url: http.urls.echos,
+          headers: {
+            'x-status-code': 200
+          }
+        },
+        mapping: {
+          [uid]: 'mapping',
+          'forward-response': () => {
+            return 'test'
+          }
+        },
+        configuration: { [uid]: 'configuration' },
+        match: { [uid]: 'match' }
+      })
+        .then(({ promise, response }) => promise.then(value => {
+          assert(() => value === 'test')
+          assert(() => response.statusCode === undefined) // Not yet answered
+        }))
+    })
+
+    it('forbids internal redirection when method is not GET or HEAD', () => {
+      return handle({
+        request: {
+          method: 'POST',
+          url: http.urls.echos,
+          headers: {
+            'x-status-code': 200
+          },
+          body: 'Hello World'
+        },
+        mapping: {
+          [uid]: 'mapping',
+          'forward-response': () => {
+            return 'test'
+          }
+        },
+        configuration: { [uid]: 'configuration' },
+        match: { [uid]: 'match' }
+      })
+        .then(({ promise, response }) => promise.then(assert.notExpected, reason => {
+          assert(() => !!reason)
+        }))
+    })
+  })
 })
