@@ -29,7 +29,7 @@ serve({
   port: 8081,
   mappings: [{
     match: /favicon\.ico/,
-    file: "favicon.ico"
+    file: 'favicon.ico'
   }, {
     match: /^\/$/,
     custom: html.bind(null, `<!doctype html>
