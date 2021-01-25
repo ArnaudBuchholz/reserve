@@ -4,7 +4,7 @@ This sample demonstrates the use of [server-sent events](https://developer.mozil
 
 ## How to start
 
-* `node ../..`
+`node ../..`
 
 ## How to use
 
