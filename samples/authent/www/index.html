@@ -1,0 +1,17 @@
+<html>
+  <head>
+    <title>Index</title>
+  </head>
+  <body>
+    <h1>This is the index page</h1>
+    <button>Call the API</button>
+    <script>
+      document.querySelector('button').addEventListener('click', () => {
+        fetch('/api/test')
+          .then(response => response.text())
+          .then(text => alert(text))
+          .catch(reason => alert('FAILED : ' + reason.toString()))
+      })
+    </script>
+  </body>
+</html>
