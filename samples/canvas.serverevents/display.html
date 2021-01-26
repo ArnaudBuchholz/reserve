@@ -19,6 +19,7 @@
       const windows = []
       let index = 0
       if (shared) {
+        localStorage[`plot.lastEventId`] = -1
         const plotsSource = new EventSource('/plots')
         plotsSource.addEventListener('plot', e => {
           const { data, lastEventId } = e
