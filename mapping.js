@@ -46,9 +46,12 @@ function checkMatch (mapping) {
   matchTypes[typeof mapping.match](mapping, mapping.match)
 }
 
+function notTrueOnly (value) {
+  return value !== undefined && value !== true
+}
+
 function checkInvertMatch (mapping) {
-  const invertMatch = mapping['invert-match']
-  if (invertMatch !== undefined && invertMatch !== true) {
+  if (notTrueOnly(mapping['invert-match'])) {
     throw new Error('Invalid mapping invert-match')
   }
 }
@@ -57,6 +60,12 @@ function checkIfMatch (mapping) {
   const ifMatch = mapping['if-match']
   if (!['undefined', 'function'].includes(typeof ifMatch)) {
     throw new Error('Invalid mapping if-match')
+  }
+}
+
+function checkExcludeFromHoldingList (mapping) {
+  if (notTrueOnly(mapping['exclude-from-holding-list'])) {
+    throw new Error('Invalid mapping exclude-from-holding-list')
   }
 }
 
@@ -74,6 +83,7 @@ module.exports = {
     checkMatch(mapping)
     checkInvertMatch(mapping)
     checkIfMatch(mapping)
+    checkExcludeFromHoldingList(mapping)
     const handler = checkHandler(configuration, mapping)
     checkMethod(mapping, $mappingMethod, handler[$handlerMethod])
     if (handler[$handlerSchema]) {
