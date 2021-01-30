@@ -68,10 +68,10 @@ The configuration interface lets you access the dictionary of handlers (member `
 
 It is recommended to be extremely careful when manipulating the mappings' content, since you might break the logic of the server.
 
-It is possible to safely change the list of mapping using the [asynchronous](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) `setMappings` method. This API takes two parameters: the new list of mappings and the current request.
+It is possible to safely change the list of mappings using the [asynchronous](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) `setMappings` method. This API takes two parameters: the new list of mappings and the current request.
 
 The API will:
 * validate any new mapping *(relies on an internal detection mechanism based on symbols)*
-* **wait** for all pending requests to be completed before applying the new list
+* **wait** for all pending requests to be completed before applying the new mappings *(any new incoming request is put on hold in the meantime)*
 
-**NOTE** : If the server implements [server-sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events), this could lead to an infinite waiting time.
+**NOTE** : If the server implements [server-sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) or any blocking request, this could lead to an **infinite waiting time**. To ignore such requests, use the mapping setting [`exclude-from-holding-list`](https://github.com/ArnaudBuchholz/reserve/blob/master/doc/configuration.md).
