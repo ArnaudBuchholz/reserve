@@ -16,8 +16,6 @@ module.exports = {
   $mappingMatch: Symbol(`${ns}mapping.match`),
   $mappingMethod: Symbol(`${ns}mapping.method`),
   $requestId: Symbol(`${ns}request.id`),
-  $requestPromise: Symbol(`${ns}request.promise`),
-  $requestRedirectCount: Symbol(`${ns}request.redirectCount`),
   $responseEnded: Symbol(`${ns}response.ended`),
   $useMiddleware: Symbol(`${ns}use.middleware`)
 }
