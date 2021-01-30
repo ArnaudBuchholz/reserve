@@ -51,7 +51,8 @@ See [Custom handlers](#custom-handlers) for more information.
 
 ## mappings
 
-An array of mappings that is evaluated in the order of declaration.
+An array of mappings :
+* For each incoming request, the mapings are evaluated in the order of declaration
 * Several mappings may apply to the same request
 * Evaluation stops when the request is **finalized** *(see the note below)*
 * When a handler triggers a redirection, the array of mappings is re-evaluated
@@ -66,6 +67,8 @@ Each mapping may contain :
 * `invert-match` *(optional)* : inverts the matching process when set to `true` *(only allowed value)*. It enables the implementation of an *'all but'* pattern. A typical use forbids unexpected verbs by creating an inverted match on the list of supported verbs.
 
 * `if-match` *(optional)* : a function being executed only if the mapping matches the request (*meaning after applying `match`, `method` and `invert-match`*). It receives the request object, the current url *(in case of internal redirections)* and the current match result. It may return a `string` or a `number` to trigger an internal redirection or any other value. If truthy, the mapping is applied otherwise it is ignored.<br /> **NOTE** : If the mapping handler value relies on captured groups, the `if-match` methods **must** return the match parameter.
+
+* `exclude-from-holding-list` *(optional)* : when set to `true`, it instructs REserve to ignore any request processed by this mapping when updating the list of mappings with [`setMappings`](https://github.com/ArnaudBuchholz/reserve/blob/master/doc/handler.md#configuration-interface).
 
 * the handler prefix *(required)* : for instance `custom`, `file`, `status`, `url`, `use`... which value may contain capturing groups *(see [Custom handlers](#custom-handlers))*
 
