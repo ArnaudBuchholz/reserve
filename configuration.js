@@ -198,8 +198,8 @@ module.exports = {
     await checkMappings(checkedConfiguration)
     checkedConfiguration[$configurationRequests] = {
       lastId: 0,
-      hold: Promise.resolve(),
-      promises: []
+      holding: Promise.resolve(),
+      contexts: []
     }
     return checkedConfiguration
   },
