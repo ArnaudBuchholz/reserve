@@ -72,4 +72,6 @@ It is possible to safely change the list of mapping using the [asynchronous](htt
 
 The API will:
 * validate any new mapping *(relies on an internal detection mechanism based on symbols)*
-* wait for all pending requests to be completed before applying the new list
+* **wait** for all pending requests to be completed before applying the new list
+
+**NOTE** : If the server implements [server-sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events), this could lead to an infinite waiting time.
