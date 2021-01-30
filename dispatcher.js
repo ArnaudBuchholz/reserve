@@ -8,8 +8,6 @@ const {
   $dispatcherEnd,
   $mappingMatch,
   $requestId,
-  $requestPromise,
-  $requestRedirectCount,
   $responseEnded
 } = require('./symbols')
 
@@ -48,7 +46,7 @@ function redirected () {
   } catch (reason) {
     emitError.call(this, reason)
   }
-  this.resolve()
+  this.redirected()
 }
 
 function error (reason) {
@@ -70,7 +68,7 @@ function error (reason) {
 }
 
 function redispatch (url) {
-  const redirectCount = ++this.request[$requestRedirectCount]
+  const redirectCount = ++this.redirectCount
   if (redirectCount > this.configuration['max-redirect']) {
     error.call(this, 508)
   } else {
@@ -134,29 +132,46 @@ async function dispatch (url, index = 0) {
 
 module.exports = function (configuration, request, response) {
   const configurationRequests = configuration[$configurationRequests]
+  const { contexts } = configurationRequests
   const emitParameters = { id: ++configurationRequests.lastId, method: request.method, url: request.url, start: new Date() }
-  let promiseResolver
-  const requestPromise = new Promise(resolve => { promiseResolver = resolve })
-  const context = { eventEmitter: this, emitParameters, configuration, request, response, resolve: promiseResolver }
+  let dispatched
+  const dispatching = new Promise(resolve => { dispatched = resolve })
+  let release
+  const holding = new Promise(resolve => { release = resolve })
+  const context = {
+    configuration,
+    eventEmitter: this,
+    emitParameters,
+    holding,
+    redirectCount: 0,
+    redirected () {
+      this.setAsNonHolding()
+      dispatched()
+    },
+    request,
+    response,
+    setAsNonHolding () {
+      this.released = true
+      release()
+    }
+  }
   request[$requestId] = emitParameters.id
-  request[$requestPromise] = requestPromise
-  request[$requestRedirectCount] = 0
   request.on('aborted', emit.bind(this, 'aborted', emitParameters))
   request.on('close', emit.bind(this, 'closed', emitParameters))
   try {
     emit.call(this, 'incoming', emitParameters)
   } catch (reason) {
     error.call(context, reason)
-    return requestPromise
+    return dispatching
   }
-  return configurationRequests.hold
+  return configurationRequests.holding
     .then(() => {
-      configurationRequests.promises.push(requestPromise)
+      contexts.push(context)
       dispatch.call(context, request.url)
-      return requestPromise
+      return dispatching
     })
     .then(() => {
-      configurationRequests.promises = configurationRequests.promises
-        .filter(promise => promise !== requestPromise)
+      const index = contexts.findIndex(candidate => candidate === context)
+      contexts.splice(index, 1)
     })
 }
