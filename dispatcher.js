@@ -76,14 +76,12 @@ function redispatch (url) {
   }
 }
 
-function redirecting ({ mapping, match, handler, type, redirect, url, index = 0 }) {
+function redirecting ({ mapping = {}, match, handler, type, redirect, url, index = 0 }) {
   try {
     emit.call(this.eventEmitter, 'redirecting', this.emitParameters, { type, redirect })
-/* TODO: currently failing because of test that does not forward mapping
     if (mapping['exclude-from-holding-list']) {
       this.setAsNonHolding()
     }
-*/
     return handler.redirect({
       configuration: this.configuration[$configurationInterface],
       mapping,
