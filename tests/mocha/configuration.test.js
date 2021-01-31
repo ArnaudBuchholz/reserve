@@ -226,6 +226,39 @@ describe('configuration', () => {
           file: '$1'
         }]
       })))
+
+      const invalidInvertExcludeFromHoldingList = [
+        false,
+        0,
+        1,
+        {}
+      ]
+
+      invalidInvertExcludeFromHoldingList.forEach(invalidExcludeFromHoldingList => {
+        it(`validates exclude-from-holding-list (${JSON.stringify(invalidExcludeFromHoldingList)})`, () => shouldFail(check({
+          mappings: [{
+            match: '^/',
+            'exclude-from-holding-list': invalidExcludeFromHoldingList,
+            file: '$1'
+          }]
+        })))
+      })
+
+      it('validates exclude-from-holding-list (function)', () => shouldFail(check({
+        mappings: [{
+          match: '^/',
+          'exclude-from-holding-list': shouldFail,
+          file: '$1'
+        }]
+      })))
+
+      it('validates exclude-from-holding-list (Symbol)', () => shouldFail(check({
+        mappings: [{
+          match: '^/',
+          'exclude-from-holding-list': Symbol('test'),
+          file: '$1'
+        }]
+      })))
     })
 
     describe('handlers', () => {
