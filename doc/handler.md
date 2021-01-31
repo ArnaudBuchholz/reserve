@@ -68,7 +68,7 @@ The configuration interface lets you access the dictionary of handlers (member `
 
 It is recommended to be extremely careful when manipulating the mappings' content, since you might break the logic of the server.
 
-It is possible to safely change the list of mappings using the [asynchronous](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) `setMappings` method. This API takes two parameters: the new list of mappings and the current request.
+It is possible to safely change the list of mappings using the [asynchronous](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) `setMappings` method. This API takes two parameters: the new list of mappings and the current request. An optional third numeric parameter can be used to specify a timeout *(in ms, default `5000`)* after which the API fails *(usefull to detect blocking situations, see [#39](https://github.com/ArnaudBuchholz/reserve/issues/39))*
 
 The API will:
 * validate any new mapping *(relies on an internal detection mechanism based on symbols)*
