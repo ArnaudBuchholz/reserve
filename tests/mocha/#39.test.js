@@ -5,7 +5,16 @@ const { check, mock } = require('../../index')
 
 const reconfigure = {
   async redirect ({ configuration, request, response }) {
-    await configuration.setMappings([], request, 100)
+    await configuration.setMappings([{
+      method: 'GET',
+      match: '/world',
+      custom: async (request, response) => {
+        response.writeHead(200, {
+          'content-type': 'text/plain'
+        })
+        response.end('World')
+      }
+    }], request, 100)
     response.writeHead(200, {
       'content-type': 'text/plain'
     })
@@ -37,6 +46,12 @@ const defaultConfigurationPromise = check({
       })
       response.end('Hello')
     }
+  }, {
+    method: 'GET',
+    match: '/redirect',
+    custom: () => new Promise(resolve => {
+      setTimeout(() => resolve('/hello'), 50)
+    })
   }]
 })
 
@@ -49,17 +64,23 @@ describe('#39 setMapings blocked by long request', () => {
     mocked.request('GET', '/non-holding')
     return Promise.all([
       mocked.request('GET', '/hello'),
+      mocked.request('GET', '/redirect'),
       mocked.request('GET', '/reconfigure'),
       mocked.request('GET', '/hello')
     ])
       .then(responses => {
         assert(() => responses[0].toString() === 'Hello')
-        assert(() => responses[1].statusCode === 500) // failed
-        assert(() => responses[2].toString() === 'Hello')
+        assert(() => responses[1].toString() === 'Hello')
+        assert(() => responses[2].statusCode === 500) // failed
+        assert(() => responses[3].toString() === 'Hello')
         return mocked.request('GET', '/hello')
       })
       .then(response => {
         assert(() => response.toString() === 'Hello')
+        return mocked.request('GET', '/world')
+      })
+      .then(response => {
+        assert(() => response.statusCode === 501) // reconfigure failed
       })
   })
 
@@ -72,6 +93,14 @@ describe('#39 setMapings blocked by long request', () => {
       .then(responses => {
         assert(() => responses[0].toString() === 'Hello')
         assert(() => responses[1].toString() === 'OK')
+        return mocked.request('GET', '/world')
+      })
+      .then(response => {
+        assert(() => response.toString() === 'World')
+        return mocked.request('GET', '/hello')
+      })
+      .then(response => {
+        assert(() => response.statusCode === 501)
       })
   })
 })
