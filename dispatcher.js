@@ -37,12 +37,13 @@ function emitError (reason) {
 
 function redirected () {
   const end = new Date()
+  Object.assign(this.emitParameters, {
+    end,
+    timeSpent: end - this.emitParameters.start,
+    statusCode: this.response.statusCode
+  })
   try {
-    emit.call(this.eventEmitter, 'redirected', this.emitParameters, {
-      end,
-      timeSpent: end - this.emitParameters.start,
-      statusCode: this.response.statusCode
-    })
+    emit.call(this.eventEmitter, 'redirected', this.emitParameters)
   } catch (reason) {
     emitError.call(this, reason)
   }
