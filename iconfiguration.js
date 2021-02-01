@@ -1,6 +1,6 @@
 'use strict'
 
-const { gray, red, green } = require('./detect/colors')
+const { red } = require('./detect/colors')
 const { check } = require('./mapping')
 const {
   $configuration,
@@ -33,7 +33,7 @@ module.exports = class IConfiguration {
     const configuration = this[$configuration]
     await checkMappings(configuration, mappings)
     const configurationRequests = configuration[$configurationRequests]
-    const { contexts } = configurationRequests
+    const contexts = [...configurationRequests.contexts]
     const requestContext = contexts.filter(({ request: candidate }) => candidate === request)[0]
     const requestsHolding = contexts.filter(candidate => candidate !== requestContext).map(({ holding }) => holding)
     const holding = Promise.race([
@@ -47,16 +47,25 @@ module.exports = class IConfiguration {
       })
     configurationRequests.holding = holding.then(undefined, () => {}) // Absorb error to unblock server
     holding.then(undefined, () => {
-      console.log(red('REserve detected a long holding request during configuration.setMappings'))
-      contexts.forEach(({ request, released }) => {
-        let status
-        if (released) {
-          status = green('excluded from holding list')
+      console.log(red('REserve blocked during configuration.setMappings'))
+      console.table(contexts.map(context => {
+        const { emitParameters, request, released } = context
+        let info
+        if (emitParameters.statusCode) {
+          info = { statusCode: emitParameters.statusCode }
+        } else if (released) {
+          info = 'exclude-from-holding-list'
+        } else if (context === requestContext) {
+          info = 'configure.setMappings'
         } else {
-          status = ''
+          info = { ms: (new Date() - emitParameters.start) } // + ' ms'
         }
-        console.log(gray(request.method), gray(request.url), status)
-      })
+        return {
+          method: request.method,
+          url: request.url,
+          info
+        }
+      }))
     })
     return holding
   }
