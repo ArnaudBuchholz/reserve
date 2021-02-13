@@ -18,7 +18,11 @@
       }
       const windows = []
       let index = 0
-      if (mode === 'shared') {
+      if (mode === 'worker') {
+        navigator.serviceWorker.register('/sw.js', {scope: '/'})
+          .then(registered => console.log('Registration succeeded. Scope is ' + registered.scope))
+          .catch(error => console.log('Registration failed', error))
+      } else if (mode === 'shared') {
         localStorage[`plot.lastEventId`] = -1
         const plotsSource = new EventSource('/plots')
         plotsSource.addEventListener('plot', e => {
@@ -43,5 +47,6 @@
       <script>
         document.querySelector('button').addEventListener('click', () => windows.forEach(wnd => wnd.close()))
       </script>
+      <a href="chrome://inspect/#service-workers" target="_blank">chrome://inspect/#service-workers</a>
   </body>
 </html>
