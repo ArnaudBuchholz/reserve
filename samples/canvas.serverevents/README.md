@@ -18,6 +18,6 @@ When using 6 windows, you reach the [limit of opened connections for the browser
 
 With the help of [storage events](https://developer.mozilla.org/en-US/docs/Web/API/Window/storage_event), it is possible to build a solution that goes beyond this limit.
 
-* 6 windows : http://localhost:8082/display.html?count=6&header=100&shared=true
-* 9 windows : http://localhost:8082/display.html?count=9&header=100&shared=true
-* 16 windows : http://localhost:8082/display.html?count=16&header=100&shared=true
+* 6 windows : http://localhost:8082/display.html?count=6&header=100&mode=shared
+* 9 windows : http://localhost:8082/display.html?count=9&header=100&mode=shared
+* 16 windows : http://localhost:8082/display.html?count=16&header=100&mode=shared
