@@ -4,7 +4,7 @@
     <script>
       const count = parseInt((location.search.match(/count=(\d+)/) || [,4])[1])
       const header = parseInt((location.search.match(/header=(\d+)/) || [,0])[1])
-      const shared = !!location.search.match(/shared=true/)
+      const mode = (location.search.match(/mode=([^&]+)/) || [,'event'])[1]
       const cols = Math.ceil(Math.sqrt(count))
       const rows = Math.ceil(count / cols)
       const features = {
@@ -18,7 +18,7 @@
       }
       const windows = []
       let index = 0
-      if (shared) {
+      if (mode === 'shared') {
         localStorage[`plot.lastEventId`] = -1
         const plotsSource = new EventSource('/plots')
         plotsSource.addEventListener('plot', e => {
@@ -33,7 +33,7 @@
           .concat('left=' + (index % cols) * features.width)
           .concat('top=' + Math.floor(index / cols) * (features.height + header))
           .join(',')
-          windows.push(window.open(`http://localhost:8082/draw.html?shared=${shared}`, '_blank', windowFeatures))
+          windows.push(window.open(`http://localhost:8082/draw.html?mode=${mode}`, '_blank', windowFeatures))
         ++index
       }
     </script>
