@@ -55,8 +55,8 @@ html, body {
       context.stroke()
       context.fill()
     }
-    const shared = !!location.search.match(/shared=true/)
-    if (shared) {
+    const mode = (location.search.match(/mode=([^&]+)/) || ['event'])[1]
+    if (mode === 'shared') {
       const lastEventId = parseInt(localStorage['plot.lastEventId'] || '0', 10)
       for (let id = 0; id <= lastEventId; ++id) {
         const data = localStorage[`plot#${id}`]
