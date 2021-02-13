@@ -56,7 +56,17 @@ html, body {
       context.fill()
     }
     const mode = (location.search.match(/mode=([^&]+)/) || ['event'])[1]
-    if (mode === 'shared') {
+    if (mode === 'worker') {
+        navigator.serviceWorker.register('/sw.js', {scope: '/'})
+          .then(registered => console.log('Registration succeeded. Scope is ' + registered.scope))
+          .catch(error => console.log('Registration failed', error))
+        navigator.serviceWorker.addEventListener('message', event => {
+          const { type, lastEventId, data } = event.data
+          if (type === 'plot') {
+            plot(lastEventId, data)
+          }
+        })
+    } else if (mode === 'shared') {
       const lastEventId = parseInt(localStorage['plot.lastEventId'] || '0', 10)
       for (let id = 0; id <= lastEventId; ++id) {
         const data = localStorage[`plot#${id}`]
