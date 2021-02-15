@@ -97,7 +97,7 @@ describe('configuration', () => {
 
     it('supports http2', () => {
       return read('/folder/reserve.json')
-        .then(configuration => check({ ...configuration, http2: true }))
+        .then(configuration => check({ ...configuration, http2: true }))
         .then(configuration => {
           assert(() => configuration.ssl.key === 'privatekey')
           assert(() => configuration.ssl.cert === 'certificate')
