@@ -86,6 +86,7 @@
       "tests/mocha/mocked_modules/fs.js",
       "tests/mocha/mocked_modules/http.js",
       "tests/mocha/mocked_modules/https.js",
+      "tests/mocha/mocked_modules/http2.js",
       "tests/mocha/mocked_modules/process.js"
     ]
   },
