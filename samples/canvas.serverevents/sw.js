@@ -1,5 +1,7 @@
 'use strict'
 
+/* global self, EventSource */
+
 self.addEventListener('install', event => {
   console.log('installed, activating immediately')
   event.waitUntil(self.skipWaiting())
