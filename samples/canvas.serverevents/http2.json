@@ -1,0 +1,10 @@
+{
+  "port": 8082,
+  "http2": true,
+  "ssl": {
+    "key": "../../tests/privatekey.pem",
+    "cert": "../../tests/certificate.pem"
+  },
+  "extend": "./mappings.json"
+}
+  
