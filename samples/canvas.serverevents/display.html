@@ -37,7 +37,7 @@
           .concat('left=' + (index % cols) * features.width)
           .concat('top=' + Math.floor(index / cols) * (features.height + header))
           .join(',')
-          windows.push(window.open(`http://localhost:8082/draw.html?mode=${mode}`, '_blank', windowFeatures))
+          windows.push(window.open(`/draw.html?mode=${mode}`, '_blank', windowFeatures))
         ++index
       }
     </script>
