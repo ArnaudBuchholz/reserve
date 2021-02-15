@@ -58,7 +58,7 @@ describe('serve', () => {
   )
 
   it('allocates http2 server', () => read('/folder/reserve-with-another-port.json')
-    .then(configuration => promisify({ ...configuration, http2: true }, ({ url }) => {
+    .then(configuration => promisify({ ...configuration, http2: true }, ({ url }) => {
       assert(() => url === 'http2://0.0.0.0:220103/')
     }))
   )
