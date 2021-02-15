@@ -1,0 +1,12 @@
+{
+  "mappings": [{
+    "match": "/plots",
+    "methods": "POST,GET",
+    "custom": "plots.js"
+  }, {
+    "match": "/(.*)",
+    "file": "$1"
+  }, {
+    "status": 501
+  }]
+}
