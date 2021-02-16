@@ -5,6 +5,7 @@ const http = require('../http')
 const assert = require('../assert')
 const urlHandler = require('../../../handlers/url')
 const handle = require('./handle')(urlHandler)
+const { $configuration } = require('../../../symbols')
 
 describe('handlers/url', () => {
   it('returns a promise', () => handle({
@@ -108,8 +109,8 @@ describe('handlers/url', () => {
     },
     mapping: {
       [uid]: 'mapping',
-      'forward-request': async ({ configuration: receivedConfiguration, context, mapping: receivedMapping, match: receivedMatch, request }) => {
-        assert(() => receivedConfiguration[uid] === 'configuration')
+      'forward-request': async ({ configuration: receivedIConfiguration, context, mapping: receivedMapping, match: receivedMatch, request }) => {
+        assert(() => receivedIConfiguration[$configuration][uid] === 'configuration')
         assert(() => receivedMapping[uid] === 'mapping')
         assert(() => receivedMatch[uid] === 'match')
         assert(() => context && typeof context === 'object')
@@ -131,8 +132,8 @@ describe('handlers/url', () => {
   )
 
   it('manipulates response headers (forward-response)', () => {
-    mockRequire('/url.forward-response.js', ({ configuration: receivedConfiguration, context, mapping: receivedMapping, match: receivedMatch, headers }) => {
-      assert(() => receivedConfiguration[uid] === 'configuration')
+    mockRequire('/url.forward-response.js', ({ configuration: receivedIConfiguration, context, mapping: receivedMapping, match: receivedMatch, headers }) => {
+      assert(() => receivedIConfiguration[$configuration][uid] === 'configuration')
       assert(() => receivedMapping[uid] === 'mapping')
       assert(() => receivedMatch[uid] === 'match')
       assert(() => context && typeof context === 'object')
@@ -255,5 +256,30 @@ describe('handlers/url', () => {
           assert(() => !!reason)
         }))
     })
+  })
+
+  describe('HTTP/2 support', () => {
+    it('filters out forbidden headers', () => handle({
+      configuration: {
+        http2: true
+      },
+      request: {
+        method: 'POST',
+        url: http.urls.echos,
+        headers: {
+          ':method': 'POST',
+          'x-status-code': 200
+        },
+        body: 'Hello World!'
+      }
+    })
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 200)
+        assert(() => response.toString() === 'Hello World!')
+        assert(() => !response.headers[':method'])
+        assert(() => !response.headers.connection)
+      }))
+    )
   })
 })
