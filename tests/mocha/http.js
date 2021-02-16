@@ -16,7 +16,10 @@ module.exports = {
     const result = new EventEmitter()
     const response = new Response()
     const statusCode = options.headers['x-status-code']
-    response.writeHead(statusCode, options.headers)
+    response.writeHead(statusCode, {
+      connection: 'close',
+      ...options.headers
+    })
     result.write = chunk => {
       response.write(chunk)
     }
