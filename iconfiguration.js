@@ -29,6 +29,10 @@ module.exports = class IConfiguration {
     return [].concat(this[$configuration].mappings)
   }
 
+  get http2 () {
+    return this[$configuration].http2 || false
+  }
+
   async setMappings (mappings, request, timeout = 5000) {
     const configuration = this[$configuration]
     await checkMappings(configuration, mappings)
