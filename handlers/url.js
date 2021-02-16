@@ -3,6 +3,12 @@
 const http = require('http')
 const https = require('https')
 
+const http2ForbiddenResponseHeaders = [
+  'transfer-encoding',
+  'connection',
+  'keep-alive'
+]
+
 function protocol (url) {
   if (url.startsWith('https')) {
     return https
@@ -75,6 +81,9 @@ module.exports = {
       incoming: request
     }
     await mapping['forward-request'](hookParams)
+    Object.keys(options.headers)
+      .filter(header => header.startsWith(':'))
+      .forEach(header => delete options.headers[header])
     const redirectedRequest = protocol(options.url).request(options.url, options, async redirectedResponse => {
       if (mapping['unsecure-cookies']) {
         unsecureCookies(redirectedResponse.headers)
@@ -90,6 +99,9 @@ module.exports = {
           return fail(new Error('Internal redirection impossible because the body is already consumed'))
         }
         return done(result)
+      }
+      if (configuration.http2) {
+        http2ForbiddenResponseHeaders.forEach(header => delete responseHeaders[header])
       }
       response.writeHead(redirectedResponse.statusCode, responseHeaders)
       response.on('finish', () => done(result))
