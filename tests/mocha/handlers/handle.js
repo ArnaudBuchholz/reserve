@@ -2,6 +2,7 @@
 
 const Request = require('../../../mock/Request')
 const Response = require('../../../mock/Response')
+const IConfiguration = require('../../../iconfiguration')
 const { check } = require('../../../mapping')
 
 module.exports = (handler, defaults = {}) => function ({ request, mapping, configuration, match, redirect }) {
@@ -11,6 +12,7 @@ module.exports = (handler, defaults = {}) => function ({ request, mapping, confi
   request = new Request(request)
   const response = new Response()
   configuration = { ...defaults.configuration, ...configuration, handler: () => { return { handler } } }
+  const iconfiguration = new IConfiguration(configuration)
   let mappingReady
   if (mapping !== null) {
     mapping = { ...defaults.mapping, ...mapping }
@@ -21,7 +23,7 @@ module.exports = (handler, defaults = {}) => function ({ request, mapping, confi
   return mappingReady
     .then(() => {
       const promise = handler.redirect({
-        configuration,
+        configuration: iconfiguration,
         match,
         request,
         response,
