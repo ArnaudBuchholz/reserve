@@ -95,22 +95,40 @@ describe('configuration', () => {
         })
     })
 
-    it('supports unsecured http2', () => {
-      return read('/reserve.json')
-        .then(configuration => check({ ...configuration, http2: true }))
-        .then(configuration => {
-          assert(() => configuration.protocol === 'http')
-        })
-    })
+    describe('http2', () => {
+      it('defaults http2 to false', () => {
+        return read('/reserve.json')
+          .then(configuration => check({ ...configuration }))
+          .then(configuration => {
+            assert(() => configuration.http2 === false)
+          })
+      })
 
-    it('supports secured http2', () => {
-      return read('/folder/reserve.json')
-        .then(configuration => check({ ...configuration, http2: true }))
-        .then(configuration => {
-          assert(() => configuration.ssl.key === 'privatekey')
-          assert(() => configuration.ssl.cert === 'certificate')
-          assert(() => configuration.protocol === 'https')
-        })
+      it('validates http2', () => {
+        return read('/folder/reserve.json')
+          .then(configuration => check({ ...configuration, http2: 'abc' }))
+          .then(assert.notExpected, reason => {
+            assert(() => !!reason)
+          })
+      })
+
+      it('supports unsecured http2', () => {
+        return read('/reserve.json')
+          .then(configuration => check({ ...configuration, http2: true }))
+          .then(configuration => {
+            assert(() => configuration.protocol === 'http')
+          })
+      })
+
+      it('supports secured http2', () => {
+        return read('/folder/reserve.json')
+          .then(configuration => check({ ...configuration, http2: true }))
+          .then(configuration => {
+            assert(() => configuration.ssl.key === 'privatekey')
+            assert(() => configuration.ssl.cert === 'certificate')
+            assert(() => configuration.protocol === 'https')
+          })
+      })
     })
 
     describe('mappings', () => {
