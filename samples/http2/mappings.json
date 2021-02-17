@@ -1,0 +1,14 @@
+{
+  "mappings": [{
+    "match": "/http2-\\d+.svg",
+    "file": "http2.svg"
+  }, {
+    "match": "/$",
+    "file": "index.html"
+  }, {
+    "match": "/(.*)",
+    "file": "$1"
+  }, {
+    "status": 501
+  }]
+}
