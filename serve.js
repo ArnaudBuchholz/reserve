@@ -9,19 +9,25 @@ const http2 = require('http2')
 const { $configurationInterface } = require('./symbols')
 
 function createServer (configuration, requestHandler) {
+  const { httpOptions } = configuration
   if (configuration.ssl) {
     if (configuration.http2) {
       return http2.createSecureServer({
         key: configuration.ssl.key,
-        cert: configuration.ssl.cert
+        cert: configuration.ssl.cert,
+        ...httpOptions
       }, requestHandler)
     }
     return https.createServer({
       key: configuration.ssl.key,
-      cert: configuration.ssl.cert
+      cert: configuration.ssl.cert,
+      ...httpOptions
     }, requestHandler)
   }
-  return http.createServer(requestHandler)
+  if (configuration.http2) {
+    return http2.createServer(httpOptions, requestHandler)
+  }
+  return http.createServer(httpOptions, requestHandler)
 }
 
 function createServerAsync (eventEmitter, configuration, dispatcher) {
