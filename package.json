@@ -1,6 +1,6 @@
 {
   "name": "reserve",
-  "version": "1.10.1",
+  "version": "1.11.0",
   "description": "Lightweight http server statically configurable using regular expressions",
   "main": "./index.js",
   "files": [
@@ -54,13 +54,13 @@
     "lodash": "^4.17.20",
     "mime": "^2.5.0",
     "minimist": ">=1.2.3",
-    "mocha": "^8.2.1",
+    "mocha": "^8.3.0",
     "mock-require": "^3.0.3",
     "nyc": "^15.1.0",
     "passport": "^0.4.1",
-    "socket.io": "^3.1.0",
+    "socket.io": "^3.1.1",
     "standard": "^16.0.3",
-    "start-server-and-test": "^1.11.7"
+    "start-server-and-test": "^1.12.0"
   },
   "dependencies": {},
   "standard": {
