@@ -50,9 +50,11 @@ module.exports = jsonConfiguration => {
       return createServerAsync(eventEmitter, configuration, dispatcher)
         .then(server => {
           const port = server.address().port
+          const { http2 } = configuration
           eventEmitter.emit('ready', {
             url: `${configuration.protocol}://${configuration.hostname || '0.0.0.0'}:${port}/`,
-            port
+            port,
+            http2
           })
         })
     })
