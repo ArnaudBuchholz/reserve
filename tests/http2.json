@@ -1,10 +1,9 @@
 {
-    "extend": "./mappings.json",
-    "port": 5002,
-    "http2": true,
-    "ssl": {
-      "key": "./privatekey.pem",
-      "cert": "./certificate.pem"
-    }
+  "extend": "./mappings.json",
+  "port": 5002,
+  "http2": true,
+  "ssl": {
+    "key": "./privatekey.pem",
+    "cert": "./certificate.pem"
   }
-  
+}
