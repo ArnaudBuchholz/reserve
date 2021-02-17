@@ -60,3 +60,4 @@
 |1.10.0|Enables redirection within the `url` handler through the `forward-response` hook (only `GET` and `HEAD` requests)|
 |1.10.1|Detects and handles blocking situations during [`configuration.setMappings`](https://github.com/ArnaudBuchholz/reserve/blob/master/doc/handler.md#configuration-interface) ([#39](https://github.com/ArnaudBuchholz/reserve/issues/39))|
 ||Introduces `exclude-from-holding-list` to exclude blocking requests from holding [`configuration.setMappings`](https://github.com/ArnaudBuchholz/reserve/blob/master/doc/handler.md#configuration-interface) ([#39](https://github.com/ArnaudBuchholz/reserve/issues/39))|
+|1.11.0|[HTTP/2](https://en.wikipedia.org/wiki/HTTP/2) support|
