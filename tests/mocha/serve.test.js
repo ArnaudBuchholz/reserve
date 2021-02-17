@@ -40,26 +40,37 @@ describe('serve', () => {
   it('allocates http server', () => promisify({
     hostname: '127.0.0.1',
     port: 3475
-  }, ({ url }) => {
+  }, ({ url, http2 }) => {
     assert(() => url === 'http://127.0.0.1:3475/')
+    assert(() => http2 === false)
   }))
 
   it('allocates a port', () => promisify({
     hostname: '127.0.0.1',
     port: 'auto'
-  }, ({ url }) => {
+  }, ({ url, http2 }) => {
     assert(() => url === 'http://127.0.0.1:34750/')
+    assert(() => http2 === false)
   }))
 
   it('allocates https server', () => read('/folder/reserve-with-another-port.json')
-    .then(configuration => promisify(configuration, ({ url }) => {
+    .then(configuration => promisify(configuration, ({ url, http2 }) => {
       assert(() => url === 'https://0.0.0.0:220103/')
+      assert(() => http2 === false)
     }))
   )
 
-  it('allocates http2 server', () => read('/folder/reserve-with-another-port.json')
-    .then(configuration => promisify({ ...configuration, http2: true }, ({ url }) => {
-      assert(() => url === 'http2://0.0.0.0:220103/')
+  it('allocates unsecured http2 server', () => read('/reserve.json')
+    .then(configuration => promisify({ ...configuration, http2: true }, ({ url, http2 }) => {
+      assert(() => url === 'http://0.0.0.0:3475/')
+      assert(() => http2 === true)
+    }))
+  )
+
+  it('allocates secured http2 server', () => read('/folder/reserve-with-another-port.json')
+    .then(configuration => promisify({ ...configuration, http2: true }, ({ url, http2 }) => {
+      assert(() => url === 'https://0.0.0.0:220103/')
+      assert(() => http2 === true)
     }))
   )
 
