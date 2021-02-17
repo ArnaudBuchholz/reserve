@@ -132,11 +132,7 @@ async function checkProtocol (configuration) {
   if (configuration.ssl) {
     configuration.ssl.cert = await readSslFile(configuration, configuration.ssl.cert)
     configuration.ssl.key = await readSslFile(configuration, configuration.ssl.key)
-    if (configuration.http2 === true) {
-      configuration.protocol = 'http2'
-    } else {
-      configuration.protocol = 'https'
-    }
+    configuration.protocol = 'https'
   } else {
     configuration.protocol = 'http'
   }
