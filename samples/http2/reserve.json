@@ -1,0 +1,5 @@
+{
+  "port": 8080,
+  "extend": "./mappings.json"
+}
+  
