@@ -30,6 +30,22 @@ The object must contain :
 
 If relative, the configuration file directory or the current working directory (when embedding) is considered.
 
+## http2 *(optional)*
+*From version 1.11.0*
+
+When set to `true`, REserve allocates an [HTTP/2](https://en.wikipedia.org/wiki/HTTP/2) server.
+
+**NOTE** : Since browsers do not connect to an unsecure HTTP/2 server, use `ssl`.
+
+## httpOptions *(optional)*
+*From version 1.11.0*
+
+This object provides **additional server creation options** *(not validated)* being passed to the appropriate native API :
+* [http.createServer](https://nodejs.org/api/http.html#http_http_createserver_options_requestlistener)
+* [https.createServer](https://nodejs.org/api/https.html#https_https_createserver_options_requestlistener)
+* [http2.createServer](https://nodejs.org/api/http2.html#http2_http2_createserver_options_onrequesthandler)
+* [http2.createSecureServer](https://nodejs.org/api/http2.html#http2_http2_createsecureserver_options_onrequesthandler)
+
 ## handlers
 
 An object associating a handler prefix to a handler object.
