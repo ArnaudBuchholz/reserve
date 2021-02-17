@@ -136,6 +136,12 @@ async function checkProtocol (configuration) {
   } else {
     configuration.protocol = 'http'
   }
+  if (![true, false, undefined].includes(configuration.http2)) {
+    throw new Error('Invalid http2 setting')
+  }
+  if (!configuration.http2) {
+    configuration.http2 = false
+  }
 }
 
 async function checkMappings (configuration) {
