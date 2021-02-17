@@ -4,5 +4,6 @@ const { request, createServer } = require('../http')
 
 require('mock-require')('http2', {
   request,
+  createServer: createServer,
   createSecureServer: createServer
 })
