@@ -30,7 +30,7 @@ module.exports = class IConfiguration {
   }
 
   get http2 () {
-    return this[$configuration].http2 || false
+    return this[$configuration].http2
   }
 
   async setMappings (mappings, request, timeout = 5000) {
