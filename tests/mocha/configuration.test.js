@@ -95,13 +95,21 @@ describe('configuration', () => {
         })
     })
 
-    it('supports http2', () => {
+    it('supports unsecured http2', () => {
+      return read('/reserve.json')
+        .then(configuration => check({ ...configuration, http2: true }))
+        .then(configuration => {
+          assert(() => configuration.protocol === 'http')
+        })
+    })
+
+    it('supports secured http2', () => {
       return read('/folder/reserve.json')
         .then(configuration => check({ ...configuration, http2: true }))
         .then(configuration => {
           assert(() => configuration.ssl.key === 'privatekey')
           assert(() => configuration.ssl.cert === 'certificate')
-          assert(() => configuration.protocol === 'http2')
+          assert(() => configuration.protocol === 'https')
         })
     })
 
