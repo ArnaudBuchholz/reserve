@@ -1,14 +1,18 @@
 module.exports = (request, response) => {
   response.createPushResponse({
-    ":method": "GET",
-    ":path": "/pushed.js"
+    ':method': 'GET',
+    ':path': '/pushed.js'
   }, (err, res) => {
+    setTimeout(function () {
       console.log(err)
       try {
-        res.setHeader("content-type", "application/javascript")
-        res.end("var msg = \"Hello World !\";")
+        res.writeHead(200, {
+          'content-type': 'application/javascript'
+        })
+        res.end('var msg = "Hello World !";')
       } catch (e) {
-          console.error(e)
+        console.error(e)
       }
+    }, 100)
   })
 }
