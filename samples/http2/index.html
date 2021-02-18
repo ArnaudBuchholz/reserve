@@ -1,5 +1,16 @@
 <html>
-    <body>
+    <head>
+        <script src="pushed.js"></script>
+        <script>
+const start = Date.now()
+
+function onLoad () {
+    const end = Date.now()
+    document.title = `${(end - start)}ms`
+}
+        </script>
+    </head>
+    <body onload="onLoad()">
         <table>
             <script>
 for (let tr = 0; tr < 10; ++tr) {
