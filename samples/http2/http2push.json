@@ -1,0 +1,14 @@
+{
+    "port": 8083,
+    "http2": true,
+    "ssl": {
+      "key": "../../tests/privatekey.pem",
+      "cert": "../../tests/certificate.pem"
+    },
+    "mappings": [{
+      "match": "/$",
+      "custom": "push.js"
+    }],
+    "extend": "./mappings.json"
+  }
+    
