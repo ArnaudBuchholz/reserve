@@ -5,7 +5,8 @@ const { check } = require('./mapping')
 const {
   $configuration,
   $configurationRequests,
-  $mappingChecked
+  $mappingChecked,
+  $requestId
 } = require('./symbols')
 
 async function checkMappings (configuration, mappings) {
@@ -65,6 +66,7 @@ module.exports = class IConfiguration {
           info = { ms: (new Date() - emitParameters.start) } // + ' ms'
         }
         return {
+          id: request[requestId],
           method: request.method,
           url: request.url,
           info
