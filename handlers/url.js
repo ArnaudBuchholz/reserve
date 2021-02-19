@@ -104,6 +104,10 @@ module.exports = {
         http2ForbiddenResponseHeaders.forEach(header => delete responseHeaders[header])
       }
       response.writeHead(redirectedResponse.statusCode, responseHeaders)
+      if (request.aborted) {
+        response.end()
+        return done()
+      }
       response.on('finish', () => done(result))
       redirectedResponse
         .on('error', fail)
