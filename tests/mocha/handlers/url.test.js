@@ -37,6 +37,31 @@ describe('handlers/url', () => {
     }))
   )
 
+  it('handles aborted requests', () => handle({
+    request: {
+      method: 'POST',
+      url: http.urls.echo,
+      headers: {
+        'x-status-code': 200,
+        'x-value-1': 'test',
+        host: 'http://example.com'
+      },
+      body: 'Hello World!'
+    }
+  })
+    .then(({ promise, request, response }) => {
+      request.abort()
+      return promise
+      .then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 200)
+        assert(() => response.headers['x-value-1'] === 'test')
+        assert(() => response.headers.host === undefined)
+        assert(() => response.toString() === '')
+      })
+    })
+  )
+
   it('pipes URL content (https)', () => handle({
     request: {
       method: 'POST',
