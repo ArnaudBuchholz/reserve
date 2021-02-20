@@ -52,13 +52,13 @@ describe('handlers/url', () => {
     .then(({ promise, request, response }) => {
       request.abort()
       return promise
-      .then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 200)
-        assert(() => response.headers['x-value-1'] === 'test')
-        assert(() => response.headers.host === undefined)
-        assert(() => response.toString() === '')
-      })
+        .then(value => {
+          assert(() => value === undefined)
+          assert(() => response.statusCode === 200)
+          assert(() => response.headers['x-value-1'] === 'test')
+          assert(() => response.headers.host === undefined)
+          assert(() => response.toString() === '')
+        })
     })
   )
 
