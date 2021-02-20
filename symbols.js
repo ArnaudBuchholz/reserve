@@ -8,6 +8,7 @@ module.exports = {
   $configurationRequests: Symbol(`${ns}configuration.requests`),
   $customPath: Symbol(`${ns}custom.path`),
   $customCallback: Symbol(`${ns}custom.callback`),
+  $customConfiguration: Symbol(`${ns}custom.configuration`),
   $customTimestamp: Symbol(`${ns}custom.timestamp`),
   $dispatcherEnd: Symbol(`${ns}dispatcher.end`),
   $handlerMethod: Symbol(`${ns}handler.method`),
