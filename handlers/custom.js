@@ -5,7 +5,12 @@ const path = require('path')
 const util = require('util')
 const statAsync = util.promisify(fs.stat)
 
-const { $customPath, $customCallback, $customTimestamp } = require('../symbols')
+const {
+  $customPath,
+  $customCallback,
+  $customConfiguration,
+  $customTimestamp
+} = require('../symbols')
 
 module.exports = {
   schema: {
@@ -28,8 +33,11 @@ module.exports = {
     if (typeof mapping[$customCallback] !== 'function') {
       throw new Error('Invalid custom handler, expected a function')
     }
+    if (mapping.configuration === undefined) {
+      mapping[$customConfiguration] = true
+    }
   },
-  redirect: async ({ mapping, match, request, response }) => {
+  redirect: async ({ configuration, mapping, match, request, response }) => {
     if (mapping[$customTimestamp]) {
       const timestamp = (await statAsync(mapping[$customPath])).mtimeMs
       if (timestamp !== mapping[$customTimestamp]) {
@@ -40,6 +48,9 @@ module.exports = {
     }
     // Include timeout?
     const parameters = [request, response].concat([].slice.call(match, 1))
+    if (mapping[$customConfiguration]) {
+      mapping.configuration = configuration
+    }
     return mapping[$customCallback].apply(mapping, parameters)
   }
 }
