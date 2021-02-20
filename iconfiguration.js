@@ -66,7 +66,7 @@ module.exports = class IConfiguration {
           info = { ms: (new Date() - emitParameters.start) } // + ' ms'
         }
         return {
-          id: request[requestId],
+          id: request[$requestId],
           method: request.method,
           url: request.url,
           info
