@@ -6,7 +6,10 @@ const EventEmitter = require('events')
 const http = require('http')
 const https = require('https')
 const http2 = require('http2')
-const { $configurationInterface } = require('./symbols')
+const {
+  $configurationEventEmitter,
+  $configurationInterface
+} = require('./symbols')
 
 function createServer (configuration, requestHandler) {
   const { httpOptions } = configuration
@@ -46,6 +49,7 @@ module.exports = jsonConfiguration => {
   const eventEmitter = new EventEmitter()
   check(jsonConfiguration)
     .then(configuration => {
+      configuration[$configurationEventEmitter] = eventEmitter
       configuration.listeners.forEach(register => register(eventEmitter))
       return createServerAsync(eventEmitter, configuration, dispatcher)
         .then(server => {
