@@ -185,7 +185,7 @@ function extend (filePath, configuration) {
         // Only merge mappings
         const baseMappings = baseConfiguration.mappings
         const mergedConfiguration = Object.assign(baseConfiguration, configuration)
-        if (baseMappings !== mergedConfiguration.mappings) {
+        if (baseMappings && baseMappings !== mergedConfiguration.mappings) {
           mergedConfiguration.mappings = [...configuration.mappings, ...baseMappings]
         }
         return extend(basefilePath, mergedConfiguration)
