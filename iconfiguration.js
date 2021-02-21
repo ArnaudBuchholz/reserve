@@ -37,6 +37,10 @@ module.exports = class IConfiguration {
     return this[$configuration].http2
   }
 
+  get protocol () {
+    return this[$configuration].protocol
+  }
+
   async setMappings (mappings, request, timeout = 5000) {
     const configuration = this[$configuration]
     await checkMappings(configuration, mappings)
