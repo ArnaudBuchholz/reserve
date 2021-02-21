@@ -8,6 +8,8 @@ const log = require('./log')
 const serve = require('./serve')
 
 module.exports = {
+  Request: require('./mock/Request'),
+  Response: require('./mock/Response'),
   body: require('./body'),
   capture: require('./capture'),
   check: require('./configuration').check,
