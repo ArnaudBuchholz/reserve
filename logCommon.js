@@ -16,6 +16,9 @@ module.exports = function (type, showId, ...text) {
   if (showId) {
     const id = this.id.toString(16).toUpperCase()
     params.push(yellow(id.padStart(Math.max(4, id.length), '0')))
+    if (this.internal) {
+      params.push(yellow('(i)'))
+    }
   } else {
     params.push(gray(this.method), gray(this.url))
   }
