@@ -66,3 +66,4 @@
 ||**custom** handler passes configuration interface through the mapping|
 ||Introduces [`configuration.dispatch`](https://github.com/ArnaudBuchholz/reserve/blob/master/doc/handler.md#configuration-interface)|
 ||Exposes ̀`Request` and `Response` mocked class|
+||Command line supports multiple configurations (use `--config` with comma separated names)|
