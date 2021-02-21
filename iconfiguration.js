@@ -2,11 +2,14 @@
 
 const { red } = require('./detect/colors')
 const { check } = require('./mapping')
+const dispatcher = require('./dispatcher')
 const {
   $configuration,
+  $configurationEventEmitter,
   $configurationRequests,
   $mappingChecked,
-  $requestId
+  $requestId,
+  $requestInternal
 } = require('./symbols')
 
 async function checkMappings (configuration, mappings) {
@@ -74,5 +77,12 @@ module.exports = class IConfiguration {
       }))
     })
     return holding
+  }
+
+  dispatch (request, response) {
+    const configuration = this[$configuration]
+    const eventEmitter = configuration[$configurationEventEmitter]
+    request[$requestInternal] = true
+    return dispatcher.call(eventEmitter, configuration, request, response)
   }
 }
