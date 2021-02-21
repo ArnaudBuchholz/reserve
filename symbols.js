@@ -6,6 +6,7 @@ module.exports = {
   $configuration: Symbol(`${ns}configuration`),
   $configurationInterface: Symbol(`${ns}configuration.interface`),
   $configurationRequests: Symbol(`${ns}configuration.requests`),
+  $configurationEventEmitter: Symbol(`${ns}configuration.eventEmitter`),
   $customPath: Symbol(`${ns}custom.path`),
   $customCallback: Symbol(`${ns}custom.callback`),
   $customConfiguration: Symbol(`${ns}custom.configuration`),
@@ -17,6 +18,7 @@ module.exports = {
   $mappingMatch: Symbol(`${ns}mapping.match`),
   $mappingMethod: Symbol(`${ns}mapping.method`),
   $requestId: Symbol(`${ns}request.id`),
+  $requestInternal: Symbol(`${ns}request.internal`),
   $responseEnded: Symbol(`${ns}response.ended`),
   $useMiddleware: Symbol(`${ns}use.middleware`)
 }
