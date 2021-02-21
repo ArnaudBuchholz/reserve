@@ -5,12 +5,16 @@ const dispatcher = require('./dispatcher')
 const EventEmitter = require('events')
 const Request = require('./mock/Request')
 const Response = require('./mock/Response')
-const { $configurationInterface } = require('./symbols')
+const {
+  $configurationEventEmitter,
+  $configurationInterface
+} = require('./symbols')
 
 module.exports = (jsonConfiguration, mockedHandlers = {}) => {
   const eventEmitter = new EventEmitter()
   return check(jsonConfiguration)
     .then(configuration => {
+      configuration[$configurationEventEmitter] = eventEmitter
       Object.assign(configuration.handlers, mockedHandlers)
       configuration.listeners.forEach(listener => listener(eventEmitter))
       eventEmitter.emit('server-created', {
