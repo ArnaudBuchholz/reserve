@@ -8,6 +8,7 @@ const {
   $dispatcherEnd,
   $mappingMatch,
   $requestId,
+  $requestInternal,
   $responseEnded
 } = require('./symbols')
 
@@ -137,7 +138,13 @@ async function dispatch (url, index = 0) {
 module.exports = function (configuration, request, response) {
   const configurationRequests = configuration[$configurationRequests]
   const { contexts } = configurationRequests
-  const emitParameters = { id: ++configurationRequests.lastId, method: request.method, url: request.url, start: new Date() }
+  const emitParameters = {
+    id: ++configurationRequests.lastId,
+    internal: !!request[$requestInternal],
+    method: request.method,
+    url: request.url,
+    start: new Date()
+  }
   let dispatched
   const dispatching = new Promise(resolve => { dispatched = resolve })
   let release
