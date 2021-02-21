@@ -1,7 +1,7 @@
 'use strict'
 
 const assert = require('./assert')
-const { check, mock } = require('../../index')
+const { Request, Response, check, log, mock } = require('../../index')
 
 function checkConfiguration (configuration, mapping) {
   assert(() => configuration.handlers instanceof Object)
@@ -149,6 +149,50 @@ describe('iconfiguration', () => {
         assert(() => response.statusCode === 200)
         assert(() => response.headers['x-injected'] === 'true')
         assert(() => response.toString() === '5')
+      })
+    )
+  })
+
+  describe('dispatch', () => {
+    let mocked
+
+    before(async () => {
+      mocked = await mock({
+        mappings: [{
+          match: 'dispatch',
+          custom: async function (request, response) {
+            const res1 = new Response()
+            const res2 = new Response()
+            await Promise.all([
+              this.configuration.dispatch(new Request('GET', 'hello'), res1),
+              this.configuration.dispatch(new Request('GET', 'world'), res2)
+            ])
+            response.writeHead(200, { 'content-type': 'text/plain' })
+            response.write(res1.toString())
+            response.write(res2.toString())
+            response.end()
+          }
+        }, {
+          match: 'hello',
+          custom: async (request, response) => {
+            response.writeHead(200, { 'content-type': 'text/plain' })
+            response.end('Hello ')
+          }
+        }, {
+          match: 'world',
+          custom: async (request, response) => {
+            response.writeHead(200, { 'content-type': 'text/plain' })
+            response.end('World !')
+          }
+        }]
+      })
+      log(mocked, true)
+    })
+
+    it('enables internal dispatch', () => mocked.request('GET', 'dispatch')
+      .then(response => {
+        assert(() => response.statusCode === 200)
+        assert(() => response.toString() === 'Hello World !')
       })
     )
   })
