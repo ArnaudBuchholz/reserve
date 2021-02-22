@@ -61,17 +61,3 @@ For instance, the following schema specification defines:
 ```
 
 If provided, the schema is applied on the mapping **before** the **validate** function.
-
-### Configuration interface
-
-The configuration interface lets you access the dictionary of handlers (member `handlers`) as well as the array of existing mappings (member `mappings`).
-
-It is recommended to be extremely careful when manipulating the mappings' content, since you might break the logic of the server.
-
-It is possible to safely change the list of mappings using the [asynchronous](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) `setMappings` method. This API takes two parameters: the new list of mappings and the current request. An optional third numeric parameter can be used to specify a timeout *(in ms, default `5000`)* after which the API fails *(usefull to detect blocking situations, see [#39](https://github.com/ArnaudBuchholz/reserve/issues/39))*
-
-The API will:
-* validate any new mapping *(relies on an internal detection mechanism based on symbols)*
-* **wait** for all pending requests to be completed before applying the new mappings *(any new incoming request is put on hold in the meantime)*
-
-**NOTE** : If the server implements [server-sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) or any blocking request, this could lead to an **infinite waiting time**. To ignore such requests, use the mapping setting [`exclude-from-holding-list`](https://github.com/ArnaudBuchholz/reserve/blob/master/doc/configuration.md).
