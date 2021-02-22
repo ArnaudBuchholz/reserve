@@ -67,3 +67,4 @@
 ||Introduces [`configuration.dispatch`](iconfiguration.md#async-dispatch-request-response)|
 ||Exposes ̀`Request` and `Response` mocked class|
 ||Command line supports multiple configurations (use `--config` with comma separated names)|
+|1.11.1|**url** fix headers manipulation in case of HTTP/2|
