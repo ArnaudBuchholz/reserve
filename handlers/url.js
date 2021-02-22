@@ -2,6 +2,7 @@
 
 const http = require('http')
 const https = require('https')
+const headersFactory = require('../mock/headers')
 
 const http2ForbiddenResponseHeaders = [
   'transfer-encoding',
@@ -62,12 +63,12 @@ module.exports = {
       fail = reject
     })
     const { method, headers } = request
-    delete headers.host // Some websites rely on the host header
     const options = {
       method,
       url,
-      headers
+      headers: headersFactory(headers)
     }
+    delete options.headers.host // Some websites rely on the host header
     if (mapping['ignore-unverifiable-certificate']) {
       options.rejectUnauthorized = false
     }
