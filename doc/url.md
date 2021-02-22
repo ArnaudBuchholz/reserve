@@ -37,7 +37,7 @@ The expected signature is :
 `async function ({ configuration, context, mapping, match, request, incoming })`
 
 With :
-* `configuration` the [configuration interface](handler.md#configuration-interface)
+* `configuration` the [configuration interface](iconfiguration.md)
 * `context` a modifiable object used to share data with the `forward-response` hook
 * `mapping` the mapping being executed
 * `match` the regular expression [exec result](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec)
@@ -60,7 +60,7 @@ The expected signature is :
 `async function ({ configuration, context, mapping, match, request,  statusCode, headers })`
 
 With :
-* `configuration` the [configuration interface](handler.md#configuration-interface)
+* `configuration` the [configuration interface](iconfiguration.md)
 * `context` a modifiable object used to share data with the `forward-request` hook
 * `mapping` the mapping being executed
 * `match` the regular expression [exec result](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec)
