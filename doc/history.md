@@ -60,7 +60,7 @@
 |1.10.0|Enables redirection within the `url` handler through the `forward-response` hook (only `GET` and `HEAD` requests)|
 |1.10.1|Detects and handles blocking situations during [`configuration.setMappings`](iconfiguration.md#async-setmappings-mappings-request-timeout--5000) ([#39](https://github.com/ArnaudBuchholz/reserve/issues/39))|
 ||Introduces `exclude-from-holding-list` to exclude blocking requests from holding [`configuration.setMappings`](iconfiguration.md#async-setmappings-mappings-request-timeout--5000) ([#39](https://github.com/ArnaudBuchholz/reserve/issues/39))|
-|<a name="1.11.0" />1.11.0|[HTTP/2](https://en.wikipedia.org/wiki/HTTP/2) support|
+|1.11.0|[HTTP/2](https://en.wikipedia.org/wiki/HTTP/2) support|
 ||Adds request `id` in the blocking requests list|
 ||**url** handler does not pipe content on aborted request|
 ||**custom** handler passes configuration interface through the mapping|
