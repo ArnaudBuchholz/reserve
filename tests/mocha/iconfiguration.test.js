@@ -12,6 +12,7 @@ function checkConfiguration (configuration, mapping) {
   assert(() => !!configuration.handlers.url)
   assert(() => Array.isArray(configuration.mappings))
   assert(() => configuration.mappings.includes(mapping))
+  assert(() => configuration.protocol.startsWith('http'))
   // Read-only handlers
   delete configuration.handlers.custom
   assert(() => !!configuration.handlers.custom)
