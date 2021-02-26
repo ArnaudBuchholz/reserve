@@ -2,18 +2,20 @@
 
 const { body } = require('../..')
 
+const send = function (channel, id, plot) {
+  try {
+    channel.write(`event: plot\nid: ${id}\ndata: ${plot}\n\n`)
+  } catch (e) {
+    // ignore
+  }
+}
+
 module.exports = async function (request, response) {
   if (!this.plots) {
     this.channels = []
     this.plots = []
   }
-  const send = function (channel, id, plot) {
-    try {
-      channel.write(`event: plot\nid: ${id}\ndata: ${plot}\n\n`)
-    } catch (e) {
-    // ignore
-    }
-  }
+
   if (request.method === 'POST') {
     const plot = await body(request)
     this.plots.push(plot)
@@ -27,14 +29,21 @@ module.exports = async function (request, response) {
     response.end()
     return
   }
-  response.writeHead(200, {
-    Connection: 'keep-alive',
+
+  const headers = {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache'
-  })
+  }
+  if (!this.configuration.http2) {
+    headers.Connection = 'keep-alive'
+  }
+  response.writeHead(200, headers)
+
   const lastId = parseInt(request.headers['Last-Event-ID'] || '-1')
   this.plots.slice(lastId + 1).forEach((plot, id) => send(response, id, plot))
+
   this.channels.push(response)
+
   let resolver
   const promise = new Promise(resolve => {
     resolver = resolve
