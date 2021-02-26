@@ -21,3 +21,20 @@ With the help of [storage events](https://developer.mozilla.org/en-US/docs/Web/A
 * 6 windows : http://localhost:8082/display.html?count=6&header=100&mode=shared
 * 9 windows : http://localhost:8082/display.html?count=9&header=100&mode=shared
 * 16 windows : http://localhost:8082/display.html?count=16&header=100&mode=shared
+
+Another solution is to go with a [service worker](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API), meaning one central thread that listens to the events and dispatch them to the opened windows
+
+* 6 windows : http://localhost:8082/display.html?count=6&header=100&mode=worker
+* 9 windows : http://localhost:8082/display.html?count=9&header=100&mode=worker
+* 16 windows : http://localhost:8082/display.html?count=16&header=100&mode=worker
+
+## HTTP/2
+
+The same examples can also be played on HTTP/2, it basically removes the maximum number of connections
+
+`node ../.. --config http2.json`
+
+* Standalone window : https://localhost:8082/draw.html
+* 4 windows : https://localhost:8082/display.html?count=4&header=100
+* 6 windows : https://localhost:8082/display.html?count=6&header=100
+* 9 windows : https://localhost:8082/display.html?count=9&header=100
