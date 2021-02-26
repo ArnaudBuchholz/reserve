@@ -1,6 +1,25 @@
 # Testing UI5
 
-After writing an article on how REserve could be used to [serve an Open UI5 application](../openui5.md), 
+## Context
+
+As a software developer, I write code *(a lot !)*.
+
+As a [TDD](https://en.wikipedia.org/wiki/Test-driven_development) addict *and since I don't want to [ship s#!+](https://www.artima.com/weblogs/viewpost.jsp?thread=7588)*, this code is **always preceeded by tests**.
+
+When working with the [UI5 framework](https://openui5.org/), the recommendation for testing is to use either **QUnit** or **OPA**.
+
+These two frameworks are used to cover the three lower stacks of the [**test pyramid**](https://martinfowler.com/articles/practical-test-pyramid.html) : unit, component and integration testing. This is usually the location where the the **testing is focused**. Everything is already written down in the book [Testing SAPUI5 Applications](https://www.sap-press.com/testing-sapui5-applications_5056/).
+
+> This article presents the point of view of the developer working on the UI side. To be complete and cover **more stages of the test pyramid**, one also need to consider end-to-end, application and scenario testing. To achieve these tests, [UIVeri5](https://github.com/SAP/ui5-uiveri5) can be used.
+
+The beauty of QUnit and OPA is that they only require a browser to **execute the tests**. Hence the minimal work environment of an UI5 developer is composed of an editor, a browser and a web server. Regarding the last point, UI5 provides [command line tools](https://sap.github.io/ui5-tooling/pages/CLI/) to serve the application.
+
+In case you missed it, and because the rest of the article assumes **you already know it**, I documented an alternate solution on how REserve could be used to [serve an Open UI5 application](../openui5.md).
+
+## Continuous integration
+
+Once the code is tested, linted and reviewed, it goes to the continuous integration pipeline.
+
 
 In my daily work, I write lots of tests and the biggest applications I have been involved with may take up to 45 minutes to execute.
 In the current pipeline implementation, all the tests are executed sequentially in the same browser window. This model is not scalable because the more tests, the slower the execution and also the javascript language being garbage collected the memory can grow very quickly (which  slows down the execution even faster).
