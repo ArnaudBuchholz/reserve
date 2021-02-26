@@ -59,4 +59,4 @@ module.exports = async function (request, response) {
   request.on('close', close)
   request.on('abort', close)
   return promise
-}.bind({})
+}
