@@ -20,13 +20,20 @@ In case you missed it, and because the rest of the article assumes **you already
 
 Once the code is tested, linted and reviewed, it goes to the continuous integration pipeline.
 
+In this context, the game is **different**.
 
-In my daily work, I write lots of tests and the biggest applications I have been involved with may take up to 45 minutes to execute.
+>>> TODO
+
+To execute the tests, the pipeline needs a tooling that is capable of starting a browser, pilot the test execution and collect the results. Furthermore, the process can be configured to collect code coverage during the tests execution.
+
 In the current pipeline implementation, all the tests are executed sequentially in the same browser window. This model is not scalable because the more tests, the slower the execution and also the javascript language being garbage collected the memory can grow very quickly (which  slows down the execution even faster).
 
 So my idea was to enable the test execution in an environemnt where :
 - the text would be no more sequential but parallel
 - recycling the browser window in a regular basis to makee sure the tests run in a fresh environment
+
+A little bit like I demonstrated how REserve could be used to server UI5 applications, I wanted to see how difficult it would be to implement a test runner that would :
+
 
 In this serie of articles, I would like to present a solution that I designed to run all the tests contained in an Open UI5 application and also take coverage measurement.
 The goal is to make sure that the execution collects all the information about the running tests (such as the test names, success failure and execution) as well as coverage information.
