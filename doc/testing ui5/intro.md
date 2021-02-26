@@ -10,7 +10,7 @@ When working with the [UI5 framework](https://openui5.org/), the recommendation 
 
 These two frameworks are used to cover the three lower stacks of the [**test pyramid**](https://martinfowler.com/articles/practical-test-pyramid.html) : unit, component and integration testing. This is usually the location where the the **testing is focused**. Everything is already written down in the book [Testing SAPUI5 Applications](https://www.sap-press.com/testing-sapui5-applications_5056/).
 
-> This article presents the point of view of the developer working on the UI side. To be complete and cover **more stages of the test pyramid**, one also need to consider end-to-end, application and scenario testing. To achieve these tests, [UIVeri5](https://github.com/SAP/ui5-uiveri5) can be used.
+> This article presents the point of view of the developer working on the UI side. To be complete and cover **more stages of the test pyramid**, one also needs to consider end-to-end, application and scenario testing. To achieve these tests, [UIVeri5](https://github.com/SAP/ui5-uiveri5) can be used.
 
 The beauty of QUnit and OPA is that they only require a browser to **execute the tests**. Hence the minimal work environment of an UI5 developer is composed of an editor, a browser and a web server. Regarding the last point, UI5 provides [command line tools](https://sap.github.io/ui5-tooling/pages/CLI/) to serve the application.
 
