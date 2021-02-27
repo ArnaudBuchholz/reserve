@@ -22,9 +22,13 @@ Once the code is tested, linted and reviewed, it goes to the continuous integrat
 
 In this context, the game is **different**.
 
->>> TODO
+Indeed, to execute the tests, the pipeline needs a tooling that is capable of **serving** the application, opening a **browser**, piloting the **test execution** and **consolidating** the results. Furthermore, this process is usually the place where the **code coverage is measured**.
 
-To execute the tests, the pipeline needs a tooling that is capable of starting a browser, pilot the test execution and collect the results. Furthermore, the process can be configured to collect code coverage during the tests execution.
+Last but not least, a report is generated to let the developer know if everything succeeded *(or not)*.
+
+> Actually, the r
+
+>>>TODO
 
 In the current pipeline implementation, all the tests are executed sequentially in the same browser window. This model is not scalable because the more tests, the slower the execution and also the javascript language being garbage collected the memory can grow very quickly (which  slows down the execution even faster).
 
