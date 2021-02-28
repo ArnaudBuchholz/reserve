@@ -35,26 +35,24 @@ Unfortunately, on **very big projects** this model appears to not **scale** prop
 
 Unfortunately, this can lead the browser to **crash**.
 
+> We are talking of complex projects with a huge test suite that takes more than 45 minutes to execute.
+
 So I wanted to investigate a **different approach** and enable the tests execution in an environment where :
 - By **splitting** the QUnit tests and the different OPA journeys, the tests would be no more sequential but **parallel**. 
-- By using **one** browser window **per** test, it limits the consequences of memory leaks and **reduces** the risk of crash:
+- By using **one** browser window **per** test, it limits the consequences of memory leaks and **reduces** the risk of crash.
 
 ## A new test runner
 
->>> TODO
+In this serie of articles, we will detail **step by step** the solution that was prototyped to run all the tests contained in an UI5 application and also take coverage measurement.
 
-In this serie of articles, I would like to present a solution that I designed to run all the tests contained in an Open UI5 application and also take coverage measurement.
+To properly generate the report, we have to make sure that the runner **collects** all the information about the different tests *(such as the test names, success, failure and execution)* as well as **individual coverage** information.
 
-The goal is to make sure that the execution collects all the information about the running tests (such as the test names, success failure and execution) as well as coverage information.
+> This little experiment actually demonstrates some interesting **features of REserve** and it shows how **complex problems** can be solved with very **little code**.
 
-Ideally, we want the tests to be fast so the solution should also propose a way to parallelize the tests
+> **Disclaimer** : this article provides details about a proof of concept. The code is far from being perfect and it can surely be improved.
 
-This little experiment is actually a really good example of what REserve can offer in terms of flexibility
+* **Serving and probing tests** : in this first article, we will setup the basic runner and trigger a specific page that references all the tests to execute. This will require the use of **script substitution** as well as offering an **endpoint** to receive the collected tests.
 
-* Serving and probing tests : in this first article, I will setup the basic server and leverage one page that contains all the tests to execute in order to extract them. This will require the use of script substitution as well as offering an endpoint to receive the extracted scripts
+* **Executing tests** : in this second article, the runner will be improved to **enable the execution** of the tests *(qUnit and OPA)*. The web server will be modified to **inject** hooking scripts and **new endpoints** will be provided to receive tests results. Also, a basic **execution queue** will be implemented so that we can control the number of instances that are **executed simultaneously**.
 
-* Executing tests : in this second article, the basic setup will be improved to enable the execution of the tests (qUnit and OPA). To achieve that, the platform will be modified to inject some script and new endpoints will be provided to receive tests results. Also,  the management of the execution queue will be handled so that we can control the number of instances that are executed simultaneously
-
-* Measuring code coverage : the last article will explain how nyc is used to instrument the sources, REserve is modified to not only substitute the instrumneted source instead of the original one but also, those sources will require a little update because of the way OPA tests are designed (using iframes. Once all the measurements are extracted ,nyc will be used to merge the coverage and generate a report.
-
-Disclaimer : this article provides details about a proof of concept. The code is far from being perfect (and can surely be improved).
+* **Measuring code coverage** : in this last article, we will explain how [nyc](https://www.npmjs.com/package/nyc) is used to **instrument the sources** and the runner is modified to handle code coverage. The web server will switch between instrumented sources and the original ones *(in case one does not want to measure the coverage of specific files)*. Because of the way OPA tests are designed (and the use of IFrames), the instrumented files will be updated on the fly to update their scope. Once every individual coverage information is extracted, nyc will be called to merge the coverage and generate a report.
