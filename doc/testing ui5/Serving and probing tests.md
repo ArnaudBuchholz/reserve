@@ -2,6 +2,10 @@
 
 In this first article, we will setup the basic runner and trigger a specific page that references all the tests to execute. This will require the use of **script substitution** as well as offering an **endpoint** to receive the collected tests.
 
+Before probing the tests, we need to **code** the base runner **services**.
+
+> This article assumes that the runner is in a folder at the same level as the `webapp` folder.
+
 ## Defining a job
 
 To centralize the different **parameters** of the runner, a **job object** is defined with a list of properties.
@@ -20,6 +24,7 @@ const job = {
   logServer: false
 }
 ```
+*Job definition*
 
 Parameters are :
 * `port` : the port used to serve the application *(`0` means REserve will allocate one)*
@@ -49,12 +54,13 @@ process.argv.forEach(arg => {
   }
 })
 ```
+*Command line parameters parsing*
 
 ## Serving the application
 
-To serve the web application, REserve is **embedded** in the command line by **importing** the relevant functions and offering the minimum services :
-* Mapping UI5 resources
-* Mapping the project sources
+To serve the web application, REserve is **embedded** in the command line by **importing** the relevant functions and publishing two mappings :
+* UI5 resources
+* The project sources
 
 Once the **server started**, the port is stored at the job level *(in the event REserve allocated it)*.
 
@@ -93,16 +99,17 @@ check({
       })
   })
 ```
+*Serving the UI5 application with REserve*
 
 ## Spawning a browser
 
-The runner needs a fine control over the **browser instanciation** process. Furthermore, since it needs to execute more than one test in parallel, each instance needs to be **distinguished with a unique ID**.
+The runner needs a fine control over the **browser instanciation** process. Furthermore, since it needs to execute more than one test in parallel, each instance needs to be **distinguished**.
 
-The `start` function receives the **URL to open** as its unique argument. It returns a **promise** that is **resolved** when the spawned processed **is terminated** (using `stop`). The promise is augmented with the `id` property containing the value of the allocated id.
+The `start` function receives the **URL to open** as its unique argument. It returns a **promise** that is **resolved** when the spawned processed **is terminated** (using `stop`). A **unique ID** is allocated and transmitted to the browsers by adding a URL parameter. The returned promise is **augmented** with the `id` property containing the value of the allocated id.
 
-> This is the **weakest** part of the POC. different **problems may happen** when opening the browser. Also, when the tests are running, the browser may stop **unexpectedly**. This is **not handled** here. The idea would be to offer such **monitoring features** in a separate command line and notify back the runner using a **dedicated endpoint**.
+> This is the **weakest** part of the POC. different **problems may happen** when opening the browser. Also, when the tests are running, the browser may stop **unexpectedly**. This is **not handled** here. The idea would be to offer such **monitoring features** in a separate command line and notify the runner in case of problems using a **dedicated endpoint**.
 
-> When started through a command line, Chrome spawns another process and closes the initial one. As a result, the spawned process **leaks**. One way to tackle this behavior is to use automation helpers such as [selenium](https://chromedriver.chromium.org/getting-started) or [puppeteer](https://developers.google.com/web/tools/puppeteer). This wil be done **later** by offering command lines that manipulate Chrome the proper way.
+> When started through a command line, Chrome spawns another process and closes the initial one. As a result, the spawned process **leaks**. One way to tackle this behavior is to leverage automation helpers such as [selenium](https://chromedriver.chromium.org/getting-started) or [puppeteer](https://developers.google.com/web/tools/puppeteer). This wil be done **later** by offering command lines that manipulate browsers the proper way.
 
 ```javascript
 const { spawn } = require('child_process')
@@ -150,16 +157,15 @@ function stop (id) {
   done()
 }
 ```
+*Start and stop helpers to control browser execution*
 
 ## Defining an endpoint
 
 The runner will require **different endpoints** to receive **feedback** from the spawned browsers.
 
-As a lazy developer, I don't want to repeat myself ([DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) concept).
+As a lazy developer, I don't want to repeat myself ([DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) concept). Hence a function is used to generate these endpoints : it immediately **acknowledges** the response, **deserializes** the **request body** and **identifies the id** of the browser by looking into the [referer header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer).
 
-A function is created to implememt these endpoints : it immediately **acknowledges** the response, **deserializes** the **request body** and **identifies the id** of the browser by looking into the [referer header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer).
-
-It takes a callback *(named implementation)* that is called with  the id and the JSON data.
+It takes a **callback** *(named implementation)* that is called with the id and the JSON data.
 
 ```javascript
 function endpoint (implementation) {
@@ -178,10 +184,15 @@ function endpoint (implementation) {
   }
 }
 ```
+*Endpoint generation helper*
 
-## Probing the tests
+## Declaring the tests
 
-Most of UI5 projects have a similar test structure. one page called `webapp/test/testsuite.qunit.html`. Its content is pretty short since it is used to declare what are the test pages contained in the project.
+Now that the basic services are implemented, we can consider **extracting the tests** to execute.
+
+Most of UI5 projects have a similar testing structure : the page called `webapp/test/testsuite.qunit.html` acts as an entry point. Its content **declares the test pages** contained in the project and it includes the `qunit-redirect` module which will bootstrap a **web test runner** provided by UI5.
+
+> One big projects, it is recommended to split the OPA tests pages *(one per journey)*. One pattern is to write a json file (named `AllJourneys.json`) containing the journeys' names and declare as many test pages as needed.
 
 ```html
 <!DOCTYPE html>
@@ -215,12 +226,16 @@ Most of UI5 projects have a similar test structure. one page called `webapp/test
 	</body>
 </html>
 ```
+*testsuite.qunit.html file content*
 
-You may notice the UI5 resources included at the top, it loads the default UI5 test runner.
+When opening the `webapp/test/testsuite.qunit.html` page, a **redirection** occurs and the web test runner goes over the tests.
 
->>> SCREENSHOT OF TEST RUNNER
+![SAPUI5 QUnit TestRunner](SAPUI5%20QUnit%20TestRunner.png)
+*UI5 Web test runner*
 
-An easy way to extract the list of pages would be to substitute the qunit-redirect.js resource with a custom one that would send back the list of pages to the runner.
+## Probing the tests
+
+One easy way to extract the list of test pages is to **substitute** the UI5 `qunit-redirect.js` resource with a **custom one** that **posts the list of pages** directly to the runner.
 
 ```javascript
 (function () {
@@ -247,6 +262,7 @@ An easy way to extract the list of pages would be to substitute the qunit-redire
   })
 }())
 ```
+*Custom qunit-redirect.js*
 
 new mappings
 
