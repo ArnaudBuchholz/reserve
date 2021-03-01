@@ -235,7 +235,9 @@ When opening the `webapp/test/testsuite.qunit.html` page, a **redirection** occu
 
 ## Probing the tests
 
-One easy way to extract the list of test pages is to **substitute** the UI5 `qunit-redirect.js` resource with a **custom one** that **posts the list of pages** directly to the runner.
+One easy way to extract the list of test pages is to **substitute** the UI5 `qunit-redirect.js` resource with a **custom one** that **transmists the list of pages** directly to the runner.
+
+The custom script exposes the **expected interface** but it **posts** the result list to the endpoint `/_/addTestPages`.
 
 ```javascript
 (function () {
@@ -264,7 +266,7 @@ One easy way to extract the list of test pages is to **substitute** the UI5 `qun
 ```
 *Custom qunit-redirect.js*
 
-new mappings
+To **substitute** the module and **receive** the probing result, two new mappings are added in the REserve configuration. The received data is stored as the property `_testPages` on the job.
 
 ```javascript
 {
@@ -280,6 +282,8 @@ new mappings
   })
 }
 ```
+
+Last but not least, once the server started, we trigger the call to extractPages containing :
 
 ```javascript
 async function extractPages () {
