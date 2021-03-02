@@ -51,8 +51,10 @@ To properly generate the report, we have to make sure that the runner **collects
 
 > **Disclaimer** : these articles provide details about a proof of concept. The code is far from being perfect and it can surely be improved.
 
-* **Serving and probing tests** : in this first article, we will setup the basic runner and trigger a specific page that references all the tests to execute. This will require the use of **script substitution** as well as offering an **endpoint** to receive the collected tests.
+* **Building a platform** : in this first article, we setup the runner by building a **configurable platform** that serves the web application and offers **basic services**.
 
-* **Executing tests** : in this second article, the runner will be improved to **enable the execution** of the tests *(qUnit and OPA)*. The web server will be modified to **inject** hooking scripts and **new endpoints** will be provided to receive tests results. Also, a basic **execution queue** will be implemented so that we can control the number of instances that are **executed simultaneously**.
+* **Probing tests** : in this second article, we **fetch the list of test pages** by triggering a specific one that references all the tests to execute. This will require the use of **script substitution** as well as offering an **endpoint** to receive the collected tests.
+
+* **Executing tests** : in this third article, the runner will be improved to **enable the execution** of the tests *(qUnit and OPA)*. The web server will be modified to **inject** hooking scripts and **new endpoints** will be provided to receive tests results. Also, a basic **execution queue** will be implemented so that we can control the number of instances that are **executed simultaneously**.
 
 * **Measuring code coverage** : in this last article, we will explain how [nyc](https://www.npmjs.com/package/nyc) is used to **instrument the sources** and the runner is modified to handle **code coverage**. The web server will **switch** between instrumented sources and the original ones *(in case one does not want to measure the coverage of specific files)*. Because of the way OPA tests are designed (and the use of **IFrames**), the instrumented files will be **updated on the fly** to update their scope. Once every individual coverage information is extracted, nyc will be called to **merge** the coverage and **generate a report**.
