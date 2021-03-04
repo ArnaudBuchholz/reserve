@@ -33,7 +33,7 @@ By default, the UI5 tooling proposes a solution based on [karma](https://karma-r
 
 Unfortunately, on **very big projects** this model appears to not **scale** properly. Indeed, the combination of **iframes** in the OPA tests and the **extra memory** needed to collect the code coverage generates **leaks that accumulate** over time.
 
-Unfortunately, this can lead the browser to **crash**.
+This can lead the browser to **crash**.
 
 > We are talking of complex projects with a huge test suite that takes more than 45 minutes to execute.
 
