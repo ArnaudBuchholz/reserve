@@ -47,7 +47,7 @@ In this serie of articles, we will detail **step by step** the solution that was
 
 To properly generate the report, we have to make sure that the runner **collects** all the information about the different tests *(such as the test names, success, failure and execution)* as well as **individual coverage** information.
 
-> This little experiment actually demonstrates some interesting **features of REserve** and it shows how **complex problems** can be solved with very **little code**.
+> This little experiment actually demonstrates some interesting **features of REserve** as it shows how **complex problems** can be solved with very **little code**.
 
 > **Disclaimer** : these articles provide details about a proof of concept. The code is far from being perfect and it can surely be improved.
 
