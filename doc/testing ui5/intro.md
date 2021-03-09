@@ -29,7 +29,10 @@ Indeed, to execute the tests, the pipeline needs a tooling that is capable of **
 
 Last but not least, a **report** is generated to let the developer know the **execution status**. Actually, the report is crucial when the **tests fail** : the developer needs a maximum of information to **fix the problems**.
 
-By default, the UI5 tooling proposes a solution based on [karma](https://karma-runner.github.io/latest/index.html). In the current implementation, all the tests are executed **sequentially** in the **same** browser window. 
+By default, the UI5 tooling proposes a solution based on [karma](https://karma-runner.github.io/latest/index.html). In the current implementation, all the tests are executed **sequentially** in the **same** browser window.
+
+![UI5 karma runner](UI5%20karma20runner.png)
+*UI5 karma runner in action*
 
 Unfortunately, on **very big projects** this model appears to not **scale** properly. Indeed, the combination of **iframes** in the OPA tests and the **extra memory** needed to collect the code coverage generates **leaks that accumulate** over time.
 
@@ -53,8 +56,8 @@ To properly generate the report, we have to make sure that the runner **collects
 
 * **Building a platform** : in this first article, we setup the runner by building a **configurable platform** that serves the web application and offers **basic services**.
 
-* **Probing tests** : in this second article, we **fetch the list of test pages** by triggering a specific one that references all the tests to execute. This will require the use of **script substitution** as well as offering an **endpoint** to receive the collected tests.
+* **Probing tests** : in this second article, we **fetch the list of test pages** by triggering a specific URL that references all the tests to execute. This will require the use of **script substitution** as well as offering an **endpoint** to receive the collected tests.
 
-* **Executing tests** : in this third article, the runner will be improved to **enable the execution** of the tests *(qUnit and OPA)*. The web server will be modified to **inject** hooking scripts and **new endpoints** will be provided to receive tests results. Also, a basic **execution queue** will be implemented so that we can control the number of instances that are **executed simultaneously**.
+* **Executing tests** : in this third article, the runner will be improved to **enable the execution** of the tests *(qUnit and OPA)*. The web server will be modified to **inject** hooking scripts and **new endpoints** will be provided to receive the tests results. Also, a basic **execution queue** will be implemented so that we can control the number of instances that are **executed simultaneously**.
 
-* **Measuring code coverage** : in this last article, we will explain how [nyc](https://www.npmjs.com/package/nyc) is used to **instrument the sources** and the runner is modified to handle **code coverage**. The web server will **switch** between instrumented sources and the original ones *(in case one does not want to measure the coverage of specific files)*. Because of the way OPA tests are designed (and the use of **IFrames**), the instrumented files will be **updated on the fly** to update their scope. Once every individual coverage information is extracted, nyc will be called to **merge** the coverage and **generate a report**.
+* **Measuring code coverage** : in this last article, we will explain how [nyc](https://www.npmjs.com/package/nyc) is used to **instrument the sources** and the runner is modified to handle **code coverage**. The web server will **switch** between instrumented sources and the original ones *(in case one does not want to measure the coverage of specific files)*. Because of the way OPA tests are designed (and the use of **IFrames**), the instrumented files will be **updated on the fly** to update their scope. Once every individual coverage information is extracted, nyc will be called again to **merge** the coverage and **generate a report**.
