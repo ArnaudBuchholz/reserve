@@ -1,5 +1,7 @@
 # Building a platform
 
+![Platform](platform.jpg)
+
 In this first article, we setup the runner by building a **configurable platform** that serves the web application and offers **basic services**.
 
 # Defining and configuring a job
@@ -12,18 +14,16 @@ const job = {
   port: 0,
   ui5: 'https://ui5.sap.com/1.87.0',
   webapp: 'webapp',
-  keepAlive: false,
   logServer: false
 }
 ```
 *Job definition with named parameters*
 
-The list of parameters will be **increased** while covering the different steps but let's start simple :
+The list of parameters will be **changed** while covering the different steps but let's start simple :
 * `cwd` : the current **working directory**, it is initialized with the [process current one](https://nodejs.org/api/process.html#process_process_cwd)
 * `port` : the port used to serve the application *(`0` means REserve will allocate one)*
 * `ui5` : the base URL of the content delivery network to grab UI5 from
 * `webapp` : the webapp directory of the application to serve 
-* `keepAlive` : even after the runner ended, keep the server alive *(mostly for debugging purposes)*
 * `logServer` : enables REserve logs
 
 A very **basic parameter parsing** offers the possibility to alter some of these settings through the **command line** (using syntax `-<parameter>:<value>`).
@@ -66,7 +66,7 @@ toAbsolute('webapp')
 
 ## Serving the application
 
-To serve the web application, REserve is **embedded** in the runner by **importing** the relevant functions and publishing two kind of mappings :
+To serve the tested web application, REserve is **embedded** in the runner by **importing** the relevant functions and exposing two kind of mappings :
 * UI5 resources
 * The project sources
 
@@ -105,9 +105,9 @@ async function main () {
 main()
 ```
 
-Regarding ui5 mappings, this first version simply **proxify** the UI5 content delivery repository using REserve's `url` handler.
+Regarding ui5 resources, this first version simply **proxifies** the UI5 content delivery repository using REserve's `url` handler.
 
-> For **perfomance** reasons and to support **additional resources** such as libraries, the UI5 mappings are more complex. This will be detailled in a separate article.
+> For **perfomance** reasons and to support **additional resources** such as libraries, the UI5 mappings will become more complex. This will be detailled in a separate article and explains why the definition is isolated.
 
 ```javascript
 'use strict'
