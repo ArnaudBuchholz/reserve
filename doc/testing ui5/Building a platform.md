@@ -117,18 +117,20 @@ const job = require('./job')
 const mappings = [{
   // UI5 from url
   method: ['GET', 'HEAD'],
-  match,
+  match: /\/((?:test-)?resources\/.*)/,
   url: `${job.ui5}/$1`
 }]
 
 module.exports = mappings
 ```
 
->>> So far so good, you may run this command and check that the application is visible in a browser
+> So far, we have a functional and configurable web server capable of serving UI5 applications. You may download the [consolidated source](serving.js) and play with it *(don't forget to install [REserve](https://www.npmjs.com/package/reserve))*.
 
 ## Spawning a browser
 
-The runner needs a fine control over the **browser instanciation** process. Furthermore, since it needs to execute more than one test in parallel, each instance needs to be **distinguished**.
+>>> TODO
+
+In order to execute the tests without user interaction, the runner needs a fine control over the **browser instanciation** process. Furthermore, since it needs to execute more than one test in parallel.
 
 The `start` function receives the **URL to open** as its unique argument. It returns a **promise** that is **resolved** when the spawned processed **is terminated** (using `stop`). A **unique ID** is allocated and transmitted to the browsers by adding a URL parameter. The returned promise is **augmented** with the `id` property containing the value of the allocated id.
 
