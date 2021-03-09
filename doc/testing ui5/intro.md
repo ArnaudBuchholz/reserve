@@ -31,7 +31,7 @@ Last but not least, a **report** is generated to let the developer know the **ex
 
 By default, the UI5 tooling proposes a solution based on [karma](https://karma-runner.github.io/latest/index.html). In the current implementation, all the tests are executed **sequentially** in the **same** browser window.
 
-![UI5 karma runner](UI5%20karma20runner.png)
+![UI5 karma runner](UI5%20karma%20runner.png)
 *UI5 karma runner in action*
 
 Unfortunately, on **very big projects** this model appears to not **scale** properly. Indeed, the combination of **iframes** in the OPA tests and the **extra memory** needed to collect the code coverage generates **leaks that accumulate** over time.
