@@ -56,7 +56,7 @@ To properly generate the report, we have to make sure that the runner **collects
 
 * [**Building a platform**](Building%20a%20platform.md) : in this first article, we setup the runner by building a **configurable platform** that serves the web application and offers **basic services**.
 
-* **Probing tests** : in this second article, we **fetch the list of test pages** by triggering a specific URL that references all the tests to execute. This will require the use of **script substitution** as well as offering an **endpoint** to receive the collected tests.
+* [**Probing tests**](Probing%20tests.md) : in this second article, we **fetch the list of test pages** by triggering a specific URL that references all the tests to execute. This will require the use of **script substitution** as well as offering an **endpoint** to receive the collected tests.
 
 * **Executing tests** : in this third article, the runner will be improved to **enable the execution** of the tests *(qUnit and OPA)*. The web server will be modified to **inject** hooking scripts and **new endpoints** will be provided to receive the tests results. Also, a basic **execution queue** will be implemented so that we can control the number of instances that are **executed simultaneously**.
 
