@@ -3,7 +3,7 @@
 ![7658449002_0646d75738_c.jpg](7658449002_0646d75738_c.jpg)
 *Image from https://www.flickr.com/photos/emsl/7658449002/*
 
-In this second article, we **fetch the list of test pages** by triggering a specific URL that references all the tests to execute. This will require the use of **script substitution** as well as offering an **endpoint** to receive the collected tests.
+In this second article, we **fetch the list of test pages** by triggering a specific URL that references all the tests to execute. This requires the use of **script substitution** as well as offering an **endpoint** to receive the collected tests.
 
 ## Declaring the tests
 
