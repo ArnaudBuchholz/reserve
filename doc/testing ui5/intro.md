@@ -54,7 +54,7 @@ To properly generate the report, we have to make sure that the runner **collects
 
 > **Disclaimer** : these articles provide details about a proof of concept. The code is far from being perfect and it can surely be improved.
 
-* **Building a platform** : in this first article, we setup the runner by building a **configurable platform** that serves the web application and offers **basic services**.
+* [**Building a platform**](Building%20a%20platform.md) : in this first article, we setup the runner by building a **configurable platform** that serves the web application and offers **basic services**.
 
 * **Probing tests** : in this second article, we **fetch the list of test pages** by triggering a specific URL that references all the tests to execute. This will require the use of **script substitution** as well as offering an **endpoint** to receive the collected tests.
 
