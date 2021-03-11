@@ -176,6 +176,6 @@ function endpoint (implementation) {
 ```
 *Endpoint generation helper*
 
-## Next steps
+## Next step
 
 The platform is now **ready to execute** the tests. The next step is to **extract** them.
