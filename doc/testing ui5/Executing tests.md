@@ -67,7 +67,13 @@ Finally, when a request hits `thirdparty/qunit.js` or `thirdparty/qunit-2.js` :
 * To avoid an infinite loop *(and ensure that the UI5 resource is being retreived)*, the request `ui5Request` is flagged with a member `internal` set to `true`. The mapping will ignore it.
 * Once the internal responses are obtained, the final one is built by **concatenating the two results**.
 
+This mapping must be applied **before** the UI5 one(s).
+
 ```javascript
+const { Request, Response } = require('reserve')
+
+/*...*/
+
 {
   // QUnit hooks
   match: '/_/qunit-hooks.js',
@@ -104,7 +110,59 @@ Finally, when a request hits `thirdparty/qunit.js` or `thirdparty/qunit-2.js` :
 
 ## Endpoints
 
+>>> TODO
 
+Assuming each test page is associated with its own report object inside the runner, the QUnit hooks endpoints consists in assigning some information coming from the hook to the page.
+
+The only exception is the hook triggered when the test suite ends. The browser execution is stopped using the `stop` API. Remember ? A promise is returned when calling `start` and this promise is resolved **when** stop is called.
+
+When the test suite ends, we want to serialize the test page results into a file so that it can be later reused and / or consolidated in a report. To make sure that the processing does not try to access the file WHILE it is being written, we first wait for the completion of the file *before* stopping the browser.
+This way, we make sure that when the promise is resolved, all the processing related to the file is stopped.
+
+the `filename` helper is used to convert the URL into a valid filename. 
+
+```javascript
+const { promisify } = require('util')
+const { writeFile } = require('fs')
+const writeFileAsync = promisify(writeFile)
+const { filename } = require('./tools')
+
+/* ... */
+
+{
+  // Endpoint to receive QUnit.begin
+  match: '/_/QUnit/begin',
+  custom: endpoint((url, details) => {
+    const page = job.testPages[url]
+    Object.assign(page, {
+      total: details.totalTests,
+      failed: 0,
+      passed: 0
+    })
+  })
+}, {
+  // Endpoint to receive QUnit.testDone
+  match: '/_/QUnit/testDone',
+  custom: endpoint((url, report) => {
+    const page = job.testPages[url]
+    if (report.failed) {
+      ++page.failed
+    } else {
+      ++page.passed
+    }
+    page.tests.push(report)
+  })
+}, {
+  // Endpoint to receive QUnit.done
+  match: '/_/QUnit/done',
+  custom: endpoint((url, report) => {
+    const page = job.testPages[url]
+    page.report = report
+    const promise = writeFileAsync(join(job.tstReportDir, `${filename(url)}.json`), JSON.stringify(page))
+    promise.then(() => stop(url))
+  })
+}
+```
 
 ## Execution queue
 
