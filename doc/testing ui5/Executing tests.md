@@ -14,9 +14,9 @@ Because of its **popularity**, the library offers a variety of features and, in 
 * [QUnit.testDone](https://api.qunitjs.com/callbacks/QUnit.testDone/) : triggers a callback whenever a **test ends**
 * [QUnit.done](https://api.qunitjs.com/callbacks/QUnit.done/) : triggers a callback whenever the **test suite ends**
 
-Each hook provides **information about the current event**. For instance, when the test suite begins, an object containing the **number of tests** to execute (member `totalTests`) is passed to the callback. The same way, when a test ends, the parameter contains information about the number of passed (member `passed`) and failed (member `failed`) **assertions**.
+Each hook provides **information about the current event**. For instance, when the test suite begins, an object containing the **number of tests** to execute (member `totalTests`) is passed to the callback. The same way, when a test ends, the parameter contains information about the number of **passed** (member `passed`) and **failed** (member `failed`) **assertions**.
 
-As we run the tests by starting a browser with the test page URL, it is possible to monitor the execution by leveraging the hooks.
+As we run the tests by starting a browser with the test page URL, it is possible to monitor the execution by leveraging these hooks.
 
 Using dedicated endpoints, we can send back this information to the runner.
 
@@ -49,7 +49,7 @@ Using dedicated endpoints, we can send back this information to the runner.
 
 The only problem is to find a way to **inject these hooks**.
 
-The implemented solution is close to script substitution but with a twist : when the test page **requests the qunit resource**, we **concatenate** it with the hooks.
+The implemented solution is close to script substitution but with a twist : when the test page **requests the qUnit resource**, we **concatenate** it with the hooks.
 
 This part is tricky and involves **different mechanisms** offered by REserve.
 
@@ -62,9 +62,9 @@ The regular expression `/\/thirdparty\/(qunit(?:-2)?\.js)/` matches both.
 Then, REserve can publish any **local file** using the `file` handler. The lazy me doesn't want to read a file using [fs API](https://nodejs.org/api/fs.html) so a mapping is declared to make the qunit hooks source available on the URL `/_/qunit-hooks.js`.
 
 Finally, when a request hits `thirdparty/qunit.js` or `thirdparty/qunit-2.js` :
-* Two new requests are created : one to get the qunit resource (`ui5Request`, the same URL is used) and the other one to read the hooks (`hooksRequest` on `/_/qunit-hooks.js`).
+* Two new requests are created : one to get the qUnit resource (`ui5Request`, the same URL is used) and the other one to read the hooks (`hooksRequest` on `/_/qunit-hooks.js`).
 * They are processed **internally** with the **[`dispatch` helper](https://github.com/ArnaudBuchholz/reserve/blob/master/doc/iconfiguration.md#async-dispatch-request-response)**.
-* To avoid an infinite loop *(and ensure that the UI5 resource is being retreived)*, the request `ui5Request` is flagged with a member `internal` set to `true`. The mapping will ignore it.
+* To avoid an infinite loop *(and ensure that the UI5 resource is being retreived)*, the request `ui5Request` is flagged with a member `internal` set to `true`. The mapping ignores it when it **loops back**.
 * Once the internal responses are obtained, the final one is built by **concatenating the two results**.
 
 This mapping must be applied **before** the UI5 one(s).
