@@ -47,12 +47,60 @@ Using dedicated endpoints, we can send back this information to the runner.
 
 ## Injecting QUnit hooks
 
-The only problem is that we must find a way to **inject these hooks**.
+The only problem is to find a way to **inject these hooks**.
 
+The implemented solution is close to script substitution but with a twist : when the test page **requests the qunit resource**, we **concatenate** it with the hooks.
 
+This part is tricky and involves **different mechanisms** offered by REserve.
 
-This part is tricky and involves different technics from REserve
-(internal dispatch)
+First of all, the qunit resource is part of the UI5 delivery, it may be either :
+* version 1 : https://openui5.hana.ondemand.com/resources/sap/ui/thirdparty/qunit.js
+* version 2 : https://openui5.hana.ondemand.com/resources/sap/ui/thirdparty/qunit-2.js
+
+The regular expression `/\/thirdparty\/(qunit(?:-2)?\.js)/` matches both.
+
+Then, REserve can publish any **local file** using the `file` handler. The lazy me doesn't want to read a file using [fs API](https://nodejs.org/api/fs.html) so a mapping is declared to make the qunit hooks source available on the URL `/_/qunit-hooks.js`.
+
+Finally, when a request hits `thirdparty/qunit.js` or `thirdparty/qunit-2.js` :
+* Two new requests are created : one to get the qunit resource (`ui5Request`, the same URL is used) and the other one to read the hooks (`hooksRequest` on `/_/qunit-hooks.js`).
+* They are processed **internally** with the **[`dispatch` helper](https://github.com/ArnaudBuchholz/reserve/blob/master/doc/iconfiguration.md#async-dispatch-request-response)**.
+* To avoid an infinite loop *(and ensure that the UI5 resource is being retreived)*, the request `ui5Request` is flagged with a member `internal` set to `true`. The mapping will ignore it.
+* Once the internal responses are obtained, the final one is built by **concatenating the two results**.
+
+```javascript
+{
+  // QUnit hooks
+  match: '/_/qunit-hooks.js',
+  file: join(__dirname, './inject/qunit-hooks.js')
+}, {
+  // Concatenate qunit.js source with hooks
+  match: /\/thirdparty\/(qunit(?:-2)?\.js)/,
+  custom: async function (request, response, scriptName) {
+    if (request.internal) {
+      return // ignore to avoid infinite loop
+    }
+    const ui5Request = new Request('GET', request.url)
+    ui5Request.internal = true
+    const ui5Response = new Response()
+    const hooksRequest = new Request('GET', '/_/qunit-hooks.js')
+    const hooksResponse = new Response()
+    await Promise.all([
+      this.configuration.dispatch(ui5Request, ui5Response),
+      this.configuration.dispatch(hooksRequest, hooksResponse)
+    ])
+    const hooksLength = parseInt(hooksResponse.headers['content-length'], 10)
+    const ui5Length = parseInt(ui5Response.headers['content-length'], 10)
+    response.writeHead(ui5Response.statusCode, {
+      ...ui5Response.headers,
+      'content-length': ui5Length + hooksLength,
+      'cache-control': 'no-store' // for debugging purpose
+    })
+    response.write(ui5Response.toString())
+    response.end(hooksResponse.toString())
+  }
+}
+```
+*Mappings to inject the hooks in the qunit resource*
 
 ## Endpoints
 
