@@ -6,7 +6,7 @@ In this third article, the runner is improved to **enable the execution** of the
 
 ## QUnit hooks
 
-The [OPA framework](https://sapui5.hana.ondemand.com/#/topic/2696ab50faad458f9b4027ec2f9b884d) is built **on top of [QUnit](https://qunitjs.com/)**. Developped by [John Resig](https://www.linkedin.com/in/jeresig/), the **QUnit framework** was originally built to test [jQuery](https://jquery.com/). In 2008, it became a **standalone project** and, since, it is widely used.
+The [OPA framework](https://sapui5.hana.ondemand.com/#/topic/2696ab50faad458f9b4027ec2f9b884d) is a layer **on top of [QUnit](https://qunitjs.com/)**. Developped by [John Resig](https://www.linkedin.com/in/jeresig/), the **QUnit framework** was originally designed to test [jQuery](https://jquery.com/). In 2008, it became a **standalone project** and, since, it is widely used.
 
 Because of its **popularity**, the library offers a variety of features and, in particular, it exposes some **hooks to monitor the tests execution** :
 
@@ -16,9 +16,9 @@ Because of its **popularity**, the library offers a variety of features and, in 
 
 Each hook provides **information about the current event**. For instance, when the test suite begins, an object containing the **number of tests** to execute (member `totalTests`) is passed to the callback. The same way, when a test ends, the parameter contains information about the number of **passed** (member `passed`) and **failed** (member `failed`) **assertions**.
 
-As we run the tests by starting a browser with the test page URL, it is possible to monitor the execution by leveraging these hooks.
+As we run the tests by starting a browser with the test page URL, it is possible to **monitor the execution** by leveraging these hooks.
 
-Using dedicated endpoints, we can send back this information to the runner.
+Using **dedicated endpoints**, we can send back this information to the runner.
 
 ```javascript
 (function () {
@@ -110,16 +110,23 @@ const { Request, Response } = require('reserve')
 
 ## Endpoints
 
->>> TODO
+To **collect information** about each executed page, the runner associates an object with them. The qUnit hooks endpoinds consists in **filling this object**.
 
-Assuming each test page is associated with its own report object inside the runner, the QUnit hooks endpoints consists in assigning some information coming from the hook to the page.
+Members are :
+* `total` : the total number of tests
+* `failed` : the count of failed tests
+* `passed` : the count of passed tests
+* `tests` : an array aggregating the information reported by [QUnit.testDone](https://api.qunitjs.com/callbacks/QUnit.testDone/)
+* `report` : the information reported by [QUnit.done](https://api.qunitjs.com/callbacks/QUnit.done/)
 
-The only exception is the hook triggered when the test suite ends. The browser execution is stopped using the `stop` API. Remember ? A promise is returned when calling `start` and this promise is resolved **when** stop is called.
+When the tests are done, the resulting object is **stored for later reuse**. Once the file is generated, the browser is shut down using the `stop` API.
 
-When the test suite ends, we want to serialize the test page results into a file so that it can be later reused and / or consolidated in a report. To make sure that the processing does not try to access the file WHILE it is being written, we first wait for the completion of the file *before* stopping the browser.
-This way, we make sure that when the promise is resolved, all the processing related to the file is stopped.
+A new parameter is added to the job : 
+* `tstReportDir` : the directory where store reports
 
-the `filename` helper is used to convert the URL into a valid filename. 
+> It is important to **wait** for the file to be written **before** calling `stop`. Indeed, a promise is returned when calling `start` and this promise is **resolved** right after `stop` is called. The **last stop** signals the end of all the tests meaning that the runner will possibily access these files.
+
+**NOTE** : The helper `filename` converts the URL into a valid filename.
 
 ```javascript
 const { promisify } = require('util')
@@ -133,12 +140,12 @@ const { filename } = require('./tools')
   // Endpoint to receive QUnit.begin
   match: '/_/QUnit/begin',
   custom: endpoint((url, details) => {
-    const page = job.testPages[url]
-    Object.assign(page, {
+    job.testPages[url] = {
       total: details.totalTests,
       failed: 0,
-      passed: 0
-    })
+      passed: 0,
+      tests: []
+    }
   })
 }, {
   // Endpoint to receive QUnit.testDone
@@ -158,17 +165,45 @@ const { filename } = require('./tools')
   custom: endpoint((url, report) => {
     const page = job.testPages[url]
     page.report = report
-    const promise = writeFileAsync(join(job.tstReportDir, `${filename(url)}.json`), JSON.stringify(page))
+    const reportFileName = join(job.tstReportDir, `${filename(url)}.json`)
+    const promise = writeFileAsync(reportFileName, JSON.stringify(page))
     promise.then(() => stop(url))
   })
 }
 ```
+*Endpoints keeping **track of tests** execution*
 
 ## Execution queue
 
+Last but not least, the runner needs to **sequence the execution** of the tests.
+
+A new parameter is added to the job : 
+* `parallel` : the number of parallel tests allowed (default `2`)
+
+As already explained in a previous article, once the runner embedded server started, the **probing of tests** is triggered. After getting the list of pages to execute, the runner **starts** the number of tests given by the parameter `parallel`.
+
+The function `runTestPage` is a sort of **recursive one** that calls itself **after** a test completed.
+
+Two job members are added to **keep track of the progress** :
+* `testPagesStarted` : the number of tests ***already* started**. It also helps to know which page must be started **next**.
+* `testPagesCompleted` : the number of tests **completed**. When this number equals the number of test pages, the runner knows that the tests are **over**.
+
+> Because of the qUnit hooks, the **end** of the test will **stop** the browser which will **resolve** the promise. It means that once a browser is started, the **flow of events** will take care of the rest.
+
 ```javascript
+
+/* ... */
+  server
+    .on('ready', ({ url, port }) => {
+      job.port = port
+      if (!job.logServer) {
+        console.log(`Server running at ${url}`)
+      }
+      extractTestPages()
+    })
+
 async function extractTestPages () {
-  await start('/test/testsuite.qunit.html')
+  await start('/test/testsuite.qunit.html') // fills job.testPageUrls
   job.testPagesStarted = 0
   job.testPagesCompleted = 0
   job.testPages = {}
@@ -179,22 +214,16 @@ async function extractTestPages () {
 
 async function runTestPage () {
   const { length } = job.testPageUrls
-  if (job.testPagesCompleted === length) {
+  if (job.testPagesCompleted === length) { 
+    // Last test completed
     return generateReport()
   }
   if (job.testPagesStarted === length) {
-    return
+    return // No more tests to run
   }
-
   const index = job.testPagesStarted++
   const url = job.testPageUrls[index]
-  const promise = start(url)
-  job.testPages[url] = {
-    tests: [],
-    wait: Promise.resolve()
-  }
-
-  await promise
+  await start(url)
   ++job.testPagesCompleted
   runTestPage()
 }
@@ -203,3 +232,7 @@ async function generateReport () {
   /* ... */
 }
 ```
+
+## Next step
+
+The platform **executes** the tests. The next step is to **measure** code coverage.
