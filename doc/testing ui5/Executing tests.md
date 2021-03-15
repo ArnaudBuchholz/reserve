@@ -110,7 +110,7 @@ const { Request, Response } = require('reserve')
 
 ## Endpoints
 
-To **collect information** about each executed page, the runner associates an object with them. The qUnit hooks endpoinds consists in **filling this object**.
+To **collect information** about each executed page, the runner associates an object with them. The qUnit hooks endpoinds are **filling this object**.
 
 Members are :
 * `total` : the total number of tests
@@ -119,7 +119,7 @@ Members are :
 * `tests` : an array aggregating the information reported by [QUnit.testDone](https://api.qunitjs.com/callbacks/QUnit.testDone/)
 * `report` : the information reported by [QUnit.done](https://api.qunitjs.com/callbacks/QUnit.done/)
 
-When the tests are done, the resulting object is **stored for later reuse**. Once the file is generated, the browser is shut down using the `stop` API.
+When the tests are done, the resulting object is **serialized for later reuse**. Once the file is generated, the browser is shut down using the `stop` API.
 
 A new parameter is added to the job : 
 * `tstReportDir` : the directory where store reports
@@ -182,13 +182,13 @@ A new parameter is added to the job :
 
 As already explained in a previous article, once the runner embedded server started, the **probing of tests** is triggered. After getting the list of pages to execute, the runner **starts** the number of tests given by the parameter `parallel`.
 
-The function `runTestPage` is a sort of **recursive one** that calls itself **after** a test completed.
+The function `runTestPage` is a sort of **recursive one** that calls itself **after** the test completed.
 
 Two job members are added to **keep track of the progress** :
 * `testPagesStarted` : the number of tests ***already* started**. It also helps to know which page must be started **next**.
 * `testPagesCompleted` : the number of tests **completed**. When this number equals the number of test pages, the runner knows that the tests are **over**.
 
-> Because of the qUnit hooks, the **end** of the test will **stop** the browser which will **resolve** the promise. It means that once a browser is started, the **flow of events** will take care of the rest.
+> Because of the qUnit hooks, the **end** of the test will **stop** the browser which will **resolve** the promise. It means that once a browser is started, the **flow of events** will take care of the rest, explaining why the code is so **simple**.
 
 ```javascript
 
