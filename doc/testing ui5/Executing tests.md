@@ -232,6 +232,7 @@ async function generateReport () {
   /* ... */
 }
 ```
+*Sequencing the tests inside the runner*
 
 ## Next step
 
