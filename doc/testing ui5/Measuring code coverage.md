@@ -4,11 +4,9 @@
 
 In this last article, we explain how [nyc](https://www.npmjs.com/package/nyc) is used to **instrument the sources** and the runner is modified to handle **code coverage**. The web server **switches** between instrumented sources and the original ones *(in case one does not want to measure the coverage of specific files)*. Because of the way OPA tests are designed (and the use of **IFrames**), the instrumented files are **altered on the fly** to update their scope. Once every individual coverage information is extracted, nyc is called again to **merge** the coverage and **generate a report**.
 
-## NYC
+## Fundamentals
 
-[nyc](https://www.npmjs.com/package/nyc) is a command line wrapper for [Istanbul](https://www.npmjs.com/package/istanbul), a JS code coverage tool.
-
-Before jumping to the implementation details, let's get back to **fundamentals**.
+Before jumping to the implementation details, I would like to spend some time on  **fundamentals**.
 
 **Why do we care about measuring the code coverage ?**
 
@@ -36,12 +34,14 @@ assert.strictEqual(div(4,2), 2);
 ```
 *Test code*
 
-But, in reality, it says almost nothing on the tested code. What happens in the following cases :
+But, in reality, it says almost nothing on the tested code.
+
+What happens in the following cases ?
 * `div(1,0)`
 * `div('1','b')`
 * is `div(1,3) * 3` equal to `1` ?
 
-So you must implement additional test cases to **document** and **secure** these beahviors.
+So you must implement additional test cases to **document** and **secure** the beahviors.
 
 > A good guideline is to start with **acceptance criterias** : test whatever is expected from a **behavior** point of view.
 
@@ -50,13 +50,13 @@ So you must implement additional test cases to **document** and **secure** these
 **How does the code coverage work ?**
 
 There is no magic behind code coverage : it usually consists in three steps : 
-1. Instrumentation of the code
-2. Execution of the code
-3. Extraction and consolidation of measurement
+1. **Instrumentation** of the code
+2. **Evaluation** of the code
+3. **Extraction** and consolidation of measurement
 
-The first step rewrites the code :
+The first step rewrites the code in such a way that :
 * The code behavior does **not** change *(and this is obviously **critical**)*
-* When the code is executed, it keeps track of which functions, lines and conditions are evaluated.
+* While the code is executed, it keeps track of which functions, lines and conditions are evaluated.
 
 For instance, the previous example :
 
@@ -65,7 +65,7 @@ function div (a, b) { return a / b; }
 ```
 *Source file*
 
-Turns into :
+Turns into *(when instrumenting with nyc)*:
 
 ```javascript
 function cov_1scmxvb45(){var path="div.js";var hash="021d227dc28d530884d8c843c2806b96b01d5347";var global=new Function("return this")();var gcv="__coverage__";var coverageData={path:"div.js",statementMap:{"0":{start:{line:1,column:22},end:{line:1,column:35}}},fnMap:{"0":{name:"div",decl:{start:{line:1,column:9},end:{line:1,column:12}},loc:{start:{line:1,column:20},end:{line:1,column:37}},line:1}},branchMap:{},s:{"0":0},f:{"0":0},b:{},_coverageSchema:"1a1c01bbd47fc00a2c39e90264f33305004495a9",hash:"021d227dc28d530884d8c843c2806b96b01d5347"};var coverage=global[gcv]||(global[gcv]={});if(!coverage[path]||coverage[path].hash!==hash){coverage[path]=coverageData;}var actualCoverage=coverage[path];{// @ts-ignore
@@ -74,30 +74,19 @@ cov_1scmxvb45=function(){return actualCoverage;};}return actualCoverage;}cov_1sc
 ```
 *Instrumented source file*
 
-The last part enables **source mapping** to let you debug the code inside the browser.
+> The last part includes **source mapping** to enable debugging inside the browser.
 
-```json
-{"version":3,"sources":["div.js"],"names":["div","a","b"],"mappings":"yzBAeY;yFAfZ,QAASA,CAAAA,GAAT,CAAcC,CAAd,CAAiBC,CAAjB,CAAoB,+CAAE,MAAOD,CAAAA,CAAC,CAAGC,CAAX,CAAe","sourcesContent":["function div (a, b) { return a / b; }"]}
-```
-*Source mapping contained in the instrumented source file*
+For the second step, the tests are executed after **replacing** the **original** source files with the **instrumented** ones.
 
->> TODO
+Finally, regarding the last step, code coverage tools consolidate the information in a **global javascript variable** which content can be extracted.
 
-This operation is done while executing the tests, it means that the tool must find a way to add information in the code to keep track of which lines were evaluated. This step is called instrumenting.
+> By default, NYC aggregates the coverage data inside `window.__coverage__`.
 
-During the execution, this additional code consolidates the information in one global object.
+## NYC
 
-When the tests are done, this object can be extracted and the tool usually provides a way to generate a report out of it.
+[nyc](https://www.npmjs.com/package/nyc) is a command line wrapper for [Istanbul](https://www.npmjs.com/package/istanbul), a JS code coverage tool.
 
-Branch testing
-
-## Triggering NYC commands
-
-NYC being a command line wrapper, the runner offers a new service to call it. NYC is declared as a depedency of the runner, as a result, it is available inside `node_modules`
-
-the `nyc` function wraps the execution of the command line and waits for its termination
-
-> code could be improved to test for status code
+The runner offers a function wrapping the **execution of the command line** and **waiting** for its termination. nyc being declared as a depedency, it is available inside the `node_modules` folder of the runner.
 
 ```javascript
 const { join } = require('path')
@@ -113,10 +102,23 @@ function nyc (...args) {
   return promise
 }
 ```
+*nyc wrapper*
+
+> The code could be improved to **check for errors**.
 
 ## Instrumenting sources
 
-NYC default settings
+The command [`nyc instrument`](https://github.com/istanbuljs/nyc/blob/master/docs/instrument.md) is used.
+
+New parameters are added to the job :
+* `covSettings` : file name of a **coverage settings** file *(default explained below)*
+* `covTempDir` : **temporary directory** to store the instrumented files as well as the individual coverage files (defaulted  to `'.nyc_output'`)
+* `covReportDir` : directory where to store the **coverage report** *(defaulted to `'coverage'`)*
+
+To facilitate the option selection, the runner supports the specification of a [configuration file](https://github.com/istanbuljs/nyc#configuration-files).
+
+A default one is provided :
+
 ```json
 {
   "all": true,
@@ -126,13 +128,39 @@ NYC default settings
   "sourceMap": false
 }
 ```
+*nyc default settings*
 
->>> put sourceMap to true and show a screenshot of the debugger
+> By default, I also **include** the test files in the coverage report. Since the **test code must be as clean as the production code**, there is no valid reason to have a low coverage on the test files.
 
+This step is triggered *before* executing the tests :
+
+```javascript
+/* ... */
+  server
+    .on('ready', ({ url, port }) => {
+      job.port = port
+      if (!job.logServer) {
+        console.log(`Server running at ${url}`)
+      }
+      await instrument()
+      executeTests()
+    })
+```
+*Instrumenting the code before executing the tests inside the runner*
 
 ## Replacing coverage context
 
-REserve offers the possibility to use custom file systems
+By default, the **object** used to aggregate coverage information is stored at the **window level**.
+
+> To be more **precise**, nyc uses the **[Function constructor](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function) pattern** to retreive the global context of the current host : `var global=new Function("return this")()`. In a browser, it corresponds to the current [`window`](https://developer.mozilla.org/en-US/docs/Web/API/Window) object.
+
+Unfortunately, when running OPA tests using the **IFrame mode**, the code being executed **inside** the IFrame will aggregate the coverage information **in** the IFrame window. Meaning that whenever the **application is shut down** at the end of the test, this valuable information is **lost**.
+
+To avoid that, we need to **change the place** where the coverage information is stored.
+
+> This is [common issue](https://github.com/istanbuljs/istanbuljs/issues/199) and several solutions are proposed.
+
+REserve offers the possibility to use **custom file systems** in the [`file` handler](https://github.com/ArnaudBuchholz/reserve/blob/master/doc/file.md#custom-file-system). This gives the opportinity to **manipulate the file content**.
 
 ```javascript
 const globalContextSearch = 'var global=new Function("return this")();'
