@@ -140,7 +140,7 @@ By default, the test files are **excluded** from the coverage report. But since 
 ```
 *nyc settings to include test files*
 
-The instrumentation step is triggered *before* executing the tests :
+The instrumentation step is triggered **before** executing the tests :
 
 ```javascript
 /* ... */
@@ -202,7 +202,7 @@ const customFileSystem = {
 
 ## Replacing sources with instrumented files
 
-Now that the **instrumented files are generated** and the **coverage information is stored at the right place**, a new mapping is created to **substitute the source files with the instrumented ones**. To enable substitution, it must be inserted **before** the source mapping.
+Now that the **instrumented files are generated** and the **coverage information is stored at the right place**, a new mapping is created to **substitute the source files with the instrumented ones**. To work properly, it must be inserted **before** the source mapping.
 
 **NOTE** : `'ignore-if-not-found'` is defined to tell the handler to **not fail** the request if the file is not found *(allowing the **subsequent mapping(s)** to process the request)*.
 
@@ -235,7 +235,7 @@ When the test page ends, the [QUnit.done](https://api.qunitjs.com/callbacks/QUni
 
   QUnit.done(function (report) {
     if (window.__coverage__) {
-      post('nyc/coverage', window.__coverage__)
+      report.__coverage__ = window.__coverage__
     }
     post('QUnit/done', report)
   })
@@ -243,55 +243,37 @@ When the test page ends, the [QUnit.done](https://api.qunitjs.com/callbacks/QUni
 ```
 *Modified QUnit hook to also collect coverage information*
 
-This requires a **new endpoint** to save the information in the coverage **temporary directory**.
+This requires a modification in the **endpoint** to save the information in the coverage **temporary directory**.
 
 The runner **must wait** for the test report to be saved **before** stopping the browser. Also, it must wait for the **coverage report** to be **saved**. Hence, **two synchronization points are needed**.
 
-A **simple pattern** to keep track of pending operations is to **chain promises**.
-
-When the test page object is created, a member `wait` is initialized with a resolved promise. Whenever a synchronization point is expected, this member is replaced with a new promised chained with the previous one : `wait = wait.then(newPromise)`
-
 ```javascript
 {
-  // Endpoint to receive QUnit.begin
-  match: '/_/QUnit/begin',
-  custom: endpoint((url, details) => {
-    job.testPages[url] = {
-      total: details.totalTests,
-      failed: 0,
-      passed: 0,
-      tests: [],
-      wait: Promise.resolve()
-    }
-  })
-}, {
-  // ...
-}, {
   // Endpoint to receive QUnit.done
   match: '/_/QUnit/done',
   custom: endpoint((url, report) => {
-    const page = job.testPages[url]
+     const page = job.testPages[url]
+    const promises = []
+    if (report.__coverage__) {
+      const coverageFileName = join(job.covTempDir, `${filename(url)}.json`)
+      promises.push(writeFileAsync(coverageFileName, JSON.stringify(report.coverage__)))
+      delete report.__coverage__
+    }
     page.report = report
-    const promise = writeFileAsync(join(job.tstReportDir, `${filename(url)}.json`), JSON.stringify(page))
-    page.wait.then(promise).then(() => stop(url))
-  })
-}, {
-  // Endpoint to receive coverage
-  match: '/_/nyc/coverage',
-  custom: endpoint((url, data) => {
-    const page = job.testPages[url]
-    const promise = writeFileAsync(join(job.covTempDir, `${filename(url)}.json`), JSON.stringify(data))
-    page.wait = page.wait.then(promise)
-    return promise
+    const reportFileName = join(job.tstReportDir, `${filename(url)}.json`)
+    promises.push(writeFileAsync(reportFileName, JSON.stringify(page)))
+    Promise.all(promises).then(() => stop(url))
   })
 }
 ```
+*Modified endpoint to collect code coverage and test report*
 
 ## Generating the code coverage reports
 
+When all the test pages are executed, the **coverage report** is generated using two commands :
 
+* [`nyc merge`](https://www.npmjs.com/package/nyc#what-about-nyc-merge-) to merge the **different** coverage reports in a **single one**.
+* `nyc report` to generate an **HTML report** summarizing the coverage information in the `covReportDir` directory.
 
-Two steps :
-- Merge individual coverage files
-- Generate a report
-
+![Coverage report](Coverage%20report.png)
+*Coverage report*
