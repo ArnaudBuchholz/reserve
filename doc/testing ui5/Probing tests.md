@@ -52,7 +52,7 @@ When opening the `webapp/test/testsuite.qunit.html` page, a **redirection** occu
 
 ## Test suite extraction
 
-To extract the list of test pages, we **substitute** the UI5 `qunit-redirect.js` resource with a **custom one** that **transmists the list of pages** directly to the runner.
+To extract the list of test pages, we **substitute** the UI5 `qunit-redirect.js` resource with a **custom one** that **transmits the list of pages** directly to the runner.
 
 The custom script exposes the **expected interface** and it **posts** the result list to the endpoint `/_/addTestPages`.
 
@@ -121,4 +121,4 @@ Last but not least, once the server started, we trigger the tests extraction by 
 
 ## Next step
 
-The job now has the **list of test pages** to execute. The next step is to **parallelize** them and **collect** the tests results.
+The job now has the **list of test pages** to execute. The [next step](Executing%20tests.md) is to **parallelize** them and **collect** the tests results.
