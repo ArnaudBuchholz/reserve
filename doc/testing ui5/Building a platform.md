@@ -107,7 +107,7 @@ main()
 
 Regarding ui5 resources, this first version simply **proxifies** the UI5 content delivery repository using REserve's `url` handler.
 
-> For **perfomance** reasons and to support **additional resources** such as libraries, the UI5 mappings will become more complex. This will be detailled in a separate article and it explains why the definition is isolated.
+> For **performance** reasons and to support **additional resources** such as libraries, the UI5 mappings will become more complex. This will be explained in a separate article and it elucidates why the definition is isolated.
 
 ```javascript
 'use strict'
@@ -123,6 +123,7 @@ const mappings = [{
 
 module.exports = mappings
 ```
+*UI5 mapping*
 
 > So far, we have a functional and configurable web server capable of serving UI5 applications. You may download the [consolidated source](serving.js) and play with it *(don't forget to install [REserve](https://www.npmjs.com/package/reserve))*.
 
@@ -178,4 +179,4 @@ function endpoint (implementation) {
 
 ## Next step
 
-The platform is now **ready to execute** the tests. The next step is to **extract** them.
+The platform is now **ready to execute** the tests. The [next step](Probing%20tests.md) is to **extract** them.
