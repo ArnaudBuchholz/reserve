@@ -4,7 +4,7 @@
 
 As a software developer, I write code *(a lot !)*.
 
-As a [TDD](https://en.wikipedia.org/wiki/Test-driven_development) addict *and because I don't want to [ship s#!+](https://www.artima.com/weblogs/viewpost.jsp?thread=7588)*, this code is **always preceeded by tests**.
+As a [TDD](https://en.wikipedia.org/wiki/Test-driven_development) addict *and because I don't want to [ship s#!+](https://www.artima.com/weblogs/viewpost.jsp?thread=7588)*, this code is **always preceded by tests**.
 
 When working with the [UI5 framework](https://openui5.org/), the recommendation for testing is to use either **QUnit** or **OPA**.
 
