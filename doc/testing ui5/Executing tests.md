@@ -124,7 +124,7 @@ When the tests are done, the resulting object is **serialized for later reuse**.
 A new parameter is added to the job : 
 * `tstReportDir` : the directory where store reports
 
-> It is important to **wait** for the file to be written **before** calling `stop`. Indeed, a promise is returned when calling `start` and this promise is **resolved** right after `stop` is called. The **last stop** signals the end of all the tests meaning that the runner will possibily access these files.
+> It is important to **wait** for the file to be written **before** calling `stop`. Indeed, a promise is returned when calling `start` and this promise is **resolved** right after `stop` is called. The **last stop** signals the end of all the tests meaning that the runner will possibly access these files.
 
 **NOTE** : The helper `filename` converts the URL into a valid filename.
 
@@ -236,4 +236,4 @@ async function generateReport () {
 
 ## Next step
 
-The platform **executes** the tests. The next step is to **measure** code coverage.
+The platform **executes** the tests. The [next step](Measuring%20code%20coverage.md) is to **measure** code coverage.
