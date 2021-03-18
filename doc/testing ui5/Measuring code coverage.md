@@ -86,7 +86,7 @@ Finally, regarding the last step, code coverage tools consolidate the informatio
 
 [nyc](https://www.npmjs.com/package/nyc) is a command line wrapper for [Istanbul](https://www.npmjs.com/package/istanbul), a JS code coverage tool.
 
-The runner offers a function wrapping the **execution of the command line** and **waiting** for its termination. nyc being declared as a depedency, it is available inside the `node_modules` folder of the runner.
+The runner offers a function wrapping the **execution of the command line** and **waiting** for its termination. nyc being declared as a **depedency**, it is available inside the `node_modules` folder of the runner.
 
 ```javascript
 const { join } = require('path')
@@ -122,17 +122,25 @@ A default one is provided :
 ```json
 {
   "all": true,
+  "sourceMap": false
+}
+```
+*nyc default settings*
+
+By default, the test files are **excluded** from the coverage report. But since the **test code must be as clean as the production code**, one may want to also measure the coverage of the **test files**. Simply create a custom `nyc.json` which 'cancel' the test folder exclusion and assign its path in `covSettings` :
+
+```json
+{
+  "all": true,
   "exclude": [
     "!**/test/**"
   ],
   "sourceMap": false
 }
 ```
-*nyc default settings*
+*nyc settings to include test files*
 
-> By default, I also **include** the test files in the coverage report. Since the **test code must be as clean as the production code**, there is no valid reason to have a low coverage on the test files.
-
-This step is triggered *before* executing the tests :
+The instrumentation step is triggered *before* executing the tests :
 
 ```javascript
 /* ... */
@@ -154,15 +162,22 @@ By default, the **object** used to aggregate coverage information is stored at t
 
 > To be more **precise**, nyc uses the **[Function constructor](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function) pattern** to retreive the global context of the current host : `var global=new Function("return this")()`. In a browser, it corresponds to the current [`window`](https://developer.mozilla.org/en-US/docs/Web/API/Window) object.
 
-Unfortunately, when running OPA tests using the **IFrame mode**, the code being executed **inside** the IFrame will aggregate the coverage information **in** the IFrame window. Meaning that whenever the **application is shut down** at the end of the test, this valuable information is **lost**.
+Unfortunately, when running OPA tests using the **IFrame mode**, the code being executed **inside** the IFrame will aggregate the coverage information **in** the IFrame window. Meaning that whenever the **tested application is shut down** at the end of the journey, this valuable information is **lost**.
 
-To avoid that, we need to **change the place** where the coverage information is stored.
+We must **change the place** where the coverage information is stored.
 
-> This is [common issue](https://github.com/istanbuljs/istanbuljs/issues/199) and several solutions are proposed.
+> This is [common issue](https://github.com/istanbuljs/istanbuljs/issues/199) and several solutions were discussed. This mechanism can be **configured** when istanbul is **integrated** in solutions like [karma](https://karma-runner.github.io/latest/index.html) (see the following [change](https://github.com/istanbuljs/istanbuljs/commit/25509c7ff31f114e7036a940ed799d6d0548b706)). However, I was **not** able to leverage these options through the nyc command line.
 
-REserve offers the possibility to use **custom file systems** in the [`file` handler](https://github.com/ArnaudBuchholz/reserve/blob/master/doc/file.md#custom-file-system). This gives the opportinity to **manipulate the file content**.
+Another approach is to rely on REserve which offers the possibility to implement a **custom file system** in the [`file` handler](https://github.com/ArnaudBuchholz/reserve/blob/master/doc/file.md#custom-file-system). This gives the opportunity to **manipulate the file content** before it is sent to the client.
 
 ```javascript
+const { promisify } = require('util')
+const { readdir, readFile, stat } = require('fs')
+const readdirAsync = promisify(readdir)
+const readFileAsync = promisify(readFile)
+const statAsync = promisify(stat)
+const { Readable } = require('stream')
+
 const globalContextSearch = 'var global=new Function("return this")();'
 const globalContextReplace = 'var global=window.top;'
 
@@ -183,12 +198,13 @@ const customFileSystem = {
   }
 }
 ```
+*Custom file system that searches and replaces the global context definition with a custom one*
 
 ## Replacing sources with instrumented files
 
-A new mapping is added before the sources so that if an instrumented source exist for a given file it will be used (passing through the custom file system).
+Now that the **instrumented files are generated** and the **coverage information is stored at the right place**, a new mapping is created to **substitute the source files with the instrumented ones**. To enable substitution, it must be inserted **before** the source mapping.
 
-NOTE the use of `'ignore-if-not-found'` which prevents the request to fail if the file is not found, meaning the other mappings will process it
+**NOTE** : `'ignore-if-not-found'` is defined to tell the handler to **not fail** the request if the file is not found *(allowing the **subsequent mapping(s)** to process the request)*.
 
 ```javascript
 {
@@ -198,8 +214,82 @@ NOTE the use of `'ignore-if-not-found'` which prevents the request to fail if th
   'custom-file-system': customFileSystem
 }
 ```
+*Coverage mapping*
+
+## Extracting the code coverage
+
+When the test page ends, the [QUnit.done](https://api.qunitjs.com/callbacks/QUnit.done/) callback is triggered. This is the perfect time to **collect** the generated coverage information.
+
+```javascript
+/* Injected QUnit hooks */
+(function () {
+  'use strict'
+
+  function post (url, data) {
+    const xhr = new XMLHttpRequest()
+    xhr.open('POST', '/_/' + url)
+    xhr.send(JSON.stringify(data))
+  }
+
+  /* ... */
+
+  QUnit.done(function (report) {
+    if (window.__coverage__) {
+      post('nyc/coverage', window.__coverage__)
+    }
+    post('QUnit/done', report)
+  })
+}())
+```
+*Modified QUnit hook to also collect coverage information*
+
+This requires a **new endpoint** to save the information in the coverage **temporary directory**.
+
+The runner **must wait** for the test report to be saved **before** stopping the browser. Also, it must wait for the **coverage report** to be **saved**. Hence, **two synchronization points are needed**.
+
+A **simple pattern** to keep track of pending operations is to **chain promises**.
+
+When the test page object is created, a member `wait` is initialized with a resolved promise. Whenever a synchronization point is expected, this member is replaced with a new promised chained with the previous one : `wait = wait.then(newPromise)`
+
+```javascript
+{
+  // Endpoint to receive QUnit.begin
+  match: '/_/QUnit/begin',
+  custom: endpoint((url, details) => {
+    job.testPages[url] = {
+      total: details.totalTests,
+      failed: 0,
+      passed: 0,
+      tests: [],
+      wait: Promise.resolve()
+    }
+  })
+}, {
+  // ...
+}, {
+  // Endpoint to receive QUnit.done
+  match: '/_/QUnit/done',
+  custom: endpoint((url, report) => {
+    const page = job.testPages[url]
+    page.report = report
+    const promise = writeFileAsync(join(job.tstReportDir, `${filename(url)}.json`), JSON.stringify(page))
+    page.wait.then(promise).then(() => stop(url))
+  })
+}, {
+  // Endpoint to receive coverage
+  match: '/_/nyc/coverage',
+  custom: endpoint((url, data) => {
+    const page = job.testPages[url]
+    const promise = writeFileAsync(join(job.covTempDir, `${filename(url)}.json`), JSON.stringify(data))
+    page.wait = page.wait.then(promise)
+    return promise
+  })
+}
+```
 
 ## Generating the code coverage reports
+
+
 
 Two steps :
 - Merge individual coverage files
