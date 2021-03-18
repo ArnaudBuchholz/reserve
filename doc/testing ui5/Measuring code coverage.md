@@ -45,7 +45,7 @@ So you must implement additional test cases to **document** and **secure** the b
 
 > A good guideline is to start with **acceptance criterias** : test whatever is expected from a **behavior** point of view.
 
-> That is the reason why I use to say that the coverage must reach "at least 100%" !
+> That is the reason why I use to say that the coverage must reach **"at least 100%"** !
 
 **How does the code coverage work ?**
 
@@ -86,7 +86,7 @@ Finally, regarding the last step, code coverage tools consolidate the informatio
 
 [nyc](https://www.npmjs.com/package/nyc) is a command line wrapper for [Istanbul](https://www.npmjs.com/package/istanbul), a JS code coverage tool.
 
-The runner offers a function wrapping the **execution of the command line** and **waiting** for its termination. nyc being declared as a **depedency**, it is available inside the `node_modules` folder of the runner.
+The runner offers a function wrapping the **execution of the command line** and **waiting** for its termination. nyc being declared as a **dependency**, it is available inside the `node_modules` folder of the runner.
 
 ```javascript
 const { join } = require('path')
@@ -166,7 +166,7 @@ Unfortunately, when running OPA tests using the **IFrame mode**, the code being 
 
 We must **change the place** where the coverage information is stored.
 
-> This is [common issue](https://github.com/istanbuljs/istanbuljs/issues/199) and several solutions were discussed. This mechanism can be **configured** when istanbul is **integrated** in solutions like [karma](https://karma-runner.github.io/latest/index.html) (see the following [change](https://github.com/istanbuljs/istanbuljs/commit/25509c7ff31f114e7036a940ed799d6d0548b706)). However, I was **not** able to leverage these options through the nyc command line.
+> This is [common issue](https://github.com/istanbuljs/istanbuljs/issues/199) and several solutions were discussed. This mechanism can be **configured** when [Istanbul](https://www.npmjs.com/package/istanbul) is **integrated** in solutions like [karma](https://karma-runner.github.io/latest/index.html) (see the following [change](https://github.com/istanbuljs/istanbuljs/commit/25509c7ff31f114e7036a940ed799d6d0548b706)). However, I was **not** able to leverage these options through the nyc command line.
 
 Another approach is to rely on REserve which offers the possibility to implement a **custom file system** in the [`file` handler](https://github.com/ArnaudBuchholz/reserve/blob/master/doc/file.md#custom-file-system). This gives the opportunity to **manipulate the file content** before it is sent to the client.
 
