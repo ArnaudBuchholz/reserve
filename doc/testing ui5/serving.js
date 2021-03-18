@@ -14,7 +14,7 @@ process.argv.forEach(arg => {
     number: value => parseInt(value, 10),
     default: value => value
   }
-  
+
   const parsed = /-(\w+):(.*)/.exec(arg)
   if (parsed) {
     const [, name, value] = parsed
@@ -42,7 +42,7 @@ const ui5 = [{
   match: /\/((?:test-)?resources\/.*)/,
   url: `${job.ui5}/$1`
 }]
-const { check, log, serve } = require(reserve)
+const { check, log, serve } = require('reserve')
 
 async function main () {
   const configuration = await check({
