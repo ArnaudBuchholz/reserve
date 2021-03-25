@@ -64,13 +64,11 @@
   },
   "dependencies": {},
   "standard": {
+    "env": [
+      "mocha",
+      "node"
+    ],
     "globals": [
-      "process",
-      "describe",
-      "it",
-      "before",
-      "beforeEach",
-      "after",
       "sap"
     ]
   },
