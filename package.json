@@ -98,7 +98,8 @@
       "tests/cache/**",
       "console.js",
       "coverage/**",
-      "samples/**"
+      "samples/**",
+      "doc/**"
     ],
     "branches": 100,
     "lines": 100,
