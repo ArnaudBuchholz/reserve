@@ -111,7 +111,7 @@ function checkListeners (configuration) {
   configuration.listeners = listeners.map(register => {
     let registerType = typeof register
     if (registerType === 'string') {
-      register = require(register)
+      register = require(path.join(configuration.cwd || process.cwd(), register))
       registerType = typeof register
     }
     if (registerType !== 'function') {
@@ -171,6 +171,7 @@ function setCwd (folderPath, configuration) {
   if (configuration.ssl && !configuration.ssl.cwd) {
     configuration.ssl.cwd = folderPath
   }
+  configuration.cwd = folderPath
 }
 
 function extend (filePath, configuration) {
