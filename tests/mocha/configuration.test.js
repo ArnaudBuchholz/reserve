@@ -469,7 +469,7 @@ describe('configuration', () => {
       })))
 
       it('allows injecting listeners through require', () => {
-        require('mock-require')('mocked-listener', shouldFail)
+        require('mock-require')('/mocked-listener', shouldFail)
         return check({
           listeners: ['mocked-listener']
         })
