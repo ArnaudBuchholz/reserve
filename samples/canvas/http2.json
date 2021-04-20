@@ -1,5 +1,6 @@
 {
   "port": 8082,
+  "listeners": ["./socket.js"],
   "http2": true,
   "ssl": {
     "key": "../../tests/privatekey.pem",
