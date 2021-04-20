@@ -13,6 +13,7 @@ html, body {
   <body>
     <canvas></canvas>
   </body>
+  <script src="/socket.io/socket.io.js"></script>
   <script>
     const canvas = document.querySelector('canvas')
     const context = canvas.getContext("2d")
@@ -22,26 +23,20 @@ html, body {
     }
     window.addEventListener('resize', resize)
     resize()
-    let draw = false
+    let send = body => fetch('/plots', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain',
+        'Content-Length': body.length
+      },
+      body
+    })
     canvas.addEventListener('mousemove', event => {
       const { clientX, clientY } = event
       const body = [clientX, clientY].join(',')
-      if (draw) {
-        fetch('/plots', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'text/plain',
-            'Content-Length': body.length
-          },
-          body
-        })
+      if (event.buttons) {
+        send(body)
       }
-    })
-    canvas.addEventListener('mousedown', event => {
-      draw = true
-    })
-    canvas.addEventListener('mouseup', event => {
-      draw = false
     })
     const colors = ['#ff0000', '#ffa500', '#ffff00', '#008000', '#0000ff', '#4b0082' , '#ee82ee']
     function plot(id, coords) {
@@ -55,8 +50,41 @@ html, body {
       context.stroke()
       context.fill()
     }
-    const mode = (location.search.match(/mode=([^&]+)/) || ['event'])[1]
-    if (mode === 'worker') {
+
+    const modes = {
+
+      event: () => {
+        const plotsSource = new EventSource('/plots')
+        plotsSource.addEventListener('plot', e => {
+          plot(e.lastEventId, e.data)
+        })
+      },
+
+      socket: () => {
+        const socket = io()
+        send = body => socket.emit('plot', body)
+        socket.on('plot', msg => {
+          const [,id,data] = /(\d+)\|(.*)/.exec(msg)
+          plot(id, data)
+        })
+      },
+
+      shared: () => {
+        const lastEventId = parseInt(localStorage['plot.lastEventId'] || '0', 10)
+        for (let id = 0; id <= lastEventId; ++id) {
+          const data = localStorage[`plot#${id}`]
+          if (data) {
+            plot(id, data)
+          }
+        }
+        window.addEventListener('storage', event => {
+          if (event.key.startsWith('plot#')) {
+            plot(event.key.substring(5), event.newValue)
+          }
+        })
+      },
+
+      worker: () => {
         navigator.serviceWorker.register('/sw.js', {scope: '/'})
           .then(registered => console.log('Registration succeeded. Scope is ' + registered.scope))
           .catch(error => console.log('Registration failed', error))
@@ -66,24 +94,10 @@ html, body {
             plot(lastEventId, data)
           }
         })
-    } else if (mode === 'shared') {
-      const lastEventId = parseInt(localStorage['plot.lastEventId'] || '0', 10)
-      for (let id = 0; id <= lastEventId; ++id) {
-        const data = localStorage[`plot#${id}`]
-        if (data) {
-          plot(id, data)
-        }
       }
-      window.addEventListener('storage', event => {
-        if (event.key.startsWith('plot#')) {
-          plot(event.key.substring(5), event.newValue)
-        }
-      })
-    } else {
-      const plotsSource = new EventSource('/plots')
-      plotsSource.addEventListener('plot', e => {
-        plot(e.lastEventId, e.data)
-      })
+
     }
+
+    modes[(location.search.match(/mode=([^&]+)/) || ['event'])[1] || 'event']()
   </script>
 </html>
