@@ -9,44 +9,53 @@
       const rows = Math.ceil(count / cols)
       const features = {
         height: Math.floor(screen.height / rows) - header,
-        location: 0,
-        menubar: 0,
-        resizable: 0,
-        status: 0,
-        toolbar: 0,
+        location: 0, menubar: 0, resizable: 0, status: 0, toolbar: 0,
         width: Math.floor(screen.width / cols)
       }
       const windows = []
       let index = 0
-      if (mode === 'worker') {
-        navigator.serviceWorker.register('/sw.js', {scope: '/'})
-          .then(registered => console.log('Registration succeeded. Scope is ' + registered.scope))
-          .catch(error => console.log('Registration failed', error))
-      } else if (mode === 'shared') {
-        localStorage[`plot.lastEventId`] = -1
-        const plotsSource = new EventSource('/plots')
-        plotsSource.addEventListener('plot', e => {
-          const { data, lastEventId } = e
-          localStorage[`plot#${lastEventId}`] = data
-          localStorage[`plot.lastEventId`] = lastEventId
-        })
-      }
       while (index < count) {
-        const windowFeatures = Object.keys(features)
+        const draw = window.open(`/draw.html?mode=${mode}`, '_blank', Object.keys(features)
           .map(name => name + '=' + features[name].toString())
           .concat('left=' + (index % cols) * features.width)
           .concat('top=' + Math.floor(index / cols) * (features.height + header))
           .join(',')
-          windows.push(window.open(`/draw.html?mode=${mode}`, '_blank', windowFeatures))
+        )
+        if (window.screenLeft < 0) {
+          draw.moveBy(window.screenLeft, 0)
+        }
+        windows.push(draw)
         ++index
       }
+      window.addEventListener('load', () => {
+        document.querySelector('button').addEventListener('click', () => windows.forEach(wnd => wnd.close()))
+      })
+
+      const modes = {
+
+        shared: () => {
+          localStorage[`plot.lastEventId`] = -1
+          const plotsSource = new EventSource('/plots')
+          plotsSource.addEventListener('plot', e => {
+            const { data, lastEventId } = e
+            localStorage[`plot#${lastEventId}`] = data
+            localStorage[`plot.lastEventId`] = lastEventId
+          })
+        },
+
+        worker: () => {
+          navigator.serviceWorker.register('/sw.js', {scope: '/'})
+            .then(registered => console.log('Registration succeeded. Scope is ' + registered.scope))
+            .catch(error => console.log('Registration failed', error))
+        }
+
+      }
+
+      modes[mode] && modes[mode]()
     </script>
   </head>
   <body>
       <button>close</button>
-      <script>
-        document.querySelector('button').addEventListener('click', () => windows.forEach(wnd => wnd.close()))
-      </script>
       <a href="chrome://inspect/#service-workers" target="_blank">chrome://inspect/#service-workers</a>
   </body>
 </html>
