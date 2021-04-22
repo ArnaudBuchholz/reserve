@@ -1,11 +1,15 @@
 module.exports = (eventEmitter) => {
   eventEmitter.on('server-created', ({ server }) => {
     const io = require('socket.io')(server)
-    let id = 0
+
+    const plots = require('./plots')
+    plots.on('plot', ({ id, plot }) => {
+      io.emit('plot', `${id}|${plot}`)
+    })
+
     io.on('connection', socket => {
-      socket.on('plot', body => {
-        io.emit('plot', `${++id}|${body}`)
-      })
+      plots.forEach(({ id, plot }) => socket.emit('plot', `${id}|${plot}`))
+      socket.on('plot', plot => plots.push(plot))
     })
   })
 }
