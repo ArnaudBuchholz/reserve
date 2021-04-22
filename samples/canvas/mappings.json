@@ -2,7 +2,7 @@
   "mappings": [{
     "match": "/plots",
     "methods": "POST,GET",
-    "custom": "plots.js"
+    "custom": "serverevents.js"
   }, {
     "match": "/(.*)",
     "file": "$1"
