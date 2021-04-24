@@ -69,3 +69,4 @@
 ||Command line supports multiple configurations (use `--config` with comma separated names)|
 |1.11.1|**url** fix headers manipulation in case of HTTP/2|
 |1.11.2|Fixes paths when loading listeners ([#43](https://github.com/ArnaudBuchholz/reserve/issues/39))|
+||Adds request `headers` in the **incoming** event parameters|
