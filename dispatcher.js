@@ -143,6 +143,7 @@ module.exports = function (configuration, request, response) {
     internal: !!request[$requestInternal],
     method: request.method,
     url: request.url,
+    headers: Object.assign({}, request.headers),
     start: new Date()
   }
   let dispatched
