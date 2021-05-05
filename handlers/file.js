@@ -6,7 +6,7 @@ const mime = require('../detect/mime')
 const path = require('path')
 const { format: formatLastModified } = require('../lastModified')
 
-const defaultMimeType = mime.getType('bin')
+const defaultMimeType = mime('bin')
 
 const cfs = 'custom-file-system'
 const matchcase = 'case-sensitive'
@@ -60,7 +60,7 @@ function sendFile ({ cachingStrategy, request, response, fs, filePath }, fileSta
     const { start, end, header: rangeHeader, status: rangeStatus, contentLength } = processBytesRange(request, fileStat)
     const status = cacheStatus || rangeStatus
     response.writeHead(status, {
-      'content-type': mime.getType(path.extname(filePath)) || defaultMimeType,
+      'content-type': mime(path.extname(filePath)),
       'content-length': contentLength,
       'accept-ranges': 'bytes',
       ...rangeHeader,
