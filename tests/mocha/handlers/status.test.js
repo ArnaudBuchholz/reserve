@@ -5,7 +5,7 @@ const mime = require('../../../detect/mime')
 const statusHandler = require('../../../handlers/status')
 const handle = require('./handle')(statusHandler)
 
-const textMimeType = mime.getType('text')
+const textMimeType = mime('text')
 
 describe('handlers/status', () => {
   it('returns a promise', () => handle({
