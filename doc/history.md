@@ -68,5 +68,6 @@
 ||Exposes ̀`Request` and `Response` mocked class|
 ||Command line supports multiple configurations (use `--config` with comma separated names)|
 |1.11.1|**url** fix headers manipulation in case of HTTP/2|
-|1.11.2|Fixes paths when loading listeners ([#43](https://github.com/ArnaudBuchholz/reserve/issues/39))|
+|1.11.2|Fixes paths when loading listeners ([#43](https://github.com/ArnaudBuchholz/reserve/issues/43))|
 ||Adds request `headers` in the **incoming** event parameters|
+|1.11.3|Fixes compatibility issue with mime 1.x ([#45](https://github.com/ArnaudBuchholz/reserve/issues/45))|
