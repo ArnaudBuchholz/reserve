@@ -14,28 +14,66 @@ function cleanRequireCache () {
 describe('detect/mime', () => {
   let mime
 
-  before(() => {
-    cleanRequireCache()
-    mockRequire('mime', null)
-    mime = require('../../../detect/mime')
-  })
-
-  after(() => {
-    mockRequire.stop('mime')
-    cleanRequireCache()
-  })
-
   const expected = {
     text: 'text/plain',
     html: 'text/html',
     unknown: 'application/octet-stream'
   }
 
-  Object.keys(expected).forEach(extension => {
-    const mimeType = expected[extension]
-    it(`returns the expcted mime type for extension .${extension}`, () => {
-      assert(() => mime.getType(extension) === mimeType)
-      assert(() => mime.getType(`.${extension}`) === mimeType)
+  function tests () {
+    Object.keys(expected).forEach(extension => {
+      const mimeType = expected[extension]
+      it(`returns the expected mime type for extension .${extension}`, () => {
+        assert(() => mime(extension) === mimeType)
+        assert(() => mime(`.${extension}`) === mimeType)
+      })
+    })
+  }
+
+  describe('mime not installed', () => {
+    before(() => {
+      cleanRequireCache()
+      mockRequire('mime', null)
+      mime = require('../../../detect/mime')
+    })
+
+    tests()
+
+    after(() => {
+      mockRequire.stop('mime')
+      cleanRequireCache()
+    })
+  })
+
+  describe('mime v1', () => {
+    before(() => {
+      cleanRequireCache()
+      const mimeV2 = require('mime')
+      cleanRequireCache()
+      mockRequire('mime', {
+        lookup: extension => mimeV2.getType(extension)
+      })
+      mime = require('../../../detect/mime')
+    })
+
+    tests()
+
+    after(() => {
+      mockRequire.stop('mime')
+      cleanRequireCache()
+    })
+  })
+
+  describe('mime v2', () => {
+    before(() => {
+      cleanRequireCache()
+      mime = require('../../../detect/mime')
+    })
+
+    tests()
+
+    after(() => {
+      cleanRequireCache()
     })
   })
 })
