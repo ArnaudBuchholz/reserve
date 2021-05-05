@@ -8,9 +8,9 @@ const fs = require('fs')
 const { promisify } = require('util')
 const mockRequire = require('mock-require')
 
-const textMimeType = mime.getType('text')
-const htmlMimeType = mime.getType('html')
-const defaultMimeType = mime.getType('bin')
+const textMimeType = mime('text')
+const htmlMimeType = mime('html')
+const defaultMimeType = mime('bin')
 
 describe('handlers/file', () => {
   it('returns a promise', () => handle('./file.txt')
