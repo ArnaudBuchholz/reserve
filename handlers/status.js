@@ -2,7 +2,7 @@
 
 const mime = require('../detect/mime')
 const interpolate = require('../interpolate')
-const textMimeType = mime.getType('text')
+const textMimeType = mime('text')
 const byStatus = {
   403: 'Forbidden',
   404: 'Not found',
