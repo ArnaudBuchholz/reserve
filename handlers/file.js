@@ -6,8 +6,6 @@ const mime = require('../detect/mime')
 const path = require('path')
 const { format: formatLastModified } = require('../lastModified')
 
-const defaultMimeType = mime('bin')
-
 const cfs = 'custom-file-system'
 const matchcase = 'case-sensitive'
 const i404 = 'ignore-if-not-found'
