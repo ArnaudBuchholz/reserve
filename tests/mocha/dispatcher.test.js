@@ -8,7 +8,7 @@ const Response = require('../../mock/Response')
 const { check } = require('../../index')
 const dispatcher = require('../../dispatcher')
 
-const textMimeType = mime.getType('text')
+const textMimeType = mime('text')
 const defaultConfigurationPromise = check({
   handlers: {
     fail: {
