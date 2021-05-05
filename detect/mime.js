@@ -29,8 +29,17 @@ const types = {
   xml: `${app}/xml`
 }
 
-module.exports = mime || {
-  getType: extension => {
+if (mime && !mime.getType && mime.lookup) {
+  const mimeV1 = mime
+  mime = {
+    getType: extension => mimeV1.lookup(extension)
+  }
+}
+
+if (mime) {
+  module.exports = extension => mime.getType(extension) || types.bin
+} else {
+  module.exports = extension => {
     if (extension.charAt(0) === '.') {
       extension = extension.substring(1)
     }
