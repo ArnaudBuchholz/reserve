@@ -6,10 +6,13 @@ const mime = require('../detect/mime')
 const path = require('path')
 const { format: formatLastModified } = require('../lastModified')
 
+const bin = 'application/octet-stream'
+
 const cfs = 'custom-file-system'
 const matchcase = 'case-sensitive'
 const i404 = 'ignore-if-not-found'
 const cache = 'caching-strategy'
+const cmt = 'mime-types'
 
 const nodeFs = {
   stat: promisify(fs.stat),
@@ -52,13 +55,15 @@ function processBytesRange (request, { mtime, size }) {
   return { status: 200, contentLength: size }
 }
 
-function sendFile ({ cachingStrategy, request, response, fs, filePath }, fileStat) {
+function sendFile ({ cachingStrategy, mapping, request, response, fs, filePath }, fileStat) {
   return new Promise((resolve, reject) => {
     const { header: cacheHeader, status: cacheStatus } = processCache(request, cachingStrategy, fileStat)
     const { start, end, header: rangeHeader, status: rangeStatus, contentLength } = processBytesRange(request, fileStat)
     const status = cacheStatus || rangeStatus
+    const fileExtension = (/\.([^.]*)$/.exec(filePath) || [])[1]
+    const mimeType = mapping[cmt][fileExtension] || mime(fileExtension) || bin
     response.writeHead(status, {
-      'content-type': mime(path.extname(filePath)),
+      'content-type': mimeType,
       'content-length': contentLength,
       'accept-ranges': 'bytes',
       ...rangeHeader,
@@ -133,6 +138,10 @@ module.exports = {
     strict: {
       type: 'boolean',
       defaultValue: false
+    },
+    [cmt]: {
+      type: 'object',
+      defaultValue: {}
     }
   },
   method: 'GET,HEAD',
@@ -163,11 +172,12 @@ module.exports = {
       filePath = filePath.substring(0, filePath.length - 1)
     }
     const context = {
-      request,
-      response,
       cachingStrategy: mapping[cache],
       fs: mapping[cfs],
-      filePath
+      filePath,
+      mapping,
+      request,
+      response
     }
     if (mapping.strict) {
       context.checkPath = checkStrictPath
