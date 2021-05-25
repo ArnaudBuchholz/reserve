@@ -16,8 +16,7 @@ describe('detect/mime', () => {
 
   const expected = {
     text: 'text/plain',
-    html: 'text/html',
-    unknown: 'application/octet-stream'
+    html: 'text/html'
   }
 
   function tests () {
@@ -25,7 +24,6 @@ describe('detect/mime', () => {
       const mimeType = expected[extension]
       it(`returns the expected mime type for extension .${extension}`, () => {
         assert(() => mime(extension) === mimeType)
-        assert(() => mime(`.${extension}`) === mimeType)
       })
     })
   }
