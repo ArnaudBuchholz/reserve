@@ -835,7 +835,7 @@ describe('handlers/file', () => {
     it('overrides default mime types', () => handle({
       request: {
         method: 'GET',
-        url: './file.txt',
+        url: './file.txt'
       },
       mapping: {
         'mime-types': {
