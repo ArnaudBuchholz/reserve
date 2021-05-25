@@ -37,12 +37,7 @@ if (mime && !mime.getType && mime.lookup) {
 }
 
 if (mime) {
-  module.exports = extension => mime.getType(extension) || types.bin
+  module.exports = mime.getType
 } else {
-  module.exports = extension => {
-    if (extension.charAt(0) === '.') {
-      extension = extension.substring(1)
-    }
-    return types[extension] || types.bin
-  }
+  module.exports = extension => types[extension]
 }
