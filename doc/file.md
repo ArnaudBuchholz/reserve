@@ -47,6 +47,7 @@ Example :
 |||| any number: hard coded duration (in seconds), based on the response header [`Cache-Control` with `max-age`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) |
 |||| 0 *(default)*: [`Cache-Control` with `no-store`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) |
 | `strict` | Boolean | `false` | when `true`, the file path is tested strictly (in particular, duplicated separators like in `foldera//folderb` are not ignored). This option implies `case-sensitive`. Since it has an impact on **performances**, use carefully. |
+| `mime-types` | Object | `{}` | Dictionary indexed by file extension that overrides mime type resolution. For instance : `{ "csv": "text/csv" }`. |
 
 ## Custom File System
 
