@@ -830,4 +830,24 @@ describe('handlers/file', () => {
       ))
     })
   })
+
+  describe('mime-types', () => {
+    it('overrides default mime types', () => handle({
+      request: {
+        method: 'GET',
+        url: './file.txt',
+      },
+      mapping: {
+        'mime-types': {
+          txt: 'not-even-existing'
+        }
+      }
+    })
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 200)
+        assert(() => response.headers['Content-Type'] === 'not-even-existing')
+      }))
+    )
+  })
 })
