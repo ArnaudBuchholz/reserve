@@ -3,7 +3,7 @@
 const fs = require('fs')
 const { promisify } = require('util')
 const mime = require('../detect/mime')
-const path = require('path')
+const { basename, dirname, isAbsolute, join } = require('path')
 const { format: formatLastModified } = require('../lastModified')
 
 const bin = 'application/octet-stream'
@@ -89,7 +89,7 @@ function sendFile ({ cachingStrategy, mapping, request, response, fs, filePath }
 }
 
 async function sendIndex (context) {
-  const filePath = path.join(context.filePath, 'index.html')
+  const filePath = join(context.filePath, 'index.html')
   await context.checkPath(filePath)
   const stat = await context.fs.stat(filePath)
   if (stat.isDirectory()) {
@@ -99,9 +99,9 @@ async function sendIndex (context) {
 }
 
 async function checkCaseSensitivePath (filePath) {
-  const folderPath = path.dirname(filePath)
+  const folderPath = dirname(filePath)
   if (folderPath && folderPath !== filePath) {
-    const name = path.basename(filePath)
+    const name = basename(filePath)
     const names = await this.fs.readdir(folderPath)
     if (!names.includes(name)) {
       throw new Error('Not found')
@@ -147,7 +147,7 @@ module.exports = {
   method: 'GET,HEAD',
   validate: async mapping => {
     if (typeof mapping[cfs] === 'string') {
-      mapping[cfs] = require(mapping[cfs])
+      mapping[cfs] = require(join(mapping.cwd, mapping[cfs]))
     }
     const apis = ['stat', 'createReadStream']
     if (mapping[matchcase]) {
@@ -164,8 +164,8 @@ module.exports = {
   },
   redirect: ({ request, mapping, redirect, response }) => {
     let filePath = /([^?#]+)/.exec(unescape(redirect))[1] // filter URL parameters & hash
-    if (!path.isAbsolute(filePath)) {
-      filePath = path.join(mapping.cwd, filePath)
+    if (!isAbsolute(filePath)) {
+      filePath = join(mapping.cwd, filePath)
     }
     const directoryAccess = !!filePath.match(/(\\|\/)$/) // Test known path separators
     if (directoryAccess) {
