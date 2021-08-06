@@ -16,6 +16,7 @@
     </tr>
 </table>
 
+[![Node.js CI](https://github.com/ArnaudBuchholz/reserve/actions/workflows/node.js.yml/badge.svg)](https://github.com/ArnaudBuchholz/reserve/actions/workflows/node.js.yml)
 [![Travis-CI](https://travis-ci.org/ArnaudBuchholz/reserve.svg?branch=master)](https://travis-ci.org/ArnaudBuchholz/reserve#)
 [![Coverage Status](https://coveralls.io/repos/github/ArnaudBuchholz/reserve/badge.svg?branch=master)](https://coveralls.io/github/ArnaudBuchholz/reserve?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/49e3adbc8f31ae2febf3/maintainability)](https://codeclimate.com/github/ArnaudBuchholz/reserve/maintainability)
