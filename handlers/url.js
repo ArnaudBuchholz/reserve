@@ -20,7 +20,13 @@ function protocol (url) {
 function unsecureCookies (headers) {
   const setCookie = headers['set-cookie']
   if (setCookie) {
-    headers['set-cookie'] = setCookie.map(cookie => cookie.replace(/\s*secure;/i, ''))
+    headers['set-cookie'] = setCookie.map(cookie => {
+      const modified = cookie.replace(/\s*secure;/i, '')
+      if (modified !== cookie) {
+        return modified.replace(/\s*samesite=none;/i, ' SameSite=Lax;')
+      }
+      return cookie
+    })
   }
 }
 
