@@ -73,4 +73,5 @@
 |1.11.3|Fixes compatibility issue with mime 1.x ([#45](https://github.com/ArnaudBuchholz/reserve/issues/45))|
 |1.11.4|`mime-types` option in **file** handler *(enables mime type overriding)*|
 |1.11.5|Fix `custom-file-system` option in **file** handler to be relative to configuration file ([#47](https://github.com/ArnaudBuchholz/reserve/issues/47))|
-|1.11.6|Improve `unsecure-cookies` option in **url** handler to handle `SameSite=None` ([#49](https://github.com/ArnaudBuchholz/reserve/issues/47))|
+|1.11.6|Improve `unsecure-cookies` option in **url** handler to handle `SameSite=None` ([#49](https://github.com/ArnaudBuchholz/reserve/issues/49))|
+|1.11.7|Fix `unsecure-cookies` option in **url** handler to handle attributes without ending ; ([#51](https://github.com/ArnaudBuchholz/reserve/issues/51))|

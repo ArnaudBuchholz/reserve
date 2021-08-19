@@ -105,6 +105,26 @@ describe('handlers/url', () => {
       }))
     )
 
+    it('unsecures cookies (no SameSite, no ending ;)', () => handle({
+      request: {
+        method: 'GET',
+        url: http.urls.echos,
+        headers: {
+          'x-status-code': 200,
+          'Set-Cookie': ['name=value; Secure']
+        }
+      },
+      mapping: {
+        'unsecure-cookies': true
+      }
+    })
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 200)
+        assert(() => response.headers['Set-Cookie'][0] === 'name=value;')
+      }))
+    )
+
     it('unsecures cookies (SameSite=None)', () => handle({
       request: {
         method: 'GET',
@@ -112,6 +132,46 @@ describe('handlers/url', () => {
         headers: {
           'x-status-code': 200,
           'Set-Cookie': ['name=value; SameSite=None; Secure;']
+        }
+      },
+      mapping: {
+        'unsecure-cookies': true
+      }
+    })
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 200)
+        assert(() => response.headers['Set-Cookie'][0] === 'name=value; SameSite=Lax;')
+      }))
+    )
+
+    it('unsecures cookies (SameSite=None, no ending ;)', () => handle({
+      request: {
+        method: 'GET',
+        url: http.urls.echos,
+        headers: {
+          'x-status-code': 200,
+          'Set-Cookie': ['name=value; SameSite=None; Secure']
+        }
+      },
+      mapping: {
+        'unsecure-cookies': true
+      }
+    })
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 200)
+        assert(() => response.headers['Set-Cookie'][0] === 'name=value; SameSite=Lax;')
+      }))
+    )
+
+    it('unsecures cookies (Secure first, SameSite=None, no ending ;)', () => handle({
+      request: {
+        method: 'GET',
+        url: http.urls.echos,
+        headers: {
+          'x-status-code': 200,
+          'Set-Cookie': ['name=value; Secure; SameSite=None']
         }
       },
       mapping: {
@@ -142,6 +202,46 @@ describe('handlers/url', () => {
         assert(() => value === undefined)
         assert(() => response.statusCode === 200)
         assert(() => response.headers['Set-Cookie'][0] === 'name=value; SameSite=Strict;')
+      }))
+    )
+
+    it('unsecures cookies (SameSite=Strict, no ending ;)', () => handle({
+      request: {
+        method: 'GET',
+        url: http.urls.echos,
+        headers: {
+          'x-status-code': 200,
+          'Set-Cookie': ['name=value; SameSite=Strict; Secure']
+        }
+      },
+      mapping: {
+        'unsecure-cookies': true
+      }
+    })
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 200)
+        assert(() => response.headers['Set-Cookie'][0] === 'name=value; SameSite=Strict;')
+      }))
+    )
+
+    it('unsecures cookies (Secure first, SameSite=Strict, no ending ;)', () => handle({
+      request: {
+        method: 'GET',
+        url: http.urls.echos,
+        headers: {
+          'x-status-code': 200,
+          'Set-Cookie': ['name=value; Secure; SameSite=Strict']
+        }
+      },
+      mapping: {
+        'unsecure-cookies': true
+      }
+    })
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 200)
+        assert(() => response.headers['Set-Cookie'][0] === 'name=value; SameSite=Strict')
       }))
     )
 
