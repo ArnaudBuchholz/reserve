@@ -7,6 +7,8 @@ const urlHandler = require('../../../handlers/url')
 const handle = require('./handle')(urlHandler)
 const { $configuration } = require('../../../symbols')
 
+const uid = Symbol('uid')
+
 describe('handlers/url', () => {
   it('returns a promise', () => handle({
     request: http.urls.echo
@@ -82,91 +84,109 @@ describe('handlers/url', () => {
     }))
   )
 
-  it('unsecures cookies', () => handle({
-    request: {
-      method: 'GET',
-      url: http.urls.echos,
-      headers: {
-        'x-status-code': 200,
-        'Set-Cookie': ['name=value; Secure;']
+  describe('unsecure-cookies', () => {
+    it('unsecures cookies (no SameSite)', () => handle({
+      request: {
+        method: 'GET',
+        url: http.urls.echos,
+        headers: {
+          'x-status-code': 200,
+          'Set-Cookie': ['name=value; Secure;']
+        }
+      },
+      mapping: {
+        'unsecure-cookies': true
       }
-    },
-    mapping: {
-      'unsecure-cookies': true
-    }
-  })
-    .then(({ promise, response }) => promise.then(value => {
-      assert(() => value === undefined)
-      assert(() => response.statusCode === 200)
-      assert(() => response.headers['Set-Cookie'][0] === 'name=value;')
-    }))
-  )
-
-  it('unsecures cookies (no cookies)', () => handle({
-    request: {
-      method: 'GET',
-      url: http.urls.echos,
-      headers: {
-        'x-status-code': 200
-      }
-    },
-    mapping: {
-      'unsecure-cookies': true
-    }
-  })
-    .then(({ promise, response }) => promise.then(value => {
-      assert(() => value === undefined)
-      assert(() => response.statusCode === 200)
-      assert(() => !response.headers['Set-Cookie'])
-    }))
-  )
-
-  const uid = Symbol('uid')
-
-  it('manipulates request details (forward-request)', () => handle({
-    request: {
-      method: 'GET',
-      url: http.urls.echos,
-      headers: {
-        'x-status-code': 200,
-        Cookie: 'name=value;'
-      }
-    },
-    mapping: {
-      [uid]: 'mapping',
-      'forward-request': async ({ configuration: receivedIConfiguration, context, mapping: receivedMapping, match: receivedMatch, request }) => {
-        assert(() => receivedIConfiguration[$configuration][uid] === 'configuration')
-        assert(() => receivedMapping[uid] === 'mapping')
-        assert(() => receivedMatch[uid] === 'match')
-        assert(() => context && typeof context === 'object')
-        assert(() => request.method === 'GET')
-        assert(() => request.url === http.urls.echos)
-        assert(() => request.headers['x-status-code'] === 200)
-        assert(() => request.headers.Cookie === 'name=value;')
-        request.headers.Cookie = 'a=b;c=d;'
-      }
-    },
-    configuration: { [uid]: 'configuration' },
-    match: { [uid]: 'match' }
-  })
-    .then(({ promise, response }) => promise.then(value => {
-      assert(() => value === undefined)
-      assert(() => response.statusCode === 200)
-      assert(() => response.headers.Cookie === 'a=b;c=d;')
-    }))
-  )
-
-  it('manipulates response headers (forward-response)', () => {
-    mockRequire('/url.forward-response.js', ({ configuration: receivedIConfiguration, context, mapping: receivedMapping, match: receivedMatch, headers }) => {
-      assert(() => receivedIConfiguration[$configuration][uid] === 'configuration')
-      assert(() => receivedMapping[uid] === 'mapping')
-      assert(() => receivedMatch[uid] === 'match')
-      assert(() => context && typeof context === 'object')
-      assert(() => headers['x-status-code'] === 200)
-      assert(() => headers.Cookie === 'name=value;')
-      headers.Cookie = 'a=b;c=d;'
     })
-    return handle({
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 200)
+        assert(() => response.headers['Set-Cookie'][0] === 'name=value;')
+      }))
+    )
+
+    it('unsecures cookies (SameSite=None)', () => handle({
+      request: {
+        method: 'GET',
+        url: http.urls.echos,
+        headers: {
+          'x-status-code': 200,
+          'Set-Cookie': ['name=value; SameSite=None; Secure;']
+        }
+      },
+      mapping: {
+        'unsecure-cookies': true
+      }
+    })
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 200)
+        assert(() => response.headers['Set-Cookie'][0] === 'name=value; SameSite=Lax;')
+      }))
+    )
+
+    it('unsecures cookies (SameSite=Strict)', () => handle({
+      request: {
+        method: 'GET',
+        url: http.urls.echos,
+        headers: {
+          'x-status-code': 200,
+          'Set-Cookie': ['name=value; SameSite=Strict; Secure;']
+        }
+      },
+      mapping: {
+        'unsecure-cookies': true
+      }
+    })
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 200)
+        assert(() => response.headers['Set-Cookie'][0] === 'name=value; SameSite=Strict;')
+      }))
+    )
+
+    it('unsecures cookies (no change)', () => handle({
+      request: {
+        method: 'GET',
+        url: http.urls.echos,
+        headers: {
+          'x-status-code': 200,
+          'Set-Cookie': ['name=value; SameSite=Strict;']
+        }
+      },
+      mapping: {
+        'unsecure-cookies': true
+      }
+    })
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 200)
+        assert(() => response.headers['Set-Cookie'][0] === 'name=value; SameSite=Strict;')
+      }))
+    )
+
+    it('unsecures cookies (no cookies)', () => handle({
+      request: {
+        method: 'GET',
+        url: http.urls.echos,
+        headers: {
+          'x-status-code': 200
+        }
+      },
+      mapping: {
+        'unsecure-cookies': true
+      }
+    })
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 200)
+        assert(() => !response.headers['Set-Cookie'])
+      }))
+    )
+  })
+
+  describe('forward-request and forward-response', () => {
+    it('manipulates request details (forward-request)', () => handle({
       request: {
         method: 'GET',
         url: http.urls.echos,
@@ -177,7 +197,17 @@ describe('handlers/url', () => {
       },
       mapping: {
         [uid]: 'mapping',
-        'forward-response': '/url.forward-response.js'
+        'forward-request': async ({ configuration: receivedIConfiguration, context, mapping: receivedMapping, match: receivedMatch, request }) => {
+          assert(() => receivedIConfiguration[$configuration][uid] === 'configuration')
+          assert(() => receivedMapping[uid] === 'mapping')
+          assert(() => receivedMatch[uid] === 'match')
+          assert(() => context && typeof context === 'object')
+          assert(() => request.method === 'GET')
+          assert(() => request.url === http.urls.echos)
+          assert(() => request.headers['x-status-code'] === 200)
+          assert(() => request.headers.Cookie === 'name=value;')
+          request.headers.Cookie = 'a=b;c=d;'
+        }
       },
       configuration: { [uid]: 'configuration' },
       match: { [uid]: 'match' }
@@ -187,50 +217,84 @@ describe('handlers/url', () => {
         assert(() => response.statusCode === 200)
         assert(() => response.headers.Cookie === 'a=b;c=d;')
       }))
-  })
+    )
 
-  it('provides a unique context to link forward-request and forward-response', () => {
-    let contextId = 0
-    const checks = {}
-    const mapping = {
-      'forward-request': ({ context, request }) => {
-        assert(() => context.id === undefined)
-        context.id = ++contextId
-        context.requestId = request.headers['x-id']
-        assert(() => context.requestId)
-        assert(() => checks[context.id] === undefined)
-        checks[context.id] = context.requestId
-      },
-      'forward-response': ({ context }) => {
-        assert(() => context.id !== undefined)
-        assert(() => context.requestId !== undefined)
-        assert(() => checks[context.id] === context.requestId)
+    it('manipulates response headers (forward-response)', () => {
+      mockRequire('/url.forward-response.js', ({ configuration: receivedIConfiguration, context, mapping: receivedMapping, match: receivedMatch, headers }) => {
+        assert(() => receivedIConfiguration[$configuration][uid] === 'configuration')
+        assert(() => receivedMapping[uid] === 'mapping')
+        assert(() => receivedMatch[uid] === 'match')
+        assert(() => context && typeof context === 'object')
+        assert(() => headers['x-status-code'] === 200)
+        assert(() => headers.Cookie === 'name=value;')
+        headers.Cookie = 'a=b;c=d;'
+      })
+      return handle({
+        request: {
+          method: 'GET',
+          url: http.urls.echos,
+          headers: {
+            'x-status-code': 200,
+            Cookie: 'name=value;'
+          }
+        },
+        mapping: {
+          [uid]: 'mapping',
+          'forward-response': '/url.forward-response.js'
+        },
+        configuration: { [uid]: 'configuration' },
+        match: { [uid]: 'match' }
+      })
+        .then(({ promise, response }) => promise.then(value => {
+          assert(() => value === undefined)
+          assert(() => response.statusCode === 200)
+          assert(() => response.headers.Cookie === 'a=b;c=d;')
+        }))
+    })
+
+    it('provides a unique context to link forward-request and forward-response', () => {
+      let contextId = 0
+      const checks = {}
+      const mapping = {
+        'forward-request': ({ context, request }) => {
+          assert(() => context.id === undefined)
+          context.id = ++contextId
+          context.requestId = request.headers['x-id']
+          assert(() => context.requestId)
+          assert(() => checks[context.id] === undefined)
+          checks[context.id] = context.requestId
+        },
+        'forward-response': ({ context }) => {
+          assert(() => context.id !== undefined)
+          assert(() => context.requestId !== undefined)
+          assert(() => checks[context.id] === context.requestId)
+        }
       }
-    }
-    return Promise.all([
-      handle({
-        request: {
-          method: 'GET',
-          url: http.urls.echos,
-          headers: {
-            'x-status-code': 200,
-            'x-id': 1
-          }
-        },
-        mapping
-      }).then(({ promise }) => promise),
-      handle({
-        request: {
-          method: 'GET',
-          url: http.urls.echos,
-          headers: {
-            'x-status-code': 200,
-            'x-id': 2
-          }
-        },
-        mapping
-      }).then(({ promise }) => promise)
-    ])
+      return Promise.all([
+        handle({
+          request: {
+            method: 'GET',
+            url: http.urls.echos,
+            headers: {
+              'x-status-code': 200,
+              'x-id': 1
+            }
+          },
+          mapping
+        }).then(({ promise }) => promise),
+        handle({
+          request: {
+            method: 'GET',
+            url: http.urls.echos,
+            headers: {
+              'x-status-code': 200,
+              'x-id': 2
+            }
+          },
+          mapping
+        }).then(({ promise }) => promise)
+      ])
+    })
   })
 
   describe('internal redirection', () => {
