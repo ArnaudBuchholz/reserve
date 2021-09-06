@@ -19,10 +19,11 @@ Example :
 
 | option | type | default | description |
 |---|---|---|---|
-| `unsecure-cookies` | Boolean | `false` | when `true`, the secured cookies are converted to unsecure ones. Hence, the browser will keep them even if not running on https. |
+| `unsecure-cookies` | Boolean | `false` | when `true`, the secured cookies are converted to unsecure ones. Hence, the browser will keep them even if not running on https.<br>**NOTE :** this applies **before** `forward-response` |
 | `forward-request` | String or Function | - | when specified, the hook is called **before** generating the forward request. See below.
 | `forward-response` | String or Function | - | when specified, the hook is called **after** sending the forward request but **before** writing the current request's response. See below.
 | `ignore-unverifiable-certificate` | Boolean | `false` | when `true`, the request does not fail when contacting a server which SSL certificate can not be verified. |
+| `absolute-location` | Boolean | `false` | when `true`, any relative `location` header is made absolute to the redirected URL.<br>**NOTE :** this applies **before** `forward-response` |
 
 **NOTE** : When a string is used for `forward-request` or `forward-response`, the corresponding function is loaded with [require](https://nodejs.org/api/modules.html#modules_require_id).
 
