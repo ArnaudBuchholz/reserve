@@ -78,6 +78,8 @@ function capture (response, headers, writableStream) {
 
     writableStream.on('finish', () => done())
 
+    let writeToOut = true
+
     response.write = function () {
       const { data, encoding, callback } = writeParameters(arguments)
       let waitForDrain = 0
@@ -87,9 +89,11 @@ function capture (response, headers, writableStream) {
           response.emit('drain')
         }
       }
-      if (!out.write(data, encoding)) {
-        ++waitForDrain
-        out.once('drain', drained)
+      if (writeToOut) {
+        if (!out.write(data, encoding)) {
+          ++waitForDrain
+          out.once('drain', drained)
+        }
       }
       if (!write.call(response, data, encoding, callback)) {
         ++waitForDrain
@@ -108,15 +112,13 @@ function capture (response, headers, writableStream) {
 
     response.end = function () {
       const { data, encoding, callback } = endParameters(arguments)
-      function endWritableStream () {
-        if (out !== writableStream) {
-          out.end()
-        } else {
-          writableStream.end()
-        }
+      if (out !== writableStream) {
+        out.end(data, encoding)
+      } else {
+        writableStream.end(data, encoding)
       }
+      writeToOut = false
       end.call(response, data, encoding, function () {
-        endWritableStream()
         callback.apply(this, arguments)
       })
       return this
