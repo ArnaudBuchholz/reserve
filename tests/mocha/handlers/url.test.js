@@ -471,4 +471,65 @@ describe('handlers/url', () => {
       }))
     )
   })
+
+  describe('redirect', () => {
+    const redirectCodes = [300, 301, 302, 303, 307, 308]
+
+    redirectCodes.forEach(statusCode => it(`ignore redirects (default - ${statusCode})`, () => handle({
+      request: {
+        method: 'GET',
+        url: http.urls.echos,
+        headers: {
+          'x-status-code': 301,
+          'location': '/test'
+        }
+      },
+      mapping: {
+      }
+    })
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 301)
+        assert(() => response.headers['location'] === '/test')
+      }))
+    ))
+
+    it('changes the location URL to absolute if relative', () => handle({
+      request: {
+        method: 'GET',
+        url: http.urls.echos,
+        headers: {
+          'x-status-code': 301,
+          'location': '/test'
+        }
+      },
+      mapping: {
+        "absolute-location": true
+      }
+    })
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.headers['location'] === 'https://www.mocked.com/test')
+      }))
+    )
+
+    it('does not change the location URL if absolute', () => handle({
+      request: {
+        method: 'GET',
+        url: http.urls.echos,
+        headers: {
+          'x-status-code': 301,
+          'location': 'http://my.website/test'
+        }
+      },
+      mapping: {
+        "absolute-location": true
+      }
+    })
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.headers['location'] === 'http://my.website/test')
+      }))
+    )
+  })
 })
