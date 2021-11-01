@@ -75,3 +75,6 @@
 |1.11.5|Fix `custom-file-system` option in **file** handler to be relative to configuration file ([#47](https://github.com/ArnaudBuchholz/reserve/issues/47))|
 |1.11.6|Improve `unsecure-cookies` option in **url** handler to handle `SameSite=None` ([#49](https://github.com/ArnaudBuchholz/reserve/issues/49))|
 |1.11.7|Fix `unsecure-cookies` option in **url** handler to handle attributes without ending ; ([#51](https://github.com/ArnaudBuchholz/reserve/issues/51))|
+|1.12.0|Typescript definitions|
+||Support of Node.js 16|
+||`absolute-location` option in **url** handler|
