@@ -481,7 +481,7 @@ describe('handlers/url', () => {
         url: http.urls.echos,
         headers: {
           'x-status-code': 301,
-          'location': '/test'
+          location: '/test'
         }
       },
       mapping: {
@@ -490,7 +490,7 @@ describe('handlers/url', () => {
       .then(({ promise, response }) => promise.then(value => {
         assert(() => value === undefined)
         assert(() => response.statusCode === 301)
-        assert(() => response.headers['location'] === '/test')
+        assert(() => response.headers.location === '/test')
       }))
     ))
 
@@ -500,16 +500,16 @@ describe('handlers/url', () => {
         url: http.urls.echos,
         headers: {
           'x-status-code': 301,
-          'location': '/test'
+          location: '/test'
         }
       },
       mapping: {
-        "absolute-location": true
+        'absolute-location': true
       }
     })
       .then(({ promise, response }) => promise.then(value => {
         assert(() => value === undefined)
-        assert(() => response.headers['location'] === 'https://www.mocked.com/test')
+        assert(() => response.headers.location === 'https://www.mocked.com/test')
       }))
     )
 
@@ -519,16 +519,16 @@ describe('handlers/url', () => {
         url: http.urls.echos,
         headers: {
           'x-status-code': 301,
-          'location': 'http://my.website/test'
+          location: 'http://my.website/test'
         }
       },
       mapping: {
-        "absolute-location": true
+        'absolute-location': true
       }
     })
       .then(({ promise, response }) => promise.then(value => {
         assert(() => value === undefined)
-        assert(() => response.headers['location'] === 'http://my.website/test')
+        assert(() => response.headers.location === 'http://my.website/test')
       }))
     )
   })
