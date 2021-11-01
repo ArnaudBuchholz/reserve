@@ -89,6 +89,7 @@ function capture (response, headers, writableStream) {
           response.emit('drain')
         }
       }
+      /* istanbul ignore else */
       if (writeToOut) {
         if (!out.write(data, encoding)) {
           ++waitForDrain
