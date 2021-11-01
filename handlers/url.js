@@ -100,7 +100,7 @@ module.exports = {
         unsecureCookies(redirectedResponse.headers)
       }
       const { headers: responseHeaders } = redirectedResponse
-      const { location } = responseHeaders
+      const { location } = responseHeaders
       if (location && mapping['absolute-location'] && !location.match(/^https?:\/\//)) {
         responseHeaders.location = options.url.match(/^http?s:\/\/[^/]+/)[0] + location
       }
