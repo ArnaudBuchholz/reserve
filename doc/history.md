@@ -78,3 +78,4 @@
 |1.12.0|Typescript definitions|
 ||Support of Node.js 16|
 ||`absolute-location` option in **url** handler|
+|1.12.1|Improve typescript definitions|
