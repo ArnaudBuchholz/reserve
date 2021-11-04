@@ -3,7 +3,7 @@ import { Stats } from 'fs'
 import { IncomingMessage, ServerResponse } from 'http'
 
 declare module 'reserve' {
-  type RedirectResponse = undefined | number | string
+  type RedirectResponse = void | number | string
 
   type IfMatcher = (request: IncomingMessage, url: string, match: RegExpMatchArray) => boolean | RedirectResponse
 
@@ -13,7 +13,7 @@ declare module 'reserve' {
     'invert-match'?: boolean
     'if-match'?: IfMatcher
     'exclude-from-holding-list'?: boolean
-    cwd: string
+    cwd?: string
   }
 
   // region file
@@ -84,7 +84,10 @@ declare module 'reserve' {
   // region custom
 
   interface CustomMapping extends BaseMapping {
-    custom: string | ((request: IncomingMessage, response: ServerResponse, ...capturedGroups: string[]) => Promise<RedirectResponse>)
+    custom: string | (() => Promise<RedirectResponse>) |
+      ((request: IncomingMessage) => Promise<RedirectResponse>) |
+      ((request: IncomingMessage, response: ServerResponse) => Promise<RedirectResponse>) |
+      ((request: IncomingMessage, response: ServerResponse, ...capturedGroups: string[]) => Promise<RedirectResponse>)
     watch?: boolean
   }
 
@@ -153,8 +156,33 @@ declare module 'reserve' {
     dispatch: (request: IncomingMessage, response: ServerResponse) => void
   }
 
+  function body (request: IncomingMessage): Promise<string>
+  function capture (response: ServerResponse, stream: WritableStream): Promise<void>
+
   function check (configuration: Configuration): Promise<Configuration>
-  function log (server: EventEmitter, verbose?: boolean): EventEmitter
+  function log (server: EventEmitter, verbose: boolean = false): EventEmitter
   function serve (configuration: Configuration): EventEmitter
-  function mock (configuration: Configuration, mockedHandlers?: Handlers): Promise<EventEmitter>
+
+  interface MockedResponse extends ServerResponse {
+    toString: () => string
+    waitForFinish: () => Promise<void>
+    isInitial: () => boolean
+    setAsynchronous: () => void
+  }
+
+  type MockedRequestDefinition = {
+    method?: string,
+    url: string,
+    headers?: Headers,
+    properties?: object
+  }
+
+  interface MockServer extends EventEmitter {
+    request: ((method: string, url: string) => Promise<MockedResponse>) |
+      ((method: string, url: string, headers: Headers) => Promise<MockedResponse>) | 
+      ((method: string, url: string, headers: Headers, properties: object) => Promise<MockedResponse>) | 
+      ((definition: MockedRequestDefinition) => Promise<MockedResponse>)
+  }
+
+  function mock (configuration: Configuration, mockedHandlers: Handlers = {}): Promise<MockServer>
 }
