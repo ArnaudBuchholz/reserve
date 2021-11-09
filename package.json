@@ -46,6 +46,8 @@
   },
   "homepage": "https://github.com/ArnaudBuchholz/reserve#readme",
   "devDependencies": {
+    "@stryker-mutator/core": "^5.4.1",
+    "@stryker-mutator/mocha-runner": "^5.4.1",
     "autocannon": "^7.5.0",
     "colors": "^1.4.0",
     "coveralls": "^3.1.1",
@@ -60,7 +62,7 @@
     "mock-require": "^3.0.3",
     "nyc": "^15.1.0",
     "passport": "^0.5.0",
-    "socket.io": "^4.3.1",
+    "socket.io": "^4.3.2",
     "standard": "^16.0.4",
     "start-server-and-test": "^1.14.0"
   },
