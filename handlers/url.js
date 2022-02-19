@@ -3,6 +3,7 @@
 const http = require('http')
 const https = require('https')
 const headersFactory = require('../mock/headers')
+const defer = require('../defer')
 
 const http2ForbiddenResponseHeaders = [
   'transfer-encoding',
@@ -66,12 +67,7 @@ module.exports = {
     validateHook(mapping, 'forward-response')
   },
   redirect: async ({ configuration, mapping, match, redirect: url, request, response }) => {
-    let done
-    let fail
-    const promise = new Promise((resolve, reject) => {
-      done = resolve
-      fail = reject
-    })
+    const [promise, done, fail] = defer()
     const { method, headers } = request
     const options = {
       method,
