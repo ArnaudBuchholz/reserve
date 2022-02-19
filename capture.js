@@ -2,6 +2,7 @@
 
 const zlib = require('zlib')
 const { pipeline } = require('stream')
+const defer = require('./defer')
 
 const decoderFactories = {
   gzip: zlib.createGunzip,
@@ -12,16 +13,6 @@ const decoderFactories = {
 /* istanbul ignore else */
 if (zlib.createBrotliDecompress) {
   decoderFactories.br = zlib.createBrotliDecompress
-}
-
-function defer () {
-  let done
-  let fail
-  const promise = new Promise((resolve, reject) => {
-    done = resolve
-    fail = reject
-  })
-  return { done, fail, promise }
 }
 
 function selectDecoder (headers) {
@@ -49,7 +40,7 @@ const writeParameters = _getParameters.bind(null, false)
 const endParameters = _getParameters.bind(null, true)
 
 function capture (response, headers, writableStream) {
-  const { done, fail, promise } = defer()
+  const [promise, done, fail] = defer()
   const { emit, end, write } = response
 
   function release () {
@@ -131,7 +122,7 @@ function capture (response, headers, writableStream) {
 }
 
 module.exports = (response, writableStream) => {
-  const { done, fail, promise } = defer()
+  const [promise, done, fail] = defer()
   const { writeHead } = response
   response.writeHead = function (status, headers = {}) {
     if (status === 200) {
