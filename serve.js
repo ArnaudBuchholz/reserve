@@ -10,6 +10,7 @@ const {
   $configurationEventEmitter,
   $configurationInterface
 } = require('./symbols')
+const defer = require('./defer')
 
 function createServer (configuration, requestHandler) {
   const { httpOptions } = configuration
@@ -47,13 +48,15 @@ function createServerAsync (eventEmitter, configuration, dispatcher) {
 
 module.exports = jsonConfiguration => {
   const eventEmitter = new EventEmitter()
+  const [serverAvailable, ready, failed] = defer()
   check(jsonConfiguration)
     .then(configuration => {
       configuration[$configurationEventEmitter] = eventEmitter
       configuration.listeners.forEach(register => register(eventEmitter))
       return createServerAsync(eventEmitter, configuration, dispatcher)
         .then(server => {
-          const port = server.address().port
+          ready(server)
+          const { port } = server.address()
           const { http2 } = configuration
           eventEmitter.emit('ready', {
             url: `${configuration.protocol}://${configuration.hostname || '0.0.0.0'}:${port}/`,
@@ -62,6 +65,15 @@ module.exports = jsonConfiguration => {
           })
         })
     })
-    .catch(reason => eventEmitter.emit('error', { reason }))
+    .catch(reason => {
+      failed(reason)
+      eventEmitter.emit('error', { reason })
+    })
+  eventEmitter.close = function () {
+    return serverAvailable
+      .then(server => {
+        return new Promise(resolve => server.close(() => resolve()))
+      })
+  }
   return eventEmitter
 }
