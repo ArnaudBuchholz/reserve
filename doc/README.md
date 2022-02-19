@@ -6,7 +6,7 @@ There are two ways to **leverage** REserve :
 * Run as a **standalone command line** with a **configuration file** *(default name is `reserve.json`)*
 * **Embed** with its configuration in a **custom application**
 
-In both cases, the configuration must specify the properties and mappings [documented here](configuration.md).
+In both cases, the configuration must comply with the properties and mappings [documented here](configuration.md).
 
 ## Handlers
 
