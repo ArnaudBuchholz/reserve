@@ -44,6 +44,10 @@ module.exports = {
           callback(null)
         }
       },
+      close: function (callback) {
+        this._closed = true
+        callback()
+      },
       address: () => simulatedAddress
     }
   }
