@@ -80,37 +80,69 @@ describe('serve', () => {
     assert(() => reason.message === 'error')
   }))
 
-  it('fails if a listener registration throws an exception', () => promisifyWithError({
-    listeners: [eventEmitter => {
-      throw new Error('immediate')
-    }],
-    hostname: '127.0.0.1',
-    port: 3475
-  }, reason => {
-    assert(() => reason.message === 'immediate')
-  }))
+  describe('listeners', () => {
+    it('fails if a listener registration throws an exception', () => promisifyWithError({
+      listeners: [eventEmitter => {
+        throw new Error('immediate')
+      }],
+      hostname: '127.0.0.1',
+      port: 3475
+    }, reason => {
+      assert(() => reason.message === 'immediate')
+    }))
 
-  it('fails if a listener throws an exception during server-create', () => promisifyWithError({
-    listeners: [eventEmitter => {
-      eventEmitter.on('server-created', () => {
-        throw new Error('server-created')
-      })
-    }],
-    hostname: '127.0.0.1',
-    port: 3475
-  }, reason => {
-    assert(() => reason.message === 'server-created')
-  }))
+    it('fails if a listener throws an exception during server-create', () => promisifyWithError({
+      listeners: [eventEmitter => {
+        eventEmitter.on('server-created', () => {
+          throw new Error('server-created')
+        })
+      }],
+      hostname: '127.0.0.1',
+      port: 3475
+    }, reason => {
+      assert(() => reason.message === 'server-created')
+    }))
 
-  it('provides server instance to listeners (server-created)', () => promisify({
-    listeners: [eventEmitter => {
-      eventEmitter.on('server-created', ({ server }) => {
-        assert(() => !!server)
+    it('provides server instance to listeners (server-created)', () => promisify({
+      listeners: [eventEmitter => {
+        eventEmitter.on('server-created', ({ server }) => {
+          assert(() => !!server)
+        })
+      }],
+      hostname: '127.0.0.1',
+      port: 3475
+    }, ({ url }) => {
+      assert(() => url === 'http://127.0.0.1:3475/')
+    }))
+  })
+
+  describe('close', () => {
+    it('terminates the server', async () => {
+      let httpServer
+      const server = serve({
+        listeners: [eventEmitter => {
+          eventEmitter.on('server-created', ({ server }) => {
+            httpServer = server
+          })
+        }],
+        hostname: '127.0.0.1',
+        port: 3475
       })
-    }],
-    hostname: '127.0.0.1',
-    port: 3475
-  }, ({ url }) => {
-    assert(() => url === 'http://127.0.0.1:3475/')
-  }))
+      await server.close()
+      assert(() => httpServer._closed)
+    })
+
+    it('forwards the error', async () => {
+      const server = serve({
+        hostname: 'error'
+      })
+      let errorThrown
+      try {
+        await server.close()
+      } catch (e) {
+        errorThrown = e
+      }
+      assert(() => errorThrown !== undefined)
+    })
+  })
 })
