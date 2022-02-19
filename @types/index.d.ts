@@ -54,7 +54,7 @@ declare module 'reserve' {
   interface ForwardRequestContext {
     configuration: IConfiguration
     context: object
-    mapping: BaseUrlMapping
+    mapping: UrlMapping
     match: RegExpMatchArray
     request: RequestSummary
     incoming: IncomingMessage
@@ -63,7 +63,7 @@ declare module 'reserve' {
   interface ForwardResponseContext {
     configuration: IConfiguration
     context: object
-    mapping: BaseUrlMapping
+    mapping: UrlMapping
     match: RegExpMatchArray
     request: RequestSummary
     statusCode: number
@@ -109,7 +109,7 @@ declare module 'reserve' {
   interface PropertySchema {
     type?: string
     types?: string[]
-    defaultValue?: boolean | number | string | object | function
+    defaultValue?: boolean | number | string | object | Function
   }
 
   interface RedirectContext {
@@ -160,8 +160,13 @@ declare module 'reserve' {
   function capture (response: ServerResponse, stream: WritableStream): Promise<void>
 
   function check (configuration: Configuration): Promise<Configuration>
-  function log (server: EventEmitter, verbose: boolean = false): EventEmitter
-  function serve (configuration: Configuration): EventEmitter
+
+  interface Server extends EventEmitter {
+    close: () => Promise<void>
+  }
+
+  function log (server: Server, verbose?: boolean): Server
+  function serve (configuration: Configuration): Server
 
   interface MockedResponse extends ServerResponse {
     toString: () => string
@@ -177,12 +182,12 @@ declare module 'reserve' {
     properties?: object
   }
 
-  interface MockServer extends EventEmitter {
+  interface MockServer extends Server {
     request: ((method: string, url: string) => Promise<MockedResponse>) |
       ((method: string, url: string, headers: Headers) => Promise<MockedResponse>) | 
       ((method: string, url: string, headers: Headers, properties: object) => Promise<MockedResponse>) | 
       ((definition: MockedRequestDefinition) => Promise<MockedResponse>)
   }
 
-  function mock (configuration: Configuration, mockedHandlers: Handlers = {}): Promise<MockServer>
+  function mock (configuration: Configuration, mockedHandlers?: Handlers): Promise<MockServer>
 }
