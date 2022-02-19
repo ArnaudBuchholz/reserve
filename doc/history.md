@@ -79,3 +79,5 @@
 ||Support of Node.js 16|
 ||`absolute-location` option in **url** handler|
 |1.12.1|Improve typescript definitions|
+|1.13.0|Introduces `close` to shutdown server|
+|1.13.1|Improve typescript definitions and documentation|
