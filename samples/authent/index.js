@@ -7,6 +7,7 @@ const readFileAsync = promisify(readFile)
 const statAsync = promisify(stat)
 const { Readable } = require('stream')
 const EventEmitter = require('events')
+const defer = require('../../defer')
 
 const isHtml = path => !!path.match(/\.html?$/)
 const htmlInject = '<script src="/api/connect.js"></script>'
@@ -67,11 +68,8 @@ log(serve({
     match: /^\/api\/test/,
     custom: async (request, response) => {
       if (!connected) {
-        let done, fail
-        waitForConnection = new Promise((resolve, reject) => {
-          done = resolve
-          fail = reject
-        })
+        const [promise, done, fail] = defer()
+        waitForConnection = promise
         waitForConnection.done = done
         waitForConnection.fail = fail
         events.emit('connect')
