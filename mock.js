@@ -12,6 +12,7 @@ const {
 
 module.exports = (jsonConfiguration, mockedHandlers = {}) => {
   const eventEmitter = new EventEmitter()
+  eventEmitter.close = () => Promise.resolve()
   return check(jsonConfiguration)
     .then(configuration => {
       configuration[$configurationEventEmitter] = eventEmitter
