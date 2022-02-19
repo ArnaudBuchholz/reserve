@@ -10,8 +10,8 @@ describe('mock', () => {
 
     before(() => read('/reserve.json')
       .then(configuration => mock(configuration))
-      .then(eventEmitter => {
-        mocked = eventEmitter
+      .then(server => {
+        mocked = server
       })
     )
 
@@ -21,6 +21,11 @@ describe('mock', () => {
         assert(() => response.toString() === 'Hello World!')
       })
     )
+
+    it('exposes the same interface', () => {
+      assert(() => typeof mocked.close === 'function')
+      assert(() => mocked.close() instanceof Promise)
+    })
   })
 
   describe('overriding the handlers', () => {
@@ -45,8 +50,8 @@ describe('mock', () => {
           }
         }
       }))
-      .then(eventEmitter => {
-        mocked = eventEmitter
+      .then(server => {
+        mocked = server
       })
     )
 
@@ -58,7 +63,7 @@ describe('mock', () => {
       })
     )
 
-    it('suports internal redirection', () => mocked.request('GET', '/error')
+    it('supports internal redirection', () => mocked.request('GET', '/error')
       .then(response => {
         assert(() => response.statusCode === 500)
       })
