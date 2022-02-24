@@ -16,7 +16,8 @@ describe('detect/mime', () => {
 
   const expected = {
     text: 'text/plain',
-    html: 'text/html'
+    html: 'text/html',
+    json: 'application/json'
   }
 
   function tests () {
