@@ -81,3 +81,5 @@
 |1.12.1|Improve typescript definitions|
 |1.13.0|Introduces `close` to shutdown server|
 |1.13.1|Improve typescript definitions and documentation|
+|1.14.0|`json` mime type|
+|1.15.0|Improves configuration validation|
