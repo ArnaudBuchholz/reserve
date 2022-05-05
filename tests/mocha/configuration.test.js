@@ -66,6 +66,22 @@ describe('configuration', () => {
   })
 
   describe('configuration.check', () => {
+    const invalidConfigurations = {
+      true: true,
+      false: false,
+      'empty string': '',
+      'json string': JSON.stringify({}),
+      function: shouldFail,
+      symbol: Symbol('test'),
+      zero: 0,
+      number: 42,
+      float: 42.3,
+      null: null
+    }
+    Object.keys(invalidConfigurations).forEach(description => {
+      it(`rejects invalid type (${description})`, () => shouldFail(check(invalidConfigurations[description])))
+    })
+
     it('applies defaults', () => {
       return check({})
         .then(configuration => {

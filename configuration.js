@@ -197,6 +197,9 @@ function extend (filePath, configuration) {
 
 module.exports = {
   async check (configuration) {
+    if (typeof configuration !== 'object' || configuration === null) {
+      throw new Error('Configuration must be an object')
+    }
     const checkedConfiguration = Object.assign({}, configuration)
     applyDefaults(checkedConfiguration)
     setHandlers(checkedConfiguration)
