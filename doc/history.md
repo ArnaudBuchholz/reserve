@@ -83,3 +83,4 @@
 |1.13.1|Improve typescript definitions and documentation|
 |1.14.0|`json` mime type|
 |1.15.0|Improves configuration validation|
+|1.15.1|`http-status` option in **file** handler *(enables HTTP status overriding)*|

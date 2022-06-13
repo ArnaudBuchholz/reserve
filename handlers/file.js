@@ -13,6 +13,7 @@ const matchcase = 'case-sensitive'
 const i404 = 'ignore-if-not-found'
 const cache = 'caching-strategy'
 const cmt = 'mime-types'
+const httpStatus = 'http-status'
 
 const nodeFs = {
   stat: promisify(fs.stat),
@@ -59,7 +60,7 @@ function sendFile ({ cachingStrategy, mapping, request, response, fs, filePath }
   return new Promise((resolve, reject) => {
     const { header: cacheHeader, status: cacheStatus } = processCache(request, cachingStrategy, fileStat)
     const { start, end, header: rangeHeader, status: rangeStatus, contentLength } = processBytesRange(request, fileStat)
-    const status = cacheStatus || rangeStatus
+    const status = mapping[httpStatus] || cacheStatus || rangeStatus
     const fileExtension = (/\.([^.]*)$/.exec(filePath) || [])[1]
     const mimeType = mapping[cmt][fileExtension] || mime(fileExtension) || bin
     response.writeHead(status, {
@@ -142,6 +143,10 @@ module.exports = {
     [cmt]: {
       type: 'object',
       defaultValue: {}
+    },
+    [httpStatus]: {
+      type: 'number',
+      defaultValue: 0
     }
   },
   method: 'GET,HEAD',
@@ -155,11 +160,14 @@ module.exports = {
     }
     const invalids = apis.filter(name => typeof mapping[cfs][name] !== 'function')
     if (invalids.length) {
-      throw new Error(`Invalid custom-file-system specification (${invalids.join(', ')})`)
+      throw new Error(`Invalid ${cfs} specification (${invalids.join(', ')})`)
     }
     const cachingStrategy = mapping[cache]
+    if (mapping[httpStatus] && cachingStrategy) {
+      throw new Error(`${cache} incompatible with ${httpStatus}`)
+    }
     if (typeof cachingStrategy === 'string' && cachingStrategy !== 'modified') {
-      throw new Error('Invalid caching-strategy name')
+      throw new Error(`Invalid ${cache} name`)
     }
   },
   redirect: ({ request, mapping, redirect, response }) => {
