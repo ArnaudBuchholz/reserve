@@ -3,7 +3,8 @@
 const assert = require('../assert')
 const mime = require('../../../detect/mime')
 const fileHandler = require('../../../handlers/file')
-const handle = require('./handle')(fileHandler, { mapping: { cwd: '/' } })
+const handleFactory = require('./handle')
+const handle = handleFactory(fileHandler, { mapping: { cwd: '/' } })
 const fs = require('fs')
 const { promisify } = require('util')
 const mockRequire = require('mock-require')
@@ -849,5 +850,39 @@ describe('handlers/file', () => {
         assert(() => response.headers['Content-Type'] === 'not-even-existing')
       }))
     )
+  })
+
+  describe('http-status', () => {
+    it('overrides default status code', () => handle({
+      request: '/file.txt',
+      mapping: {
+        cwd: '/',
+        'http-status': 403
+      }
+    })
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 403)
+        assert(() => response.headers['Content-Type'] === textMimeType)
+        assert(() => response.toString() === 'Hello World!')
+      }))
+    )
+
+    it('forbids the use of caching-strategy', async () => {
+      let exceptionCaught
+      try {
+        await handleFactory(fileHandler, {
+          mapping: {
+            'http-status': 403,
+            'caching-strategy': 'whatever'
+          }
+        })({
+          request: './file.txt'
+        })
+      } catch (e) {
+        exceptionCaught = e
+      }
+      assert(() => exceptionCaught !== undefined)
+    })
   })
 })
