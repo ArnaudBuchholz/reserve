@@ -49,6 +49,7 @@ declare module 'reserve' {
     'caching-strategy'?: 'modified' | number
     'strict'?: boolean
     'mime-types'?: Record<string, string>
+    'http-status'?: number
   }
 
   // endregion file
