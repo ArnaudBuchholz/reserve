@@ -16,6 +16,18 @@ declare module 'reserve' {
     cwd?: string
   }
 
+  // region custom
+
+  interface CustomMapping extends BaseMapping {
+    custom: string | (() => Promise<RedirectResponse>) |
+      ((request: IncomingMessage) => Promise<RedirectResponse>) |
+      ((request: IncomingMessage, response: ServerResponse) => Promise<RedirectResponse>) |
+      ((request: IncomingMessage, response: ServerResponse, ...capturedGroups: string[]) => Promise<RedirectResponse>)
+    watch?: boolean
+  }
+
+  // endregion custom
+
   // region file
 
   interface ReadStreamOptions {
@@ -40,6 +52,15 @@ declare module 'reserve' {
   }
 
   // endregion file
+
+  // region status
+
+  interface StatusMapping extends BaseMapping {
+    status: number
+    headers?: Record<string, string>
+  }
+
+  // endregion status
 
   // region url
 
@@ -81,18 +102,6 @@ declare module 'reserve' {
 
   // endregion url
 
-  // region custom
-
-  interface CustomMapping extends BaseMapping {
-    custom: string | (() => Promise<RedirectResponse>) |
-      ((request: IncomingMessage) => Promise<RedirectResponse>) |
-      ((request: IncomingMessage, response: ServerResponse) => Promise<RedirectResponse>) |
-      ((request: IncomingMessage, response: ServerResponse, ...capturedGroups: string[]) => Promise<RedirectResponse>)
-    watch?: boolean
-  }
-
-  // endregion custom
-
   // region use
 
   interface UseMapping extends BaseMapping {
@@ -132,7 +141,7 @@ declare module 'reserve' {
 
   type Listener = string | ((eventEmitter: EventEmitter) => void)
 
-  type Mapping = BaseMapping | FileMapping | UrlMapping | CustomMapping
+  type Mapping = BaseMapping | CustomMapping | FileMapping | StatusMapping | UrlMapping | UseMapping
 
   interface Configuration {
     hostname?: string
