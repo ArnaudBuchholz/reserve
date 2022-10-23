@@ -14,5 +14,6 @@
     "dashboard"
   ],
   "testRunner": "mocha",
-  "coverageAnalysis": "perTest"
+  "coverageAnalysis": "perTest",
+  "ignoreStatic": true
 }
