@@ -1,0 +1,11 @@
+{
+  "port": "8080",
+  "mappings": [{
+    "match": "^/(.*)",
+    "file": "./public/$1",
+    "ignore-if-not-found": true
+  }, {
+    "http-status": 403,
+    "file": "private/403.html"
+  }]
+}
