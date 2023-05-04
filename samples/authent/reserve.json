@@ -6,6 +6,6 @@
     "ignore-if-not-found": true
   }, {
     "http-status": 403,
-    "file": "private/403.html"
+    "file": "403.html"
   }]
 }
