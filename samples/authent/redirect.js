@@ -1,14 +1,21 @@
 'use strict'
 
-const { getAllCookies, setCookie } = require('./cookies')
+const { getAllCookies, setCookie, names: { redirect: $redirect } } = require('./cookies')
 
-const xRedirect = 'x-redirect'
+function redirect (response, location) {
+  response.writeHead(302, { location })
+  response.end()
+}
 
 module.exports = {
+  toStartup (request, response) {
+    const location = getAllCookies(request)[$redirect] || '/'
+    redirect(response, location)
+  },
+
   toLogin (request, response) {
-    const redirect = getAllCookies(request)[xRedirect] || request.url.substring(1)
-    setCookie(response, { name: xRedirect, value: redirect })
-    response.writeHead(302, { location: '/login' })
-    response.end()
+    const redirect = getAllCookies(request)[$redirect] || request.url.substring(1)
+    setCookie(response, { name: $redirect, value: redirect })
+    redirect(response, '/login')
   }
 }
