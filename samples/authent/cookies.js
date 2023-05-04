@@ -1,6 +1,11 @@
 'use strict'
 
 module.exports = {
+  names: {
+    redirect: 'x-redirect',
+    jwt: 'x-jwt'
+  },
+
   getAllCookies (request) {
     const cookiesStr = request.headers.cookie
     if (cookiesStr) {
