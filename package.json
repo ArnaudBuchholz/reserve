@@ -64,6 +64,7 @@
     "mock-require": "^3.0.3",
     "nyc": "^15.1.0",
     "passport": "^0.6.0",
+    "reserve": "^1.15.2",
     "socket.io": "^4.6.1",
     "standard": "^17.0.0",
     "start-server-and-test": "^2.0.0"
