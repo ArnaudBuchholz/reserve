@@ -13,7 +13,7 @@ module.exports = {
         .split(';')
         .map(cookie => cookie.trim())
         .reduce((cookies, cookie) => {
-          const [, name, value] = cookie.match(/(\w+)=(.*)/)
+          const [, name, value] = cookie.match(/([^=]+)=(.*)/)
           cookies[name] = decodeURI(value)
           return cookies
         }, {})
