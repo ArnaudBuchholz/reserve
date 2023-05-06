@@ -5,6 +5,10 @@
     "file": "./public/$1",
     "ignore-if-not-found": true
   }, {
+    "match": "^/jose/(.*)",
+    "file": "../../node_modules/jose/dist/browser/$1",
+    "ignore-if-not-found": true
+  }, {
     "match": "^/favicon.ico",
     "status": 404
   }, {
