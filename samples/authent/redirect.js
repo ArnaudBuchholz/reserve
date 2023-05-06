@@ -10,12 +10,18 @@ function redirect (response, location) {
 module.exports = {
   toStartup (request, response) {
     const location = getAllCookies(request)[$redirect] || '/'
+    setCookie(response, {
+      name: $redirect,
+      value: ''
+    })
     redirect(response, location)
   },
 
   toLogin (request, response) {
-    const redirect = getAllCookies(request)[$redirect] || request.url.substring(1)
-    setCookie(response, { name: $redirect, value: redirect })
-    redirect(response, '/login')
+    setCookie(response, {
+      name: $redirect,
+      value: getAllCookies(request)[$redirect] || request.url.substring(1)
+    })
+    redirect(response, '/login.html')
   }
 }
