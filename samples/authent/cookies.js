@@ -27,7 +27,7 @@ module.exports = {
     } else {
       maxAge = ''
     }
-    const encoded = `${name}=${encodeURI(value)}${maxAge}; HttpOnly; SameSite=Strict`
+    const encoded = `${name}=${encodeURI(value)}${maxAge}; SameSite=Strict`
     let allCookies = response.getHeader('Set-Cookie')
     if (!allCookies) {
       allCookies = [encoded]
