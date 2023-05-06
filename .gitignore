@@ -27,3 +27,5 @@ tests/cache/
 # stryker temp files
 .stryker-tmp
 reports/
+
+.env
