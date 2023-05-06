@@ -5,6 +5,22 @@
     "file": "./public/$1",
     "ignore-if-not-found": true
   }, {
+    "match": "^/favicon.ico",
+    "status": 404
+  }, {
+    "method": "POST",
+    "match": "^/login",
+    "custom": "./login"
+  }, {
+    "match": "^/logout",
+    "custom": "./logout"
+  }, {
+    "custom": "./authent"
+  }, {
+    "match": "^/(.*)",
+    "file": "./protected/$1",
+    "ignore-if-not-found": true
+  }, {
     "http-status": 403,
     "file": "403.html"
   }]
