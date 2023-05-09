@@ -3,7 +3,7 @@
 const { jwtSecret } = require('./config')
 const jose = require('jose')
 const { getAllCookies, names: { jwt: $jwt } } = require('./cookies')
-const { toLogin } = require('./redirect')
+const { rememberLocation, toLogin } = require('./redirect')
 
 module.exports = async function isAuthenticated (request, response) {
   try {
@@ -11,6 +11,7 @@ module.exports = async function isAuthenticated (request, response) {
     const { payload } = await jose.jwtVerify(token, jwtSecret)
     request.jwt = payload
   } catch (e) {
+    rememberLocation(request, response)
     toLogin(request, response)
   }
 }

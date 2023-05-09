@@ -17,11 +17,14 @@ module.exports = {
     redirect(response, location)
   },
 
-  toLogin (request, response) {
+  rememberLocation (request, response) {
     setCookie(response, {
       name: $redirect,
       value: getAllCookies(request)[$redirect] || request.url.substring(1)
     })
+  },
+
+  toLogin (request, response) {
     redirect(response, '/login.html')
   }
 }
