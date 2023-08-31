@@ -19,9 +19,9 @@ declare module 'reserve' {
   // region custom
 
   interface CustomMapping extends BaseMapping {
-    custom: string | (() => Promise<RedirectResponse>) |
-      ((request: IncomingMessage) => Promise<RedirectResponse>) |
-      ((request: IncomingMessage, response: ServerResponse) => Promise<RedirectResponse>) |
+    custom: string | (() => Promise<RedirectResponse>) &
+      ((request: IncomingMessage) => Promise<RedirectResponse>) &
+      ((request: IncomingMessage, response: ServerResponse) => Promise<RedirectResponse>) &
       ((request: IncomingMessage, response: ServerResponse, ...capturedGroups: string[]) => Promise<RedirectResponse>)
     watch?: boolean
   }
@@ -193,11 +193,12 @@ declare module 'reserve' {
   }
 
   interface MockServer extends Server {
-    request: ((method: string, url: string) => Promise<MockedResponse>) |
-      ((method: string, url: string, headers: Headers) => Promise<MockedResponse>) | 
-      ((method: string, url: string, headers: Headers, properties: object) => Promise<MockedResponse>) | 
+    request: ((method: string, url: string) => Promise<MockedResponse>) &
+      ((method: string, url: string, headers: Headers) => Promise<MockedResponse>) &
+      ((method: string, url: string, headers: Headers, properties: object) => Promise<MockedResponse>) &
       ((definition: MockedRequestDefinition) => Promise<MockedResponse>)
   }
 
   function mock (configuration: Configuration, mockedHandlers?: Handlers): Promise<MockServer>
 }
+
