@@ -85,3 +85,4 @@
 |1.15.0|Improves configuration validation|
 |1.15.1|`http-status` option in **file** handler *(enables HTTP status overriding)*|
 |1.15.2|Improves types definition (adds status mapping, fixes file mapping)|
+|1.15.3|Fix types definition (CustomMapping::custom, MockServer::request)|
