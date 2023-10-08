@@ -81,7 +81,6 @@
   "mocha": {
     "diff": false,
     "spec": [
-      "tests/mocha/*.test.js",
       "tests/mocha/**/*.test.js"
     ],
     "require": [
@@ -91,7 +90,8 @@
       "tests/mocha/mocked_modules/http.js",
       "tests/mocha/mocked_modules/https.js",
       "tests/mocha/mocked_modules/http2.js",
-      "tests/mocha/mocked_modules/process.js"
+      "tests/mocha/mocked_modules/process.js",
+      "tests/mocha/mocked_modules/os.js"
     ]
   },
   "nyc": {
