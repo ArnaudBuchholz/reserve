@@ -1,7 +1,7 @@
 'use strict'
 
 const { jwtExpiration, jwtSecret } = require('./config')
-const { body } = require('reserve')
+const { body } = require('../..') // use require('reserve')
 const jose = require('jose')
 const { setCookie, names: { jwt: $jwt } } = require('./cookies')
 const { toLogin, toStartup } = require('./redirect')

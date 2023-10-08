@@ -1,6 +1,6 @@
 'use strict'
 
-const { log, serve } = require('../..')
+const { log, serve } = require('../..') // use require('reserve')
 const { createReadStream, readdir, readFile, stat } = require('fs')
 const { promisify } = require('util')
 const readFileAsync = promisify(readFile)
