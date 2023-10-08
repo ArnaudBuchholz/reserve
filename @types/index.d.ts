@@ -19,10 +19,7 @@ declare module 'reserve' {
   // region custom
 
   interface CustomMapping extends BaseMapping {
-    custom: string | (() => Promise<RedirectResponse>) &
-      ((request: IncomingMessage) => Promise<RedirectResponse>) &
-      ((request: IncomingMessage, response: ServerResponse) => Promise<RedirectResponse>) &
-      ((request: IncomingMessage, response: ServerResponse, ...capturedGroups: string[]) => Promise<RedirectResponse>)
+    custom: string | ((request: IncomingMessage, response: ServerResponse, ...capturedGroups: string[]) => Promise<RedirectResponse>)
     watch?: boolean
   }
 
