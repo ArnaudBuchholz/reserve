@@ -18,7 +18,7 @@
     "node": ">=12.0.0"
   },
   "scripts": {
-    "test": "standard && node tests/all.js && nyc mocha && npm run test:types",
+    "test": "standard && node tests/all.js && nyc mocha && (node -e \"if (parseInt(process.version.match(/v(\\d+)/)[1]) > 14) process.exit(1) \" || npm run test:types)",
     "test:mutation": "stryker run",
     "lint": "standard --fix",
     "mocha": "mocha",
@@ -28,7 +28,7 @@
     "perf-test": "autocannon localhost:5000",
     "perf": "start-server-and-test perf-test http-get://localhost:5000 perf-serve",
     "reserve": "node ./samples/reserve",
-    "test:types": "npm run install-reserve-for-types",
+    "test:types": "npm run install-reserve-for-types && npx tsc tests/types.ts",
     "install-reserve-for-types": "node tests/install-reserve-for-types.js"
   },
   "repository": {
