@@ -23,6 +23,7 @@ coverage
 
 # tests
 tests/cache/
+tests/types.js
 
 # stryker temp files
 .stryker-tmp
