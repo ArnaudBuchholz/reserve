@@ -18,7 +18,7 @@
     "node": ">=12.0.0"
   },
   "scripts": {
-    "test": "standard && node tests/all.js && nyc mocha",
+    "test": "standard && node tests/all.js && nyc mocha && npm run test:types",
     "test:mutation": "stryker run",
     "lint": "standard --fix",
     "mocha": "mocha",
@@ -28,7 +28,8 @@
     "perf-test": "autocannon localhost:5000",
     "perf": "start-server-and-test perf-test http-get://localhost:5000 perf-serve",
     "reserve": "node ./samples/reserve",
-    "install-reserve-types": "mkdirp node_modules/@types/reserve && ncp @types/index.d.ts node_modules/@types/reserve/index.d.ts"
+    "test:types": "npm run install-reserve-for-types && npx tsc tests/types.ts",
+    "install-reserve-for-types": "mkdirp node_modules/reserve && ncp package.json node_modules/reserve/package.json && mkdirp node_modules/@types/reserve && ncp @types/index.d.ts node_modules/@types/reserve/index.d.ts"
   },
   "repository": {
     "type": "git",
@@ -69,7 +70,8 @@
     "passport": "^0.6.0",
     "socket.io": "^4.7.2",
     "standard": "^17.1.0",
-    "start-server-and-test": "^2.0.1"
+    "start-server-and-test": "^2.0.1",
+    "typescript": "^5.2.2"
   },
   "standard": {
     "env": [
