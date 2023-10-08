@@ -1,7 +1,10 @@
 const { join } = require('path')
-const { mkdirSync, cpSync } = require('fs')
+const { mkdirSync, createReadStream, createWriteStream } = require('fs')
 const root = join(__dirname, '..')
 mkdirSync(join(root, 'node_modules/reserve'), { recursive: true })
-cpSync(join(root, 'package.json'), join(root, 'node_modules/reserve/package.json'), { force: true })
 mkdirSync(join(root, 'node_modules/@types/reserve'), { recursive: true })
-cpSync(join(root, '@types/index.d.ts'), join(root, 'node_modules/@types/reserve/index.d.ts'), { force: true })
+function copy (src, dst) {
+  createReadStream(join(root, src)).pipe(createWriteStream(join(root, dst)))
+}
+copy('package.json', 'node_modules/reserve/package.json')
+copy('@types/index.d.ts', 'node_modules/@types/reserve/index.d.ts')
