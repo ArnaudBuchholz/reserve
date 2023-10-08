@@ -27,7 +27,8 @@
     "perf-serve": "node . --config ./tests/http.json --silent",
     "perf-test": "autocannon localhost:5000",
     "perf": "start-server-and-test perf-test http-get://localhost:5000 perf-serve",
-    "reserve": "node ./samples/reserve"
+    "reserve": "node ./samples/reserve",
+    "install-reserve-types": "mkdirp node_modules/@types/reserve && ncp @types/index.d.ts node_modules/@types/reserve/index.d.ts"
   },
   "repository": {
     "type": "git",
@@ -60,8 +61,10 @@
     "lodash": "^4.17.21",
     "mime": "^3.0.0",
     "minimist": ">=1.2.8",
+    "mkdirp": "^3.0.1",
     "mocha": "^10.2.0",
     "mock-require": "^3.0.3",
+    "ncp": "^2.0.0",
     "nyc": "^15.1.0",
     "passport": "^0.6.0",
     "socket.io": "^4.7.2",
