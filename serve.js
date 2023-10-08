@@ -11,6 +11,7 @@ const {
   $configurationInterface
 } = require('./symbols')
 const defer = require('./defer')
+const { networkInterfaces } = require('os')
 
 function createServer (configuration, requestHandler) {
   const { httpOptions } = configuration
@@ -53,13 +54,26 @@ module.exports = jsonConfiguration => {
     .then(configuration => {
       configuration[$configurationEventEmitter] = eventEmitter
       configuration.listeners.forEach(register => register(eventEmitter))
+      let { hostname } = configuration
+      if (!hostname) {
+        hostname = '127.0.0.1'
+        const networks = networkInterfaces()
+        for (const name of Object.keys(networks)) {
+          for (const network of networks[name]) {
+            if (!network.internal && (network.family === 'IPv4' || network.family === 4)) {
+              hostname = network.address
+              break
+            }
+          }
+        }
+      }
       return createServerAsync(eventEmitter, configuration, dispatcher)
         .then(server => {
           ready(server)
           const { port } = server.address()
           const { http2 } = configuration
           eventEmitter.emit('ready', {
-            url: `${configuration.protocol}://${configuration.hostname || '0.0.0.0'}:${port}/`,
+            url: `${configuration.protocol}://${hostname}:${port}/`,
             port,
             http2
           })
