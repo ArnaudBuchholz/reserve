@@ -1,0 +1,7 @@
+const { join } = require('path')
+const { mkdirSync, cpSync } = require('fs')
+const root = join(__dirname, '..')
+mkdirSync(join(root, 'node_modules/reserve'), { recursive: true })
+cpSync(join(root, 'package.json'), join(root, 'node_modules/reserve/package.json'), { force: true })
+mkdirSync(join(root, 'node_modules/@types/reserve'), { recursive: true })
+cpSync(join(root, '@types/index.d.ts'), join(root, 'node_modules/@types/reserve/index.d.ts'), { force: true })
