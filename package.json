@@ -28,8 +28,8 @@
     "perf-test": "autocannon localhost:5000",
     "perf": "start-server-and-test perf-test http-get://localhost:5000 perf-serve",
     "reserve": "node ./samples/reserve",
-    "test:types": "npm run install-reserve-for-types && npx tsc tests/types.ts",
-    "install-reserve-for-types": "node tests/install-reserve-for-types.js"
+    "test:types": "npm run install-local-reserve && npx tsc tests/types.ts",
+    "install-local-reserve": "node tests/install-local-reserve.js"
   },
   "repository": {
     "type": "git",
