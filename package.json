@@ -107,7 +107,7 @@
       "console.js",
       "coverage/**",
       "samples/**",
-      "doc/**"
+      "docs/**"
     ],
     "branches": 100,
     "lines": 100,
