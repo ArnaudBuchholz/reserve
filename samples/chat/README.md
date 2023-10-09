@@ -6,6 +6,7 @@ This sample demonstrates two different ways to build a chat application with REs
 
 ## How to start
 
+* `npm run install-local-reserve`
 * `node socket.js`
 * or `node serverevents.js`
 

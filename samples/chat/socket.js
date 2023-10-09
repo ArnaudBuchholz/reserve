@@ -2,7 +2,7 @@
 
 'use strict'
 
-const { serve } = require('../..') // use require('reserve')
+const { serve } = require('reserve')
 
 function socket (eventEmitter) {
   eventEmitter.on('server-created', ({ server }) => {

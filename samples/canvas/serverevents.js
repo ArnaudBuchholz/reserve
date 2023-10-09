@@ -1,6 +1,6 @@
 'use strict'
 
-const { body } = require('../..') // use require('reserve')
+const { body } = require('reserve')
 
 const send = function (channel, id, plot) {
   try {

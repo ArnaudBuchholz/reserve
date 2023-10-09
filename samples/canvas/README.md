@@ -4,7 +4,8 @@ This sample demonstrates the use of [server-sent events](https://developer.mozil
 
 ## How to start
 
-`node ../.. --config http.json,http2.json`
+`npm run install-local-reserve`
+`npx reserve --config http.json,http2.json`
 
 ## How to use
 

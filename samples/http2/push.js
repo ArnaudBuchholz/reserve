@@ -1,4 +1,4 @@
-const { Request } = require('../..') // use require('reserve')
+const { Request } = require('reserve')
 
 function push (configuration, path, response) {
   response.createPushResponse({

@@ -4,12 +4,13 @@ Examples from the article [Serving an OpenUI5 application](https://medium.com/@a
 
 ## How to start
 
-`node ..\.. --config <config.json>`
+`npm run install-local-reserve`
+`npx reserve --config <config.json>`
 
 Where `<config.json>` is one of the configuration files 
 
 For instance :
-`node ..\.. --config static.json`
+`npx reserve --config static.json`
 
 ## How to use
 

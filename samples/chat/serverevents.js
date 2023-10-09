@@ -1,6 +1,6 @@
 'use strict'
 
-const { body, serve } = require('../..') // use require('reserve')
+const { body, serve } = require('reserve')
 const EventEmitter = require('events')
 
 function html (content, request, response) {
