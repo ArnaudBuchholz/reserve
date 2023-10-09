@@ -31,7 +31,7 @@ When the project started, an initial - not to say basic - test was created by bu
   }]
 }
 ```
-<u>*Initial mappings used to prototype REserve*</u>
+> Initial mappings used to prototype REserve
 
 * The first mapping is a typical **proxy** that enables any request on a **remote website**
 * The second *(and third)* mapping uses the **custom handler** with a **capturing group**
@@ -43,13 +43,13 @@ When the project started, an initial - not to say basic - test was created by bu
   "port": 5000
 }
 ```
-<u>*http.json file used to expose mappings through http*</u>
+> http.json file used to expose mappings through http
 
 Finally, a [web page](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/index.html) was designed to leverage the different mappings and the result was validated with a list of [assertions](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/assertions.js) *(thanks to the [gpf-js http](https://arnaudbuchholz.github.io/gpf/doc/gpf.http.html) helper)*.
 
 ![test result](localhost_5000.png)
 
-<u>*Basic tests executed in a browser*</u>
+> Basic tests executed in a browser
 
 However, this can hardly be **automated** *(or the lazy me did not want to go with selenium)*.
 
@@ -63,7 +63,7 @@ The previous approach considers the **whole project** as a standalone - monolith
 
 ![Test pyramid](test-pyramid.png)
 
-<u>*A simplified version of the pyramid of tests*</u>
+> A simplified version of the pyramid of tests
 
 Another angle for testing is to **isolate each class and service** by [mocking or stubbing](https://www.martinfowler.com/articles/mocksArentStubs.html#TheDifferenceBetweenMocksAndStubs) their dependencies and **test them individually**. This is known as **unit testing**. It begins the pyramid of tests, meaning this is where most effort should be put.
 
@@ -73,7 +73,7 @@ If you are familiar with the [mocha framework](https://www.npmjs.com/package/moc
 
 [![Mocha](mocha.svg)](https://mochajs.org/)
 
-<u>*Mocha framework logo*</u>
+> Mocha framework logo
 
 For each source file of the project a **corresponding** test file is created, for instance: [`handlers/custom.js`](https://github.com/ArnaudBuchholz/reserve/blob/master/handlers/custom.js) is tested by [`tests/mocha/handlers/custom.test.js`](https://github.com/ArnaudBuchholz/reserve/blob/master/tests/mocha/handlers/custom.test.js). The directory structure is also recreated under the [mocha tests folder](https://github.com/ArnaudBuchholz/reserve/tree/master/tests/mocha).
 
@@ -83,7 +83,7 @@ When running, it produces a report that helps you identify which **test case fai
 
 ![Mocha execution excerpt](mocha%20tests%20%28excerpt%29.png)
 
-<u>*Mocha execution excerpt*</u>
+> Mocha execution excerpt
 
 ### Isolation in a nutshell
 
@@ -126,7 +126,7 @@ function getEntry (entryPath) {
   }, entries)
 }
 ```
-<u>*The main function of the virtual file system*</u>
+> The main function of the virtual file system
 
 #### Mocking of http, requests & responses
 
@@ -165,7 +165,7 @@ if (parameter = '--config') {
   return false
 }
 ```
-<u>*An example of faulty code*</u>
+> An example of faulty code
 
 ```cmd
 > standard --fix
@@ -174,7 +174,7 @@ standard: Use JavaScript Standard Style (https://standardjs.com)
   .\reserve\index.js:13:9: Expected a conditional expression and instead saw an assignment.
   .\reserve\index.js:13:9: Unexpected constant condition.
 ```
-<u>*The linter output*</u>
+> The linter output
 
 A linter can also **check the formatting** being used through the sources, such as the choice between tabs and spaces, how strings should be delimited... This guarantees **consistency when reading** the code and **improves maintainability**.
 
@@ -194,13 +194,13 @@ function divide (a, b) {
   return a / b;
 }
 ```
-<u>*An example of function to be tested*</u>
+> An example of function to be tested
 
 The test below executes the function and, as a result, it is **enough** to **cover it completely**.
 ```JavaScript
 assert.strictEqual(divide(4,2), 2)
 ```
-<u>*An example of test*</u>
+> An example of test
 
 Since we reached **100% of coverage**, does it mean that the **function is fully tested** ?
 
@@ -251,7 +251,7 @@ All files                           |     100 |      100 |     100 |     100 |
   schema.js                         |     100 |      100 |     100 |     100 |
   serve.js                          |     100 |      100 |     100 |     100 |
 ```
-<u>*Excerpt of the coverage report*</u>
+> Excerpt of the coverage report
 
 ### Continuous integration
 

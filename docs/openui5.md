@@ -72,7 +72,7 @@ Let's consider a **simple demonstration application** that consists in one view 
 
 ![sample app](openui5/sample%20app.png)
 
-<u>*Sample demonstration application*</u>
+> Sample demonstration application
 
 In the first version of the bootstrap (`static.html`), the OpenUI5 framework is **loaded from the CDN**.
 
@@ -96,13 +96,13 @@ In the first version of the bootstrap (`static.html`), the OpenUI5 framework is 
 </html>
 ```
 
-<u>*OpenUI5 is loaded from the CDN as specified in the `static.html` bootstrap*</u>
+> OpenUI5 is loaded from the CDN as specified in the `static.html` bootstrap
 
 When opening this **file directly in a browser**, the application **fails to load**. Since scripts running via `file://` have **limited support for [Cross-Origin Resource Sharing](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)**, it is unable to load some resources from the file system using the [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) object.
 
 ![static](openui5/file%20access.png)
 
-<u>*Loading the application from the file system fails*</u>
+> Loading the application from the file system fails
 
 To work properly, the application must be served using the **http protocol**.
 
@@ -127,7 +127,7 @@ Here are the steps to build a web server using [REserve](https://www.npmjs.com/p
 }
 ```
 
-<u>*`static.json` configuration file*</u>
+> `static.json` configuration file
 
 The above configuration contains only two mappings:
 * The first mapping intercepts requests accessing **the root of the website** and **delivers the content of `static.html`** thanks to the [file handler](https://www.npmjs.com/package/reserve#file).
@@ -139,13 +139,13 @@ Then, when the browser points to [`http://localhost:8080`](http://localhost:8080
 
 ![File access](openui5/static.png)
 
-<u>*The application running with REserve*</u>
+> The application running with REserve
 
 In the meantime, REserve **traces all the received requests** *(colors are available if you also install globally the [colors](https://www.npmjs.com/package/colors) package)*.
 
 ![File access](openui5/static%20cmd.png)
 
-<u>*Console output of REserve*</u>
+> Console output of REserve
 
 ## Changing the OpenUI5 version
 
@@ -175,7 +175,7 @@ REserve will **fill the gap**.
 </html>
 ```
 
-<u>*OpenUI5 is loaded through a non-existing path in the `index.html` bootstrap*</u>
+> OpenUI5 is loaded through a non-existing path in the `index.html` bootstrap
 
 ### Using HTTP redirect
 
@@ -204,7 +204,7 @@ The [status handler](https://www.npmjs.com/package/reserve#status) takes care of
 }
 ```
 
-<u>*`redirect.json` configuration file*</u>
+> `redirect.json` configuration file
 
 When running this configuration file, the network traces of the browser show that **OpenUI5 resources involve two requests** :
 * The first one gets status `302` from REserve,
@@ -212,13 +212,13 @@ When running this configuration file, the network traces of the browser show tha
 
 ![redirect](openui5/redirect.png)
 
-<u>*The network traces show the redirect mechanism*</u>
+> The network traces show the redirect mechanism
 
 However, **only the requests** served by REserve are traced, as shown below.
 
 ![redirect](openui5/redirect%20cmd.png)
 
-<u>*REserve traces showing the HTTP Status 302 answers*</u>
+> REserve traces showing the HTTP Status 302 answers
 
 ### Changing the version dynamically
 
@@ -244,7 +244,7 @@ The [custom handler](https://www.npmjs.com/package/reserve#custom) enables custo
 }
 ```
 
-<u>*`redirect-version.json` configuration file*</u>
+> `redirect-version.json` configuration file
 
 The custom handler **simplifies the request processing** by calling an **asynchronous function** with the Node.js' **native [request](https://nodejs.org/api/http.html#http_class_http_incomingmessage) and [response](https://nodejs.org/api/http.html#http_class_http_serverresponse) objects**. Any **capturing group value** is passed as **additional parameters**.
 REserve knows that the request is **fully answered** when the response is **finalized by calling [`end`](https://nodejs.org/api/http.html#http_response_end_data_encoding_callback)**.
@@ -262,19 +262,19 @@ module.exports = async function (request, response, ui5Path) {
 }
 ```
 
-<u>*`redirect-version.js` custom code*</u>
+> `redirect-version.js` custom code
 
 When running this new configuration file, one can now specify a **version number inside the URL** such as `localhost:8080?version=1.65.0`. This makes the application runs with the **requested OpenUI5 version** as demonstrated below.
 
 ![redirect](openui5/redirect-version.png)
 
-<u>*The demonstration application running with version 1.65.0 of OpenUI5*</u>
+> The demonstration application running with version 1.65.0 of OpenUI5
 
 As far as the traces are concerned, this does not change the output of REserve.
 
 ![redirect](openui5/redirect-version%20cmd.png)
 
-<u>*REserve traces showing the HTTP Status 302 answers*</u>
+> REserve traces showing the HTTP Status 302 answers
 
 ### Content Security Policy
 
@@ -303,7 +303,7 @@ As listed below, this new mapping has **no `match` specification**. Therefore, *
 }
 ```
 
-<u>*`redirect-csp.json` configuration file*</u>
+> `redirect-csp.json` configuration file
 
 The file `csp.js`, detailed below, adds the `Content-Security-Policy` header to tell the browser to **trust only the code loaded from the website**.
 
@@ -313,19 +313,19 @@ module.exports = async function (request, response) {
 }
 ```
 
-<u>*`csp.js` custom code file*</u>
+> `csp.js` custom code file
 
 Since **OpenUI5 resources are served from a CDN** after the request is being redirected, it leads to an **error** as shown in the network traces below and the application **fails to load**.
 
 ![redirect](openui5/redirect-csp.png)
 
-<u>*The network traces show the blocked request*</u>
+> The network traces show the blocked request
 
 Consequently, the **application loading is stopped** and only **few traces are dumped** in the REserve console.
 
 ![redirect](openui5/redirect-csp%20cmd.png)
 
-<u>*Only two requests reached REserve*</u>
+> Only two requests reached REserve
 
 ### Proxy
 
@@ -353,19 +353,19 @@ Thus, the **redirect mapping is replaced with a new one** as shown below.
 }
 ```
 
-<u>*`proxy-csp.json` configuration file*</u>
+> `proxy-csp.json` configuration file
 
 When running this configuration file, the **application is loading again** despite the CSP specification. The browser network traces show that **all resources are served by `localhost`**, as illustrated below.
 
 ![redirect](openui5/proxy-csp.png)
 
-<u>*The application runs as if all resources are local*</u>
+> The application runs as if all resources are local
 
 In the console, all the requests are completed with the status `200`.
 
 ![redirect](openui5/proxy-csp%20cmd.png)
 
-<u>*REserve appears to serve all the requests 'locally'*</u>
+> REserve appears to serve all the requests 'locally'
 
 ### A versioned proxy
 
@@ -396,7 +396,7 @@ As shown below, **two mappings** are necessary :
 }
 ```
 
-<u>*`proxy-csp-version.json` configuration file*</u>
+> `proxy-csp-version.json` configuration file
 
 The custom code is almost the **same as `redirect-version.js`** but with a **different location**.
 
@@ -411,19 +411,19 @@ module.exports = async function (request, response, ui5Path) {
 }
 ```
 
-<u>*`proxy-version.js` custom code*</u>
+> `proxy-version.js` custom code
 
 As expected, the **application runs** and the **OpenUI5 version can be changed** using the URL parameter `version=`.
 
 ![redirect](openui5/proxy-csp-version.png)
 
-<u>*The demonstration application running with version 1.65.0 of OpenUI5 served locally*</u>
+> The demonstration application running with version 1.65.0 of OpenUI5 served locally
 
 Again, the console looks like the previous example.
 
 ![redirect](openui5/proxy-csp-version%20cmd.png)
 
-<u>*REserve appears to serve all the requests 'locally'*</u>
+> REserve appears to serve all the requests 'locally'
 
 ## Conclusion
 

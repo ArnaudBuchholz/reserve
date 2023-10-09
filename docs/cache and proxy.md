@@ -20,13 +20,13 @@ log(serve({
 }), process.argv.includes('--verbose'))
 ```
 
-*<u>A simple web server built with REserve</u>*
+> A simple web server built with REserve
 
 When opening the browser to [localhost:8005](http://localhost:8005), the content of [http://facetheforce.today/](http://facetheforce.today/) is displayed as shown in the following preview.
 
 ![Face the force today](cache%20and%20proxy/Face%20the%20Force%20Today.png)
 
-*<u>Preview of the Face the force today website as seen through the local web server</u>*
+> Preview of the Face the force today website as seen through the local web server
 
 ## Saving resources
 
@@ -66,7 +66,7 @@ log(serve({
 }), process.argv.includes('--verbose'))
 ```
 
-*<u>The web server improved with a capturing mapping</u>*
+> The web server improved with a capturing mapping
 
 Using the request url, the **resource extension** is extracted and if it matches a **list of known types** (.ico, .js, .css ...), a file path is computed, the corresponding folder is created *(if missing)* and a **write stream is initiated**.
 
@@ -78,19 +78,19 @@ After **restarting** the server and **reloading** the page in the browser, the *
 
 ![Content of the cache\images folder](cache%20and%20proxy/Face%20the%20Force%20Today%20cache%20content.png)
 
-*<u>Content of the cache\images folder</u>*
+> Content of the cache\images folder
 
 If we focus on the request made to grab the file `styles.css`, we observe that it was sent with the `gzip` [content-encoding](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding). This can be verified in the **network tab** of the debugger as illustrated below.
 
 ![Request details of the styles.css resource](cache%20and%20proxy/Face%20the%20Force%20Today%20with%20style%20request%20details.png)
 
-*<u>styles.css request detail</u>*
+> styles.css request detail
 
 But as you can see in the following notepad screenshot, the cached file is **readable as plain text**.
 
 ![styles.css content](cache%20and%20proxy/Face%20the%20Force%20Today%20styles%20content.png)
 
-*<u>cached styles.css content</u>*
+> cached styles.css content
 
 Another benefit of the **capture helper** is that it **automatically decompresses streams**.
 
@@ -138,13 +138,13 @@ log(serve({
 }), process.argv.includes('--verbose'))
 ```
 
-*<u>The web server modified to serve locally cached files</u>*
+> The web server modified to serve locally cached files
 
 If we look again on the request made to grab the file `styles.css`, we notice that it was sent with **no encoding** *(and very few response headers)*.
 
 ![Request details of the cached styles.css resource](cache%20and%20proxy/Face%20the%20Force%20Today%20with%20cached%20style%20request%20details.png)
 
-*<u>cached styles.css request detail</u>*
+> cached styles.css request detail
 
 # Caching the content of any site
 
@@ -195,25 +195,25 @@ log(serve({
 }), process.argv.includes('--verbose'))
 ```
 
-*<u>The previous code modified to build a web proxy server</u>*
+> The previous code modified to build a web proxy server
 
 Once the **server is started**, we use the operating system to **setup the HTTP proxy**. As shown in the next screenshot, Chrome offers a **shortcut** to access these settings. 
 
 ![Chrome settings](cache%20and%20proxy/Chrome%20settings.png)
 
-*<u>Chrome settings</u>*
+> Chrome settings
 
 On Ubuntu, you need to **click the Network Proxy button**.
 
 ![Ubuntu network settings](cache%20and%20proxy/Ubuntu%20network%20proxy.png)
 
-*<u>Ubuntu network settings</u>*
+> Ubuntu network settings
 
 And then **point to the running server**, like in the next screenshot.
 
 ![Ubuntu proxy settings](cache%20and%20proxy/Ubuntu%20proxy%20settings.png)
 
-*<u>Ubuntu network settings</u>*
+> Ubuntu network settings
 
 Once everything is configured, you can **browse any HTTP site** and the **resources are saved automatically**.
 
@@ -221,7 +221,7 @@ For instance...
 
 ![Proxy cache folder](cache%20and%20proxy/Proxy%20cache%20folder.png)
 
-*<u>Proxy cache folder</u>*
+> Proxy cache folder
 
 # To conclude
 

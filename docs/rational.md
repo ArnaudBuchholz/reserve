@@ -40,7 +40,8 @@ app.use(express.static(wwwRoot))
 app.get('/', (req, res) => res.sendFile(path.join(wwwRoot, 'static.html')))
 app.listen(port, () => console.log(`Listening on port ${port}!`))
 ```
-<u>*An example of a web server publishing static files using express*</u>
+
+> An example of a web server publishing static files using express
 
 But then, this code would be **copied in each project** with a dependency to the **express package**. And, talking about dependencies, express itself requires [51 additional components](https://npm.anvaka.com/#/view/2d/express). This explains why the package contains only [204 KB](https://packagephobia.now.sh/result?p=express) of code but, in the end, has a **digital footprint of 1.61 MB**.
 
@@ -54,7 +55,7 @@ And they are not all sharing the same licensing model *(even if they are pretty 
 |[ISC](https://opensource.org/licenses/ISC)|3|
 |[BSD-3-Clause](https://opensource.org/licenses/BSD-3-Clause)|1|
 
-<u>*Licenses used in express*</u>
+> Licenses used in express
 
 Whenever express is **updated**, you might need to **recheck** again the list.
 
@@ -83,7 +84,8 @@ There are two ways to install and use it:
   }
 }
 ```
-<u>*Example of package.json that executes `serve` through `npm start`*</u>
+
+> Example of package.json that executes `serve` through `npm start`
 
 It suffers from the **same drawbacks** regarding dependencies *(it is even bigger)* and licensing. But, most annoying, the tool offers **very little [configuration support](https://github.com/zeit/serve-handler#options)**.
 
@@ -130,6 +132,7 @@ I started to draft a separate [project](https://github.com/ArnaudBuchholz/reserv
   }]
 }
 ```
-<u>*An example of a web server publishing static files using REserve*</u>
+
+> An example of a web server publishing static files using REserve
 
 REserve was born.
