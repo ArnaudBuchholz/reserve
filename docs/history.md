@@ -88,3 +88,4 @@
 |1.15.3|Fix types definition (CustomMapping::custom, MockServer::request)|
 |1.15.4|Fix types definition (Configuration)|
 ||Fix url IP in `ready` event|
+|1.15.5|Documentation as github pages|
