@@ -1,7 +1,7 @@
 'use strict'
 
-const assert = require('./assert')
-const body = require('../../body')
+const { assert } = require('test-tools')
+const body = require('./body')
 const EventEmitter = require('events')
 
 function request (chunks) {

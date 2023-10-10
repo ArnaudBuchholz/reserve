@@ -2,7 +2,7 @@
 
 const assert = require('./assert')
 
-describe('(test tool) assert', () => {
+describe('[test-tool] assert', () => {
   it('documents exception if any', () => {
     try {
       assert(() => {

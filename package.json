@@ -80,7 +80,8 @@
   "mocha": {
     "diff": false,
     "spec": [
-      "src/**/*.spec.js"
+      "src/**/*.spec.js",
+      "tests/mocha/*.spec.js"
     ],
     "require": [
       "tests/mocha/setup.js"
