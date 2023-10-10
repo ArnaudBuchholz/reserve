@@ -1,9 +1,8 @@
 'use strict'
 
 const mockRequire = require('mock-require')
-const { assert } = require('test-env')
-const Request = require('../mock/Request')
-const Response = require('../mock/Response')
+const { assert } = require('test-tools')
+const { Request, Response } = require('../index')
 const useHandler = require('./use')
 
 describe('handlers/use', () => {

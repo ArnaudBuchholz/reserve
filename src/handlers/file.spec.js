@@ -870,7 +870,7 @@ describe('handlers/file', () => {
     it('forbids the use of caching-strategy', async () => {
       let exceptionCaught
       try {
-        await handleFactory(fileHandler, {
+        await wrapHandler(fileHandler, {
           mapping: {
             'http-status': 403,
             'caching-strategy': 'whatever'
