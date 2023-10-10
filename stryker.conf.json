@@ -1,10 +1,8 @@
 {
   "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
   "mutate": [
-    "*.js",
-    "detect/*.js",
-    "handlers/*.js",
-    "mock/*.js"
+    "src/**/*.js",
+    "!src/**/*.spec.js"
   ],
   "packageManager": "npm",
   "reporters": [
