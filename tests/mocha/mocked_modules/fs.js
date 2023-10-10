@@ -1,6 +1,6 @@
 'use strict'
 
-const { join, sep } = require('path')
+const { join } = require('path')
 const { readFileSync } = require('fs')
 const Readable = require('stream').Readable
 
@@ -124,7 +124,7 @@ function getEntry (entryPath) {
   if (entryPath === '/') {
     return entries
   }
-  return entryPath.split(sep).slice(1).reduce((folder, name) => {
+  return entryPath.split(/\\|\//).slice(1).reduce((folder, name) => {
     if (!folder || folder.content || (!name && ignoreEmptyFolders)) {
       return folder
     }
