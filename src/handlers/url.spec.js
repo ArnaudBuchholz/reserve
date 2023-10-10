@@ -1,11 +1,10 @@
 'use strict'
 
 const mockRequire = require('mock-require')
-const http = require('../http')
-const assert = require('../assert')
-const urlHandler = require('../../../handlers/url')
-const handle = require('./handle')(urlHandler)
-const { $configuration } = require('../../../symbols')
+const { assert, wrapHandler, http } = require('test-tools')
+const urlHandler = require('./url')
+const handle = wrapHandler(urlHandler)
+const { $configuration } = require('../symbols')
 
 const uid = Symbol('uid')
 

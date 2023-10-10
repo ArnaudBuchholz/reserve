@@ -1,7 +1,7 @@
 'use strict'
 
-const assert = require('../assert')
-const headersFactory = require('../../../mock/headers')
+const { assert } = require('test-tools')
+const headersFactory = require('./headers')
 
 describe('mock/headers', () => {
   it('returns an empty object', () => {

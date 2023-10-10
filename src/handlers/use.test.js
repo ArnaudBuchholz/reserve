@@ -1,10 +1,10 @@
 'use strict'
 
 const mockRequire = require('mock-require')
-const assert = require('../assert')
-const Request = require('../../../mock/Request')
-const Response = require('../../../mock/Response')
-const useHandler = require('../../../handlers/use')
+const { assert } = require('test-env')
+const Request = require('../mock/Request')
+const Response = require('../mock/Response')
+const useHandler = require('./use')
 
 describe('handlers/use', () => {
   it('rejects invalid signatures (no next)', () => useHandler.validate({

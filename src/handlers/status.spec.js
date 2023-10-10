@@ -1,9 +1,9 @@
 'use strict'
 
-const assert = require('../assert')
-const mime = require('../../../detect/mime')
-const statusHandler = require('../../../handlers/status')
-const handle = require('./handle')(statusHandler)
+const { assert, wrapHandler } = require('test-tools')
+const mime = require('../detect/mime')
+const statusHandler = require('./status')
+const handle = wrapHandler(statusHandler)
 
 const textMimeType = mime('text')
 

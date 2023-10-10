@@ -1,7 +1,7 @@
 'use strict'
 
-const assert = require('../assert')
-const Request = require('../../../mock/Request')
+const { assert } = require('test-tools')
+const Request = require('./Request')
 
 describe('mock/Request', () => {
   describe('constructor', () => {
