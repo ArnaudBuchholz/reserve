@@ -26,7 +26,7 @@ const defaultHandlers = [
   require('./handlers/use')
 ].reduce((handlers, handler) => {
   handlers[handler[$handlerPrefix]] = handler
-  return handler
+  return handlers
 }, {})
 
 const defaults = {
