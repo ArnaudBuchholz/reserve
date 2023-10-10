@@ -1,7 +1,7 @@
 'use strict'
 
-const assert = require('./assert')
-const { check, mock } = require('../../index')
+const { assert } = require('test-tools')
+const { check, mock } = require('./index')
 
 const reconfigure = {
   async redirect ({ configuration, request, response }) {
