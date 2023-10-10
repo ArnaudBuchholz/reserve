@@ -2,6 +2,7 @@
 
 const mime = require('../detect/mime')
 const interpolate = require('../interpolate')
+const { $handlerPrefix } = require('../symbols')
 const textMimeType = mime('text')
 const byStatus = {
   403: 'Forbidden',
@@ -13,6 +14,7 @@ const byStatus = {
 }
 
 module.exports = {
+  [$handlerPrefix]: 'status',
   schema: {
     status: 'number',
     headers: {

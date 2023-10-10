@@ -12,6 +12,7 @@ module.exports = {
   $customConfiguration: Symbol(`${ns}custom.configuration`),
   $customTimestamp: Symbol(`${ns}custom.timestamp`),
   $dispatcherEnd: Symbol(`${ns}dispatcher.end`),
+  $handlerPrefix: Symbol(`${ns}handler.prefix`),
   $handlerMethod: Symbol(`${ns}handler.method`),
   $handlerSchema: Symbol(`${ns}handler.schema`),
   $mappingChecked: Symbol(`${ns}mapping.checked`),

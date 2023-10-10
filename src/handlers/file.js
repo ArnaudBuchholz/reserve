@@ -5,6 +5,7 @@ const { promisify } = require('util')
 const mime = require('../detect/mime')
 const { basename, dirname, isAbsolute, join } = require('path')
 const { format: formatLastModified } = require('../lastModified')
+const { $handlerPrefix } = require('../symbols')
 
 const bin = 'application/octet-stream'
 
@@ -119,6 +120,7 @@ async function checkStrictPath (filePath) {
 }
 
 module.exports = {
+  [$handlerPrefix]: 'file',
   schema: {
     [matchcase]: {
       type: 'boolean',

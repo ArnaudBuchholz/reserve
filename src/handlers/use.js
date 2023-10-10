@@ -1,8 +1,9 @@
 'use strict'
 
-const { $useMiddleware } = require('../symbols')
+const { $useMiddleware, $handlerPrefix } = require('../symbols')
 
 module.exports = {
+  [$handlerPrefix]: 'use',
   schema: {
     use: ['string', 'function'],
     options: {

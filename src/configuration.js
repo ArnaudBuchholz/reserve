@@ -10,6 +10,7 @@ const { parse } = require('./schema')
 const {
   $configurationInterface,
   $configurationRequests,
+  $handlerPrefix,
   $handlerMethod,
   $handlerSchema
 } = require('./symbols')
@@ -17,13 +18,16 @@ const {
 const readFileAsync = util.promisify(fs.readFile)
 const statAsync = util.promisify(fs.stat)
 
-const defaultHandlers = {
-  custom: require('./handlers/custom'),
-  file: require('./handlers/file'),
-  status: require('./handlers/status'),
-  url: require('./handlers/url'),
-  use: require('./handlers/use')
-}
+const defaultHandlers = [
+  require('./handlers/custom'),
+  require('./handlers/file'),
+  require('./handlers/status'),
+  require('./handlers/url'),
+  require('./handlers/use')
+].reduce((handlers, handler) => {
+  handlers[handler[$handlerPrefix]] = handler
+  return handler
+}, {})
 
 const defaults = {
   hostname: undefined,
@@ -196,6 +200,8 @@ function extend (filePath, configuration) {
 }
 
 module.exports = {
+  checkHandler,
+
   async check (configuration) {
     if (typeof configuration !== 'object' || configuration === null) {
       throw new Error('Configuration must be an object')

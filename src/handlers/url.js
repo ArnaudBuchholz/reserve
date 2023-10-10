@@ -4,6 +4,7 @@ const http = require('http')
 const https = require('https')
 const headersFactory = require('../mock/headers')
 const defer = require('../defer')
+const { $handlerPrefix } = require('../symbols')
 
 const http2ForbiddenResponseHeaders = [
   'transfer-encoding',
@@ -40,6 +41,7 @@ function validateHook (mapping, hookName) {
 }
 
 module.exports = {
+  [$handlerPrefix]: 'url',
   schema: {
     'unsecure-cookies': {
       type: 'boolean',

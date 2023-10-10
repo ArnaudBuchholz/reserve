@@ -6,6 +6,7 @@ const util = require('util')
 const statAsync = util.promisify(fs.stat)
 
 const {
+  $handlerPrefix,
   $customPath,
   $customCallback,
   $customConfiguration,
@@ -13,6 +14,7 @@ const {
 } = require('../symbols')
 
 module.exports = {
+  [$handlerPrefix]: 'custom',
   schema: {
     custom: ['function', 'string'],
     watch: {
