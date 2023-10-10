@@ -32,4 +32,7 @@ reports/
 # jekyll build
 docs/_site
 
+# npm pack
+*.tgz
+
 .env
