@@ -2,16 +2,13 @@
   "name": "reserve",
   "version": "1.15.5",
   "description": "Lightweight http server statically configurable using regular expressions",
-  "main": "./index.js",
+  "main": "./src/index.js",
   "files": [
-    "handlers/*.js",
-    "detect/*.js",
-    "mock/*.js",
-    "@types/*.d.ts",
-    "*.js"
+    "./src/**/*.js",
+    "@types/*.d.ts"
   ],
   "bin": {
-    "reserve": "./index.js"
+    "reserve": "./src/index.js"
   },
   "types": "./@types/index.d.ts",
   "engines": {
@@ -83,17 +80,10 @@
   "mocha": {
     "diff": false,
     "spec": [
-      "tests/mocha/**/*.test.js"
+      "src/**/*.spec.js"
     ],
     "require": [
-      "tests/mocha/mocked_modules/console.js",
-      "tests/mocha/mocked_modules/path.js",
-      "tests/mocha/mocked_modules/fs.js",
-      "tests/mocha/mocked_modules/http.js",
-      "tests/mocha/mocked_modules/https.js",
-      "tests/mocha/mocked_modules/http2.js",
-      "tests/mocha/mocked_modules/process.js",
-      "tests/mocha/mocked_modules/os.js"
+      "tests/mocha/setup.js"
     ]
   },
   "nyc": {

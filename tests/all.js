@@ -2,7 +2,7 @@
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
 
-const colors = require('../detect/colors')
+const colors = require('../src/detect/colors')
 global.gpf = require('gpf-js')
 global.assert = require('assert')
 global.location = {
@@ -18,7 +18,7 @@ function startServer (cmdLineParameters) {
   console.log(colors.gray(`directory:  ${process.cwd()}`))
   console.log(colors.gray(`parameters: ${cmdLineParameters.join(' ')}`))
   return new Promise(resolve => {
-    const server = fork(path.join(__dirname, '../index.js'), cmdLineParameters)
+    const server = fork(path.join(__dirname, '../src/index.js'), cmdLineParameters)
     server.on('message', message => {
       console.log(colors.yellow('reserve message'), colors.gray(message))
       if (message === 'ready') {

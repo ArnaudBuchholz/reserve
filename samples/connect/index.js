@@ -7,7 +7,7 @@ const readFileAsync = promisify(readFile)
 const statAsync = promisify(stat)
 const { Readable } = require('stream')
 const EventEmitter = require('events')
-const defer = require('../../defer')
+const defer = require('../../src/defer')
 
 const isHtml = path => !!path.match(/\.html?$/)
 const htmlInject = '<script src="/api/connect.js"></script>'

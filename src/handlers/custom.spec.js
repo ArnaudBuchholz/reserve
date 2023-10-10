@@ -1,9 +1,10 @@
 'use strict'
 
 const mockRequire = require('mock-require')
-const assert = require('../assert')
-const customHandler = require('../../../handlers/custom')
-const handle = require('./handle')(customHandler, {
+const { assert, wrapHandler } = require('test-tools')
+const customHandler = require('./custom')
+
+const handle = wrapHandler(customHandler, {
   mapping: {
     custom: () => {}
   }
@@ -12,7 +13,7 @@ const handle = require('./handle')(customHandler, {
 const {
   $configuration,
   $customTimestamp
-} = require('../../../symbols')
+} = require('../symbols')
 
 describe('handlers/custom', () => {
   it('validates the custom function', async () => {

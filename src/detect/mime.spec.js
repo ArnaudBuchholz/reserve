@@ -1,6 +1,6 @@
 'use strict'
 
-const assert = require('../assert')
+const { assert } = require('test-tools')
 const mockRequire = require('mock-require')
 
 function cleanRequireCache () {
@@ -33,7 +33,7 @@ describe('detect/mime', () => {
     before(() => {
       cleanRequireCache()
       mockRequire('mime', null)
-      mime = require('../../../detect/mime')
+      mime = require('./mime')
     })
 
     tests()
@@ -52,7 +52,7 @@ describe('detect/mime', () => {
       mockRequire('mime', {
         lookup: extension => mimeV2.getType(extension)
       })
-      mime = require('../../../detect/mime')
+      mime = require('./mime')
     })
 
     tests()
@@ -66,7 +66,7 @@ describe('detect/mime', () => {
   describe('mime v2', () => {
     before(() => {
       cleanRequireCache()
-      mime = require('../../../detect/mime')
+      mime = require('./mime')
     })
 
     tests()

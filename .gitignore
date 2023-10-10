@@ -29,4 +29,7 @@ tests/types.js
 .stryker-tmp
 reports/
 
+# jekyll build
+docs/_site
+
 .env

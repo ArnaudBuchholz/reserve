@@ -1,6 +1,6 @@
 'use strict'
 
-const assert = require('../assert')
+const { assert } = require('test-tools')
 const mockRequire = require('mock-require')
 
 function cleanRequireCache () {
@@ -17,7 +17,7 @@ describe('detect/colors', () => {
   before(() => {
     cleanRequireCache()
     mockRequire('colors/safe', null)
-    colors = require('../../../detect/colors')
+    colors = require('./colors')
   })
 
   after(() => {

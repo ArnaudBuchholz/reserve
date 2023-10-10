@@ -1,10 +1,9 @@
 'use strict'
 
-const assert = require('../assert')
-const mime = require('../../../detect/mime')
-const fileHandler = require('../../../handlers/file')
-const handleFactory = require('./handle')
-const handle = handleFactory(fileHandler, { mapping: { cwd: '/' } })
+const { assert, wrapHandler } = require('test-tools')
+const mime = require('../detect/mime')
+const fileHandler = require('./file')
+const handle = wrapHandler(fileHandler, { mapping: { cwd: '/' } })
 const fs = require('fs')
 const { promisify } = require('util')
 const mockRequire = require('mock-require')

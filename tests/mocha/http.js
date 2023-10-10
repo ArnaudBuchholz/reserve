@@ -1,7 +1,7 @@
 'use strict'
 
 const EventEmitter = require('events')
-const Response = require('../../mock/Response')
+const Response = require('../../src/mock/Response')
 const echo = 'http://www.mocked.com/echo'
 const echos = 'https://www.mocked.com/echo'
 

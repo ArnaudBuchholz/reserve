@@ -1,9 +1,9 @@
 'use strict'
 
-const Request = require('../../../mock/Request')
-const Response = require('../../../mock/Response')
-const IConfiguration = require('../../../iconfiguration')
-const { check } = require('../../../mapping')
+const Request = require('../../src/mock/Request')
+const Response = require('../../src/mock/Response')
+const IConfiguration = require('../../src/iconfiguration')
+const { check } = require('../../src/mapping')
 
 const $checked = Symbol('mapping-already-checked')
 
