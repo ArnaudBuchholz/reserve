@@ -1,6 +1,6 @@
 'use strict'
 
-const assert = require('./assert')
+const { assert } = require('test-tools')
 
 describe('[test-tool] assert', () => {
   it('documents exception if any', () => {

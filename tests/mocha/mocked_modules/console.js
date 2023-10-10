@@ -10,7 +10,7 @@ function trace (type, ...params) {
   traces.push({ type, text: params.join(' ') })
 }
 
-require('mock-require')(join(__dirname, '../../../console.js'), {
+require('mock-require')(join(__dirname, '../../../src/console.js'), {
   log: trace.bind(null, 'log'),
   error: trace.bind(null, 'error')
 })

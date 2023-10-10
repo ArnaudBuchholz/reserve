@@ -1,8 +1,7 @@
 'use strict'
 
-const assert = require('./assert')
-const { clean, collect } = require('./mocked_modules/console')
-const { log } = require('../../index')
+const { assert, console: { clean, collect } } = require('test-tools')
+const { log } = require('./index')
 const EventEmitter = require('events')
 
 describe('log', () => {

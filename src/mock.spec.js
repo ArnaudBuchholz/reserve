@@ -1,8 +1,8 @@
 'use strict'
 
-const assert = require('./assert')
-const mock = require('../../mock')
-const { read } = require('../../configuration')
+const { assert } = require('test-tools')
+const mock = require('./mock')
+const { read } = require('./configuration')
 
 describe('mock', () => {
   describe('keeping the original handlers', () => {

@@ -1,7 +1,7 @@
 'use strict'
 
-const assert = require('./assert')
-const interpolate = require('../../interpolate')
+const { assert } = require('test-tools')
+const interpolate = require('./interpolate')
 
 function compare (result, expected) {
   const keys = Object.keys(expected)

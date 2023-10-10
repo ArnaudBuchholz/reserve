@@ -1,8 +1,8 @@
 'use strict'
 
-const assert = require('./assert')
-const capture = require('../../capture')
-const Response = require('../../mock/Response')
+const { assert } = require('test-tools')
+const capture = require('./capture')
+const Response = require('./mock/Response')
 const { readFile } = require('fs')
 const zlib = require('zlib')
 

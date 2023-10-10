@@ -1,7 +1,7 @@
 'use strict'
 
-const assert = require('./assert')
-const { parse, validate } = require('../../schema')
+const { assert } = require('test-tools')
+const { parse, validate } = require('./schema')
 
 /* istanbul ignore next */ // Will not be called
 function noop () {}

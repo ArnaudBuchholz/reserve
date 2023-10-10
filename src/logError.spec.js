@@ -1,8 +1,7 @@
 'use strict'
 
-const assert = require('./assert')
-const { clean, collect } = require('./mocked_modules/console')
-const logError = require('../../logError')
+const { assert, console: { clean, collect } } = require('test-tools')
+const logError = require('./logError')
 
 describe('logError', () => {
   beforeEach(clean)

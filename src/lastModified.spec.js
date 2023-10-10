@@ -1,7 +1,7 @@
 'use strict'
 
-const assert = require('./assert')
-const { format, parse } = require('../../lastModified')
+const { assert } = require('test-tools')
+const { format, parse } = require('./lastModified')
 
 const dates = [{
   d: new Date(Date.UTC(2015, 9, 21, 7, 28, 0, 0)),

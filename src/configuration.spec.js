@@ -1,9 +1,9 @@
 'use strict'
 
-const assert = require('./assert')
-const { read, check } = require('../../configuration')
-
-const { $customCallback } = require('../../symbols')
+const { assert } = require('test-tools')
+const { join } = require('path')
+const { read, check } = require('./configuration')
+const { $customCallback } = require('./symbols')
 
 const shouldFail = promise => promise.then(assert.notExpected, () => {
   assert(() => true) // expected
@@ -319,7 +319,7 @@ describe('configuration', () => {
         return check({
           mappings: [{
             match: '(.*)',
-            cwd: __dirname,
+            cwd: join(__dirname, '../tests/mocha'),
             custom: 'custom.js'
           }]
         })

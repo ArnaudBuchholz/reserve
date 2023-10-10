@@ -1,7 +1,7 @@
 'use strict'
 
-const assert = require('./assert')
-const checkMethod = require('../../checkMethod')
+const { assert } = require('test-tools')
+const checkMethod = require('./checkMethod')
 
 function test (method, expected, allowed) {
   return () => {

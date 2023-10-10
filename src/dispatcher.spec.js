@@ -1,12 +1,10 @@
 'use strict'
 
-const assert = require('./assert')
-const mime = require('../../detect/mime')
+const { assert } = require('test-tools')
+const mime = require('./detect/mime')
 const EventEmitter = require('events')
-const Request = require('../../mock/Request')
-const Response = require('../../mock/Response')
-const { check } = require('../../index')
-const dispatcher = require('../../dispatcher')
+const { check, Request, Response } = require('./index')
+const dispatcher = require('./dispatcher')
 
 const textMimeType = mime('text')
 const defaultConfigurationPromise = check({

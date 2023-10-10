@@ -1,10 +1,10 @@
 'use strict'
 
-const assert = require('./assert')
+const { assert } = require('test-tools')
 
 describe('index', () => {
   it('returns all APIs when required', () => {
-    const apis = require('../../.')
+    const apis = require('./index')
     assert(() => typeof apis.check === 'function')
     assert(() => typeof apis.log === 'function')
     assert(() => typeof apis.mock === 'function')

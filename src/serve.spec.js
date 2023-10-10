@@ -1,8 +1,8 @@
 'use strict'
 
-const assert = require('./assert')
-const serve = require('../../serve')
-const { read } = require('../../configuration')
+const { assert } = require('test-tools')
+const serve = require('./serve')
+const { read } = require('./configuration')
 
 function promisify (configuration, callback) {
   return new Promise((resolve, reject) => {

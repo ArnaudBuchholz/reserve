@@ -1,7 +1,7 @@
 'use strict'
 
-const assert = require('./assert')
-const { Request, Response, check, log, mock } = require('../../index')
+const { assert } = require('test-tools')
+const { Request, Response, check, log, mock } = require('./index')
 
 function checkConfiguration (configuration, mapping) {
   assert(() => configuration.handlers instanceof Object)
