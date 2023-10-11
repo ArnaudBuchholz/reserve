@@ -18,7 +18,7 @@ function startServer (cmdLineParameters) {
   console.log(colors.gray(`directory:  ${process.cwd()}`))
   console.log(colors.gray(`parameters: ${cmdLineParameters.join(' ')}`))
   return new Promise(resolve => {
-    const server = fork(path.join(__dirname, '../src/index.js'), cmdLineParameters)
+    const server = fork(path.join(__dirname, '../src/cli.js'), cmdLineParameters)
     server.on('message', message => {
       console.log(colors.yellow('reserve message'), colors.gray(message))
       if (message === 'ready') {
