@@ -32,6 +32,9 @@ reports/
 # jekyll build
 docs/_site
 
+# build result
+dist/index.js
+
 # npm pack
 *.tgz
 
