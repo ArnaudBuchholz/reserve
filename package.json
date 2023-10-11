@@ -1,20 +1,21 @@
 {
   "name": "reserve",
-  "version": "1.15.5",
+  "version": "1.16.0",
   "description": "Lightweight http server statically configurable using regular expressions",
-  "main": "./src/index.js",
+  "main": "./dist/index.js",
   "files": [
-    "./src/**/*.js",
-    "@types/*.d.ts"
+    "dist/*.js",
+    "@types/*.d.ts"    
   ],
   "bin": {
-    "reserve": "./src/index.js"
+    "reserve": "./dist/cli.js"
   },
   "types": "./@types/index.d.ts",
   "engines": {
     "node": ">=12.0.0"
   },
   "scripts": {
+    "build": "rollup -c rollup.config.js && terser dist/index.js --compress --mangle -o dist/index.js",
     "test": "standard && node tests/all.js && nyc mocha && (node -e \"if (parseInt(process.version.match(/v(\\d+)/)[1]) > 14) process.exit(1) \" || npm run test:types)",
     "test:mutation": "stryker run",
     "lint": "standard --fix",
@@ -46,6 +47,7 @@
   },
   "homepage": "https://github.com/ArnaudBuchholz/reserve#readme",
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.5",
     "@stryker-mutator/core": "^7.2.0",
     "@stryker-mutator/mocha-runner": "^7.2.0",
     "autocannon": "^7.12.0",
@@ -63,9 +65,11 @@
     "mock-require": "^3.0.3",
     "nyc": "^15.1.0",
     "passport": "^0.6.0",
+    "rollup": "^4.0.2",
     "socket.io": "^4.7.2",
     "standard": "^17.1.0",
     "start-server-and-test": "^2.0.1",
+    "terser": "^5.21.0",
     "typescript": "^5.2.2"
   },
   "standard": {
