@@ -5,7 +5,7 @@
   "main": "./dist/index.js",
   "files": [
     "dist/*.js",
-    "@types/*.d.ts"    
+    "@types/*.d.ts"
   ],
   "bin": {
     "reserve": "./dist/cli.js"
@@ -102,7 +102,9 @@
       "src/console.js",
       "coverage/**",
       "samples/**",
-      "docs/**"
+      "docs/**",
+      "dist/**",
+      "rollup.config.js"
     ],
     "branches": 100,
     "lines": 100,
