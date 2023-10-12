@@ -99,7 +99,6 @@
       "tests/*.js",
       "tests/mocha/assert.js",
       "tests/cache/**",
-      "src/cli.js",
       "src/console.js",
       "coverage/**",
       "samples/**",
