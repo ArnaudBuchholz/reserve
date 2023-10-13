@@ -102,7 +102,7 @@
       "samples/**",
       "docs/**",
       "dist/**",
-      "rollup.config.js"
+      "build/**"
     ],
     "branches": 100,
     "lines": 100,
