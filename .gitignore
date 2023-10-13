@@ -33,7 +33,7 @@ reports/
 docs/_site
 
 # build result
-dist/index.js
+dist/
 
 # npm pack
 *.tgz
