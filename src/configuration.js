@@ -1,6 +1,6 @@
 'use strict'
 
-const { readFile, stat, dirname, isAbsolute, join } = require('./node-api')
+const { readFile, stat, dirname, isAbsolute, join } = require('./dependencies')
 const IConfiguration = require('./iconfiguration')
 const { check } = require('./mapping')
 const checkMethod = require('./checkMethod')

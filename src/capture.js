@@ -1,18 +1,13 @@
 'use strict'
 
-const zlib = require('zlib')
-const { pipeline } = require('stream')
+const { pipeline, zlib } = require('./dependencies')
 const defer = require('./defer')
 
 const decoderFactories = {
   gzip: zlib.createGunzip,
   deflate: zlib.createInflate,
+  br: zlib.createBrotliDecompress,
   default: encoding => { throw new Error(`Unsupported encoding: ${encoding}`) }
-}
-
-/* istanbul ignore else */
-if (zlib.createBrotliDecompress) {
-  decoderFactories.br = zlib.createBrotliDecompress
 }
 
 function selectDecoder (headers) {

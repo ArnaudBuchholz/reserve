@@ -1,10 +1,6 @@
 'use strict'
 
-let colors
-
-try {
-  colors = require('colors/safe')
-} catch (e) {}
+const { colors } = require('../dependencies')
 
 const noColor = text => text
 

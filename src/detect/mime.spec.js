@@ -1,15 +1,7 @@
 'use strict'
 
-const { assert } = require('test-tools')
+const { assert, cleanRequireCache } = require('test-tools')
 const mockRequire = require('mock-require')
-
-function cleanRequireCache () {
-  Object.keys(require.cache).forEach(path => {
-    if (path.match(/(node_modules|detect)(\/|\\)mime/)) {
-      delete require.cache[path]
-    }
-  })
-}
 
 describe('detect/mime', () => {
   let mime

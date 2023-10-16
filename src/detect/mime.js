@@ -1,10 +1,6 @@
 'use strict'
 
-let mime
-
-try {
-  mime = require('mime')
-} catch (e) {}
+const { mime } = require('../dependencies')
 
 const app = 'application'
 const html = 'text/html'
@@ -28,13 +24,6 @@ const types = {
   text,
   txt: text,
   xml: `${app}/xml`
-}
-
-if (mime && !mime.getType && mime.lookup) {
-  const mimeV1 = mime
-  mime = {
-    getType: extension => mimeV1.lookup(extension)
-  }
 }
 
 if (mime) {

@@ -1,7 +1,7 @@
 'use strict'
 
 const { log } = require('..')
-const EventEmitter = require('events')
+const { EventEmitter } = require('./dependencies')
 const emitter = new EventEmitter()
 log(emitter, process.argv.includes('-verbose'))
 

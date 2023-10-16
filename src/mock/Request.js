@@ -1,6 +1,6 @@
 'use strict'
 
-const { Readable } = require('../node-api')
+const { Readable } = require('../dependencies')
 const headersFactory = require('./headers')
 
 module.exports = class Request extends Readable {
