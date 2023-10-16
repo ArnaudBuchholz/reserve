@@ -1,7 +1,6 @@
 'use strict'
 
 const EventEmitter = require('events')
-const Response = require('../../src/mock/Response')
 const echo = 'http://www.mocked.com/echo'
 const echos = 'https://www.mocked.com/echo'
 
@@ -13,6 +12,7 @@ module.exports = {
   },
 
   request: (url, options, callback) => {
+    const Response = require('../../src/mock/Response')
     const result = new EventEmitter()
     const response = new Response()
     const statusCode = options.headers['x-status-code']
