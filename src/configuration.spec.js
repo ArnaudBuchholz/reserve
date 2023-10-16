@@ -15,7 +15,9 @@ async function okHandler () {
 
 describe('configuration', () => {
   describe('configuration.read', () => {
-    process.mockCwd('/')
+    beforeEach(() => {
+      process.mockCwd('/')
+    })
 
     it('reads a configuration', () => {
       return read('reserve.json')
