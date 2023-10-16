@@ -1,14 +1,19 @@
 'use strict'
 
-let fsPromises
-try {
-  fsPromises = require('fs/promises')
-} catch (e) {
-  fsPromises = require('fs').promises
-}
-const { readFile, stat } = fsPromises
+const { readFile, stat } = require('fs')
+const { promisify } = require('util')
+const { dirname, isAbsolute, join } = require('path')
+const { Duplex, Readable } = require('stream')
 
 module.exports = {
-  readFile,
-  stat
+  // fs
+  readFile: promisify(readFile),
+  stat: promisify(stat),
+  // path
+  dirname,
+  isAbsolute,
+  join,
+  // stream
+  Duplex,
+  Readable
 }
