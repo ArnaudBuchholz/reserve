@@ -89,4 +89,6 @@
 |1.15.4|Fix types definition (Configuration)|
 ||Fix url IP in `ready` event|
 |1.15.5|Documentation as github pages|
-|1.16.0|Refactoring to improve project structure|
+|2.0.0|Refactoring to improve project structure|
+||Support of CommonJS and ESM imports|
+
