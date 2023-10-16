@@ -13,7 +13,8 @@ while (stack.length) {
   }
   const content = readFileSync(join('src', path)).toString()
   const module = {
-    // content
+    content,
+    depends: []
   }
   const dynamic = []
   const native = {}
@@ -21,7 +22,9 @@ while (stack.length) {
     if (dependency.startsWith('\'')) {
       const id = dependency.match(/^'(.*)'$/)[1]
       if (id.startsWith('.')) {
-        stack.push(join(dirname(path), `${id}.js`).replace(/\\/g, '/'))
+        const depend = join(dirname(path), `${id}.js`).replace(/\\/g, '/')
+        module.depends.push(depend)
+        stack.push(depend)
       } else {
         const re = `(\\w+|\\{[^}]+\\})\\s*=\\s*require\\('${id.replace(/\//g, '\\/')}'\\)`
         try {
@@ -42,6 +45,8 @@ while (stack.length) {
   if (dynamic.length) {
     module.dynamic = dynamic
   }
+  delete module.content // TODO remove
+  delete module.depends // TODO remove
   modules[path] = module
 }
 
