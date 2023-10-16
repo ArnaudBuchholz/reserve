@@ -1,6 +1,6 @@
 'use strict'
 
-const { Duplex } = require('stream')
+const { Duplex } = require('../node-api')
 const headersFactory = require('./headers')
 
 module.exports = class Response extends Duplex {

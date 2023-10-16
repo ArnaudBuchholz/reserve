@@ -1,8 +1,6 @@
 'use strict'
 
-const fs = require('fs')
-const path = require('path')
-const util = require('util')
+const { readFile, stat, dirname, isAbsolute, join } = require('./node-api')
 const IConfiguration = require('./iconfiguration')
 const { check } = require('./mapping')
 const checkMethod = require('./checkMethod')
@@ -14,9 +12,6 @@ const {
   $handlerMethod,
   $handlerSchema
 } = require('./symbols')
-
-const readFileAsync = util.promisify(fs.readFile)
-const statAsync = util.promisify(fs.stat)
 
 const defaultHandlers = [
   require('./handlers/custom'),
@@ -115,7 +110,7 @@ function checkListeners (configuration) {
   configuration.listeners = listeners.map(register => {
     let registerType = typeof register
     if (registerType === 'string') {
-      register = require(path.join(configuration.cwd || process.cwd(), register))
+      register = require(join(configuration.cwd || process.cwd(), register))
       registerType = typeof register
     }
     if (registerType !== 'function') {
@@ -126,10 +121,10 @@ function checkListeners (configuration) {
 }
 
 async function readSslFile (configuration, filePath) {
-  if (path.isAbsolute(filePath)) {
-    return (await readFileAsync(filePath)).toString()
+  if (isAbsolute(filePath)) {
+    return (await readFile(filePath)).toString()
   }
-  return (await readFileAsync(path.join(configuration.ssl.cwd, filePath))).toString()
+  return (await readFile(join(configuration.ssl.cwd, filePath))).toString()
 }
 
 async function checkProtocol (configuration) {
@@ -161,7 +156,7 @@ function setCwd (folderPath, configuration) {
     Object.keys(configuration.handlers).forEach(prefix => {
       const handler = configuration.handlers[prefix]
       if (typeof handler === 'string' && handler.match(/^\.\.?\//)) {
-        configuration.handlers[prefix] = path.join(folderPath, handler)
+        configuration.handlers[prefix] = join(folderPath, handler)
       }
     })
   }
@@ -179,12 +174,12 @@ function setCwd (folderPath, configuration) {
 }
 
 function extend (filePath, configuration) {
-  const folderPath = path.dirname(filePath)
+  const folderPath = dirname(filePath)
   setCwd(folderPath, configuration)
   if (configuration.extend) {
-    const basefilePath = path.join(folderPath, configuration.extend)
+    const basefilePath = join(folderPath, configuration.extend)
     delete configuration.extend
-    return readFileAsync(basefilePath)
+    return readFile(basefilePath)
       .then(buffer => JSON.parse(buffer.toString()))
       .then(baseConfiguration => {
         // Only merge mappings
@@ -222,13 +217,13 @@ module.exports = {
 
   async read (fileName) {
     let filePath
-    if (path.isAbsolute(fileName)) {
+    if (isAbsolute(fileName)) {
       filePath = fileName
     } else {
-      filePath = path.join(process.cwd(), fileName)
+      filePath = join(process.cwd(), fileName)
     }
-    return statAsync(filePath)
-      .then(() => readFileAsync(filePath).then(buffer => JSON.parse(buffer.toString())))
+    return stat(filePath)
+      .then(() => readFile(filePath).then(buffer => JSON.parse(buffer.toString())))
       .then(configuration => extend(filePath, configuration))
   }
 }
