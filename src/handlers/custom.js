@@ -1,9 +1,6 @@
 'use strict'
 
-const fs = require('fs')
-const path = require('path')
-const util = require('util')
-const statAsync = util.promisify(fs.stat)
+const { join, stat } = require('../dependencies')
 
 const {
   $handlerPrefix,
@@ -24,10 +21,10 @@ module.exports = {
   },
   validate: async mapping => {
     if (typeof mapping.custom === 'string') {
-      mapping[$customPath] = path.join(mapping.cwd, mapping.custom)
+      mapping[$customPath] = join(mapping.cwd, mapping.custom)
       mapping[$customCallback] = require(mapping[$customPath])
       if (mapping.watch) {
-        mapping[$customTimestamp] = (await statAsync(mapping[$customPath])).mtimeMs
+        mapping[$customTimestamp] = (await stat(mapping[$customPath])).mtimeMs
       }
     } else {
       mapping[$customCallback] = mapping.custom
@@ -41,7 +38,7 @@ module.exports = {
   },
   redirect: async ({ configuration, mapping, match, request, response }) => {
     if (mapping[$customTimestamp]) {
-      const timestamp = (await statAsync(mapping[$customPath])).mtimeMs
+      const timestamp = (await stat(mapping[$customPath])).mtimeMs
       if (timestamp !== mapping[$customTimestamp]) {
         mapping[$customTimestamp] = timestamp
         delete require.cache[mapping[$customPath]]
