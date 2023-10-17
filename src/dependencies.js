@@ -1,7 +1,7 @@
 'use strict'
 
 const EventEmitter = require('events')
-const { createReadStream, readFile, stat } = require('fs')
+const { createReadStream, readdir, readFile, stat } = require('fs')
 const http = require('http')
 const http2 = require('http2')
 const https = require('https')
@@ -34,6 +34,7 @@ module.exports = {
   EventEmitter,
   // fs
   createReadStream,
+  readdir: promisify(readdir),
   readFile: promisify(readFile),
   stat: promisify(stat),
   // httpX

@@ -1,9 +1,7 @@
 'use strict'
 
-const fs = require('fs')
-const { promisify } = require('util')
+const { basename, createReadStream, dirname, isAbsolute, join, readdir, stat } = require('../dependencies')
 const mime = require('../detect/mime')
-const { basename, dirname, isAbsolute, join } = require('path')
 const { format: formatLastModified } = require('../lastModified')
 const { $handlerPrefix } = require('../symbols')
 
@@ -17,9 +15,9 @@ const cmt = 'mime-types'
 const httpStatus = 'http-status'
 
 const nodeFs = {
-  stat: promisify(fs.stat),
-  readdir: promisify(fs.readdir),
-  createReadStream: (path, options) => Promise.resolve(fs.createReadStream(path, options))
+  stat,
+  readdir,
+  createReadStream: (path, options) => Promise.resolve(createReadStream(path, options))
 }
 
 function processCache (request, cachingStrategy, { mtime }) {
