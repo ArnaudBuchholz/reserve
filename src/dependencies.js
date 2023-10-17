@@ -1,12 +1,12 @@
 'use strict'
 
 const EventEmitter = require('events')
-const { readFile, stat } = require('fs')
+const { createReadStream, readFile, stat } = require('fs')
 const http = require('http')
 const http2 = require('http2')
 const https = require('https')
 const { networkInterfaces } = require('os')
-const { dirname, isAbsolute, join } = require('path')
+const { basename, dirname, isAbsolute, join } = require('path')
 const { pipeline, Duplex, Readable } = require('stream')
 const { promisify } = require('util')
 const zlib = require('zlib')
@@ -33,6 +33,7 @@ module.exports = {
   // events
   EventEmitter,
   // fs
+  createReadStream,
   readFile: promisify(readFile),
   stat: promisify(stat),
   // httpX
@@ -44,6 +45,7 @@ module.exports = {
   // mime
   mime,
   // path
+  basename,
   dirname,
   isAbsolute,
   join,
