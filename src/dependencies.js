@@ -2,6 +2,10 @@
 
 const EventEmitter = require('events')
 const { readFile, stat } = require('fs')
+const http = require('http')
+const http2 = require('http2')
+const https = require('https')
+const { networkInterfaces } = require('os')
 const { dirname, isAbsolute, join } = require('path')
 const { pipeline, Duplex, Readable } = require('stream')
 const { promisify } = require('util')
@@ -31,6 +35,12 @@ module.exports = {
   // fs
   readFile: promisify(readFile),
   stat: promisify(stat),
+  // httpX
+  http,
+  http2,
+  https,
+  // os
+  networkInterfaces,
   // mime
   mime,
   // path

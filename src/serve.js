@@ -1,17 +1,13 @@
 'use strict'
 
+const { http, http2, https, networkInterfaces, EventEmitter } = require('./dependencies')
 const { check } = require('./configuration')
 const dispatcher = require('./dispatcher')
-const EventEmitter = require('events')
-const http = require('http')
-const https = require('https')
-const http2 = require('http2')
 const {
   $configurationEventEmitter,
   $configurationInterface
 } = require('./symbols')
 const defer = require('./defer')
-const { networkInterfaces } = require('os')
 
 function createServer (configuration, requestHandler) {
   const { httpOptions } = configuration
