@@ -1,7 +1,6 @@
 'use strict'
 
-const http = require('http')
-const https = require('https')
+const { http, https } = require('../dependencies')
 const headersFactory = require('../mock/headers')
 const defer = require('../defer')
 const { $handlerPrefix } = require('../symbols')
