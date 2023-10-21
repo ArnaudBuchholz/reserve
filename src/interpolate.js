@@ -5,7 +5,7 @@ const unescape = {
   '%': decodeURIComponent
 }
 
-const types = {
+const interpolatorsByType = {
   string: (match, value) => value.replace(/\$(%|&)?(\d+)|\$\$/g, (token, sUnescapeType, sIndex) => {
     if (!sIndex) {
       return '$'
@@ -27,7 +27,7 @@ const types = {
 }
 
 function interpolate (match, value) {
-  const byType = types[typeof value]
+  const byType = interpolatorsByType[typeof value]
   if (byType) {
     return byType(match, value)
   }
