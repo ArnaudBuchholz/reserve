@@ -7,7 +7,7 @@ const html = 'text/html'
 const jpeg = 'image/jpeg'
 const text = 'text/plain'
 
-const types = {
+const hardcodedMimeTypes = {
   bin: `${app}/octet-stream`,
   css: 'text/css',
   gif: 'image/gif',
@@ -29,5 +29,5 @@ const types = {
 if (mime) {
   module.exports = mime.getType
 } else {
-  module.exports = extension => types[extension]
+  module.exports = extension => hardcodedMimeTypes[extension]
 }
