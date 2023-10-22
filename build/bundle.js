@@ -55,7 +55,7 @@ mkdirSync('dist', { recursive: true })
 writeFileSync('dist/bundle.json', JSON.stringify(modules, undefined, 2))
 writeFileSync('dist/core.js', '')
 
-const written = ['index.js', 'dependencies.js']
+const written = ['index.js', 'node-api.js']
 const remaining = Object.values(modules).filter(({ path }) => !written.includes(path))
 
 while (remaining.length) {
@@ -70,7 +70,7 @@ while (remaining.length) {
   writeFileSync('dist/core.js', `// BEGIN OF ${path}\n`, { flag: 'a' })
   const transformed = content
     .replace(/'use strict'\s*\n/g, '') // No more required
-    .replace(/const [^\n]*= require\('[^']+dependencies'\)/g, dependencies => `// ${dependencies}`) // No more required
+    .replace(/const [^\n]*= require\('[^']+node-api'\)/g, dependencies => `// ${dependencies}`) // No more required
     .replace('module.exports', `const ${exports}`) // Convert to variable
   writeFileSync('dist/core.js', transformed, { flag: 'a' })
   writeFileSync('dist/core.js', `\n// END OF ${path}\n`, { flag: 'a' })
