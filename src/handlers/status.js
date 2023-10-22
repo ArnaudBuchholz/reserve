@@ -1,9 +1,7 @@
 'use strict'
 
-const mime = require('../detect/mime')
 const interpolate = require('../interpolate')
 const { $handlerPrefix } = require('../symbols')
-const textMimeType = mime('text')
 const byStatus = {
   403: 'Forbidden',
   404: 'Not found',
@@ -28,7 +26,7 @@ module.exports = {
     const length = content.length
     const headers = mapping ? mapping.headers : undefined
     response.writeHead(statusCode, {
-      'content-type': textMimeType,
+      'content-type': 'text/plain',
       'content-length': length,
       ...interpolate(match, headers)
     })

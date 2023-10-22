@@ -8,7 +8,6 @@ module.exports = {
   body: require('./body'),
   capture: require('./capture'),
   check,
-  colors: require('./detect/colors'),
   interpolate: require('./interpolate'),
   log: require('./log'),
   mock: require('./mock'),

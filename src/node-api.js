@@ -11,25 +11,7 @@ const { pipeline, Duplex, Readable } = require('stream')
 const { promisify } = require('util')
 const zlib = require('zlib')
 
-let colors
-try {
-  colors = require('colors/safe')
-} catch (e) {}
-
-let mime
-try {
-  mime = require('mime')
-} catch (e) {}
-if (mime && !mime.getType && mime.lookup) {
-  const mimeV1 = mime
-  mime = {
-    getType: extension => mimeV1.lookup(extension)
-  }
-}
-
 module.exports = {
-  // colors
-  colors,
   // events
   EventEmitter,
   // fs
@@ -43,8 +25,6 @@ module.exports = {
   https,
   // os
   networkInterfaces,
-  // mime
-  mime,
   // path
   basename,
   dirname,

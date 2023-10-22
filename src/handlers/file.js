@@ -1,11 +1,33 @@
 'use strict'
 
-const { basename, createReadStream, dirname, isAbsolute, join, readdir, stat } = require('../dependencies')
-const mime = require('../detect/mime')
-const { format: formatLastModified } = require('../lastModified')
+const { basename, createReadStream, dirname, isAbsolute, join, readdir, stat } = require('../node-api')
 const { $handlerPrefix } = require('../symbols')
 
-const bin = 'application/octet-stream'
+const app = 'application'
+const img = 'image'
+const txt = 'text'
+const html = `${txt}/html`
+const jpeg = `${img}/jpeg`
+const text = `${txt}/plain`
+
+const mimeTypes = {
+  bin: `${app}/octet-stream`,
+  css: `${txt}/css`,
+  gif: `${img}/gif`,
+  html,
+  htm: html,
+  jpeg,
+  jpg: jpeg,
+  js: `${app}/javascript`,
+  json: `${app}/json`,
+  mp4: 'video/mp4',
+  pdf: `${app}/pdf`,
+  png: `${img}/png`,
+  svg: `${img}/svg+xml`,
+  text,
+  txt: text,
+  xml: `${app}/xml`
+}
 
 const cfs = 'custom-file-system'
 const matchcase = 'case-sensitive'
@@ -22,7 +44,7 @@ const nodeFs = {
 
 function processCache (request, cachingStrategy, { mtime }) {
   if (cachingStrategy === 'modified') {
-    const lastModified = formatLastModified(mtime)
+    const lastModified = mtime.toUTCString()
     const modifiedSince = request.headers['if-modified-since']
     let status
     if (modifiedSince && lastModified === modifiedSince) {
@@ -39,7 +61,7 @@ function processCache (request, cachingStrategy, { mtime }) {
 function processBytesRange (request, { mtime, size }) {
   const bytesRange = /bytes=(\d+)-(\d+)?(,)?/.exec(request.headers.range)
   const ifRange = request.headers['if-range']
-  if ((!ifRange || ifRange === formatLastModified(mtime)) && bytesRange && !bytesRange[3] /* Multipart not supported */) {
+  if ((!ifRange || ifRange === mtime.toUTCString()) && bytesRange && !bytesRange[3] /* Multipart not supported */) {
     const start = parseInt(bytesRange[1], 10)
     let end
     if (bytesRange[2]) {
@@ -61,7 +83,7 @@ function sendFile ({ cachingStrategy, mapping, request, response, fs, filePath }
     const { start, end, header: rangeHeader, status: rangeStatus, contentLength } = processBytesRange(request, fileStat)
     const status = mapping[httpStatus] || cacheStatus || rangeStatus
     const fileExtension = (/\.([^.]*)$/.exec(filePath) || [])[1]
-    const mimeType = mapping[cmt][fileExtension] || mime(fileExtension) || bin
+    const mimeType = mapping[cmt][fileExtension] || mimeTypes[fileExtension] || mimeTypes.bin
     response.writeHead(status, {
       'content-type': mimeType,
       'content-length': contentLength,

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { colors, log, read, serve } = require('./index.js')
+const { log, read, serve } = require('./index.js')
 
 const configurationFileNames = process.argv.reduce((name, parameter) => {
   if (parameter === '--config') {

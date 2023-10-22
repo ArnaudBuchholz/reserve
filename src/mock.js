@@ -2,7 +2,7 @@
 
 const { check } = require('./configuration')
 const dispatcher = require('./dispatcher')
-const { EventEmitter } = require('./dependencies')
+const { EventEmitter } = require('./node-api')
 const Request = require('./mock/Request')
 const Response = require('./mock/Response')
 const {

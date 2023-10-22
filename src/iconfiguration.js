@@ -1,6 +1,5 @@
 'use strict'
 
-const { red } = require('./detect/colors')
 const { check } = require('./mapping')
 const dispatcher = require('./dispatcher')
 const {
@@ -59,7 +58,7 @@ module.exports = class IConfiguration {
       })
     configurationRequests.holding = holding.then(undefined, () => {}) // Absorb error to unblock server
     holding.then(undefined, () => {
-      console.log(red('REserve blocked during configuration.setMappings'))
+      console.log('REserve blocked during configuration.setMappings')
       console.table(contexts.map(context => {
         const { emitParameters, request, released } = context
         let info

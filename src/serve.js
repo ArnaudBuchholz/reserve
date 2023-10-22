@@ -1,6 +1,6 @@
 'use strict'
 
-const { http, http2, https, networkInterfaces, EventEmitter } = require('./dependencies')
+const { http, http2, https, networkInterfaces, EventEmitter } = require('./node-api')
 const { check } = require('./configuration')
 const dispatcher = require('./dispatcher')
 const {

@@ -1,6 +1,6 @@
 'use strict'
 
-const { pipeline, zlib } = require('./dependencies')
+const { pipeline, zlib } = require('./node-api')
 const defer = require('./defer')
 
 const decoderFactories = {

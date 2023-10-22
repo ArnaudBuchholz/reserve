@@ -1,16 +1,15 @@
 'use strict'
 
 const { assert, wrapHandler } = require('test-tools')
-const mime = require('../detect/mime')
 const fileHandler = require('./file')
 const handle = wrapHandler(fileHandler, { mapping: { cwd: '/' } })
 const fs = require('fs')
 const { promisify } = require('util')
 const mockRequire = require('mock-require')
 
-const textMimeType = mime('text')
-const htmlMimeType = mime('html')
-const defaultMimeType = mime('bin')
+const textMimeType = 'text/plain'
+const htmlMimeType = 'text/html'
+const defaultMimeType = 'application/octet-stream'
 
 describe('handlers/file', () => {
   it('returns a promise', () => handle('./file.txt')

@@ -1,6 +1,5 @@
 'use strict'
 
-const { gray, green, magenta, red, yellow } = require('./detect/colors')
 const { log } = require('./console')
 const logCommon = require('./logCommon')
 const logError = require('./logError')
@@ -9,16 +8,14 @@ const onRedirected = (verbose, event) => {
   const statusCode = event.statusCode
   let statusText
   if (!statusCode) {
-    statusText = red('N/A')
-  } else if (statusCode > 399) {
-    statusText = red(statusCode.toString())
+    statusText = 'N/A'
   } else {
-    statusText = green(statusCode.toString())
+    statusText = statusCode.toString()
   }
-  logCommon.call(event, 'SERVE', verbose, statusText, magenta(`${event.timeSpent} ms`))
+  logCommon.call(event, 'SERVE', verbose, statusText, `${event.timeSpent} ms`)
 }
 
-const onIncoming = event => logCommon.call(event, 'INCMG', true, gray(event.method), gray(event.url))
+const onIncoming = event => logCommon.call(event, 'INCMG', true, event.method, event.url)
 
 const onEvent = (type, event) => logCommon.call(event, type, true)
 
@@ -30,13 +27,13 @@ const onRedirecting = event => {
   } else {
     redirectLabel = redirect.toString()
   }
-  logCommon.call(event, 'RDRCT', true, gray(event.type), gray(redirectLabel))
+  logCommon.call(event, 'RDRCT', true, event.type, redirectLabel)
 }
 
 module.exports = (serve, verbose) => {
   serve
     .on('ready', ({ url }) => {
-      log(yellow(`Server running at ${url}`))
+      log(`Server running at ${url}`)
     })
     .on('redirected', onRedirected.bind(null, verbose))
   if (verbose) {

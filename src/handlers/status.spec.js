@@ -1,11 +1,10 @@
 'use strict'
 
 const { assert, wrapHandler } = require('test-tools')
-const mime = require('../detect/mime')
 const statusHandler = require('./status')
 const handle = wrapHandler(statusHandler)
 
-const textMimeType = mime('text')
+const textMimeType = 'text/plain'
 
 describe('handlers/status', () => {
   it('returns a promise', () => handle({
@@ -17,7 +16,7 @@ describe('handlers/status', () => {
     })
   )
 
-  it('sends a generic response for knonw codes', () => handle({
+  it('sends a generic response for known codes', () => handle({
     mapping: null,
     redirect: 404
   })

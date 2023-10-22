@@ -1,21 +1,5 @@
 # **RE**serve
 
-<table border="0" cellpadding="2" cellspacing="0">
-    <tr>
-        <td valign="top">
-          <strong>RE</strong>
-        </td>
-        <td>
-          <i>duced</i></br />
-          <i>levant</i></br />
-          <i>verse proxy</i><br />
-          <i>gexp-based</i><br />
-          <i>useable</i><br />
-          <strong>serve</strong>
-        </td>
-    </tr>
-</table>
-
 [![Node.js CI](https://github.com/ArnaudBuchholz/reserve/actions/workflows/node.js.yml/badge.svg)](https://github.com/ArnaudBuchholz/reserve/actions/workflows/node.js.yml)
 [![Coverage Status](https://coveralls.io/repos/github/ArnaudBuchholz/reserve/badge.svg?branch=master)](https://coveralls.io/github/ArnaudBuchholz/reserve?branch=master)
 [![Package Quality](https://npm.packagequality.com/shield/reserve.svg)](https://packagequality.com/#?package=reserve)
@@ -145,8 +129,6 @@ read('reserve.json')
     log(serve(configuration), /*verbose: */ true)
   })
 ```
-
-**NOTE** : `log` is using [`colors`](https://www.npmjs.com/package/colors) **if installed**.
 
 # Complete documentation
 

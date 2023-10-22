@@ -1,12 +1,11 @@
 'use strict'
 
 const { assert } = require('test-tools')
-const mime = require('./detect/mime')
 const EventEmitter = require('events')
 const { check, Request, Response } = require('./index')
 const dispatcher = require('./dispatcher')
 
-const textMimeType = mime('text')
+const textMimeType = 'text/plain'
 const defaultConfigurationPromise = check({
   handlers: {
     fail: {

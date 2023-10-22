@@ -1,6 +1,6 @@
 'use strict'
 
-const { join, stat } = require('../dependencies')
+const { join, stat } = require('../node-api')
 
 const {
   $handlerPrefix,
