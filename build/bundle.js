@@ -68,10 +68,15 @@ while (remaining.length) {
   remaining.splice(pos, 1)
   written.push(path)
   writeFileSync('dist/core.js', `// BEGIN OF ${path}\n`, { flag: 'a' })
-  const transformed = content
+  const transformed = `const ${exports} = (() => {${content
     .replace(/'use strict'\s*\n/g, '') // No more required
     .replace(/const [^\n]*= require\('[^']+node-api'\)/g, dependencies => `// ${dependencies}`) // No more required
-    .replace('module.exports', `const ${exports}`) // Convert to variable
+    .replace(/module\.exports\s*=/, 'return')
+    .replace(/require\(([^)]*)\)/g, (match, id) => {
+      
+      return `__REQUIRE__(${id})`
+    })
+  }})()`
   writeFileSync('dist/core.js', transformed, { flag: 'a' })
   writeFileSync('dist/core.js', `\n// END OF ${path}\n`, { flag: 'a' })
 }
