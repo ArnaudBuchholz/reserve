@@ -14,26 +14,27 @@ while (stack.length) {
   const content = readFileSync(join('src', path)).toString()
   const module = {
     content,
-    depends: []
+    depends: {}
   }
   const dynamic = []
   const native = {}
   content.replace(/require\(\s*(.*)\s*\)/g, (instruction, dependency) => {
     if (dependency.startsWith('\'')) {
       const id = dependency.match(/^'(.*)'$/)[1]
+      const re = `(:?(\\w+|\\{[^}]+\\})\\s*(?:=|:)\\s*)?require\\('${id.replace(/\//g, '\\/')}'\\)`
+      let imports = ''
+      try {
+        imports = content.match(new RegExp(re), 'i')[1] || 'as-is'
+      } catch (e) {
+        console.error(e.toString(), path, re, id)
+        throw e
+      }
       if (id.startsWith('.')) {
         const depend = join(dirname(path), `${id}.js`).replace(/\\/g, '/')
-        module.depends.push(depend)
+        module.depends[depend] = imports
         stack.push(depend)
       } else {
-        const re = `(\\w+|\\{[^}]+\\})\\s*=\\s*require\\('${id.replace(/\//g, '\\/')}'\\)`
-        try {
-          const match = content.match(new RegExp(re), 'i')[1]
-          native[id] = match
-        } catch (e) {
-          console.error(e.toString(), path, re, id)
-          throw e
-        }
+        native[id] = imports
       }
     } else {
       dynamic.push(instruction)
@@ -58,7 +59,7 @@ const written = ['index.js', 'dependencies.js']
 const remaining = Object.values(modules).filter(({ path }) => !written.includes(path))
 
 while (remaining.length) {
-  const pos = remaining.findIndex(module => module.depends.every(dep => written.includes(dep)))
+  const pos = remaining.findIndex(module => Object.keys(module.depends).every(dep => written.includes(dep)))
   if (pos === -1) {
     console.error('Unable to complete.')
     process.exit(-1)
