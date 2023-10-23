@@ -15,6 +15,7 @@
     "node": ">=12.0.0"
   },
   "scripts": {
+    "build": "node build/bundle && terser dist/core.js --compress --keep-fnames --mangle -o dist/core.js",
     "test": "standard && node tests/all.js && nyc mocha && (node -e \"if (parseInt(process.version.match(/v(\\d+)/)[1]) > 14) process.exit(1) \" || npm run test:types)",
     "test:mutation": "stryker run",
     "lint": "standard --fix",
@@ -87,20 +88,14 @@
     ]
   },
   "nyc": {
-    "all": true,
-    "cache": false,
     "check-coverage": true,
+    "include": [
+      "src/**"
+    ],
     "exclude": [
-      "tests/*.js",
-      "tests/mocha/assert.js",
-      "tests/cache/**",
       "src/cli.js",
       "src/console.js",
-      "coverage/**",
-      "samples/**",
-      "docs/**",
-      "dist/**",
-      "build/**"
+      "src/**/*.spec.js"
     ],
     "branches": 100,
     "lines": 100,
