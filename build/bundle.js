@@ -47,7 +47,11 @@ while (stack.length) {
     module.dynamic = dynamic
   }
   module.path = path
-  module.exports = `$export_${path.replace('.js', '').replace('/', '_')}`
+  if (path === 'index.js') {
+    module.exports = 'reserve'    
+  } else {
+    module.exports = `$export_${path.replace('.js', '').replace('/', '_')}`
+  }
   modules[path] = module
 }
 
@@ -55,7 +59,7 @@ mkdirSync('dist', { recursive: true })
 writeFileSync('dist/bundle.json', JSON.stringify(modules, undefined, 2))
 writeFileSync('dist/core.js', '')
 
-const written = ['index.js', 'node-api.js']
+const written = ['node-api.js']
 const remaining = Object.values(modules).filter(({ path }) => !written.includes(path))
 
 while (remaining.length) {
