@@ -70,7 +70,7 @@ while (remaining.length) {
   writeFileSync('dist/core.js', `// BEGIN OF ${path}\n`, { flag: 'a' })
   const transformed = `const ${exports} = (() => {${content
     .replace(/'use strict'\s*\n/g, '') // No more required
-    .replace(/const [^\n]*= require\('[^']+node-api'\)/g, dependencies => `// ${dependencies}`) // No more required
+    .replace(/const [^\n]*= require\('[^']+node-api'\)/g, dependencies => '') // No more required
     .replace(/module\.exports\s*=/, 'return')
     .replace(/require\('([^']*)'\)/g, (match, id) => {
       if (id.endsWith('node-api')) {
@@ -81,7 +81,7 @@ while (remaining.length) {
       if (moduleName !== undefined) {
         return modules[moduleName].exports
       }
-      return `__REQUIRE__(${id})`
+      throw new Error('Unexpected required')
     })
   }})()`
   writeFileSync('dist/core.js', transformed, { flag: 'a' })
