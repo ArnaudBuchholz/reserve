@@ -81,7 +81,10 @@ while (remaining.length) {
         return match
       }
       const depPath = join(dirname(path), id).replace('\\', '/') + '.js'
-      const moduleName = Object.keys(modules).find(path => depPath.endsWith(path))
+      const moduleName = Object.keys(modules)
+        .filter(path => depPath.endsWith(path))
+        .sort((name1, name2) => name2.length - name1.length)
+        [0] // keep longer match
       if (moduleName !== undefined) {
         return modules[moduleName].exports
       }
