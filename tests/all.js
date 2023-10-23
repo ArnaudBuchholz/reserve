@@ -2,7 +2,6 @@
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
 
-const colors = require('../src/detect/colors')
 global.gpf = require('gpf-js')
 global.assert = require('assert')
 global.location = {
@@ -14,13 +13,13 @@ const path = require('path')
 const { fork } = require('child_process')
 
 function startServer (cmdLineParameters) {
-  console.log(colors.cyan('Starting reserve'))
-  console.log(colors.gray(`directory:  ${process.cwd()}`))
-  console.log(colors.gray(`parameters: ${cmdLineParameters.join(' ')}`))
+  console.log('Starting reserve')
+  console.log(`directory:  ${process.cwd()}`)
+  console.log(`parameters: ${cmdLineParameters.join(' ')}`)
   return new Promise(resolve => {
     const server = fork(path.join(__dirname, '../src/cli.js'), cmdLineParameters)
     server.on('message', message => {
-      console.log(colors.yellow('reserve message'), colors.gray(message))
+      console.log('reserve message', message)
       if (message === 'ready') {
         resolve(server)
       }
@@ -46,9 +45,9 @@ async function all () {
     await testServer('https://localhost:5001', '--config', 'https.json')
     process.chdir('./sub')
     await testServer('http://localhost:5002')
-    console.error(colors.green('All tests succeeded'))
+    console.error('All tests succeeded')
   } catch (e) {
-    console.error(colors.red(e.toString()))
+    console.error(e.toString())
   } finally {
     console.log('Total time (ms): ', new Date() - now)
   }
