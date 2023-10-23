@@ -1,7 +1,8 @@
 'use strict'
 
 const { join } = require('path')
-const { readFileSync } = require('fs')
+const fs = require('fs')
+const { readFileSync } = fs
 const Readable = require('stream').Readable
 
 let fakeNow = new Date().getTime()
@@ -132,8 +133,7 @@ function getEntry (entryPath) {
   }, entries)
 }
 
-require('mock-require')('fs', {
-
+const mockedFs = Object.assign({}, fs, {
   setCaseSensitive (value) {
     caseSensitive = value
   },
@@ -195,3 +195,5 @@ require('mock-require')('fs', {
     callback(null, Object.keys(entry))
   }
 })
+
+require('mock-require')('fs', mockedFs)

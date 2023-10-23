@@ -1,6 +1,8 @@
 'use strict'
 
-require('mock-require')('os', {
+const os = require('os')
+
+const mockedOs = Object.assign({}, os, {
   networkInterfaces: () => ({
     Ethernet: [
       {
@@ -60,3 +62,5 @@ require('mock-require')('os', {
     ]
   })
 })
+
+require('mock-require')('os', mockedOs)
