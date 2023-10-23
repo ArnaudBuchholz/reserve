@@ -18,9 +18,9 @@ configurationFileNames.split(',').forEach(configurationFileName => {
   read(configurationFileName)
     .catch(reason => {
       if (verbose) {
-        console.error(colors.red(reason.toString()))
+        console.error(reason.toString())
       }
-      console.warn(colors.yellow(`'${configurationFileName}' not found or invalid, applying defaults`))
+      console.warn(`'${configurationFileName}' not found or invalid, applying defaults`)
       return {} // empty configuration will use all defaults
     })
     .then(configuration => {
