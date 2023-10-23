@@ -72,8 +72,15 @@ while (remaining.length) {
     .replace(/'use strict'\s*\n/g, '') // No more required
     .replace(/const [^\n]*= require\('[^']+node-api'\)/g, dependencies => `// ${dependencies}`) // No more required
     .replace(/module\.exports\s*=/, 'return')
-    .replace(/require\(([^)]*)\)/g, (match, id) => {
-      
+    .replace(/require\('([^']*)'\)/g, (match, id) => {
+      if (id.endsWith('node-api')) {
+        return match
+      }
+      const depPath = join(dirname(path), id).replace('\\', '/') + '.js'
+      const moduleName = Object.keys(modules).find(path => depPath.endsWith(path))
+      if (moduleName !== undefined) {
+        return modules[moduleName].exports
+      }
       return `__REQUIRE__(${id})`
     })
   }})()`
