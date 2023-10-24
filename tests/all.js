@@ -12,12 +12,20 @@ const assertions = require('./assertions')
 const path = require('path')
 const { fork } = require('child_process')
 
+const dist = process.argv.includes('dist')
+let cli
+if (dist) {
+  cli = path.join(__dirname, '../dist/cli.js')
+} else {
+  cli = path.join(__dirname, '../src/cli.js')
+}
+
 function startServer (cmdLineParameters) {
   console.log('Starting reserve')
   console.log(`directory:  ${process.cwd()}`)
   console.log(`parameters: ${cmdLineParameters.join(' ')}`)
   return new Promise(resolve => {
-    const server = fork(path.join(__dirname, '../src/cli.js'), cmdLineParameters)
+    const server = fork(cli, cmdLineParameters)
     server.on('message', message => {
       console.log('reserve message', message)
       if (message === 'ready') {
