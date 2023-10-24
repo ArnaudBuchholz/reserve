@@ -48,7 +48,7 @@ while (stack.length) {
   }
   module.path = path
   if (path === 'index.js') {
-    module.exports = 'reserve'    
+    module.exports = 'reserve'
   } else {
     module.exports = `$export_${path.replace('.js', '').replace('/', '_')}`
   }
@@ -57,7 +57,22 @@ while (stack.length) {
 
 mkdirSync('dist', { recursive: true })
 writeFileSync('dist/bundle.json', JSON.stringify(modules, undefined, 2))
-writeFileSync('dist/core.js', '')
+
+const nodeApi = readFileSync(join(__dirname, '../src/node-api.js')).toString()
+const imports = []
+nodeApi.replace(/const ([^=]+) = require\('([^']+)'\)/g, (match, imported, id) => {
+  if (imported.startsWith('{')) {
+    imports.push(...imported.match(/{ (.*) }/)[1].split(', '))
+  } else {
+    imports.push(imported)
+  }
+})
+
+const promisified = []
+nodeApi.replace(/(\w+): promisify\(\w+\)/g, (match, api) => promisified.push(api))
+
+writeFileSync('dist/core.js', `module.exports=function({${imports.join(',')}}){\n`)
+promisified.forEach(api => writeFileSync('dist/core.js', `${api}=promisify(${api})\n`, { flag: 'a' }))
 
 const written = ['node-api.js']
 const remaining = Object.values(modules).filter(({ path }) => !written.includes(path))
@@ -83,8 +98,7 @@ while (remaining.length) {
       const depPath = join(dirname(path), id).replace('\\', '/') + '.js'
       const moduleName = Object.keys(modules)
         .filter(path => depPath.endsWith(path))
-        .sort((name1, name2) => name2.length - name1.length)
-        [0] // keep longer match
+        .sort((name1, name2) => name2.length - name1.length)[0] // keep longer match
       if (moduleName !== undefined) {
         return modules[moduleName].exports
       }
@@ -94,5 +108,7 @@ while (remaining.length) {
   writeFileSync('dist/core.js', transformed, { flag: 'a' })
   writeFileSync('dist/core.js', `\n// END OF ${path}\n`, { flag: 'a' })
 }
+
+writeFileSync('dist/core.js', 'return reserve}', { flag: 'a' })
 
 console.log('Done.')
