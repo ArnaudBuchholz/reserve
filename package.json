@@ -3,6 +3,12 @@
   "version": "2.0.0",
   "description": "Lightweight http server statically configurable using regular expressions",
   "main": "./dist/index.js",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    }
+  },
   "files": [
     "dist/*",
     "@types/*.d.ts"
