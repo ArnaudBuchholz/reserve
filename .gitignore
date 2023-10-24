@@ -33,7 +33,9 @@ reports/
 docs/_site
 
 # build result
-dist/
+dist/core.js
+dist/bundle.json
+dist/cli.js
 
 # npm pack
 *.tgz
