@@ -30,7 +30,7 @@ const reserve = factory({
   zlib
 })
 export default reserve
-const {
+export const {
   Request,
   Response,
   body,
