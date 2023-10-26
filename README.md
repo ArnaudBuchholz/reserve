@@ -48,7 +48,7 @@ For instance, the definition of a server that **exposes files** of the current d
 
 ## npm start
 
-* Install the package with `npm install reserve` *(you decide if you want to save it as development dependency or not)*
+* Install the package with `npm install reserve`
 * You may create a start script in `package.json` :
 
 ```json
@@ -85,13 +85,16 @@ For instance, the definition of a server that **exposes files** of the current d
 It is possible to implement the server in an application using the `serve` export :
 
 ```javascript
-const path = require('path')
+// CommonJS syntax
 const { check, serve } = require('reserve')
+// ESM syntax
+// import { check, serve } from 'reserve'
+
 check({
   port: 8080,
   mappings: [{
     match: /^\/(.*)/,
-    file: path.join(__dirname, '$1')
+    file: '$1'
   }]
 })
   .then(configuration => {
@@ -108,8 +111,11 @@ It also exposes a `close` method (returning a `Promise`) to shutdown the server.
 The package also gives access to the configuration reader :
 
 ```javascript
-const path = require('path')
+// CommonJS syntax
 const { read, serve } = require('reserve')
+// ESM syntax
+// import { read, serve } from 'reserve'
+
 read('reserve.json')
   .then(configuration => {
     serve(configuration)
@@ -122,8 +128,11 @@ read('reserve.json')
 And a default log output *(verbose mode will dump all redirections)* :
 
 ```javascript
-const path = require('path')
+// CommonJS syntax
 const { log, read, serve } = require('reserve')
+// ESM syntax
+// import { log, read, serve } from 'reserve'
+
 read('reserve.json')
   .then(configuration => {
     log(serve(configuration), /*verbose: */ true)
