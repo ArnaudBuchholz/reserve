@@ -23,6 +23,7 @@
     "file": "../node_modules/gpf-js/build/gpf.js"
   }, {
     "match": "(.*)",
+    "strict": true,
     "file": "./$1"
   }]
 }

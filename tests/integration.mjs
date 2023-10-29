@@ -22,10 +22,10 @@ async function start (config) {
       }
     })
   } else {
-    const { read, serve } = await import('../dist/index.mjs')
+    const { read, serve, log } = await import('../dist/index.mjs')
     return read(config)
       .then(configuration => {
-        const server = serve(configuration)
+        const server = log(serve(configuration))
         return new Promise(resolve => {
           server.on('ready', () => resolve(server))
         })
@@ -33,11 +33,30 @@ async function start (config) {
   }
 }
 
+async function failWith404 (url) {
+  let exceptionCaught
+  try {
+    await got(url)
+  } catch (e) {
+    exceptionCaught = e
+  }
+  assert.strictEqual(exceptionCaught.response.statusCode, 404)
+}
+
 async function test (config, base) {
   const server = await start(config)
-  // mappings.json (file mapping)
+  // FILE
+  // mappings.json
   const mappings = await got(base + '/mappings.json').json()
   assert.strictEqual(typeof mappings.mappings, 'object')
+  // Hello World.txt (case sensitive)
+  const helloWorld = await got(base + '/Hello World.txt').text()
+  assert.strictEqual(helloWorld, 'Hello World!\n')
+  await failWith404(base + '/hello world.txt')
+  // URL
+  // proxy
+  const proxifiedJs = await got(base + '/proxy/https/arnaudbuchholz.github.io/blog/jsfiddle-assert.js').text()
+  assert.strictEqual(proxifiedJs.includes('return document.body.appendChild(line);'), true)
   await server.close()
 }
 
