@@ -13,34 +13,28 @@
     "url": "$1://$2",
     "unsecure-cookies": true
   }, {
-    "match": "^/echo/(.*)$",
+    "match": "^/custom/echo/(.*)$",
     "custom": "./echo.js"
   }, {
-    "match": "^/chrome/(.*)$",
-    "custom": "./chrome.js"
-  }, {
-    "match": "^/gpf\\.js$",
-    "file": "../node_modules/gpf-js/build/gpf.js"
-  }, {
-    "match": "/status/301",
+    "match": "^/status/301",
     "status": 301,
     "headers": {
       "location": "https://www.npmjs.com/package/reserve"
     }
   }, {
-    "match": "/status/redirect/(.*)",
+    "match": "^/status/redirect/(.*)",
     "status": 302,
     "headers": {
       "location": "https://www.npmjs.com/package/$1"
     }
   }, {
-    "match": "/status/404",
+    "match": "^/status/404",
     "status": 404
   }, {
-    "match": "/status/508",
+    "match": "^/status/508",
     "status": 508
   }, {
-    "match": "/file/(.*)",
+    "match": "^/file/(.*)",
     "strict": true,
     "file": "./$1"
   }]

@@ -91,6 +91,15 @@ async function test (config, base) {
     body: async body => assert.match(body, /return document.body.appendChild\(line\);/)
   })
 
+  await match('/custom/echo/Hello World !', {
+    statusCode: 200,
+    headers: {
+      'content-type': 'text/plain',
+      'content-length': '17'
+    },
+    body: 'Hello%20World%20!'
+  })
+
   await match('/status/301', {
     statusCode: 301,
     headers: {
