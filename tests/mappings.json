@@ -22,7 +22,10 @@
     "match": "^/gpf\\.js$",
     "file": "../node_modules/gpf-js/build/gpf.js"
   }, {
-    "match": "(.*)",
+    "match": "/status/404",
+    "status": 404
+  }, {
+    "match": "/file/(.*)",
     "strict": true,
     "file": "./$1"
   }]

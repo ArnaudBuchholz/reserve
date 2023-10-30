@@ -33,30 +33,65 @@ async function start (config) {
   }
 }
 
-async function failWith404 (url) {
-  let exceptionCaught
-  try {
-    await got(url)
-  } catch (e) {
-    exceptionCaught = e
-  }
-  assert.strictEqual(exceptionCaught.response.statusCode, 404)
-}
-
 async function test (config, base) {
   const server = await start(config)
-  // FILE
-  // mappings.json
-  const mappings = await got(base + '/mappings.json').json()
-  assert.strictEqual(typeof mappings.mappings, 'object')
-  // Hello World.txt (case sensitive)
-  const helloWorld = await got(base + '/Hello World.txt').text()
-  assert.strictEqual(helloWorld, 'Hello World!\n')
-  await failWith404(base + '/hello world.txt')
+
+  async function match (url, expected) {
+    const response = await got(base + url, {
+      throwHttpErrors: false
+    })
+    const extracted = {}
+    Object.keys(expected)
+      .filter(member => !['body'].includes(member))
+      .forEach(member => {
+        if (member === 'headers') {
+          extracted.headers = {}
+          Object.keys(expected.headers).forEach(header => { extracted.headers[header] = response.headers[header] })
+        } else {
+          extracted[member] = response[member]
+        }
+      })
+    if (expected.body) {
+      if (typeof expected.body === 'object') {
+        extracted.body = JSON.parse(response.body)
+      } else if (typeof expected.body === 'function') {
+        await expected.body(response.body)
+        delete expected.body
+      } else {
+        extracted.body = response.body
+      }
+    }
+    assert.deepStrictEqual(extracted, expected, url)
+  }
+
+  await match('/file/mappings.json', {
+    statusCode: 200,
+    body: async body => {
+      const file = JSON.parse(body)
+      assert.strictEqual(typeof file.mappings, 'object')
+    }
+  })
+  await match('/file/Hello World.txt', {
+    statusCode: 200,
+    headers: {
+      'content-type': 'text/plain',
+      'content-length': '13'
+    },
+    body: 'Hello World!\n'
+  })
+  await match('/file/hello world.txt', {
+    statusCode: 404,
+    body: 'Not found'
+  })
+
   // URL
   // proxy
   const proxifiedJs = await got(base + '/proxy/https/arnaudbuchholz.github.io/blog/jsfiddle-assert.js').text()
   assert.strictEqual(proxifiedJs.includes('return document.body.appendChild(line);'), true)
+
+  await failWith404(base + '/status/404')
+
+
   await server.close()
 }
 
