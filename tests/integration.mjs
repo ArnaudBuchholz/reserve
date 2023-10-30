@@ -130,4 +130,8 @@ async function test (config, base) {
   await server.close()
 }
 
-await test('tests/http.json', 'http://localhost:5000')
+async function main () {
+  await test('tests/http.json', 'http://localhost:5000')
+}
+
+main()
