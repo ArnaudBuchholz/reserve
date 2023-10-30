@@ -2,7 +2,7 @@ import { fork } from 'child_process'
 import assert from 'assert'
 import http from 'http'
 
-const mode = process.argv[2] ?? 'cli'
+const mode = process.argv[2] || 'cli'
 
 async function start (config) {
   if (mode === 'cli' || mode === 'dist') {
