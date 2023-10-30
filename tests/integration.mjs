@@ -35,10 +35,12 @@ async function start (config) {
 
 async function test (config, base) {
   const server = await start(config)
+  const now = Date.now()
 
   async function match (url, expected) {
     const response = await got(base + url, {
-      throwHttpErrors: false
+      throwHttpErrors: false,
+      followRedirect: false
     })
     const extracted = {}
     Object.keys(expected)
@@ -84,13 +86,31 @@ async function test (config, base) {
     body: 'Not found'
   })
 
-  // URL
-  // proxy
-  const proxifiedJs = await got(base + '/proxy/https/arnaudbuchholz.github.io/blog/jsfiddle-assert.js').text()
-  assert.strictEqual(proxifiedJs.includes('return document.body.appendChild(line);'), true)
+  await match('/url/proxy/https/arnaudbuchholz.github.io/blog/jsfiddle-assert.js', {
+    statusCode: 200,
+    body: async body => assert.match(body, /return document.body.appendChild\(line\);/)
+  })
 
-  await failWith404(base + '/status/404')
-
+  await match('/status/301', {
+    statusCode: 301,
+    headers: {
+      location: 'https://www.npmjs.com/package/reserve'
+    }
+  })
+  await match(`/status/redirect/${now}`, {
+    statusCode: 302,
+    headers: {
+      location: `https://www.npmjs.com/package/${now}`
+    }
+  })
+  await match('/status/404', {
+    statusCode: 404,
+    body: 'Not found'
+  })
+  await match('/status/508', {
+    statusCode: 508,
+    body: 'Loop Detected'
+  })
 
   await server.close()
 }

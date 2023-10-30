@@ -9,7 +9,7 @@
   }, {
     "custom": "./cors.js"
   }, {
-    "match": "^/proxy/(https?)/(.*)",
+    "match": "^/url/proxy/(https?)/(.*)",
     "url": "$1://$2",
     "unsecure-cookies": true
   }, {
@@ -22,8 +22,23 @@
     "match": "^/gpf\\.js$",
     "file": "../node_modules/gpf-js/build/gpf.js"
   }, {
+    "match": "/status/301",
+    "status": 301,
+    "headers": {
+      "location": "https://www.npmjs.com/package/reserve"
+    }
+  }, {
+    "match": "/status/redirect/(.*)",
+    "status": 302,
+    "headers": {
+      "location": "https://www.npmjs.com/package/$1"
+    }
+  }, {
     "match": "/status/404",
     "status": 404
+  }, {
+    "match": "/status/508",
+    "status": 508
   }, {
     "match": "/file/(.*)",
     "strict": true,
