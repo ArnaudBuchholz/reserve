@@ -40,7 +40,7 @@ async function test (config, base) {
   async function match (url, expected) {
     const response = await new Promise(resolve => {
       http.get(base + url, response => {
-        let body = []
+        const body = []
         response.on('data', chunk => body.push(chunk.toString()))
         response.on('end', () => {
           response.body = body.join('')
