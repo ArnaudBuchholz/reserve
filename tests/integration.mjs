@@ -1,6 +1,6 @@
-import got from 'got'
 import { fork } from 'child_process'
 import assert from 'assert'
+import http from 'http'
 
 const mode = process.argv[2] ?? 'cli'
 
@@ -38,9 +38,15 @@ async function test (config, base) {
   const now = Date.now()
 
   async function match (url, expected) {
-    const response = await got(base + url, {
-      throwHttpErrors: false,
-      followRedirect: false
+    const response = await new Promise(resolve => {
+      http.get(base + url, response => {
+        let body = []
+        response.on('data', chunk => body.push(chunk.toString()))
+        response.on('end', () => {
+          response.body = body.join('')
+          resolve(response)
+        })
+      })
     })
     const extracted = {}
     Object.keys(expected)
