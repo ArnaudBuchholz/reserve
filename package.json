@@ -19,11 +19,11 @@
   },
   "types": "./@types/index.d.ts",
   "engines": {
-    "node": ">=12.0.0"
+    "node": ">=12.22.12"
   },
   "scripts": {
     "build": "node build/bundle && terser dist/core.js --compress --keep-fnames --mangle -o dist/core.js && terser src/cli.js --compress --keep-fnames --mangle -o dist/cli.js",
-    "test": "standard && node tests/all.js && nyc mocha && (node -e \"if (parseInt(process.version.match(/v(\\d+)/)[1]) > 14) process.exit(1) \" || npm run test:types)",
+    "test": "standard && nyc mocha && node tests/integration.mjs && (node -e \"if (parseInt(process.version.match(/v(\\d+)/)[1]) > 14) process.exit(1) \" || npm run test:types)",
     "test:mutation": "stryker run",
     "lint": "standard --fix",
     "mocha": "mocha",
@@ -61,8 +61,6 @@
     "eslint-utils": "^3.0.0",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
-    "got": "^13.0.0",
-    "gpf-js": "^1.0.0",
     "jose": "^5.0.1",
     "lodash": "^4.17.21",
     "minimist": ">=1.2.8",
