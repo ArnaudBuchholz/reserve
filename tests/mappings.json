@@ -1,13 +1,9 @@
 {
   "mappings": [{
-    "use": "express-session",
+    "use": "cors",
     "options" : {
-      "secret": "keyboard cat",
-      "resave": false,
-      "saveUninitialized": true
+      "origin": "http://example.com"
     }
-  }, {
-    "custom": "./cors.js"
   }, {
     "match": "^/url/proxy/(https?)/(.*)",
     "url": "$1://$2",
