@@ -13,6 +13,10 @@
     "url": "$1://$2",
     "unsecure-cookies": true
   }, {
+    "match": "^/url/badssl",
+    "ignore-unverifiable-certificate": true,
+    "url": "https://expired.badssl.com/"
+  }, {
     "match": "^/custom/echo/(.*)$",
     "custom": "./echo.js"
   }, {

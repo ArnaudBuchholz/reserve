@@ -97,6 +97,11 @@ async function test (config, base) {
     body: async body => assert.match(body, /return document.body.appendChild\(line\);/)
   })
 
+  await match('/url/badssl', {
+    statusCode: 200,
+    body: async body => assert.match(body, /badssl\.com/)
+  })
+
   await match('/custom/echo/Hello World !', {
     statusCode: 200,
     headers: {
