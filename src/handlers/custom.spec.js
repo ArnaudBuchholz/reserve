@@ -1,6 +1,5 @@
 'use strict'
 
-const mockRequire = require('mock-require')
 const { assert, wrapHandler } = require('test-tools')
 const customHandler = require('./custom')
 
@@ -84,70 +83,6 @@ describe('handlers/custom', () => {
       assert(() => reason.message === 'KO')
     }))
   )
-
-  it('implements file watching (timestamp changes)', async () => {
-    const mapping = {
-      cwd: '/',
-      custom: 'now.js',
-      watch: true
-    }
-
-    mockRequire('/now.js', (request, response) => { response.end('first') })
-    let timestamp1
-    await handle({
-      request: '/any',
-      mapping
-    })
-      .then(({ mapping, promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.toString() === 'first')
-        timestamp1 = mapping[$customTimestamp]
-        assert(() => timestamp1)
-      }))
-
-    mockRequire('/now.js', (request, response) => { response.end('second') })
-    await handle({
-      request: '/any',
-      mapping
-    })
-      .then(({ mapping, promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.toString() === 'second')
-        assert(() => mapping[$customTimestamp] !== timestamp1)
-      }))
-  })
-
-  it('implements file watching (timestamp remains the same)', async () => {
-    const mapping = {
-      cwd: '/',
-      custom: 'not-now.js',
-      watch: true
-    }
-
-    mockRequire('/not-now.js', (request, response) => { response.end('first') })
-    let timestamp1
-    await handle({
-      request: '/any',
-      mapping
-    })
-      .then(({ mapping, promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.toString() === 'first')
-        timestamp1 = mapping[$customTimestamp]
-        assert(() => timestamp1)
-
-        mockRequire('/not-now.js', assert.notExpected)
-        return handle({
-          request: '/any',
-          mapping
-        })
-      }))
-      .then(({ mapping, promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.toString() === 'first')
-        assert(() => mapping[$customTimestamp] === timestamp1)
-      }))
-  })
 
   it('passes configuration on mapping if member not defined', () => handle({
     request: '/any',

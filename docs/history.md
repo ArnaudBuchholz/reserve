@@ -93,4 +93,5 @@
 ||BREAKING CHANGE: Support of CommonJS and ESM imports|
 ||BREAKING CHANGE: Remove support of `colors`|
 ||BREAKING CHANGE: Remove support of `mime`|
+||BREAKING CHANGE: Remove option `watch` in `custom`|
 
