@@ -1,6 +1,7 @@
 import { fork } from 'child_process'
 import assert from 'assert'
 import http from 'http'
+import { URL } from 'url'
 
 const mode = process.argv[2] || 'cli'
 
@@ -37,9 +38,21 @@ async function test (config, base) {
   const server = await start(config)
   const now = Date.now()
 
-  async function match (url, expected) {
-    const response = await new Promise(resolve => {
-      http.get(base + url, response => {
+  async function match (req, expected) {
+    let { method = 'GET', url } = req
+    if (typeof req === 'string') {
+      url = req
+    }
+    const response = await new Promise((resolve, reject) => {
+      const parsed = new URL(url, base)
+      const { hostname, port, pathname, search, hash } = parsed
+      const path = `${pathname}${search}${hash}`
+      const request = http.request({
+        method,
+        hostname,
+        port,
+        path
+      }, response => {
         const body = []
         response.on('data', chunk => body.push(chunk.toString()))
         response.on('end', () => {
@@ -47,6 +60,9 @@ async function test (config, base) {
           resolve(response)
         })
       })
+      request.on('error', e => reject(e))
+      // request.write(data)
+      request.end()
     })
     const extracted = {}
     Object.keys(expected)
@@ -69,7 +85,7 @@ async function test (config, base) {
         extracted.body = response.body
       }
     }
-    assert.deepStrictEqual(extracted, expected, url)
+    assert.deepStrictEqual(extracted, expected, `${method} ${url}`)
   }
 
   await match('/file/mappings.json', {
@@ -130,6 +146,11 @@ async function test (config, base) {
   await match('/status/508', {
     statusCode: 508,
     body: 'Loop Detected'
+  })
+
+  await match({ method: 'OPTIONS', url: '/file/Hello World.txt' }, {
+    statusCode: 204,
+    headers: {}
   })
 
   await server.close()
