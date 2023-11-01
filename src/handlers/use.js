@@ -25,6 +25,18 @@ module.exports = {
     mapping[$useMiddleware] = middleware
   },
   redirect: ({ mapping, request, response }) => new Promise((resolve, reject) => {
+    const useEnd = () => {
+      resolve()
+      response.end()
+    }
+    const monitoredResponse = new Proxy(response, {
+      get (target, property) {
+        if (property === 'end') {
+          return useEnd
+        }
+        return response[property]
+      }
+    })
     const next = err => {
       if (err) {
         reject(err)
@@ -33,7 +45,7 @@ module.exports = {
       }
     }
     try {
-      mapping[$useMiddleware](request, response, next)
+      mapping[$useMiddleware](request, monitoredResponse, next)
     } catch (err) {
       reject(err)
     }

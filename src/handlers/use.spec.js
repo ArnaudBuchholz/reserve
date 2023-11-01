@@ -47,14 +47,18 @@ describe('handlers/use', () => {
   })
 
   it('executes the middleware', async () => {
+    const myRequest = Symbol('myRequest')
     const dispatchedRequest = new Request()
+    dispatchedRequest[myRequest] = true
+    const myResponse = Symbol('myResponse')
     const dispatchedResponse = new Response()
+    dispatchedResponse[myResponse] = true
     let executed
     const mapping = {
       use: function () {
         return function (request, response, next) {
-          assert(() => request === dispatchedRequest)
-          assert(() => response === dispatchedResponse)
+          assert(() => request[myRequest] === true)
+          assert(() => response[myResponse] === true)
           assert(() => typeof next === 'function')
           executed = true
           next()
@@ -96,5 +100,54 @@ describe('handlers/use', () => {
     await useHandler.validate(mapping)
     return useHandler.redirect({ mapping, request: dispatchedRequest, response: dispatchedResponse })
       .then(assert.notExpected, reason => assert(() => reason === error))
+  })
+
+  it('detects the response end even if next is not called (synchronous)', async () => {
+    const dispatchedRequest = new Request()
+    const dispatchedResponse = new Response()
+    const mapping = {
+      use: function () {
+        return function (request, response, next) {
+          response.end()
+        }
+      }
+    }
+    await useHandler.validate(mapping)
+    return useHandler.redirect({ mapping, request: dispatchedRequest, response: dispatchedResponse })
+  })
+
+  it('detects the response end even if next is not called (asynchronous)', async () => {
+    const dispatchedRequest = new Request()
+    const dispatchedResponse = new Response()
+    const mapping = {
+      use: function () {
+        return function (request, response, next) {
+          setTimeout(() => response.end(), 50)
+        }
+      }
+    }
+    await useHandler.validate(mapping)
+    return useHandler.redirect({ mapping, request: dispatchedRequest, response: dispatchedResponse })
+  })
+
+  it('does not prevent the override of response.end', async () => {
+    const dispatchedRequest = new Request()
+    const dispatchedResponse = new Response()
+    let myEndWasCalled = false
+    const myEnd = function () {
+      myEndWasCalled = true
+    }
+    const mapping = {
+      use: function () {
+        return function (request, response, next) {
+          response.end = myEnd
+          response.end()
+        }
+      }
+    }
+    await useHandler.validate(mapping)
+    await useHandler.redirect({ mapping, request: dispatchedRequest, response: dispatchedResponse })
+    assert(() => myEndWasCalled)
+    assert(() => dispatchedResponse.end === myEnd)
   })
 })

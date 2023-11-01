@@ -94,4 +94,4 @@
 ||BREAKING CHANGE: Remove support of `colors`|
 ||BREAKING CHANGE: Remove support of `mime`|
 ||BREAKING CHANGE: Remove option `watch` in `custom`|
-
+||Fix `use` to handle middleware that are not calling next|
