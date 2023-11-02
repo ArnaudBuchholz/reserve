@@ -87,6 +87,7 @@ async function test (config, base) {
       }
     }
     assert.deepStrictEqual(extracted, expected, `${method} ${url}`)
+    return response
   }
 
   await match('/file/mappings.json', {
@@ -100,13 +101,48 @@ async function test (config, base) {
     statusCode: 200,
     headers: {
       'content-type': 'text/plain',
-      'content-length': '13'
+      'content-length': '13',
+      'cache-control': 'no-store',
+      'accept-ranges': 'bytes'
     },
     body: 'Hello World!\n'
   })
   await match('/file/hello world.txt', {
     statusCode: 404,
     body: 'Not found'
+  })
+  await match('/file/mime/Hello World.txt', {
+    statusCode: 200,
+    headers: {
+      'content-type': 'application/x-httpd-php',
+      'content-length': '13'
+    },
+    body: 'Hello World!\n'
+  })
+  const { headers: { 'last-modified': lastModified } } = await match('/file/cache/modified/Hello World.txt', {
+    statusCode: 200,
+    headers: {
+      'cache-control': 'no-cache'
+    },
+    body: 'Hello World!\n'
+  })
+  await match({
+    url: '/file/cache/modified/Hello World.txt',
+    headers: {
+      'if-modified-since': lastModified
+    }
+  }, {
+    statusCode: 304,
+    headers: {
+      'cache-control': 'no-cache'
+    }
+  })
+  await match('/file/cache/max-age/Hello World.txt', {
+    statusCode: 200,
+    headers: {
+      'cache-control': 'public, max-age=360, immutable'
+    },
+    body: 'Hello World!\n'
   })
 
   await match('/url/proxy/https/arnaudbuchholz.github.io/blog/jsfiddle-assert.js', {

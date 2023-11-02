@@ -38,6 +38,20 @@
     "match": "^/status/508",
     "status": 508
   }, {
+    "match": "^/file/mime/(.*)",
+    "file": "./$1",
+    "mime-types": {
+      "txt": "application/x-httpd-php"
+    }
+  }, {
+    "match": "^/file/cache/modified/(.*)",
+    "file": "./$1",
+    "caching-strategy": "modified"
+  }, {
+    "match": "^/file/cache/max-age/(.*)",
+    "file": "./$1",
+    "caching-strategy": 360
+  }, {
     "match": "^/file/(.*)",
     "strict": true,
     "file": "./$1"
