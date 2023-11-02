@@ -107,6 +107,46 @@ async function test (config, base) {
     },
     body: 'Hello World!\n'
   })
+  await match({
+    url: '/file/Hello World.txt',
+    headers: {
+      range: 'bytes=6-10'
+    }
+  }, {
+    statusCode: 206,
+    headers: {
+      'content-type': 'text/plain',
+      'content-length': '5',
+      'content-range': 'bytes 6-10/13'
+    },
+    body: 'World'
+  })
+  await match({
+    url: '/file/Hello World.txt',
+    headers: {
+      range: 'bytes=6-'
+    }
+  }, {
+    statusCode: 206,
+    headers: {
+      'content-type': 'text/plain',
+      'content-length': '7',
+      'content-range': 'bytes 6-12/13'
+    },
+    body: 'World!\n'
+  })
+  await match({
+    url: '/file/Hello World.txt',
+    headers: {
+      range: 'bytes=99-'
+    }
+  }, {
+    statusCode: 416,
+    headers: {
+      'content-type': 'text/plain',
+      'content-length': '0'
+    }
+  })
   await match('/file/hello world.txt', {
     statusCode: 404,
     body: 'Not found'
@@ -136,6 +176,35 @@ async function test (config, base) {
     headers: {
       'cache-control': 'no-cache'
     }
+  })
+  await match({
+    url: '/file/cache/modified/Hello World.txt',
+    headers: {
+      'if-range': lastModified,
+      range: 'bytes=6-10'
+    }
+  }, {
+    statusCode: 206,
+    headers: {
+      'content-type': 'text/plain',
+      'content-length': '5',
+      'content-range': 'bytes 6-10/13'
+    },
+    body: 'World'
+  })
+  await match({
+    url: '/file/cache/modified/Hello World.txt',
+    headers: {
+      'if-range': Date.now(),
+      range: 'bytes=6-10'
+    }
+  }, {
+    statusCode: 200,
+    headers: {
+      'content-type': 'text/plain',
+      'content-length': '13'
+    },
+    body: 'Hello World!\n'
   })
   await match('/file/cache/max-age/Hello World.txt', {
     statusCode: 200,
