@@ -39,7 +39,7 @@ async function test (config, base) {
   const now = Date.now()
 
   async function match (req, expected) {
-    let { method = 'GET', url } = req
+    let { method = 'GET', url, headers = {} } = req
     if (typeof req === 'string') {
       url = req
     }
@@ -51,7 +51,8 @@ async function test (config, base) {
         method,
         hostname,
         port,
-        path
+        path,
+        headers
       }, response => {
         const body = []
         response.on('data', chunk => body.push(chunk.toString()))
@@ -126,6 +127,9 @@ async function test (config, base) {
     },
     body: 'Hello%20World%20!'
   })
+  await match('/custom/configuration', {
+    statusCode: 200
+  })
 
   await match('/status/301', {
     statusCode: 301,
@@ -150,7 +154,16 @@ async function test (config, base) {
 
   await match({ method: 'OPTIONS', url: '/file/Hello World.txt' }, {
     statusCode: 204,
-    headers: {}
+    headers: {
+      'access-control-allow-origin': 'http://example.com',
+      'access-control-allow-methods': 'GET,POST'
+    }
+  })
+  await match({ method: 'GET', url: '/file/Hello World.txt' }, {
+    statusCode: 200,
+    headers: {
+      'access-control-allow-origin': 'http://example.com'
+    }
   })
 
   await server.close()

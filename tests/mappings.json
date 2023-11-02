@@ -2,7 +2,8 @@
   "mappings": [{
     "use": "cors",
     "options" : {
-      "origin": "http://example.com"
+      "origin": "http://example.com",
+      "methods": "GET,POST"
     }
   }, {
     "match": "^/url/proxy/(https?)/(.*)",
@@ -15,6 +16,9 @@
   }, {
     "match": "^/custom/echo/(.*)$",
     "custom": "./echo.js"
+  }, {
+    "match": "^/custom/configuration",
+    "custom": "./configuration.js"
   }, {
     "match": "^/status/301",
     "status": 301,
