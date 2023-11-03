@@ -30,12 +30,10 @@ const defaults = {
   'max-redirect': 10,
   listeners: [],
   mappings: [{
-    match: /^\/proxy\/(https?)\/(.*)/,
-    url: '$1://$2',
-    'unsecure-cookies': true
-  }, {
     match: '(.*)',
     file: './$1'
+  }, {
+    status: 404
   }]
 }
 
