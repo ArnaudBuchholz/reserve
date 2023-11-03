@@ -94,4 +94,10 @@
 ||BREAKING CHANGE: Remove support of `colors`|
 ||BREAKING CHANGE: Remove support of `mime`|
 ||BREAKING CHANGE: Remove option `watch` in `custom`|
+||BREAKING CHANGE: Remove option `strict` in `file`|
+||BREAKING CHANGE: Remove option `case-sensitive` in `file`, it is now always case sensitive|
+||BREAKING CHANGE: Remove option `ignore-if-not-found` in `file`, mapping is ignored if resolving to a missing / unreadable / invalid path|
+||BREAKING CHANGE: Remove option `http-status` in `file`|
+||BREAKING CHANGE: `readdir` is now mandatory in custom file system for `file`|
+||BREAKING CHANGE: default configuration does not include proxy|
 ||Fix `use` to handle middleware that are not calling next|

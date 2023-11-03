@@ -14,10 +14,10 @@ Example :
 * Capturing groups can be used as substitution parameters
 * Absolute or relative to the handler's `cwd` member *(see [mappings](configuration.md#mappings))*
 * Incoming URL parameters are automatically stripped out to simplify the matching expression
-* Directory access is internally redirected to the inner `index.html` file *(if any)* or `404` status
-* File access returns `404` status if missing or can't be read
+* Directory access is internally redirected to the inner `index.html` file *(if any)*
+* If the path resolves to a missing / unreadable / invalid file / directory, the handler does not process the request
 * Supports [`Range` HTTP header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range) *(only one range)*
-* Mime type computation is based on [`mime`](https://www.npmjs.com/package/mime) **if installed**. Otherwise a limited subset of mime types is used:
+* Only a limited subset of mime types is pre-configured, use `mime-types` to extend :
 
 |Extension|mime type|
 |---|---|
@@ -39,32 +39,24 @@ Example :
 
 | option | type | default | description |
 |---|---|---|---|
-| `case-sensitive` | Boolean | `false` | *(for Windows)* when `true`, the file path is tested case sensitively. Since it has an impact on **performances**, use carefully. |
-| `ignore-if-not-found` | Boolean | `false` | If the mapping does not resolve to a file or a folder, the handler does not end the request with status `404`. |
-| `custom-file-system` | String or Object | undefined | Provides custom file system API *(see below)*. |
+| `mime-types` | Object | `{}` | Dictionary indexed by file extension that overrides mime type resolution. For instance : `{ "csv": "text/csv" }`. |
 | `caching-strategy` | `'modified'` or Number | 0 | Configures caching strategy:  |
 |||| `'modified'`: use file last modification date, meaning the response header will contain [`Last-Modified`](https://developer.mozilla.org/fr/docs/Web/HTTP/Headers/Last-Modified) and the handler reacts to request headers [`If-Modified-Since`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Modified-Since) and [`If-Range`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Range)  |
 |||| any number: hard coded duration (in seconds), based on the response header [`Cache-Control` with `max-age`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) |
 |||| 0 *(default)*: [`Cache-Control` with `no-store`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) |
-| `strict` | Boolean | `false` | when `true`, the file path is tested strictly (in particular, duplicated separators like in `foldera//folderb` are not ignored). This option implies `case-sensitive`. Since it has an impact on **performances**, use carefully. |
-| `mime-types` | Object | `{}` | Dictionary indexed by file extension that overrides mime type resolution. For instance : `{ "csv": "text/csv" }`. |
-| `http-status` | Number | `0` | Hardcode the response HTTP status *(incompatible with `caching-strategy`)*|
+| `custom-file-system` | String or Object | undefined | Provides custom file system API *(see below)*. |
 
 ## Custom File System
 
 The custom file system is an **object** exposing several **asynchronous** methods.
 
-Some are mandatory, others depend on the **settings** of the mapping.
-
-### *optional* `async readdir (folderPath)`
+### `async readdir (folderPath)`
 
 This is the asynchronous equivalent of [fs.readdir](https://nodejs.org/api/fs.html#fs_fs_readdir_path_options_callback). No option is transmitted.
 
 It must return a promise resolved to an array of names listing the files or folders contained in the `folderPath`.
 
-It is mandatory if the `case-sensitive` or `strict` options are set on the mapping.
-
-### *mandatory* `async stat (filePath)`
+### `async stat (filePath)`
 
 This is the asynchronous equivalent of [fs.stat](https://nodejs.org/api/fs.html#fs_fs_stat_path_options_callback). No option is transmitted.
 
@@ -73,7 +65,7 @@ It must return an object equivalent to [fs.Stats](https://nodejs.org/api/fs.html
 * [`size`](https://nodejs.org/api/fs.html#fs_stats_size)
 * [`mtime`](https://nodejs.org/api/fs.html#fs_stats_mtime)
 
-### *mandatory* async createReadStream (filePath, options)
+### `async createReadStream (filePath, options)`
 
 This is the asynchronous equivalent of [fs.createReadStream](https://nodejs.org/api/fs.html#fs_fs_createreadstream_path_options).  When `options` is specified, it contains only `start` and `end`.
 

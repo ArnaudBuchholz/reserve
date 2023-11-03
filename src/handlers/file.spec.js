@@ -11,6 +11,11 @@ const textMimeType = 'text/plain'
 const htmlMimeType = 'text/html'
 const defaultMimeType = 'application/octet-stream'
 
+const ignored = ({ promise, response }) => promise.then(value => {
+  assert(() => value === undefined)
+  assert(() => response.isInitial())
+})
+
 describe('handlers/file', () => {
   it('returns a promise', () => handle('./file.txt')
     .then(({ promise }) => {
@@ -57,17 +62,13 @@ describe('handlers/file', () => {
   it('checks file access (url must *not* end with /)', () => handle({
     request: './file.txt/'
   })
-    .then(({ promise, response }) => promise.then(value => {
-      assert(() => value === 404)
-    }))
+    .then(ignored)
   )
 
   it('checks folder access (url must end with /)', () => handle({
     request: './folder'
   })
-    .then(({ promise, response }) => promise.then(value => {
-      assert(() => value === 404)
-    }))
+    .then(ignored)
   )
 
   it('sends index.html if accessing a folder', () => handle({
@@ -108,36 +109,28 @@ describe('handlers/file', () => {
     }))
   )
 
-  it('fails with 404 if the file does not exist', () => handle({
+  it('returns nothing if the file does not exist', () => handle({
     request: './not-found'
   })
-    .then(({ promise }) => promise.then(value => {
-      assert(() => value === 404)
-    }))
+    .then(ignored)
   )
 
-  it('fails with 404 if the folder does not exist', () => handle({
+  it('returns nothing if the folder does not exist', () => handle({
     request: './not-a-folder/not-found'
   })
-    .then(({ promise }) => promise.then(value => {
-      assert(() => value === 404)
-    }))
+    .then(ignored)
   )
 
-  it('fails with 404 if the folder does not have index.html', () => handle({
+  it('returns nothing if the folder does not have index.html', () => handle({
     request: './no-index/'
   })
-    .then(({ promise }) => promise.then(value => {
-      assert(() => value === 404)
-    }))
+    .then(ignored)
   )
 
-  it('fails with 404 if the folder contains a sub folder named index.html', () => handle({
+  it('returns nothing if the folder contains a sub folder named index.html', () => handle({
     request: './wrong-index/'
   })
-    .then(({ promise }) => promise.then(value => {
-      assert(() => value === 404)
-    }))
+    .then(ignored)
   )
 
   describe('Case insensitive file system', function () {
@@ -145,51 +138,23 @@ describe('handlers/file', () => {
       fs.setCaseSensitive(false)
     })
 
-    it('finds the file even if the file name does not match case sensitively', () => handle({
+    it('does not send back the file even when the file name does not match case sensitively', () => handle({
       request: '/File.txt'
     })
-      .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 200)
-        assert(() => response.headers['Content-Type'] === textMimeType)
-        assert(() => response.headers['Content-Length'] === 12)
-        assert(() => response.toString() === 'Hello World!')
-      }))
+      .then(ignored)
     )
 
-    it('finds the file even if the file name does not match case sensitively (HEAD)', () => handle({
+    it('does not send back the file even when the file name does not match case sensitively (HEAD)', () => handle({
       request: {
         method: 'HEAD',
         url: '/File.txt'
       }
     })
-      .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 200)
-        assert(() => response.headers['Content-Type'] === textMimeType)
-        assert(() => response.headers['Content-Length'] === 12)
-        assert(() => response.toString() === '')
-      }))
-    )
-
-    it('fails with 404 if the file name does not match case sensitively but case-sensitive is set', () => handle({
-      request: '/File.txt',
-      mapping: {
-        cwd: '/',
-        'case-sensitive': true
-      }
-    })
-      .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === 404)
-      }))
+      .then(ignored)
     )
 
     it('finds the file case sensitively when requested', () => handle({
-      request: '/file.txt',
-      mapping: {
-        cwd: '/',
-        'case-sensitive': true
-      }
+      request: '/file.txt'
     })
       .then(({ promise, response }) => promise.then(value => {
         assert(() => value === undefined)
@@ -204,10 +169,6 @@ describe('handlers/file', () => {
       request: {
         method: 'HEAD',
         url: '/file.txt'
-      },
-      mapping: {
-        cwd: '/',
-        'case-sensitive': true
       }
     })
       .then(({ promise, response }) => promise.then(value => {
@@ -219,24 +180,14 @@ describe('handlers/file', () => {
       }))
     )
 
-    it('fails with 404 if the file name does not match case sensitively but case-sensitive is set (folder)', () => handle({
-      request: '/Folder/index.html',
-      mapping: {
-        cwd: '/',
-        'case-sensitive': true
-      }
+    it('does not send the file back when the file name does not match case sensitively (folder)', () => handle({
+      request: '/Folder/index.html'
     })
-      .then(({ promise }) => promise.then(value => {
-        assert(() => value === 404)
-      }))
+      .then(ignored)
     )
 
     it('finds the file case sensitively when requested (folder)', () => handle({
-      request: '/folder/index.html',
-      mapping: {
-        cwd: '/',
-        'case-sensitive': true
-      }
+      request: '/folder/index.html'
     })
       .then(({ promise, response }) => promise.then(value => {
         assert(() => value === undefined)
@@ -251,96 +202,28 @@ describe('handlers/file', () => {
     })
   })
 
-  describe('Strict mode', function () {
+  describe('Strict mode (by default)', function () {
     describe('Ensure empty folders are not ignored', () => {
-      before(() => {
-        fs.setIgnoreEmptyFolders(true)
+      it('returns nothing if the path includes empty folders', () => handle({
+        request: '/folder///index.html'
       })
-
-      it('finds a file even if the path includes empty folders (default)', () => handle({
-        request: '/folder///index.html',
-        mapping: {
-          cwd: '/'
-        }
-      })
-        .then(({ promise, response }) => promise.then(value => {
-          assert(() => value === undefined)
-          assert(() => response.statusCode === 200)
-          assert(() => response.headers['Content-Type'] === htmlMimeType)
-          assert(() => response.toString() === '<html />')
-        }))
+        .then(ignored)
       )
 
-      it('finds a file even if the path includes empty folders (default) (root)', () => handle({
-        request: '///folder/index.html',
-        mapping: {
-          cwd: '/'
-        }
+      it('returns nothing if the path includes empty folders (root)', () => handle({
+        request: '///folder/index.html'
       })
-        .then(({ promise, response }) => promise.then(value => {
-          assert(() => value === undefined)
-          assert(() => response.statusCode === 200)
-          assert(() => response.headers['Content-Type'] === htmlMimeType)
-          assert(() => response.toString() === '<html />')
-        }))
+        .then(ignored)
       )
 
-      it('finds a file even if the path includes empty folders (default) (folder)', () => handle({
-        request: '/folder///',
-        mapping: {
-          cwd: '/'
-        }
+      it('fails with 404 if the path includes empty folders (folder)', () => handle({
+        request: '/folder///'
       })
-        .then(({ promise, response }) => promise.then(value => {
-          assert(() => value === undefined)
-          assert(() => response.statusCode === 200)
-          assert(() => response.headers['Content-Type'] === htmlMimeType)
-          assert(() => response.toString() === '<html />')
-        }))
-      )
-
-      it('fails with 404 if the path includes empty folders and strict mode is used', () => handle({
-        request: '/folder///index.html',
-        mapping: {
-          cwd: '/',
-          strict: true
-        }
-      })
-        .then(({ promise }) => promise.then(value => {
-          assert(() => value === 404)
-        }))
-      )
-
-      it('fails with 404 if the path includes empty folders and strict mode is used (root)', () => handle({
-        request: '///folder/index.html',
-        mapping: {
-          cwd: '/',
-          strict: true
-        }
-      })
-        .then(({ promise }) => promise.then(value => {
-          assert(() => value === 404)
-        }))
-      )
-
-      it('fails with 404 if the path includes empty folders and strict mode is used (folder)', () => handle({
-        request: '/folder///',
-        mapping: {
-          cwd: '/',
-          strict: true
-        }
-      })
-        .then(({ promise }) => promise.then(value => {
-          assert(() => value === 404)
-        }))
+        .then(ignored)
       )
 
       it('finds the file when the path strictly matches', () => handle({
-        request: '/folder/index.html',
-        mapping: {
-          cwd: '/',
-          strict: true
-        }
+        request: '/folder/index.html'
       })
         .then(({ promise, response }) => promise.then(value => {
           assert(() => value === undefined)
@@ -349,63 +232,32 @@ describe('handlers/file', () => {
           assert(() => response.toString() === '<html />')
         }))
       )
-
-      after(() => {
-        fs.setIgnoreEmptyFolders(false)
-      })
     })
   })
 
-  describe('ignore-if-not-found', function () {
-    it('does not fail with 404 if the file does not exist', () => handle({
-      request: './not-found',
-      mapping: {
-        cwd: '/',
-        'ignore-if-not-found': true
-      }
+  describe('ignore-if-not-found (default)', function () {
+    it('returns nothing if the file does not exist', () => handle({
+      request: './not-found'
     })
-      .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.isInitial())
-      }))
+      .then(ignored)
     )
 
-    it('does not fail with 404 if the folder does not exist', () => handle({
-      request: './not-a-folder/not-found',
-      mapping: {
-        cwd: '/',
-        'ignore-if-not-found': true
-      }
+    it('returns nothing if the folder does not exist', () => handle({
+      request: './not-a-folder/not-found'
     })
-      .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.isInitial())
-      }))
+      .then(ignored)
     )
 
-    it('still fails for incorrect folder access (url must end with /)', () => handle({
-      request: './folder',
-      mapping: {
-        cwd: '/',
-        'ignore-if-not-found': true
-      }
+    it('returns nothing for incorrect folder access (url must end with /)', () => handle({
+      request: './folder'
     })
-      .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === 404)
-      }))
+      .then(ignored)
     )
 
-    it('does not fail with 404 if the folder does not have index.html', () => handle({
-      request: './no-index/',
-      mapping: {
-        cwd: '/',
-        'ignore-if-not-found': true
-      }
+    it('returns nothing if the folder does not have index.html', () => handle({
+      request: './no-index/'
     })
-      .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.isInitial())
-      }))
+      .then(ignored)
     )
   })
 
@@ -848,39 +700,5 @@ describe('handlers/file', () => {
         assert(() => response.headers['Content-Type'] === 'not-even-existing')
       }))
     )
-  })
-
-  describe('http-status', () => {
-    it('overrides default status code', () => handle({
-      request: '/file.txt',
-      mapping: {
-        cwd: '/',
-        'http-status': 403
-      }
-    })
-      .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 403)
-        assert(() => response.headers['Content-Type'] === textMimeType)
-        assert(() => response.toString() === 'Hello World!')
-      }))
-    )
-
-    it('forbids the use of caching-strategy', async () => {
-      let exceptionCaught
-      try {
-        await wrapHandler(fileHandler, {
-          mapping: {
-            'http-status': 403,
-            'caching-strategy': 'whatever'
-          }
-        })({
-          request: './file.txt'
-        })
-      } catch (e) {
-        exceptionCaught = e
-      }
-      assert(() => exceptionCaught !== undefined)
-    })
   })
 })

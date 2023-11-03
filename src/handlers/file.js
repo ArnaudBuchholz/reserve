@@ -30,11 +30,8 @@ const mimeTypes = {
 }
 
 const cfs = 'custom-file-system'
-const matchcase = 'case-sensitive'
-const i404 = 'ignore-if-not-found'
 const cache = 'caching-strategy'
-const cmt = 'mime-types'
-const httpStatus = 'http-status'
+const mt = 'mime-types'
 
 const nodeFs = {
   stat,
@@ -81,9 +78,9 @@ function sendFile ({ cachingStrategy, mapping, request, response, fs, filePath }
   return new Promise((resolve, reject) => {
     const { header: cacheHeader, status: cacheStatus } = processCache(request, cachingStrategy, fileStat)
     const { start, end, header: rangeHeader, status: rangeStatus, contentLength } = processBytesRange(request, fileStat)
-    const status = mapping[httpStatus] || cacheStatus || rangeStatus
+    const status = cacheStatus || rangeStatus
     const fileExtension = (/\.([^.]*)$/.exec(filePath) || [])[1]
-    const mimeType = mapping[cmt][fileExtension] || mimeTypes[fileExtension] || mimeTypes.bin
+    const mimeType = mapping[mt][fileExtension] || mimeTypes[fileExtension] || mimeTypes.bin
     response.writeHead(status, {
       'content-type': mimeType,
       'content-length': contentLength,
@@ -142,33 +139,17 @@ async function checkStrictPath (filePath) {
 module.exports = {
   [$handlerPrefix]: 'file',
   schema: {
-    [matchcase]: {
-      type: 'boolean',
-      defaultValue: false
-    },
     [cfs]: {
       types: ['string', 'object'],
       defaultValue: nodeFs
-    },
-    [i404]: {
-      type: 'boolean',
-      defaultValue: false
     },
     [cache]: {
       types: ['string', 'number'],
       defaultValue: 0
     },
-    strict: {
-      type: 'boolean',
-      defaultValue: false
-    },
-    [cmt]: {
+    [mt]: {
       type: 'object',
       defaultValue: {}
-    },
-    [httpStatus]: {
-      type: 'number',
-      defaultValue: 0
     }
   },
   method: 'GET,HEAD',
@@ -176,18 +157,12 @@ module.exports = {
     if (typeof mapping[cfs] === 'string') {
       mapping[cfs] = require(join(mapping.cwd, mapping[cfs]))
     }
-    const apis = ['stat', 'createReadStream']
-    if (mapping[matchcase]) {
-      apis.push('readdir')
-    }
+    const apis = ['stat', 'createReadStream', 'readdir']
     const invalids = apis.filter(name => typeof mapping[cfs][name] !== 'function')
     if (invalids.length) {
       throw new Error(`Invalid ${cfs} specification (${invalids.join(', ')})`)
     }
     const cachingStrategy = mapping[cache]
-    if (mapping[httpStatus] && cachingStrategy) {
-      throw new Error(`${cache} incompatible with ${httpStatus}`)
-    }
     if (typeof cachingStrategy === 'string' && cachingStrategy !== 'modified') {
       throw new Error(`Invalid ${cache} name`)
     }
@@ -207,31 +182,21 @@ module.exports = {
       filePath,
       mapping,
       request,
-      response
-    }
-    if (mapping.strict) {
-      context.checkPath = checkStrictPath
-    } else if (mapping[matchcase]) {
-      context.checkPath = checkCaseSensitivePath
-    } else {
-      context.checkPath = async () => {}
+      response,
+      checkPath: checkStrictPath
     }
     return context.fs.stat(filePath)
       .then(async stat => {
-        await context.checkPath(filePath, mapping.strict)
+        await context.checkPath(filePath)
         const isDirectory = stat.isDirectory()
         if (isDirectory ^ directoryAccess) {
-          return 404 // Can't ignore if not found
+          return
         }
         if (isDirectory) {
           return sendIndex(context)
         }
         return sendFile(context, stat)
       })
-      .catch(() => {
-        if (!mapping[i404]) {
-          return 404
-        }
-      })
+      .catch(() => {})
   }
 }
