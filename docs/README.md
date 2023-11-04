@@ -1,5 +1,9 @@
 # REserve Documentation
 
+## ⚠️ Migration guide
+
+* [From v1 to v2](v1_to_v2.md)
+
 ## Configuration
 
 There are two ways to **leverage** REserve :
