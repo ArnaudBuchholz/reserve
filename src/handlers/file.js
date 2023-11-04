@@ -78,7 +78,10 @@ function sendFile ({ cachingStrategy, mapping, request, response, fs, filePath }
   return new Promise((resolve, reject) => {
     const { header: cacheHeader, status: cacheStatus } = processCache(request, cachingStrategy, fileStat)
     const { start, end, header: rangeHeader, status: rangeStatus, contentLength } = processBytesRange(request, fileStat)
-    const status = cacheStatus || rangeStatus
+    let status = response.statusCode
+    if (status === 200) {
+      status = cacheStatus || rangeStatus
+    }
     const fileExtension = (/\.([^.]*)$/.exec(filePath) || [])[1]
     const mimeType = mapping[mt][fileExtension] || mimeTypes[fileExtension] || mimeTypes.bin
     response.writeHead(status, {

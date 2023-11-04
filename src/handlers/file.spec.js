@@ -204,6 +204,10 @@ describe('handlers/file', () => {
 
   describe('Strict mode (by default)', function () {
     describe('Ensure empty folders are not ignored', () => {
+      beforeEach(() => {
+        fs.setIgnoreEmptyFolders(true)
+      })
+
       it('returns nothing if the path includes empty folders', () => handle({
         request: '/folder///index.html'
       })
@@ -232,6 +236,10 @@ describe('handlers/file', () => {
           assert(() => response.toString() === '<html />')
         }))
       )
+
+      afterEach(() => {
+        fs.setIgnoreEmptyFolders(false)
+      })
     })
   })
 

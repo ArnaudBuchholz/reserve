@@ -52,6 +52,12 @@
     "file": "./$1",
     "caching-strategy": 360
   }, {
+    "match": "^/file/status/(.*)",
+    "custom": "./status-205.js"
+  }, {
+    "match": "^/file/status/(.*)",
+    "file": "./$1"
+  }, {
     "match": "^/file/(.*)",
     "strict": true,
     "file": "./$1"

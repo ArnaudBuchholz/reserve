@@ -148,8 +148,8 @@ async function test (config, base) {
     }
   })
   await match('/file/hello world.txt', {
-    statusCode: 404,
-    body: 'Not found'
+    statusCode: 501,
+    body: 'Not Implemented'
   })
   await match('/file/mime/Hello World.txt', {
     statusCode: 200,
@@ -211,6 +211,10 @@ async function test (config, base) {
     headers: {
       'cache-control': 'public, max-age=360, immutable'
     },
+    body: 'Hello World!\n'
+  })
+  await match('/file/status/Hello World.txt', {
+    statusCode: 205,
     body: 'Hello World!\n'
   })
 
