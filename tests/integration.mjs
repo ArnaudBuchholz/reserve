@@ -22,7 +22,16 @@ async function start (config) {
         server.kill('SIGINT')
       }
     })
-  } else {
+  } else if (mode === 'mock') {
+    const { read, mock, log } = await import('../dist/index.mjs')
+    return read(config)
+      .then(configuration => {
+        const server = log(mock(configuration))
+        return new Promise(resolve => {
+          server.on('ready', () => resolve(server))
+        })
+      })
+  } else if (mode === 'mjs') {
     const { read, serve, log } = await import('../dist/index.mjs')
     return read(config)
       .then(configuration => {
@@ -43,28 +52,33 @@ async function test (config, base) {
     if (typeof req === 'string') {
       url = req
     }
-    const response = await new Promise((resolve, reject) => {
-      const parsed = new URL(url, base)
-      const { hostname, port, pathname, search, hash } = parsed
-      const path = `${pathname}${search}${hash}`
-      const request = http.request({
-        method,
-        hostname,
-        port,
-        path,
-        headers
-      }, response => {
-        const body = []
-        response.on('data', chunk => body.push(chunk.toString()))
-        response.on('end', () => {
-          response.body = body.join('')
-          resolve(response)
+    let response
+    if (mode === 'mock') {
+      response = await server.request(method, url, headers)
+    } else {
+      response = await new Promise((resolve, reject) => {
+        const parsed = new URL(url, base)
+        const { hostname, port, pathname, search, hash } = parsed
+        const path = `${pathname}${search}${hash}`
+        const request = http.request({
+          method,
+          hostname,
+          port,
+          path,
+          headers
+        }, response => {
+          const body = []
+          response.on('data', chunk => body.push(chunk.toString()))
+          response.on('end', () => {
+            response.body = body.join('')
+            resolve(response)
+          })
         })
+        request.on('error', e => reject(e))
+        // request.write(data)
+        request.end()
       })
-      request.on('error', e => reject(e))
-      // request.write(data)
-      request.end()
-    })
+    }
     const extracted = {}
     Object.keys(expected)
       .filter(member => !['body'].includes(member))
