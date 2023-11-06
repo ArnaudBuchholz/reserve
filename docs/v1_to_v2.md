@@ -34,3 +34,8 @@ Hence the option is now removed and the `file` handler never generates a `404`.
 ### `http-status`
 
 This option has been removed. To achieve the same result, use a custom handler setting `response.statusCode` to the expected value *before* the file mapping.
+
+## `mock` behavior change
+
+Previously, the `mock` function was returning a promise giving back the mock server.
+To mimic the behavior of the `serve` function, the promise resolves to an `EventEmitter` and you must wait for the `ready` event to use the `request` function.

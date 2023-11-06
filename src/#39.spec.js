@@ -57,7 +57,10 @@ const defaultConfigurationPromise = check({
 
 describe('#39 setMapings blocked by long request', () => {
   let mocked
-  beforeEach(async () => { mocked = await mock(await defaultConfigurationPromise) })
+  beforeEach(async () => {
+    mocked = mock(await defaultConfigurationPromise)
+    return new Promise(resolve => mocked.on('ready', resolve))
+  })
 
   it('detects blocked situation after a timeout', () => {
     mocked.request('GET', '/blocking')

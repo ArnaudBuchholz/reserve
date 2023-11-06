@@ -9,11 +9,12 @@ const {
   $configurationEventEmitter,
   $configurationInterface
 } = require('./symbols')
+const getHostName = require('./hostname')
 
 module.exports = (jsonConfiguration, mockedHandlers = {}) => {
   const eventEmitter = new EventEmitter()
   eventEmitter.close = () => Promise.resolve()
-  return check(jsonConfiguration)
+  check(jsonConfiguration)
     .then(configuration => {
       configuration[$configurationEventEmitter] = eventEmitter
       Object.assign(configuration.handlers, mockedHandlers)
@@ -30,6 +31,13 @@ module.exports = (jsonConfiguration, mockedHandlers = {}) => {
         return dispatch(request, response)
           .then(() => finished)
       }
-      return eventEmitter
+      const hostname = configuration.hostname || getHostName()
+      const { port, http2 } = configuration
+      eventEmitter.emit('ready', {
+        url: `${configuration.protocol}://${hostname}:${port}/`,
+        port,
+        http2
+      })
     })
+  return eventEmitter
 }

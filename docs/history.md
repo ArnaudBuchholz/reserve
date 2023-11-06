@@ -100,4 +100,5 @@
 ||BREAKING CHANGE: Remove option `http-status` in `file`|
 ||BREAKING CHANGE: `readdir` is now mandatory in custom file system for `file`|
 ||BREAKING CHANGE: default configuration does not include proxy|
+||BREAKING CHANGE: `mock` returns immediately even if the *server* is not ready (wait for `ready`)|
 ||Fix `use` to handle middleware that are not calling next|

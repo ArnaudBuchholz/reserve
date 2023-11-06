@@ -4,12 +4,20 @@ const { assert } = require('test-tools')
 const mock = require('./mock')
 const { read } = require('./configuration')
 
+function waitForReady (server) {
+  return new Promise(resolve => {
+    server.on('ready', () => {
+      resolve(server)
+    })
+  })
+}
+
 describe('mock', () => {
   describe('keeping the original handlers', () => {
     let mocked
 
     before(() => read('/reserve.json')
-      .then(configuration => mock(configuration))
+      .then(configuration => waitForReady(mock(configuration)))
       .then(server => {
         mocked = server
       })
@@ -32,7 +40,7 @@ describe('mock', () => {
     let mocked
 
     before(() => read('/reserve.json')
-      .then(configuration => mock(configuration, {
+      .then(configuration => waitForReady(mock(configuration, {
         file: {
           redirect: async ({ request, mapping, redirect, response }) => {
             if (redirect === '/') {
@@ -49,7 +57,7 @@ describe('mock', () => {
             }
           }
         }
-      }))
+      })))
       .then(server => {
         mocked = server
       })
@@ -84,7 +92,7 @@ describe('mock', () => {
               })
             }
           ]
-          return mock(configuration)
+          return waitForReady(mock(configuration))
         })
         .then(mocked => mocked.request('GET', '/file.txt'))
         .then(response => {
