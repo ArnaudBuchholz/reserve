@@ -11,12 +11,14 @@ const $checked = Symbol('mapping-already-checked')
 
 module.exports = (handler, defaults = {}) => {
   checkHandler(handler, handler[$handlerPrefix])
-  return function ({ request, mapping, configuration, match, redirect }) {
+  return function ({ request, mapping, configuration, match, redirect, response }) {
     if (typeof request === 'string') {
       request = { method: 'GET', url: request }
     }
     request = new Request(request)
-    const response = new Response()
+    if (!response) {
+      response = new Response()
+    }
     configuration = { ...defaults.configuration, ...configuration, handler: () => { return { handler } } }
     const iconfiguration = new IConfiguration(configuration)
     if (!match) {
