@@ -6,6 +6,7 @@ const handle = wrapHandler(fileHandler, { mapping: { cwd: '/' } })
 const fs = require('fs')
 const { promisify } = require('util')
 const mockRequire = require('mock-require')
+const Response = require('../mock/Response')
 
 const textMimeType = 'text/plain'
 const htmlMimeType = 'text/html'
@@ -47,6 +48,21 @@ describe('handlers/file', () => {
       assert(() => response.toString() === 'Hello World!')
     }))
   )
+
+  it('uses statusCode if changed before', () => {
+    const response = new Response()
+    response.statusCode = 201
+    return handle({
+      request: '/file.txt',
+      response
+    })
+      .then(({ promise, response }) => promise.then(value => {
+        assert(() => value === undefined)
+        assert(() => response.statusCode === 201)
+        assert(() => response.headers['Content-Type'] === textMimeType)
+        assert(() => response.toString() === 'Hello World!')
+      }))
+  })
 
   it('pipes file content (trim parameters)', () => handle({
     request: '/file.txt?param=1#hash'
