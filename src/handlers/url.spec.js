@@ -417,7 +417,7 @@ describe('handlers/url', () => {
       })
         .then(({ promise, response }) => promise.then(value => {
           assert(() => value === 'test')
-          assert(() => response.statusCode === undefined) // Not yet answered
+          assert(() => response.isInitial()) // Not yet answered
         }))
     })
 
