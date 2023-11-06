@@ -1,6 +1,6 @@
 'use strict'
 
-const { http, http2, https, networkInterfaces, EventEmitter } = require('./node-api')
+const { http, http2, https, EventEmitter } = require('./node-api')
 const { check } = require('./configuration')
 const dispatcher = require('./dispatcher')
 const {
@@ -8,6 +8,7 @@ const {
   $configurationInterface
 } = require('./symbols')
 const defer = require('./defer')
+const getHostName = require('./hostname')
 
 function createServer (configuration, requestHandler) {
   const { httpOptions } = configuration
@@ -50,19 +51,7 @@ module.exports = jsonConfiguration => {
     .then(configuration => {
       configuration[$configurationEventEmitter] = eventEmitter
       configuration.listeners.forEach(register => register(eventEmitter))
-      let { hostname } = configuration
-      if (!hostname) {
-        hostname = '127.0.0.1'
-        const networks = networkInterfaces()
-        for (const name of Object.keys(networks)) {
-          for (const network of networks[name]) {
-            if (!network.internal && (network.family === 'IPv4' || network.family === 4)) {
-              hostname = network.address
-              break
-            }
-          }
-        }
-      }
+      const hostname = configuration.hostname || getHostName()
       return createServerAsync(eventEmitter, configuration, dispatcher)
         .then(server => {
           ready(server)
