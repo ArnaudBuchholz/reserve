@@ -24,6 +24,7 @@
   "scripts": {
     "build": "node build/bundle && terser dist/core.js --compress --keep-fnames --mangle -o dist/core.js && terser src/cli.js --compress --keep-fnames --mangle -o dist/cli.js",
     "test": "standard && nyc mocha && node tests/integration.mjs && (node -e \"if (parseInt(process.version.match(/v(\\d+)/)[1]) > 14) process.exit(1) \" || npm run test:types)",
+    "test:build": "node tests/integration.mjs dist && node tests/integration.mjs mjs",
     "test:mutation": "stryker run",
     "lint": "standard --fix",
     "mocha": "mocha",
