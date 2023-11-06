@@ -36,6 +36,7 @@ module.exports = class Response extends Duplex {
 
   end () {
     this._headersSent = true
+    this._ended = true
     return super.end.apply(this, arguments)
   }
 
@@ -48,6 +49,8 @@ module.exports = class Response extends Duplex {
     this._waitForFinish = new Promise(resolve => {
       resolver = resolve
     })
+    this._statusCode = 200
+    this._ended = false
     this.on('finish', () => resolver(this))
   }
 
@@ -59,8 +62,16 @@ module.exports = class Response extends Duplex {
     return this._statusCode
   }
 
+  set statusCode (value) {
+    this._statusCode = value
+  }
+
   get headersSent () {
     return this._headersSent
+  }
+
+  get ended () {
+    return this._ended
   }
 
   toString () {
