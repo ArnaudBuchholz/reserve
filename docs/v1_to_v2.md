@@ -39,3 +39,12 @@ This option has been removed. To achieve the same result, use a custom handler s
 
 Previously, the `mock` function was returning a promise giving back the mock server.
 To mimic the behavior of the `serve` function, the promise resolves to an `EventEmitter` and you must wait for the `ready` event to use the `request` function.
+
+### `Request` and `Response` behavior changes
+
+The headers are not storing numbers anymore, they are converted to string. This might impact your tests. A typical example is the `Content-Length` header attribute.
+
+The request url goes through normalization, meaning :
+
+* `mock.request('GET', 'count')` generates `'/count'` url
+* `mock.request('GET', '/echo/hello world')` generates `'/echo/hello%20world'` url

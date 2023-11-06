@@ -46,10 +46,10 @@ const handler = {
     checkConfiguration(configuration, mapping)
     response.writeHead(200)
     let answer = 'OK'
-    if (redirect === 'count') {
+    if (redirect === '/count') {
       answer = (++mapping.count).toString()
     }
-    if (redirect === 'inject') {
+    if (redirect === '/inject') {
       const mappings = configuration.mappings
       const injectedMapping = {
         match: '.*',

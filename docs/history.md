@@ -101,4 +101,6 @@
 ||BREAKING CHANGE: `readdir` is now mandatory in custom file system for `file`|
 ||BREAKING CHANGE: default configuration does not include proxy|
 ||BREAKING CHANGE: `mock` returns immediately even if the *server* is not ready (wait for `ready`)|
+||BREAKING CHANGE: headers of mocked Request and Response returns strings or array of strings|
+||BREAKING CHANGE: mocked Request normalizes the received URL|
 ||Fix `use` to handle middleware that are not calling next|

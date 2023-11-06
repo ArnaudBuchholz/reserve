@@ -2,6 +2,15 @@
 
 const { Readable } = require('../node-api')
 const headersFactory = require('./headers')
+const BASE = 'http://localhost'
+
+function normalize (url) {
+  const normalized = new URL(url, BASE).toString()
+  if (normalized.startsWith(BASE)) {
+    return normalized.substring(BASE.length)
+  }
+  return normalized
+}
 
 module.exports = class Request extends Readable {
   _read () {
@@ -11,7 +20,7 @@ module.exports = class Request extends Readable {
 
   _fromObject ({ method, url, headers = {}, body = '', properties }) {
     this._method = method
-    this._url = url
+    this._url = normalize(url)
     this._headers = headersFactory(headers)
     this._body = body
     if (properties) {
