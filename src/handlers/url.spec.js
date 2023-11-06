@@ -303,7 +303,7 @@ describe('handlers/url', () => {
           assert(() => context && typeof context === 'object')
           assert(() => request.method === 'GET')
           assert(() => request.url === http.urls.echos)
-          assert(() => request.headers['x-status-code'] === 200)
+          assert(() => request.headers['x-status-code'] === '200')
           assert(() => request.headers.Cookie === 'name=value;')
           request.headers.Cookie = 'a=b;c=d;'
         }
@@ -324,7 +324,7 @@ describe('handlers/url', () => {
         assert(() => receivedMapping[uid] === 'mapping')
         assert(() => receivedMatch[uid] === 'match')
         assert(() => context && typeof context === 'object')
-        assert(() => headers['x-status-code'] === 200)
+        assert(() => headers['x-status-code'] === '200')
         assert(() => headers.Cookie === 'name=value;')
         headers.Cookie = 'a=b;c=d;'
       })

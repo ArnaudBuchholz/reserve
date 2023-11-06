@@ -14,21 +14,21 @@ describe('mock/headers', () => {
       'Content-Length': 2
     })
     assert(() => Object.keys(headers).length === 1)
-    assert(() => headers['Content-Length'] === 2)
+    assert(() => headers['Content-Length'] === '2')
   })
 
   it('lowercases properties (get)', () => {
     const headers = headersFactory({
       'Content-Length': 2
     })
-    assert(() => headers['content-length'] === 2)
+    assert(() => headers['content-length'] === '2')
   })
 
   it('lowercases properties (set)', () => {
     const headers = headersFactory({
       'Content-Length': 2
     })
-    assert(() => headers['content-length'] === 2)
+    assert(() => headers['content-length'] === '2')
   })
 
   it('supports number keys (get)', () => {

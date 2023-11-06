@@ -15,7 +15,7 @@ module.exports = {
     const Response = require('../../src/mock/Response')
     const result = new EventEmitter()
     const response = new Response()
-    const statusCode = options.headers['x-status-code']
+    const statusCode = parseInt(options.headers['x-status-code'], 10)
     response.writeHead(statusCode, {
       connection: 'close',
       ...options.headers

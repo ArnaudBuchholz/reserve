@@ -27,7 +27,7 @@ describe('mock/Request', () => {
         check(new Request('GET', '/', { 'x-info': 1 }), {
           method: 'GET',
           url: '/',
-          headers: { 'x-info': 1 }
+          headers: { 'x-info': '1' }
         })
       })
 
@@ -35,7 +35,7 @@ describe('mock/Request', () => {
         check(new Request('GET', '/', { 'content-length': 12 }, 'Hello World!'), {
           method: 'GET',
           url: '/',
-          headers: { 'content-length': 12 },
+          headers: { 'content-length': '12' },
           body: 'Hello World!'
         })
       })
@@ -54,7 +54,7 @@ describe('mock/Request', () => {
         check(request, {
           method: 'GET',
           url: '/',
-          headers: { 'content-length': 12 },
+          headers: { 'content-length': '12' },
           body: 'Hello World!'
         })
         assert(() => request.test === 1)
@@ -86,7 +86,7 @@ describe('mock/Request', () => {
         check(request, {
           method: 'GET',
           url: '/',
-          headers: { 'content-length': 12 },
+          headers: { 'content-length': '12' },
           body: 'Hello World!'
         })
         assert(() => request.test === 1)

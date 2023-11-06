@@ -68,7 +68,15 @@ const defaultConfigurationPromise = check({
       if (request.headers['x-error']) {
         throw new Error(request.headers['x-error'])
       }
-      return request.headers['x-match-redirect'] || true
+      const redirect = request.headers['x-match-redirect']
+      const redirectAsNumber = parseInt(redirect, 10)
+      if (redirectAsNumber > 0) {
+        return redirectAsNumber
+      }
+      if (redirect) {
+        return redirect
+      }
+      return true
     },
     custom: async function IfMatch (request, response) {
       response.writeHead(200, { 'Content-Type': textMimeType })
@@ -291,7 +299,7 @@ describe('dispatcher', () => {
       })
     )
 
-    it('enables redirect (number)', () => dispatch({ request: { method: 'GET', url: '/if-match.txt', headers: { 'x-match-redirect': 508 } } })
+    it('enables redirect (number)', () => dispatch({ request: { method: 'GET', url: '/if-match.txt', headers: { 'x-match-redirect': '508' } } })
       .then(({ emitter, request, response }) => {
         assert(() => !emitter.hasError)
         assert(() => request.ifMatched)

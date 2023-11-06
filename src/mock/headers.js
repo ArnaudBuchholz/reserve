@@ -14,7 +14,11 @@ module.exports = (initial = {}) => {
     },
 
     set (that, header, value) {
-      that[toLowerCase(header)] = value.toString()
+      if (Array.isArray(value)) {
+        that[toLowerCase(header)] = value.map(item => item.toString())
+      } else {
+        that[toLowerCase(header)] = value.toString()
+      }
       return true
     }
   })
