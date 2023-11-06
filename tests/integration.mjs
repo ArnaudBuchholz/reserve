@@ -55,6 +55,11 @@ async function test (config, base) {
     let response
     if (mode === 'mock') {
       response = await server.request(method, url, headers)
+        .then(async response => {
+          await response.waitForFinish
+          response.body = response.toString()
+          return response
+        })
     } else {
       response = await new Promise((resolve, reject) => {
         const parsed = new URL(url, base)
