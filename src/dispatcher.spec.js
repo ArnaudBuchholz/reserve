@@ -403,7 +403,7 @@ describe('dispatcher', () => {
       it('prevents infinite loops in error handling', () => dispatch({ configurationPromise: loopConfigurationPromise, request: 'error' })
         .then(({ emitter, response }) => {
           assert(() => emitter.hasError)
-          assert(() => !response.statusCode)
+          assert(() => response.ended)
         })
       )
     })
@@ -431,7 +431,7 @@ describe('dispatcher', () => {
       })
         .then(({ emitter, response }) => {
           assert(() => emitter.hasError)
-          assert(() => response.statusCode === undefined) // Because it never completes the request
+          assert(() => response.ended)
         })
       )
 
