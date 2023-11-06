@@ -19,6 +19,10 @@ module.exports = class Response extends Duplex {
     }
   }
 
+  getHeader (name) {
+    return this._headers[name] || ''
+  }
+
   setHeader (name, value) {
     this._headers[name] = value
   }
