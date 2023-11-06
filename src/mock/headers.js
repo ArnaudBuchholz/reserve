@@ -14,7 +14,7 @@ module.exports = (initial = {}) => {
     },
 
     set (that, header, value) {
-      that[toLowerCase(header)] = value
+      that[toLowerCase(header)] = value.toString()
       return true
     }
   })
