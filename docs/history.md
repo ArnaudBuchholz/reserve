@@ -105,3 +105,4 @@
 ||BREAKING CHANGE: mocked Request normalizes the received URL|
 ||Fix `use` to handle middleware that are not calling next|
 ||Response status code is preserved when set before `file`|
+||Fix types definition (`use` handler)|
