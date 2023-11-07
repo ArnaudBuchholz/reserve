@@ -104,3 +104,4 @@
 ||BREAKING CHANGE: headers of mocked Request and Response returns strings or array of strings|
 ||BREAKING CHANGE: mocked Request normalizes the received URL|
 ||Fix `use` to handle middleware that are not calling next|
+||Response status code is preserved when set before `file`|

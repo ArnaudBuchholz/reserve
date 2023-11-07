@@ -17,6 +17,7 @@ Example :
 * Directory access is internally redirected to the inner `index.html` file *(if any)*
 * If the path resolves to a missing / unreadable / invalid file / directory, the handler does not process the request
 * Supports [`Range` HTTP header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range) *(only one range)*
+* If the response already owns a `statusCode` different from `200`, the file handler will keep it
 * Only a limited subset of mime types is pre-configured, use `mime-types` to extend :
 
 |Extension|mime type|
