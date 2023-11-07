@@ -46,9 +46,9 @@ The API will:
 
 This API gives an **internal** access to the [dispatcher component](technical%20details.md#dispatcher). It takes a **request** and a **response**. Requests being processed through this API are flagged as `internal`.
 
-The parameters can be intialized using the internal mock helpers :
+The parameters can be initialized using the internal mock helpers :
 ```javascript
-const { Request, Response } = require('reserve')
+const { Request, Response } = require('reserve')
 ```
 
 * Instantiate the `Request` class to simulate an incoming request, it supports two different signatures :
@@ -60,7 +60,28 @@ const { Request, Response } = require('reserve')
 
 This API should be use in specific use case, such as :
 
-* Implementing **batch requests** that are split into individual requests to be processed internally
+* Implementing **batch requests** that are split into individual requests to be processed internally.
+
+For instance :
+
+```javascript
+const { body, Request, Response } = require('reserve')
+
+module.exports = async function batchRequest (request, response) {
+  const requests = JSON.parse(await body(request))
+  const promises = requests.map(url => {
+    const batchRequest = new Request('GET', url)
+    Object.keys(request.headers).forEach(header => {
+    batchRequest.headers[header] = request.headers[header]
+    })
+    const batchResponse = new Response()
+    return this.configuration.dispatch(batchRequest, batchResponse)
+      .then(() => JSON.parse(batchResponse.toString()))
+  })
+  return Promise.all(promises)
+    .then(results => sendJSON(response, results))
+}
+```
 
 * Implementing the [HTTP/2](https://en.wikipedia.org/wiki/HTTP/2) push mechanism :
 
