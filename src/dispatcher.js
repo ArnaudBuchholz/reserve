@@ -18,19 +18,17 @@ function hookEnd (response) {
       response[$responseEnded] = true
       return response.end(...arguments)
     }
-    return new Proxy(response, {
+    const proxy = new Proxy(response, {
       get (target, property) {
         if (property === 'end') {
           return end
         }
-        if (property === $dispatcherEnd) {
-          return true
-        }
         return response[property]
       }
     })
+    response[$dispatcherEnd] = proxy
   }
-  return response
+  return response[$dispatcherEnd]
 }
 
 function emit (event, emitParameters, additionalParameters) {
