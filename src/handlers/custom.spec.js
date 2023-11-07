@@ -10,8 +10,7 @@ const handle = wrapHandler(customHandler, {
 })
 
 const {
-  $configuration,
-  $customTimestamp
+  $configuration
 } = require('../symbols')
 
 describe('handlers/custom', () => {
@@ -92,7 +91,6 @@ describe('handlers/custom', () => {
   })
     .then(({ mapping, promise }) => promise.then(() => {
       assert(() => mapping.configuration[$configuration])
-      assert(() => !mapping.configuration[$customTimestamp])
     }))
   )
 
@@ -100,13 +98,10 @@ describe('handlers/custom', () => {
     request: '/any',
     mapping: {
       custom: () => {},
-      configuration: {
-        [$customTimestamp]: 'whatever'
-      }
+      configuration: {}
     }
   })
     .then(({ mapping, promise }) => promise.then(() => {
-      assert(() => mapping.configuration[$customTimestamp])
       assert(() => !mapping.configuration[$configuration])
     }))
   )
