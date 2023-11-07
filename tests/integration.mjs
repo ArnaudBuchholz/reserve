@@ -55,11 +55,6 @@ async function test (config, base) {
     let response
     if (mode === 'mock') {
       response = await server.request(method, url, headers, data)
-        .then(async response => {
-          await response.waitForFinish
-          response.body = response.toString()
-          return response
-        })
     } else {
       response = await new Promise((resolve, reject) => {
         const parsed = new URL(url, base)
@@ -71,14 +66,7 @@ async function test (config, base) {
           port,
           path,
           headers
-        }, response => {
-          const body = []
-          response.on('data', chunk => body.push(chunk.toString()))
-          response.on('end', () => {
-            response.body = body.join('')
-            resolve(response)
-          })
-        })
+        }, resolve)
         request.on('error', e => reject(e))
         if (data) {
           request.write(data)
@@ -86,6 +74,14 @@ async function test (config, base) {
         request.end()
       })
     }
+    await new Promise(resolve => {
+      const body = []
+      response.on('data', chunk => body.push(chunk.toString()))
+      response.on('end', () => {
+        response.body = body.join('')
+        resolve()
+      })
+    })
     const extracted = {}
     Object.keys(expected)
       .filter(member => !['body'].includes(member))
