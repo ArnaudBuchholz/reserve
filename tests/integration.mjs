@@ -48,13 +48,13 @@ async function test (config, base) {
   const now = Date.now()
 
   async function match (req, expected) {
-    let { method = 'GET', url, headers = {} } = req
+    let { method = 'GET', url, headers = {}, data } = req
     if (typeof req === 'string') {
       url = req
     }
     let response
     if (mode === 'mock') {
-      response = await server.request(method, url, headers)
+      response = await server.request(method, url, headers, data)
         .then(async response => {
           await response.waitForFinish
           response.body = response.toString()
@@ -80,7 +80,9 @@ async function test (config, base) {
           })
         })
         request.on('error', e => reject(e))
-        // request.write(data)
+        if (data) {
+          request.write(data)
+        }
         request.end()
       })
     }
@@ -254,6 +256,18 @@ async function test (config, base) {
       'content-length': '17'
     },
     body: 'Hello%20World%20!'
+  })
+  await match({
+    method: 'POST',
+    url: '/custom/echo',
+    data: 'Hello World !'
+  }, {
+    statusCode: 200,
+    headers: {
+      'content-type': 'text/plain',
+      'content-length': '13'
+    },
+    body: 'Hello World !'
   })
   await match('/custom/configuration', {
     statusCode: 200
