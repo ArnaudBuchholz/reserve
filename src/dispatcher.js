@@ -13,13 +13,22 @@ const {
 } = require('./symbols')
 
 function hookEnd (response) {
-  if (!response.end[$dispatcherEnd]) {
-    const end = response.end
-    response.end = function () {
-      this[$responseEnded] = true
-      return end.apply(this, arguments)
+  if (!response[$dispatcherEnd]) {
+    function end () {
+      response[$responseEnded] = true
+      return response.end(...arguments)
     }
-    response.end[$dispatcherEnd] = true
+    return new Proxy(response, {
+      get (target, property) {
+        if (property === 'end') {
+          return end
+        }
+        if (property === $dispatcherEnd) {
+          return true
+        }
+        return response[property]
+      }
+    })
   }
   return response
 }
