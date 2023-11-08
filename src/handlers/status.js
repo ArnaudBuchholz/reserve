@@ -2,6 +2,8 @@
 
 const interpolate = require('../interpolate')
 const { $handlerPrefix } = require('../symbols')
+const send = require('../send')
+
 const byStatus = {
   403: 'Forbidden',
   404: 'Not found',
@@ -21,15 +23,9 @@ module.exports = {
     }
   },
   redirect: async function ({ mapping, match, response, redirect }) {
-    const statusCode = redirect
-    const content = byStatus[statusCode] || ''
-    const length = content.length
-    const headers = mapping ? mapping.headers : undefined
-    response.writeHead(statusCode, {
-      'content-type': 'text/plain',
-      'content-length': length,
-      ...interpolate(match, headers)
+    send(response, byStatus[redirect] || '', {
+      statusCode: redirect,
+      headers: { ...interpolate(match, mapping ? mapping.headers : undefined) }
     })
-    response.end(content)
   }
 }
