@@ -171,9 +171,10 @@ declare module 'reserve' {
   interface ISendOptions {
     statusCode?: number
     headers?: Headers
+    noBody?: boolean
   }
 
-  function send (response: ServerResponse, data: string | object, options: ISendOptions): Promise<void>
+  function send (response: ServerResponse, data: string | object | ReadableStream, options?: ISendOptions): Promise<void>
 
   function check (configuration: Configuration): Promise<Configuration>
 
