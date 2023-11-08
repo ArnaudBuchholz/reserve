@@ -99,10 +99,11 @@
 ||BREAKING CHANGE: Remove option `ignore-if-not-found` in `file`, mapping is ignored if resolving to a missing / unreadable / invalid path|
 ||BREAKING CHANGE: Remove option `http-status` in `file`|
 ||BREAKING CHANGE: `readdir` is now mandatory in custom file system for `file`|
-||BREAKING CHANGE: default configuration does not include proxy|
+||BREAKING CHANGE: In the `file` handler, **no** response is sent if the request is aborted while allocating the read stream|
+||BREAKING CHANGE: Default configuration does not include proxy|
 ||BREAKING CHANGE: `mock` returns immediately even if the *server* is not ready (wait for `ready`)|
-||BREAKING CHANGE: headers of mocked Request and Response returns strings or array of strings|
-||BREAKING CHANGE: mocked Request normalizes the received URL|
+||BREAKING CHANGE: Headers of mocked Request and Response returns strings or array of strings|
+||BREAKING CHANGE: Mocked Request normalizes the received URL|
 ||Fix `use` to handle middleware that are not calling next|
 ||Response status code is preserved when set before `file`|
 ||Fix types definition (`use` handler)|

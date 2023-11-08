@@ -575,8 +575,7 @@ describe('handlers/file', () => {
             .then(value => {
               assert.strictEqual(value, undefined)
               assert.strictEqual(response.statusCode, 200)
-              assert.strictEqual(response.headers['Content-Type'], textMimeType)
-              assert.strictEqual(response.headers['Content-Length'], '12')
+              assert.deepStrictEqual(response.headers, {})
               assert.strictEqual(response.toString(), '')
             })
         })

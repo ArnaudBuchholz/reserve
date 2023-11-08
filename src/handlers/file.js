@@ -2,6 +2,7 @@
 
 const { basename, createReadStream, dirname, isAbsolute, join, readdir, stat } = require('../node-api')
 const { $handlerPrefix } = require('../symbols')
+const send = require('../send')
 
 const app = 'application'
 const img = 'image'
@@ -74,39 +75,34 @@ function processBytesRange (request, { mtime, size }) {
   return { status: 200, contentLength: size }
 }
 
-function sendFile ({ cachingStrategy, mapping, request, response, fs, filePath }, fileStat) {
-  return new Promise((resolve, reject) => {
-    const { header: cacheHeader, status: cacheStatus } = processCache(request, cachingStrategy, fileStat)
-    const { start, end, header: rangeHeader, status: rangeStatus, contentLength } = processBytesRange(request, fileStat)
-    let status = response.statusCode
-    if (status === 200) {
-      status = cacheStatus || rangeStatus
+async function sendFile ({ cachingStrategy, mapping, request, response, fs, filePath }, fileStat) {
+  const { header: cacheHeader, status: cacheStatus } = processCache(request, cachingStrategy, fileStat)
+  const { start, end, header: rangeHeader, status: rangeStatus, contentLength } = processBytesRange(request, fileStat)
+  let { statusCode } = response
+  if (statusCode === 200) {
+    statusCode = cacheStatus || rangeStatus
+  }
+  const fileExtension = (/\.([^.]*)$/.exec(filePath) || [])[1]
+  const mimeType = mapping[mt][fileExtension] || mimeTypes[fileExtension] || mimeTypes.bin
+  const noBody = request.method === 'HEAD' || contentLength === 0 || request.aborted || statusCode === 304
+  let stream
+  if (!noBody) {
+    stream = await fs.createReadStream(filePath, { start, end })
+    if (request.aborted) {
+      response.end()
+      return
     }
-    const fileExtension = (/\.([^.]*)$/.exec(filePath) || [])[1]
-    const mimeType = mapping[mt][fileExtension] || mimeTypes[fileExtension] || mimeTypes.bin
-    response.writeHead(status, {
+  }
+  return send(response, stream, {
+    statusCode,
+    headers: {
       'content-type': mimeType,
       'content-length': contentLength,
       'accept-ranges': 'bytes',
       ...rangeHeader,
       ...cacheHeader
-    })
-    if (request.method === 'HEAD' || contentLength === 0 || request.aborted || status === 304) {
-      response.end()
-      resolve()
-      return
-    }
-    response.on('finish', resolve)
-    fs.createReadStream(filePath, { start, end })
-      .then(stream => {
-        if (request.aborted) {
-          stream.destroy()
-          response.end()
-          resolve()
-        } else {
-          stream.on('error', reject).pipe(response)
-        }
-      })
+    },
+    noBody
   })
 }
 
