@@ -40,5 +40,6 @@ export const {
   log,
   mock,
   read,
+  send,
   serve
 } = reserve

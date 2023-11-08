@@ -62,7 +62,7 @@ declare module 'reserve' {
 
   // region url
 
-  type Headers = Record<string, string>
+  type Headers = Record<string, string | string[]>
 
   interface RequestSummary {
     method: string
@@ -166,6 +166,14 @@ declare module 'reserve' {
 
   function body (request: IncomingMessage): Promise<string>
   function capture (response: ServerResponse, stream: WritableStream): Promise<void>
+
+
+  interface ISendOptions {
+    statusCode?: number
+    headers?: Headers
+  }
+
+  function send (response: ServerResponse, data: string | object, options: ISendOptions): Promise<void>
 
   function check (configuration: Configuration): Promise<Configuration>
 

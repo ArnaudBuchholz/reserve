@@ -12,5 +12,6 @@ module.exports = {
   log: require('./log'),
   mock: require('./mock'),
   read,
+  send: require('./send'),
   serve: require('./serve')
 }
