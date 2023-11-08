@@ -19,9 +19,11 @@ module.exports = async function (response, data, options = {}) {
     contentType = 'application/json'
     data = JSON.stringify(data)
   }
-  headers[CONTENT_TYPE] ||= contentType
-  if (!stream) {
-    headers[CONTENT_LENGTH] ||= (new TextEncoder().encode(data)).length
+  if (!headers[CONTENT_TYPE]) {
+    headers[CONTENT_TYPE] = contentType
+  }
+  if (!stream && !headers[CONTENT_LENGTH]) {
+    headers[CONTENT_LENGTH] = (new TextEncoder().encode(data)).length
   }
   response.writeHead(statusCode, headers)
   if (noBody) {
