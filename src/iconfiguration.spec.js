@@ -1,34 +1,34 @@
 'use strict'
 
-const { assert } = require('test-tools')
+const assert = require('assert')
 const { Request, Response, check, log, mock } = require('./index')
 
 function checkConfiguration (configuration, mapping) {
-  assert(() => configuration.handlers instanceof Object)
-  assert(() => !!configuration.handlers.custom)
-  assert(() => !!configuration.handlers.file)
-  assert(() => !!configuration.handlers.status)
-  assert(() => !!configuration.handlers.test)
-  assert(() => !!configuration.handlers.url)
-  assert(() => Array.isArray(configuration.mappings))
-  assert(() => configuration.mappings.includes(mapping))
-  assert(() => configuration.protocol.startsWith('http'))
+  assert.ok(configuration.handlers instanceof Object)
+  assert.ok(!!configuration.handlers.custom)
+  assert.ok(!!configuration.handlers.file)
+  assert.ok(!!configuration.handlers.status)
+  assert.ok(!!configuration.handlers.test)
+  assert.ok(!!configuration.handlers.url)
+  assert.ok(Array.isArray(configuration.mappings))
+  assert.ok(configuration.mappings.includes(mapping))
+  assert.ok(configuration.protocol.startsWith('http'))
   // Read-only handlers
   delete configuration.handlers.custom
-  assert(() => !!configuration.handlers.custom)
+  assert.ok(!!configuration.handlers.custom)
   const fileHandler = configuration.handlers.file
   configuration.handlers.file = configuration.handlers.custom
-  assert(() => configuration.handlers.file === fileHandler)
+  assert.strictEqual(configuration.handlers.file, fileHandler)
   const fileHandlerRedirect = fileHandler.redirect
   try {
     fileHandler.redirect = 0
   } catch (e) {
-    assert(() => e instanceof TypeError)
+    assert.ok(e instanceof TypeError)
   }
-  assert(() => fileHandler.redirect === fileHandlerRedirect)
+  assert.strictEqual(fileHandler.redirect, fileHandlerRedirect)
   // Read-only mapping list
   configuration.mappings.length = 0
-  assert(() => configuration.mappings.includes(mapping))
+  assert.ok(configuration.mappings.includes(mapping))
 }
 
 const handler = {
@@ -37,8 +37,8 @@ const handler = {
     if (mapping.ko) {
       throw new Error('mapping.ko')
     }
-    assert(() => mapping.test === '$1')
-    assert(() => mapping.match instanceof RegExp)
+    assert.strictEqual(mapping.test, '$1')
+    assert.ok(mapping.match instanceof RegExp)
     mapping.ok = true
   },
 
@@ -76,7 +76,7 @@ describe('iconfiguration', () => {
       }]
     })
       .then(configuration => {
-        assert(() => configuration.mappings[0].ok)
+        assert.ok(configuration.mappings[0].ok)
       })
     )
 
@@ -90,8 +90,8 @@ describe('iconfiguration', () => {
       }]
     })
       .then(assert.notExpected, reason => {
-        assert(() => reason instanceof Error)
-        assert(() => reason.message === 'mapping.ko')
+        assert.ok(reason instanceof Error)
+        assert.strictEqual(reason.message, 'mapping.ko')
       })
     )
   })
@@ -124,8 +124,8 @@ describe('iconfiguration', () => {
 
     it('gives access to the configuration', () => mocked.request('GET', 'count')
       .then(response => {
-        assert(() => response.statusCode === 200)
-        assert(() => response.toString() === '1')
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.toString(), '1')
       })
     )
 
@@ -137,19 +137,19 @@ describe('iconfiguration', () => {
     ])
       .then(responses => {
         responses.forEach(response => {
-          assert(() => response.statusCode === 200)
-          assert(() => response.headers['x-injected'] !== 'true')
+          assert.strictEqual(response.statusCode, 200)
+          assert.ok(response.headers['x-injected'] !== 'true')
         })
-        assert(() => responses[0].toString() === '4')
-        assert(() => responses[1].toString() === '3')
-        assert(() => responses[2].toString() === 'OK')
-        assert(() => responses[3].toString() === '2')
+        assert.strictEqual(responses[0].toString(), '4')
+        assert.strictEqual(responses[1].toString(), '3')
+        assert.strictEqual(responses[2].toString(), 'OK')
+        assert.strictEqual(responses[3].toString(), '2')
         return mocked.request('GET', 'count')
       })
       .then(response => {
-        assert(() => response.statusCode === 200)
-        assert(() => response.headers['x-injected'] === 'true')
-        assert(() => response.toString() === '5')
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.headers['x-injected'], 'true')
+        assert.strictEqual(response.toString(), '5')
       })
     )
   })
@@ -192,8 +192,8 @@ describe('iconfiguration', () => {
 
     it('enables internal dispatch', () => mocked.request('GET', 'dispatch')
       .then(response => {
-        assert(() => response.statusCode === 200)
-        assert(() => response.toString() === 'Hello World !')
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.toString(), 'Hello World !')
       })
     )
   })

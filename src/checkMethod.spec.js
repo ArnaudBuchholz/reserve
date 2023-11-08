@@ -1,6 +1,6 @@
 'use strict'
 
-const { assert } = require('test-tools')
+const assert = require('assert')
 const checkMethod = require('./checkMethod')
 
 function test (method, expected, allowed) {
@@ -16,10 +16,10 @@ function test (method, expected, allowed) {
     }
     const result = object.checked
     if (expected) {
-      assert(() => result.length === expected.length)
-      expected.forEach((verb, index) => assert(() => result[index] === verb))
+      assert.strictEqual(result.length, expected.length)
+      expected.forEach((verb, index) => assert.strictEqual(result[index], verb))
     } else {
-      assert(() => !result)
+      assert.ok(!result)
     }
   }
 }

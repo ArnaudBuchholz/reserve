@@ -5,7 +5,7 @@ module.exports = async function (response, data, options = {}) {
   const headers = { ...options.headers }
   if (typeof data === 'string') {
     headers['content-type'] = 'text/plain'
-  } else if (typeof data === 'object') {
+  } else /* if (typeof data === 'object') */ {
     headers['content-type'] = 'application/json'
     data = JSON.stringify(data)
   }

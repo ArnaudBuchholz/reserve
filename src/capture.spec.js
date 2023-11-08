@@ -1,6 +1,6 @@
 'use strict'
 
-const { assert } = require('test-tools')
+const assert = require('assert')
 const capture = require('./capture')
 const Response = require('./mock/Response')
 const { readFile } = require('fs')
@@ -67,12 +67,12 @@ describe('capture', () => {
     const { response, promise } = setup()
     promise
       .then(assert.notExpected, reason => {
-        assert(() => reason.message === 'Invalid status')
+        assert.strictEqual(reason.message, 'Invalid status')
         return response.waitForFinish()
       })
       .then(() => {
-        assert(() => response.statusCode === 500)
-        assert(() => response.toString() === loremIpsum)
+        assert.strictEqual(response.statusCode, 500)
+        assert.strictEqual(response.toString(), loremIpsum)
       })
       .then(done, done)
     response.writeHead(500)
@@ -89,13 +89,13 @@ describe('capture', () => {
     }
     promise
       .then(assert.notExpected, reason => {
-        assert(() => reason.message === 'Simulated error')
-        assert(() => numberOfWrites === 1)
+        assert.strictEqual(reason.message, 'Simulated error')
+        assert.strictEqual(numberOfWrites, 1)
         return response.waitForFinish()
       })
       .then(() => {
-        assert(() => response.statusCode === 200)
-        assert(() => response.toString() === loremIpsum)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.toString(), loremIpsum)
       })
       .then(done, done)
     response.writeHead(200)
@@ -110,12 +110,12 @@ describe('capture', () => {
     })
     promise
       .then(() => {
-        assert(() => writableStream.toString() === loremIpsum)
+        assert.strictEqual(writableStream.toString(), loremIpsum)
         return Promise.all([response.waitForFinish(), reachedEnd])
       })
       .then(() => {
-        assert(() => response.statusCode === 200)
-        assert(() => response.toString() === loremIpsum)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.toString(), loremIpsum)
       })
       .then(done, done)
     response.writeHead(200, {
@@ -129,12 +129,12 @@ describe('capture', () => {
       const { response, writableStream, promise, steps = 5 } = testSetup()
       promise
         .then(() => {
-          assert(() => writableStream.toString() === loremIpsum)
+          assert.strictEqual(writableStream.toString(), loremIpsum)
           return response.waitForFinish()
         })
         .then(() => {
-          assert(() => response.statusCode === 200)
-          assert(() => response.toString() === loremIpsum)
+          assert.strictEqual(response.statusCode, 200)
+          assert.strictEqual(response.toString(), loremIpsum)
         })
         .then(done, done)
       response.writeHead(200)
@@ -145,12 +145,12 @@ describe('capture', () => {
       const { response, writableStream, promise, steps = 5 } = testSetup()
       promise
         .then(() => {
-          assert(() => writableStream.toString() === loremIpsum)
+          assert.strictEqual(writableStream.toString(), loremIpsum)
           return response.waitForFinish()
         })
         .then(() => {
-          assert(() => response.statusCode === 200)
-          assert(() => response.toString() === loremIpsum)
+          assert.strictEqual(response.statusCode, 200)
+          assert.strictEqual(response.toString(), loremIpsum)
         })
         .then(done, done)
       response.writeHead(200)
@@ -167,12 +167,12 @@ describe('capture', () => {
       const { response, promise } = setup()
       promise
         .then(assert.notExpected, reason => {
-          assert(() => reason.message.startsWith('Unsupported encoding'))
+          assert.ok(reason.message.startsWith('Unsupported encoding'))
           return response.waitForFinish()
         })
         .then(() => {
-          assert(() => response.statusCode === 200)
-          assert(() => response.toString() === loremIpsum)
+          assert.strictEqual(response.statusCode, 200)
+          assert.strictEqual(response.toString(), loremIpsum)
         })
         .then(done, done)
       response.writeHead(200, {
@@ -186,12 +186,12 @@ describe('capture', () => {
         const { response, writableStream, promise } = setup()
         promise
           .then(() => {
-            assert(() => writableStream.toString() === loremIpsum)
+            assert.strictEqual(writableStream.toString(), loremIpsum)
             return response.waitForFinish()
           })
           .then(() => {
-            assert(() => response.statusCode === 200)
-            assert(() => response.toString() !== loremIpsum) // because encoded
+            assert.strictEqual(response.statusCode, 200)
+            assert.notStrictEqual(response.toString(), loremIpsum) // because encoded
           })
           .then(done, done)
         response.writeHead(200, {

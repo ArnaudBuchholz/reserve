@@ -1,6 +1,6 @@
 'use strict'
 
-const { assert } = require('test-tools')
+const assert = require('assert')
 const { check, mock } = require('./index')
 
 const reconfigure = {
@@ -72,18 +72,18 @@ describe('#39 setMapings blocked by long request', () => {
       mocked.request('GET', '/hello')
     ])
       .then(responses => {
-        assert(() => responses[0].toString() === 'Hello')
-        assert(() => responses[1].toString() === 'Hello')
-        assert(() => responses[2].statusCode === 500) // failed
-        assert(() => responses[3].toString() === 'Hello')
+        assert.strictEqual(responses[0].toString(), 'Hello')
+        assert.strictEqual(responses[1].toString(), 'Hello')
+        assert.strictEqual(responses[2].statusCode, 500) // failed
+        assert.strictEqual(responses[3].toString(), 'Hello')
         return mocked.request('GET', '/hello')
       })
       .then(response => {
-        assert(() => response.toString() === 'Hello')
+        assert.strictEqual(response.toString(), 'Hello')
         return mocked.request('GET', '/world')
       })
       .then(response => {
-        assert(() => response.statusCode === 501) // reconfigure failed
+        assert.strictEqual(response.statusCode, 501) // reconfigure failed
       })
   })
 
@@ -94,16 +94,16 @@ describe('#39 setMapings blocked by long request', () => {
       mocked.request('GET', '/reconfigure')
     ])
       .then(responses => {
-        assert(() => responses[0].toString() === 'Hello')
-        assert(() => responses[1].toString() === 'OK')
+        assert.strictEqual(responses[0].toString(), 'Hello')
+        assert.strictEqual(responses[1].toString(), 'OK')
         return mocked.request('GET', '/world')
       })
       .then(response => {
-        assert(() => response.toString() === 'World')
+        assert.strictEqual(response.toString(), 'World')
         return mocked.request('GET', '/hello')
       })
       .then(response => {
-        assert(() => response.statusCode === 501)
+        assert.strictEqual(response.statusCode, 501)
       })
   })
 })

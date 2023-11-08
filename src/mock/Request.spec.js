@@ -1,18 +1,18 @@
 'use strict'
 
-const { assert } = require('test-tools')
+const assert = require('assert')
 const Request = require('./Request')
 
 describe('mock/Request', () => {
   describe('constructor', () => {
     function check (request, { method, url, headers = {}, body = '' }) {
-      assert(() => request.method === 'GET')
-      assert(() => request.url === '/')
-      assert(() => Object.keys(request.headers).length === Object.keys(headers).length)
+      assert.strictEqual(request.method, 'GET')
+      assert.strictEqual(request.url, '/')
+      assert.strictEqual(Object.keys(request.headers).length, Object.keys(headers).length)
       Object.keys(headers).forEach(header => {
-        assert(() => request.headers[header] === headers[header])
+        assert.strictEqual(request.headers[header], headers[header])
       })
-      assert(() => request._body === body)
+      assert.strictEqual(request._body, body)
     }
 
     describe('parameters', () => {
@@ -57,7 +57,7 @@ describe('mock/Request', () => {
           headers: { 'content-length': '12' },
           body: 'Hello World!'
         })
-        assert(() => request.test === 1)
+        assert.strictEqual(request.test, 1)
       })
 
       it('supports method, url, body and properties', () => {
@@ -68,7 +68,7 @@ describe('mock/Request', () => {
           headers: {},
           body: 'Hello World!'
         })
-        assert(() => request.test === 1)
+        assert.strictEqual(request.test, 1)
       })
     })
 
@@ -89,7 +89,7 @@ describe('mock/Request', () => {
           headers: { 'content-length': '12' },
           body: 'Hello World!'
         })
-        assert(() => request.test === 1)
+        assert.strictEqual(request.test, 1)
       })
     })
   })
@@ -101,7 +101,7 @@ describe('mock/Request', () => {
       eventThrown = true
     })
     request.abort()
-    assert(() => eventThrown)
-    assert(() => request.aborted)
+    assert.ok(eventThrown)
+    assert.ok(request.aborted)
   })
 })

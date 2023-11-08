@@ -1,6 +1,7 @@
 'use strict'
 
-const { assert, wrapHandler } = require('test-tools')
+const assert = require('assert')
+const { wrapHandler } = require('test-tools')
 const statusHandler = require('./status')
 const handle = wrapHandler(statusHandler)
 
@@ -12,7 +13,7 @@ describe('handlers/status', () => {
     redirect: 404
   })
     .then(({ promise }) => {
-      assert(() => typeof promise.then === 'function')
+      assert.strictEqual(typeof promise.then, 'function')
     })
   )
 
@@ -21,10 +22,10 @@ describe('handlers/status', () => {
     redirect: 404
   })
     .then(({ promise, response }) => promise.then(value => {
-      assert(() => value === undefined)
-      assert(() => response.statusCode === 404)
-      assert(() => response.headers['Content-Type'] === textMimeType)
-      assert(() => response.toString() === 'Not found')
+      assert.strictEqual(value, undefined)
+      assert.strictEqual(response.statusCode, 404)
+      assert.strictEqual(response.headers['Content-Type'], textMimeType)
+      assert.strictEqual(response.toString(), 'Not found')
     }))
   )
 
@@ -33,10 +34,10 @@ describe('handlers/status', () => {
     redirect: 418
   })
     .then(({ promise, response }) => promise.then(value => {
-      assert(() => value === undefined)
-      assert(() => response.statusCode === 418)
-      assert(() => response.headers['Content-Type'] === textMimeType)
-      assert(() => response.toString() === '')
+      assert.strictEqual(value, undefined)
+      assert.strictEqual(response.statusCode, 418)
+      assert.strictEqual(response.headers['Content-Type'], textMimeType)
+      assert.strictEqual(response.toString(), '')
     }))
   )
 
@@ -51,11 +52,11 @@ describe('handlers/status', () => {
     match: [undefined, 'https://www.npmjs.com/package/reserve']
   })
     .then(({ promise, response }) => promise.then(value => {
-      assert(() => value === undefined)
-      assert(() => response.statusCode === 302)
-      assert(() => response.headers['Content-Type'] === textMimeType)
-      assert(() => response.toString() === '')
-      assert(() => response.headers.Location === 'https://www.npmjs.com/package/reserve')
+      assert.strictEqual(value, undefined)
+      assert.strictEqual(response.statusCode, 302)
+      assert.strictEqual(response.headers['Content-Type'], textMimeType)
+      assert.strictEqual(response.toString(), '')
+      assert.strictEqual(response.headers.Location, 'https://www.npmjs.com/package/reserve')
     }))
   )
 })

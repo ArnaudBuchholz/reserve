@@ -1,6 +1,6 @@
 'use strict'
 
-const { assert } = require('test-tools')
+const assert = require('assert')
 const mock = require('./mock')
 const { read } = require('./configuration')
 
@@ -25,14 +25,14 @@ describe('mock', () => {
 
     it('simulates a request and returns a response', () => mocked.request('GET', '/file.txt')
       .then(response => {
-        assert(() => response.statusCode === 200)
-        assert(() => response.toString() === 'Hello World!')
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.toString(), 'Hello World!')
       })
     )
 
     it('exposes the same interface', () => {
-      assert(() => typeof mocked.close === 'function')
-      assert(() => mocked.close() instanceof Promise)
+      assert.strictEqual(typeof mocked.close, 'function')
+      assert.ok(mocked.close() instanceof Promise)
     })
   })
 
@@ -65,15 +65,15 @@ describe('mock', () => {
 
     it('simulates a request and returns a response', () => mocked.request('GET', '/')
       .then(response => {
-        assert(() => response.headersSent)
-        assert(() => response.statusCode === 201)
-        assert(() => response.toString() === 'ABCDE')
+        assert.ok(response.headersSent)
+        assert.strictEqual(response.statusCode, 201)
+        assert.strictEqual(response.toString(), 'ABCDE')
       })
     )
 
     it('supports internal redirection', () => mocked.request('GET', '/error')
       .then(response => {
-        assert(() => response.statusCode === 500)
+        assert.strictEqual(response.statusCode, 500)
       })
     )
   })
@@ -86,8 +86,8 @@ describe('mock', () => {
           configuration.listeners = [
             function register (eventEmitter) {
               eventEmitter.on('server-created', ({ configuration, server }) => {
-                assert(() => !!configuration)
-                assert(() => server === null) // Can't have a server
+                assert.ok(!!configuration)
+                assert.strictEqual(server, null) // Can't have a server
                 events.push('server-created')
               })
             }
@@ -96,10 +96,10 @@ describe('mock', () => {
         })
         .then(mocked => mocked.request('GET', '/file.txt'))
         .then(response => {
-          assert(() => response.statusCode === 200)
-          assert(() => response.toString() === 'Hello World!')
-          assert(() => events.length === 1)
-          assert(() => events[0] === 'server-created')
+          assert.strictEqual(response.statusCode, 200)
+          assert.strictEqual(response.toString(), 'Hello World!')
+          assert.strictEqual(events.length, 1)
+          assert.strictEqual(events[0], 'server-created')
         })
     })
   })

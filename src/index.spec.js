@@ -1,14 +1,14 @@
 'use strict'
 
-const { assert } = require('test-tools')
+const assert = require('assert')
 
 describe('index', () => {
   it('returns all APIs when required', () => {
     const apis = require('./index')
-    assert(() => typeof apis.check === 'function')
-    assert(() => typeof apis.log === 'function')
-    assert(() => typeof apis.mock === 'function')
-    assert(() => typeof apis.read === 'function')
-    assert(() => typeof apis.serve === 'function')
+    assert.strictEqual(typeof apis.check, 'function')
+    assert.strictEqual(typeof apis.log, 'function')
+    assert.strictEqual(typeof apis.mock, 'function')
+    assert.strictEqual(typeof apis.read, 'function')
+    assert.strictEqual(typeof apis.serve, 'function')
   })
 })

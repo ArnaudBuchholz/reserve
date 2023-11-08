@@ -1,6 +1,7 @@
 'use strict'
 
-const { assert, wrapHandler } = require('test-tools')
+const assert = require('assert')
+const { wrapHandler } = require('test-tools')
 const customHandler = require('./custom')
 
 const handle = wrapHandler(customHandler, {
@@ -23,12 +24,12 @@ describe('handlers/custom', () => {
     } catch (e) {
       exceptionCaught = e
     }
-    assert(() => !!exceptionCaught)
+    assert.ok(!!exceptionCaught)
   })
 
   it('returns a promise', () => handle({ request: '/any' })
     .then(({ promise }) => {
-      assert(() => typeof promise.then === 'function')
+      assert.strictEqual(typeof promise.then, 'function')
     })
   )
 
@@ -42,11 +43,11 @@ describe('handlers/custom', () => {
     }
   })
     .then(({ promise, request, response }) => promise.then(args => {
-      assert(() => args.length === 4)
-      assert(() => args[0] === request)
-      assert(() => args[1] === response)
-      assert(() => args[2] === 'first')
-      assert(() => args[3] === 'second')
+      assert.strictEqual(args.length, 4)
+      assert.strictEqual(args[0], request)
+      assert.strictEqual(args[1], response)
+      assert.strictEqual(args[2], 'first')
+      assert.strictEqual(args[3], 'second')
     }))
   )
 
@@ -57,7 +58,7 @@ describe('handlers/custom', () => {
     }
   })
     .then(({ promise }) => promise.then(value => {
-      assert(() => value === 'OK')
+      assert.strictEqual(value, 'OK')
     }))
   )
 
@@ -68,7 +69,7 @@ describe('handlers/custom', () => {
     }
   })
     .then(({ promise }) => promise.then(assert.notExpected, reason => {
-      assert(() => reason.message === 'KO')
+      assert.strictEqual(reason.message, 'KO')
     }))
   )
 
@@ -79,7 +80,7 @@ describe('handlers/custom', () => {
     }
   })
     .then(({ promise }) => promise.then(assert.notExpected, reason => {
-      assert(() => reason.message === 'KO')
+      assert.strictEqual(reason.message, 'KO')
     }))
   )
 
@@ -90,7 +91,7 @@ describe('handlers/custom', () => {
     }
   })
     .then(({ mapping, promise }) => promise.then(() => {
-      assert(() => mapping.configuration[$configuration])
+      assert.ok(mapping.configuration[$configuration])
     }))
   )
 
@@ -102,7 +103,7 @@ describe('handlers/custom', () => {
     }
   })
     .then(({ mapping, promise }) => promise.then(() => {
-      assert(() => !mapping.configuration[$configuration])
+      assert.ok(!mapping.configuration[$configuration])
     }))
   )
 })

@@ -1,7 +1,8 @@
 'use strict'
 
 const mockRequire = require('mock-require')
-const { assert, wrapHandler, http } = require('test-tools')
+const assert = require('assert')
+const { wrapHandler, http } = require('test-tools')
 const urlHandler = require('./url')
 const handle = wrapHandler(urlHandler)
 const { $configuration } = require('../symbols')
@@ -13,7 +14,7 @@ describe('handlers/url', () => {
     request: http.urls.echo
   })
     .then(({ promise }) => {
-      assert(() => typeof promise.then === 'function')
+      assert.strictEqual(typeof promise.then, 'function')
     })
   )
 
@@ -30,11 +31,11 @@ describe('handlers/url', () => {
     }
   })
     .then(({ promise, response }) => promise.then(value => {
-      assert(() => value === undefined)
-      assert(() => response.statusCode === 200)
-      assert(() => response.headers['x-value-1'] === 'test')
-      assert(() => response.headers.host === undefined)
-      assert(() => response.toString() === 'Hello World!')
+      assert.strictEqual(value, undefined)
+      assert.strictEqual(response.statusCode, 200)
+      assert.strictEqual(response.headers['x-value-1'], 'test')
+      assert.strictEqual(response.headers.host, undefined)
+      assert.strictEqual(response.toString(), 'Hello World!')
     }))
   )
 
@@ -54,11 +55,11 @@ describe('handlers/url', () => {
       request.abort()
       return promise
         .then(value => {
-          assert(() => value === undefined)
-          assert(() => response.statusCode === 200)
-          assert(() => response.headers['x-value-1'] === 'test')
-          assert(() => response.headers.host === undefined)
-          assert(() => response.toString() === '')
+          assert.strictEqual(value, undefined)
+          assert.strictEqual(response.statusCode, 200)
+          assert.strictEqual(response.headers['x-value-1'], 'test')
+          assert.strictEqual(response.headers.host, undefined)
+          assert.strictEqual(response.toString(), '')
         })
     })
   )
@@ -77,9 +78,9 @@ describe('handlers/url', () => {
     }
   })
     .then(({ promise, response }) => promise.then(value => {
-      assert(() => value === undefined)
-      assert(() => response.statusCode === 200)
-      assert(() => response.toString() === 'Hello World!')
+      assert.strictEqual(value, undefined)
+      assert.strictEqual(response.statusCode, 200)
+      assert.strictEqual(response.toString(), 'Hello World!')
     }))
   )
 
@@ -98,9 +99,9 @@ describe('handlers/url', () => {
       }
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 200)
-        assert(() => response.headers['Set-Cookie'][0] === 'name=value;')
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.headers['Set-Cookie'][0], 'name=value;')
       }))
     )
 
@@ -118,9 +119,9 @@ describe('handlers/url', () => {
       }
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 200)
-        assert(() => response.headers['Set-Cookie'][0] === 'name=value;')
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.headers['Set-Cookie'][0], 'name=value;')
       }))
     )
 
@@ -138,9 +139,9 @@ describe('handlers/url', () => {
       }
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 200)
-        assert(() => response.headers['Set-Cookie'][0] === 'name=value; SameSite=Lax;')
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.headers['Set-Cookie'][0], 'name=value; SameSite=Lax;')
       }))
     )
 
@@ -158,9 +159,9 @@ describe('handlers/url', () => {
       }
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 200)
-        assert(() => response.headers['Set-Cookie'][0] === 'name=value; SameSite=Lax;')
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.headers['Set-Cookie'][0], 'name=value; SameSite=Lax;')
       }))
     )
 
@@ -178,9 +179,9 @@ describe('handlers/url', () => {
       }
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 200)
-        assert(() => response.headers['Set-Cookie'][0] === 'name=value; SameSite=Lax;')
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.headers['Set-Cookie'][0], 'name=value; SameSite=Lax;')
       }))
     )
 
@@ -198,9 +199,9 @@ describe('handlers/url', () => {
       }
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 200)
-        assert(() => response.headers['Set-Cookie'][0] === 'name=value; SameSite=Strict;')
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.headers['Set-Cookie'][0], 'name=value; SameSite=Strict;')
       }))
     )
 
@@ -218,9 +219,9 @@ describe('handlers/url', () => {
       }
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 200)
-        assert(() => response.headers['Set-Cookie'][0] === 'name=value; SameSite=Strict;')
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.headers['Set-Cookie'][0], 'name=value; SameSite=Strict;')
       }))
     )
 
@@ -238,9 +239,9 @@ describe('handlers/url', () => {
       }
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 200)
-        assert(() => response.headers['Set-Cookie'][0] === 'name=value; SameSite=Strict')
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.headers['Set-Cookie'][0], 'name=value; SameSite=Strict')
       }))
     )
 
@@ -258,9 +259,9 @@ describe('handlers/url', () => {
       }
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 200)
-        assert(() => response.headers['Set-Cookie'][0] === 'name=value; SameSite=Strict;')
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.headers['Set-Cookie'][0], 'name=value; SameSite=Strict;')
       }))
     )
 
@@ -277,9 +278,9 @@ describe('handlers/url', () => {
       }
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 200)
-        assert(() => !response.headers['Set-Cookie'])
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.ok(!response.headers['Set-Cookie'])
       }))
     )
   })
@@ -297,14 +298,14 @@ describe('handlers/url', () => {
       mapping: {
         [uid]: 'mapping',
         'forward-request': async ({ configuration: receivedIConfiguration, context, mapping: receivedMapping, match: receivedMatch, request }) => {
-          assert(() => receivedIConfiguration[$configuration][uid] === 'configuration')
-          assert(() => receivedMapping[uid] === 'mapping')
-          assert(() => receivedMatch[uid] === 'match')
-          assert(() => context && typeof context === 'object')
-          assert(() => request.method === 'GET')
-          assert(() => request.url === http.urls.echos)
-          assert(() => request.headers['x-status-code'] === '200')
-          assert(() => request.headers.Cookie === 'name=value;')
+          assert.strictEqual(receivedIConfiguration[$configuration][uid], 'configuration')
+          assert.strictEqual(receivedMapping[uid], 'mapping')
+          assert.strictEqual(receivedMatch[uid], 'match')
+          assert.strictEqual(context && typeof context, 'object')
+          assert.strictEqual(request.method, 'GET')
+          assert.strictEqual(request.url, http.urls.echos)
+          assert.strictEqual(request.headers['x-status-code'], '200')
+          assert.strictEqual(request.headers.Cookie, 'name=value;')
           request.headers.Cookie = 'a=b;c=d;'
         }
       },
@@ -312,20 +313,20 @@ describe('handlers/url', () => {
       match: { [uid]: 'match' }
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 200)
-        assert(() => response.headers.Cookie === 'a=b;c=d;')
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.headers.Cookie, 'a=b;c=d;')
       }))
     )
 
     it('manipulates response headers (forward-response)', () => {
       mockRequire('/url.forward-response.js', ({ configuration: receivedIConfiguration, context, mapping: receivedMapping, match: receivedMatch, headers }) => {
-        assert(() => receivedIConfiguration[$configuration][uid] === 'configuration')
-        assert(() => receivedMapping[uid] === 'mapping')
-        assert(() => receivedMatch[uid] === 'match')
-        assert(() => context && typeof context === 'object')
-        assert(() => headers['x-status-code'] === '200')
-        assert(() => headers.Cookie === 'name=value;')
+        assert.strictEqual(receivedIConfiguration[$configuration][uid], 'configuration')
+        assert.strictEqual(receivedMapping[uid], 'mapping')
+        assert.strictEqual(receivedMatch[uid], 'match')
+        assert.strictEqual(context && typeof context, 'object')
+        assert.strictEqual(headers['x-status-code'], '200')
+        assert.strictEqual(headers.Cookie, 'name=value;')
         headers.Cookie = 'a=b;c=d;'
       })
       return handle({
@@ -345,9 +346,9 @@ describe('handlers/url', () => {
         match: { [uid]: 'match' }
       })
         .then(({ promise, response }) => promise.then(value => {
-          assert(() => value === undefined)
-          assert(() => response.statusCode === 200)
-          assert(() => response.headers.Cookie === 'a=b;c=d;')
+          assert.strictEqual(value, undefined)
+          assert.strictEqual(response.statusCode, 200)
+          assert.strictEqual(response.headers.Cookie, 'a=b;c=d;')
         }))
     })
 
@@ -356,17 +357,17 @@ describe('handlers/url', () => {
       const checks = {}
       const mapping = {
         'forward-request': ({ context, request }) => {
-          assert(() => context.id === undefined)
+          assert.strictEqual(context.id, undefined)
           context.id = ++contextId
           context.requestId = request.headers['x-id']
-          assert(() => context.requestId)
-          assert(() => checks[context.id] === undefined)
+          assert.ok(context.requestId)
+          assert.strictEqual(checks[context.id], undefined)
           checks[context.id] = context.requestId
         },
         'forward-response': ({ context }) => {
-          assert(() => context.id !== undefined)
-          assert(() => context.requestId !== undefined)
-          assert(() => checks[context.id] === context.requestId)
+          assert.ok(context.id !== undefined)
+          assert.ok(context.requestId !== undefined)
+          assert.strictEqual(checks[context.id], context.requestId)
         }
       }
       return Promise.all([
@@ -416,8 +417,8 @@ describe('handlers/url', () => {
         match: { [uid]: 'match' }
       })
         .then(({ promise, response }) => promise.then(value => {
-          assert(() => value === 'test')
-          assert(() => response.isInitial()) // Not yet answered
+          assert.strictEqual(value, 'test')
+          assert.ok(response.isInitial()) // Not yet answered
         }))
     })
 
@@ -441,7 +442,7 @@ describe('handlers/url', () => {
         match: { [uid]: 'match' }
       })
         .then(({ promise, response }) => promise.then(assert.notExpected, reason => {
-          assert(() => !!reason)
+          assert.ok(!!reason)
         }))
     })
   })
@@ -462,11 +463,11 @@ describe('handlers/url', () => {
       }
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 200)
-        assert(() => response.toString() === 'Hello World!')
-        assert(() => !response.headers[':method'])
-        assert(() => !response.headers.connection)
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.toString(), 'Hello World!')
+        assert.ok(!response.headers[':method'])
+        assert.ok(!response.headers.connection)
       }))
     )
   })
@@ -487,9 +488,9 @@ describe('handlers/url', () => {
       }
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 301)
-        assert(() => response.headers.location === '/test')
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 301)
+        assert.strictEqual(response.headers.location, '/test')
       }))
     ))
 
@@ -507,8 +508,8 @@ describe('handlers/url', () => {
       }
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.headers.location === 'https://www.mocked.com/test')
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.headers.location, 'https://www.mocked.com/test')
       }))
     )
 
@@ -526,8 +527,8 @@ describe('handlers/url', () => {
       }
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.headers.location === 'http://my.website/test')
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.headers.location, 'http://my.website/test')
       }))
     )
   })

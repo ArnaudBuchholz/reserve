@@ -1,12 +1,12 @@
 'use strict'
 
 const { join } = require('path')
-const assert = require('../assert')
+const assert = require('assert')
 
 const traces = []
 
 function trace (type, ...params) {
-  params.forEach(param => assert(() => typeof param === 'string'))
+  params.forEach(param => assert.strictEqual(typeof param, 'string'))
   traces.push({ type, text: params.join(' ') })
 }
 

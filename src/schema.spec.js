@@ -1,6 +1,6 @@
 'use strict'
 
-const { assert } = require('test-tools')
+const assert = require('assert')
 const { parse, validate } = require('./schema')
 
 /* istanbul ignore next */ // Will not be called
@@ -12,28 +12,28 @@ describe('schema', () => {
       const schema = parse({
         property: 'string'
       })
-      assert(() => schema[0].name === 'property')
-      assert(() => schema[0].types.length === 1)
-      assert(() => schema[0].types[0] === 'string')
+      assert.strictEqual(schema[0].name, 'property')
+      assert.strictEqual(schema[0].types.length, 1)
+      assert.strictEqual(schema[0].types[0], 'string')
     })
 
     it('expands property reduced to a type specification list', () => {
       const schema = parse({
         property: ['function', 'string']
       })
-      assert(() => schema[0].name === 'property')
-      assert(() => schema[0].types.length === 2)
-      assert(() => schema[0].types.includes('string'))
-      assert(() => schema[0].types.includes('function'))
+      assert.strictEqual(schema[0].name, 'property')
+      assert.strictEqual(schema[0].types.length, 2)
+      assert.ok(schema[0].types.includes('string'))
+      assert.ok(schema[0].types.includes('function'))
     })
 
     it('expands an object property with the name and default type', () => {
       const schema = parse({
         property: {}
       })
-      assert(() => schema[0].name === 'property')
-      assert(() => schema[0].types.length === 1)
-      assert(() => schema[0].types[0] === 'string')
+      assert.strictEqual(schema[0].name, 'property')
+      assert.strictEqual(schema[0].types.length, 1)
+      assert.strictEqual(schema[0].types[0], 'string')
     })
 
     it('expands an object property with the name and type', () => {
@@ -42,9 +42,9 @@ describe('schema', () => {
           type: 'boolean'
         }
       })
-      assert(() => schema[0].name === 'property')
-      assert(() => schema[0].types.length === 1)
-      assert(() => schema[0].types[0] === 'boolean')
+      assert.strictEqual(schema[0].name, 'property')
+      assert.strictEqual(schema[0].types.length, 1)
+      assert.strictEqual(schema[0].types[0], 'boolean')
     })
 
     it('expands an object property with the name and types', () => {
@@ -53,10 +53,10 @@ describe('schema', () => {
           types: ['function', 'string']
         }
       })
-      assert(() => schema[0].name === 'property')
-      assert(() => schema[0].types.length === 2)
-      assert(() => schema[0].types.includes('string'))
-      assert(() => schema[0].types.includes('function'))
+      assert.strictEqual(schema[0].name, 'property')
+      assert.strictEqual(schema[0].types.length, 2)
+      assert.ok(schema[0].types.includes('string'))
+      assert.ok(schema[0].types.includes('function'))
     })
   })
 
@@ -71,9 +71,9 @@ describe('schema', () => {
         exceptionCaught = e
       }
       if (shouldSucceed) {
-        assert(() => !exceptionCaught)
+        assert.ok(!exceptionCaught)
       } else {
-        assert(() => !!exceptionCaught)
+        assert.ok(!!exceptionCaught)
       }
       return parsedSchema
     }
@@ -113,7 +113,7 @@ describe('schema', () => {
             defaultValue: false
           }
         }, object)
-        assert(() => object.property === true)
+        assert.strictEqual(object.property, true)
       })
 
       it('sets value when missing', () => {
@@ -124,7 +124,7 @@ describe('schema', () => {
             defaultValue: false
           }
         }, object)
-        assert(() => object.property === false)
+        assert.strictEqual(object.property, false)
       })
     })
   })

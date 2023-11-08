@@ -1,12 +1,12 @@
 'use strict'
 
-const { assert } = require('test-tools')
+const assert = require('assert')
 const { join } = require('path')
 const { read, check } = require('./configuration')
 const { $customCallback } = require('./symbols')
 
 const shouldFail = promise => promise.then(assert.notExpected, () => {
-  assert(() => true) // expected
+  assert.ok(true) // expected
 })
 
 async function okHandler () {
@@ -22,43 +22,43 @@ describe('configuration', () => {
     it('reads a configuration', () => {
       return read('reserve.json')
         .then(configuration => {
-          assert(() => configuration.port === 3475)
-          assert(() => configuration.mappings.length === 1)
-          assert(() => configuration.mappings[0].match === '/(.*)')
-          assert(() => configuration.mappings[0].file === '/$1')
-          assert(() => configuration.mappings[0].cwd === '/')
+          assert.strictEqual(configuration.port, 3475)
+          assert.strictEqual(configuration.mappings.length, 1)
+          assert.strictEqual(configuration.mappings[0].match, '/(.*)')
+          assert.strictEqual(configuration.mappings[0].file, '/$1')
+          assert.strictEqual(configuration.mappings[0].cwd, '/')
         })
     })
 
     it('reads a configuration and extends it (also documents cwd)', () => {
       return read('/folder/reserve.json')
         .then(configuration => {
-          assert(() => configuration.port === 3475)
-          assert(() => configuration.ssl !== undefined)
-          assert(() => configuration.mappings.length === 2)
-          assert(() => configuration.mappings[0].match === '/folder/.*')
-          assert(() => configuration.mappings[0].url === 'https://secured.com/$1')
-          assert(() => configuration.mappings[0].cwd === '/folder')
+          assert.strictEqual(configuration.port, 3475)
+          assert.ok(configuration.ssl)
+          assert.strictEqual(configuration.mappings.length, 2)
+          assert.strictEqual(configuration.mappings[0].match, '/folder/.*')
+          assert.strictEqual(configuration.mappings[0].url, 'https://secured.com/$1')
+          assert.strictEqual(configuration.mappings[0].cwd, '/folder')
           // Extended mappings have a lower priority
-          assert(() => configuration.mappings[1].match === '/(.*)')
-          assert(() => configuration.mappings[1].file === '/$1')
-          assert(() => configuration.mappings[1].cwd === '/')
+          assert.strictEqual(configuration.mappings[1].match, '/(.*)')
+          assert.strictEqual(configuration.mappings[1].file, '/$1')
+          assert.strictEqual(configuration.mappings[1].cwd, '/')
         })
     })
 
     it('reads a configuration and extends it (relative path)', () => {
       return read('/folder/reserve-with-another-port.json')
         .then(configuration => {
-          assert(() => configuration.port === 220103)
-          assert(() => configuration.ssl !== undefined)
-          assert(() => configuration.mappings.length === 2)
-          assert(() => configuration.mappings[0].match === '/folder/.*')
-          assert(() => configuration.mappings[0].url === 'https://secured.com/$1')
-          assert(() => configuration.mappings[0].cwd === '/folder')
+          assert.strictEqual(configuration.port, 220103)
+          assert.ok(configuration.ssl)
+          assert.strictEqual(configuration.mappings.length, 2)
+          assert.strictEqual(configuration.mappings[0].match, '/folder/.*')
+          assert.strictEqual(configuration.mappings[0].url, 'https://secured.com/$1')
+          assert.strictEqual(configuration.mappings[0].cwd, '/folder')
           // Extended mappings have a lower priority
-          assert(() => configuration.mappings[1].match === '/(.*)')
-          assert(() => configuration.mappings[1].file === '/$1')
-          assert(() => configuration.mappings[1].cwd === '/')
+          assert.strictEqual(configuration.mappings[1].match, '/(.*)')
+          assert.strictEqual(configuration.mappings[1].file, '/$1')
+          assert.strictEqual(configuration.mappings[1].cwd, '/')
         })
     })
 
@@ -87,10 +87,10 @@ describe('configuration', () => {
     it('applies defaults', () => {
       return check({})
         .then(configuration => {
-          assert(() => typeof configuration.port === 'number')
-          assert(() => configuration.hostname === undefined)
-          assert(() => configuration.mappings.length === 2)
-          assert(() => configuration.listeners.length === 0)
+          assert.strictEqual(typeof configuration.port, 'number')
+          assert.strictEqual(configuration.hostname, undefined)
+          assert.strictEqual(configuration.mappings.length, 2)
+          assert.strictEqual(configuration.listeners.length, 0)
         })
     })
 
@@ -98,7 +98,7 @@ describe('configuration', () => {
       return check({})
         .then(initialConfiguration => check(initialConfiguration)
           .then(checkedConfiguration => {
-            assert(() => initialConfiguration !== checkedConfiguration)
+            assert.notStrictEqual(initialConfiguration, checkedConfiguration)
           })
         )
     })
@@ -107,9 +107,9 @@ describe('configuration', () => {
       return read('/folder/reserve.json')
         .then(check)
         .then(configuration => {
-          assert(() => configuration.ssl.key === 'privatekey')
-          assert(() => configuration.ssl.cert === 'certificate')
-          assert(() => configuration.protocol === 'https')
+          assert.strictEqual(configuration.ssl.key, 'privatekey')
+          assert.strictEqual(configuration.ssl.cert, 'certificate')
+          assert.strictEqual(configuration.protocol, 'https')
         })
     })
 
@@ -118,23 +118,21 @@ describe('configuration', () => {
         return read('/reserve.json')
           .then(configuration => check({ ...configuration }))
           .then(configuration => {
-            assert(() => configuration.http2 === false)
+            assert.strictEqual(configuration.http2, false)
           })
       })
 
       it('validates http2', () => {
         return read('/folder/reserve.json')
           .then(configuration => check({ ...configuration, http2: 'abc' }))
-          .then(assert.notExpected, reason => {
-            assert(() => !!reason)
-          })
+          .then(assert.notExpected, reason => assert.ok(!!reason))
       })
 
       it('supports unsecured http2', () => {
         return read('/reserve.json')
           .then(configuration => check({ ...configuration, http2: true }))
           .then(configuration => {
-            assert(() => configuration.protocol === 'http')
+            assert.strictEqual(configuration.protocol, 'http')
           })
       })
 
@@ -142,9 +140,9 @@ describe('configuration', () => {
         return read('/folder/reserve.json')
           .then(configuration => check({ ...configuration, http2: true }))
           .then(configuration => {
-            assert(() => configuration.ssl.key === 'privatekey')
-            assert(() => configuration.ssl.cert === 'certificate')
-            assert(() => configuration.protocol === 'https')
+            assert.strictEqual(configuration.ssl.key, 'privatekey')
+            assert.strictEqual(configuration.ssl.cert, 'certificate')
+            assert.strictEqual(configuration.protocol, 'https')
           })
       })
     })
@@ -163,7 +161,7 @@ describe('configuration', () => {
         }]
       })
         .then(configuration => {
-          assert(() => configuration.mappings[0].match instanceof RegExp)
+          assert.ok(configuration.mappings[0].match instanceof RegExp)
         })
       )
 
@@ -206,7 +204,7 @@ describe('configuration', () => {
         }]
       })
         .then(configuration => {
-          assert(() => configuration.mappings[0]['invert-match'] === true)
+          assert.strictEqual(configuration.mappings[0]['invert-match'], true)
         })
       )
 
@@ -251,7 +249,7 @@ describe('configuration', () => {
         }]
       })
         .then(configuration => {
-          assert(() => configuration.mappings[0]['if-match'] === shouldFail)
+          assert.strictEqual(configuration.mappings[0]['if-match'], shouldFail)
         })
       )
 
@@ -326,7 +324,7 @@ describe('configuration', () => {
           }]
         })
           .then(configuration => {
-            assert(() => typeof configuration.mappings[0][$customCallback] === 'function')
+            assert.strictEqual(typeof configuration.mappings[0][$customCallback], 'function')
             return configuration.mappings[0][$customCallback]()
           })
       })
@@ -340,8 +338,8 @@ describe('configuration', () => {
           }
         })
           .then(configuration => {
-            assert(() => typeof configuration.handlers.file.custom === 'undefined')
-            assert(() => typeof configuration.handlers.file.redirect === 'function')
+            assert.strictEqual(typeof configuration.handlers.file.custom, 'undefined')
+            assert.strictEqual(typeof configuration.handlers.file.redirect, 'function')
           })
       })
 
@@ -358,11 +356,11 @@ describe('configuration', () => {
           }]
         })
           .then(configuration => {
-            assert(() => Object.keys(configuration.handlers).length > 4)
-            assert(() => typeof configuration.handlers.mock.redirect === 'function')
+            assert.ok(Object.keys(configuration.handlers).length > 4)
+            assert.strictEqual(typeof configuration.handlers.mock.redirect, 'function')
             return configuration.handlers.mock.redirect()
           })
-          .then(value => assert(() => value === 'OK'))
+          .then(value => assert.strictEqual(value, 'OK'))
       })
 
       it('validates custom handlers', () => shouldFail(check({
@@ -392,11 +390,11 @@ describe('configuration', () => {
           }]
         })
           .then(configuration => {
-            assert(() => Object.keys(configuration.handlers).length > 4)
-            assert(() => typeof configuration.handlers.mock.redirect === 'function')
+            assert.ok(Object.keys(configuration.handlers).length > 4)
+            assert.strictEqual(typeof configuration.handlers.mock.redirect, 'function')
             return configuration.handlers.mock.redirect()
           })
-          .then(value => assert(() => value === 'OK'))
+          .then(value => assert.strictEqual(value, 'OK'))
       })
 
       it('validates injected handlers', () => {
@@ -492,7 +490,7 @@ describe('configuration', () => {
           listeners: ['mocked-listener']
         })
           .then(configuration => {
-            assert(() => configuration.listeners[0] === shouldFail)
+            assert.strictEqual(configuration.listeners[0], shouldFail)
           })
       })
     })

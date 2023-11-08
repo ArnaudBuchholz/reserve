@@ -1,6 +1,6 @@
 'use strict'
 
-const { assert } = require('test-tools')
+const assert = require('assert')
 const body = require('./body')
 const EventEmitter = require('events')
 
@@ -29,7 +29,7 @@ describe('body', () => {
     ' World',
     ' !'
   ]))
-    .then(text => assert(() => text === 'Hello World !'), assert.notExpected)
+    .then(text => assert.strictEqual(text, 'Hello World !'), assert.notExpected)
   )
 
   it('forwards the error', async () => body(request([
@@ -37,6 +37,6 @@ describe('body', () => {
     ' World',
     new Error('fail')
   ]))
-    .then(assert.notExpected, reason => assert(() => reason.message === 'fail'))
+    .then(assert.notExpected, reason => assert.strictEqual(reason.message, 'fail'))
   )
 })

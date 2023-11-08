@@ -1,6 +1,7 @@
 'use strict'
 
-const { assert, wrapHandler } = require('test-tools')
+const assert = require('assert')
+const { wrapHandler } = require('test-tools')
 const fileHandler = require('./file')
 const handle = wrapHandler(fileHandler, { mapping: { cwd: '/' } })
 const fs = require('fs')
@@ -13,14 +14,14 @@ const htmlMimeType = 'text/html'
 const defaultMimeType = 'application/octet-stream'
 
 const ignored = ({ promise, response }) => promise.then(value => {
-  assert(() => value === undefined)
-  assert(() => response.isInitial())
+  assert.strictEqual(value, undefined)
+  assert.ok(response.isInitial())
 })
 
 describe('handlers/file', () => {
   it('returns a promise', () => handle('./file.txt')
     .then(({ promise }) => {
-      assert(() => typeof promise.then === 'function')
+      assert.strictEqual(typeof promise.then, 'function')
     })
   )
 
@@ -28,10 +29,10 @@ describe('handlers/file', () => {
     request: './file.txt'
   })
     .then(({ promise, response }) => promise.then(value => {
-      assert(() => value === undefined)
-      assert(() => response.statusCode === 200)
-      assert(() => response.headers['Content-Type'] === textMimeType)
-      assert(() => response.toString() === 'Hello World!')
+      assert.strictEqual(value, undefined)
+      assert.strictEqual(response.statusCode, 200)
+      assert.strictEqual(response.headers['Content-Type'], textMimeType)
+      assert.strictEqual(response.toString(), 'Hello World!')
     }))
   )
 
@@ -42,10 +43,10 @@ describe('handlers/file', () => {
     }
   })
     .then(({ promise, response }) => promise.then(value => {
-      assert(() => value === undefined)
-      assert(() => response.statusCode === 200)
-      assert(() => response.headers['Content-Type'] === textMimeType)
-      assert(() => response.toString() === 'Hello World!')
+      assert.strictEqual(value, undefined)
+      assert.strictEqual(response.statusCode, 200)
+      assert.strictEqual(response.headers['Content-Type'], textMimeType)
+      assert.strictEqual(response.toString(), 'Hello World!')
     }))
   )
 
@@ -57,10 +58,10 @@ describe('handlers/file', () => {
       response
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 201)
-        assert(() => response.headers['Content-Type'] === textMimeType)
-        assert(() => response.toString() === 'Hello World!')
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 201)
+        assert.strictEqual(response.headers['Content-Type'], textMimeType)
+        assert.strictEqual(response.toString(), 'Hello World!')
       }))
   })
 
@@ -68,10 +69,10 @@ describe('handlers/file', () => {
     request: '/file.txt?param=1#hash'
   })
     .then(({ promise, response }) => promise.then(value => {
-      assert(() => value === undefined)
-      assert(() => response.statusCode === 200)
-      assert(() => response.headers['Content-Type'] === textMimeType)
-      assert(() => response.toString() === 'Hello World!')
+      assert.strictEqual(value, undefined)
+      assert.strictEqual(response.statusCode, 200)
+      assert.strictEqual(response.headers['Content-Type'], textMimeType)
+      assert.strictEqual(response.toString(), 'Hello World!')
     }))
   )
 
@@ -91,11 +92,11 @@ describe('handlers/file', () => {
     request: './folder/'
   })
     .then(({ promise, response }) => promise.then(value => {
-      assert(() => value === undefined)
-      assert(() => response.statusCode === 200)
-      assert(() => response.headers['Content-Type'] === htmlMimeType)
-      assert(() => response.headers['Content-Length'] === '8')
-      assert(() => response.toString() === '<html />')
+      assert.strictEqual(value, undefined)
+      assert.strictEqual(response.statusCode, 200)
+      assert.strictEqual(response.headers['Content-Type'], htmlMimeType)
+      assert.strictEqual(response.headers['Content-Length'], '8')
+      assert.strictEqual(response.toString(), '<html />')
     }))
   )
 
@@ -106,11 +107,11 @@ describe('handlers/file', () => {
     }
   })
     .then(({ promise, response }) => promise.then(value => {
-      assert(() => value === undefined)
-      assert(() => response.statusCode === 200)
-      assert(() => response.headers['Content-Type'] === htmlMimeType)
-      assert(() => response.headers['Content-Length'] === '8')
-      assert(() => response.toString() === '')
+      assert.strictEqual(value, undefined)
+      assert.strictEqual(response.statusCode, 200)
+      assert.strictEqual(response.headers['Content-Type'], htmlMimeType)
+      assert.strictEqual(response.headers['Content-Length'], '8')
+      assert.strictEqual(response.toString(), '')
     }))
   )
 
@@ -118,10 +119,10 @@ describe('handlers/file', () => {
     request: './file'
   })
     .then(({ promise, response }) => promise.then(value => {
-      assert(() => value === undefined)
-      assert(() => response.statusCode === 200)
-      assert(() => response.headers['Content-Type'] === defaultMimeType)
-      assert(() => response.toString() === 'binary')
+      assert.strictEqual(value, undefined)
+      assert.strictEqual(response.statusCode, 200)
+      assert.strictEqual(response.headers['Content-Type'], defaultMimeType)
+      assert.strictEqual(response.toString(), 'binary')
     }))
   )
 
@@ -173,11 +174,11 @@ describe('handlers/file', () => {
       request: '/file.txt'
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 200)
-        assert(() => response.headers['Content-Type'] === textMimeType)
-        assert(() => response.headers['Content-Length'] === '12')
-        assert(() => response.toString() === 'Hello World!')
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.headers['Content-Type'], textMimeType)
+        assert.strictEqual(response.headers['Content-Length'], '12')
+        assert.strictEqual(response.toString(), 'Hello World!')
       }))
     )
 
@@ -188,11 +189,11 @@ describe('handlers/file', () => {
       }
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 200)
-        assert(() => response.headers['Content-Type'] === textMimeType)
-        assert(() => response.headers['Content-Length'] === '12')
-        assert(() => response.toString() === '')
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.headers['Content-Type'], textMimeType)
+        assert.strictEqual(response.headers['Content-Length'], '12')
+        assert.strictEqual(response.toString(), '')
       }))
     )
 
@@ -206,10 +207,10 @@ describe('handlers/file', () => {
       request: '/folder/index.html'
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 200)
-        assert(() => response.headers['Content-Type'] === htmlMimeType)
-        assert(() => response.toString() === '<html />')
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.headers['Content-Type'], htmlMimeType)
+        assert.strictEqual(response.toString(), '<html />')
       }))
     )
 
@@ -246,10 +247,10 @@ describe('handlers/file', () => {
         request: '/folder/index.html'
       })
         .then(({ promise, response }) => promise.then(value => {
-          assert(() => value === undefined)
-          assert(() => response.statusCode === 200)
-          assert(() => response.headers['Content-Type'] === htmlMimeType)
-          assert(() => response.toString() === '<html />')
+          assert.strictEqual(value, undefined)
+          assert.strictEqual(response.statusCode, 200)
+          assert.strictEqual(response.headers['Content-Type'], htmlMimeType)
+          assert.strictEqual(response.toString(), '<html />')
         }))
       )
 
@@ -301,10 +302,10 @@ describe('handlers/file', () => {
         }
       })
         .then(({ promise, response }) => promise.then(value => {
-          assert(() => value === undefined)
-          assert(() => response.statusCode === 200)
-          assert(() => response.headers['Content-Type'] === textMimeType)
-          assert(() => response.toString() === 'Hello World!')
+          assert.strictEqual(value, undefined)
+          assert.strictEqual(response.statusCode, 200)
+          assert.strictEqual(response.headers['Content-Type'], textMimeType)
+          assert.strictEqual(response.toString(), 'Hello World!')
         }))
     })
 
@@ -318,7 +319,7 @@ describe('handlers/file', () => {
       }
     })
       .then(assert.notExpected, reason => {
-        assert(() => !!reason)
+        assert.ok(!!reason)
       })
     )
   })
@@ -328,11 +329,11 @@ describe('handlers/file', () => {
       request: './file.txt'
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 200)
-        assert(() => response.headers['Accept-Ranges'] === 'bytes')
-        assert(() => response.headers['Content-Range'] === undefined)
-        assert(() => response.toString() === 'Hello World!')
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.headers['Accept-Ranges'], 'bytes')
+        assert.strictEqual(response.headers['Content-Range'], undefined)
+        assert.strictEqual(response.toString(), 'Hello World!')
       }))
     )
 
@@ -346,10 +347,10 @@ describe('handlers/file', () => {
       }
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 200)
-        assert(() => response.headers['Content-Type'] === textMimeType)
-        assert(() => response.toString() === 'Hello World!')
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.headers['Content-Type'], textMimeType)
+        assert.strictEqual(response.toString(), 'Hello World!')
       }))
     )
 
@@ -363,12 +364,12 @@ describe('handlers/file', () => {
       }
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 206)
-        assert(() => response.headers['Content-Type'] === textMimeType)
-        assert(() => response.headers['Content-Range'] === 'bytes 0-4/12')
-        assert(() => response.headers['Content-Length'] === '5')
-        assert(() => response.toString() === 'Hello')
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 206)
+        assert.strictEqual(response.headers['Content-Type'], textMimeType)
+        assert.strictEqual(response.headers['Content-Range'], 'bytes 0-4/12')
+        assert.strictEqual(response.headers['Content-Length'], '5')
+        assert.strictEqual(response.toString(), 'Hello')
       }))
     )
 
@@ -382,12 +383,12 @@ describe('handlers/file', () => {
       }
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 206)
-        assert(() => response.headers['Content-Type'] === textMimeType)
-        assert(() => response.headers['Content-Range'] === 'bytes 6-10/12')
-        assert(() => response.headers['Content-Length'] === '5')
-        assert(() => response.toString() === 'World')
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 206)
+        assert.strictEqual(response.headers['Content-Type'], textMimeType)
+        assert.strictEqual(response.headers['Content-Range'], 'bytes 6-10/12')
+        assert.strictEqual(response.headers['Content-Length'], '5')
+        assert.strictEqual(response.toString(), 'World')
       }))
     )
 
@@ -401,12 +402,12 @@ describe('handlers/file', () => {
       }
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 206)
-        assert(() => response.headers['Content-Type'] === textMimeType)
-        assert(() => response.headers['Content-Range'] === 'bytes 6-11/12')
-        assert(() => response.headers['Content-Length'] === '6')
-        assert(() => response.toString() === 'World!')
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 206)
+        assert.strictEqual(response.headers['Content-Type'], textMimeType)
+        assert.strictEqual(response.headers['Content-Range'], 'bytes 6-11/12')
+        assert.strictEqual(response.headers['Content-Length'], '6')
+        assert.strictEqual(response.toString(), 'World!')
       }))
     )
 
@@ -420,11 +421,11 @@ describe('handlers/file', () => {
       }
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 416)
-        assert(() => response.headers['Content-Type'] === textMimeType)
-        assert(() => response.headers['Content-Length'] === '0')
-        assert(() => response.toString() === '')
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 416)
+        assert.strictEqual(response.headers['Content-Type'], textMimeType)
+        assert.strictEqual(response.headers['Content-Length'], '0')
+        assert.strictEqual(response.toString(), '')
       }))
     )
 
@@ -438,11 +439,11 @@ describe('handlers/file', () => {
       }
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 416)
-        assert(() => response.headers['Content-Type'] === textMimeType)
-        assert(() => response.headers['Content-Length'] === '0')
-        assert(() => response.toString() === '')
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 416)
+        assert.strictEqual(response.headers['Content-Type'], textMimeType)
+        assert.strictEqual(response.headers['Content-Length'], '0')
+        assert.strictEqual(response.toString(), '')
       }))
     )
 
@@ -459,10 +460,10 @@ describe('handlers/file', () => {
       }
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 206)
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 206)
         const lastModified = response.headers['Last-Modified']
-        assert(() => !!lastModified)
+        assert.ok(!!lastModified)
         return handle({
           request: {
             method: 'GET',
@@ -478,12 +479,12 @@ describe('handlers/file', () => {
         })
       }))
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 206)
-        assert(() => response.headers['Content-Type'] === textMimeType)
-        assert(() => response.headers['Content-Range'] === 'bytes 6-11/12')
-        assert(() => response.headers['Content-Length'] === '6')
-        assert(() => response.toString() === 'World!')
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 206)
+        assert.strictEqual(response.headers['Content-Type'], textMimeType)
+        assert.strictEqual(response.headers['Content-Range'], 'bytes 6-11/12')
+        assert.strictEqual(response.headers['Content-Length'], '6')
+        assert.strictEqual(response.toString(), 'World!')
       }))
     )
 
@@ -500,10 +501,10 @@ describe('handlers/file', () => {
       }
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 206)
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 206)
         const lastModified = response.headers['Last-Modified']
-        assert(() => !!lastModified)
+        assert.ok(!!lastModified)
         return handle({
           request: {
             method: 'GET',
@@ -519,12 +520,12 @@ describe('handlers/file', () => {
         })
       }))
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 200)
-        assert(() => response.headers['Content-Type'] === textMimeType)
-        assert(() => !response.headers['Content-Range'])
-        assert(() => parseInt(response.headers['Content-Length'], 10) > 6)
-        assert(() => response.toString().startsWith('Lorem ipsum dolor sit amet,'))
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.headers['Content-Type'], textMimeType)
+        assert.ok(!response.headers['Content-Range'])
+        assert.ok(parseInt(response.headers['Content-Length'], 10) > 6)
+        assert.ok(response.toString().startsWith('Lorem ipsum dolor sit amet,'))
       }))
     )
   })
@@ -540,11 +541,11 @@ describe('handlers/file', () => {
         request.abort()
         return promise
           .then(value => {
-            assert(() => value === undefined)
-            assert(() => response.statusCode === 200)
-            assert(() => response.headers['Content-Type'] === textMimeType)
-            assert(() => response.headers['Content-Length'] === '12')
-            assert(() => response.toString() === '')
+            assert.strictEqual(value, undefined)
+            assert.strictEqual(response.statusCode, 200)
+            assert.strictEqual(response.headers['Content-Type'], textMimeType)
+            assert.strictEqual(response.headers['Content-Length'], '12')
+            assert.strictEqual(response.toString(), '')
           })
       })
     )
@@ -572,11 +573,11 @@ describe('handlers/file', () => {
           allocatedRequest = request
           return promise
             .then(value => {
-              assert(() => value === undefined)
-              assert(() => response.statusCode === 200)
-              assert(() => response.headers['Content-Type'] === textMimeType)
-              assert(() => response.headers['Content-Length'] === '12')
-              assert(() => response.toString() === '')
+              assert.strictEqual(value, undefined)
+              assert.strictEqual(response.statusCode, 200)
+              assert.strictEqual(response.headers['Content-Type'], textMimeType)
+              assert.strictEqual(response.headers['Content-Length'], '12')
+              assert.strictEqual(response.toString(), '')
             })
         })
     })
@@ -592,7 +593,7 @@ describe('handlers/file', () => {
       }
     })
       .then(assert.notExpected, reason => {
-        assert(() => reason.toString().includes('Invalid caching-strategy name'))
+        assert.ok(reason.toString().includes('Invalid caching-strategy name'))
       })
     )
 
@@ -607,11 +608,11 @@ describe('handlers/file', () => {
         }
       })
         .then(({ promise, response }) => promise.then(value => {
-          assert(() => value === undefined)
-          assert(() => response.statusCode === 200)
-          assert(() => response.headers['Cache-Control'] === 'no-store')
-          assert(() => response.headers['Content-Type'] === textMimeType)
-          assert(() => response.headers['Content-Length'] === '12')
+          assert.strictEqual(value, undefined)
+          assert.strictEqual(response.statusCode, 200)
+          assert.strictEqual(response.headers['Cache-Control'], 'no-store')
+          assert.strictEqual(response.headers['Content-Type'], textMimeType)
+          assert.strictEqual(response.headers['Content-Length'], '12')
         }))
       ))
     })
@@ -627,11 +628,11 @@ describe('handlers/file', () => {
         }
       })
         .then(({ promise, response }) => promise.then(value => {
-          assert(() => value === undefined)
-          assert(() => response.statusCode === 200)
-          assert(() => response.headers['Cache-Control'] === 'public, max-age=3475, immutable')
-          assert(() => response.headers['Content-Type'] === textMimeType)
-          assert(() => response.headers['Content-Length'] === '12')
+          assert.strictEqual(value, undefined)
+          assert.strictEqual(response.statusCode, 200)
+          assert.strictEqual(response.headers['Cache-Control'], 'public, max-age=3475, immutable')
+          assert.strictEqual(response.headers['Content-Type'], textMimeType)
+          assert.strictEqual(response.headers['Content-Length'], '12')
         }))
       ))
     })
@@ -647,12 +648,12 @@ describe('handlers/file', () => {
         }
       })
         .then(({ promise, response }) => promise.then(value => {
-          assert(() => value === undefined)
-          assert(() => response.statusCode === 200)
-          assert(() => response.headers['Cache-Control'] === 'no-cache')
-          assert(() => response.headers['Last-Modified'] === 'Wed, 30 Sep 2020 18:51:00 GMT')
-          assert(() => response.headers['Content-Type'] === textMimeType)
-          assert(() => response.headers['Content-Length'] === '12')
+          assert.strictEqual(value, undefined)
+          assert.strictEqual(response.statusCode, 200)
+          assert.strictEqual(response.headers['Cache-Control'], 'no-cache')
+          assert.strictEqual(response.headers['Last-Modified'], 'Wed, 30 Sep 2020 18:51:00 GMT')
+          assert.strictEqual(response.headers['Content-Type'], textMimeType)
+          assert.strictEqual(response.headers['Content-Length'], '12')
         }))
       ))
 
@@ -669,13 +670,13 @@ describe('handlers/file', () => {
         }
       })
         .then(({ promise, response }) => promise.then(value => {
-          assert(() => value === undefined)
-          assert(() => response.statusCode === 304)
-          assert(() => response.headers['Cache-Control'] === 'no-cache')
-          assert(() => response.headers['Last-Modified'] === 'Wed, 30 Sep 2020 18:51:00 GMT')
-          assert(() => response.headers['Content-Type'] === textMimeType)
-          assert(() => response.headers['Content-Length'] === '12')
-          assert(() => response.toString() === '')
+          assert.strictEqual(value, undefined)
+          assert.strictEqual(response.statusCode, 304)
+          assert.strictEqual(response.headers['Cache-Control'], 'no-cache')
+          assert.strictEqual(response.headers['Last-Modified'], 'Wed, 30 Sep 2020 18:51:00 GMT')
+          assert.strictEqual(response.headers['Content-Type'], textMimeType)
+          assert.strictEqual(response.headers['Content-Length'], '12')
+          assert.strictEqual(response.toString(), '')
         }))
       ))
 
@@ -692,14 +693,14 @@ describe('handlers/file', () => {
         }
       })
         .then(({ promise, response }) => promise.then(value => {
-          assert(() => value === undefined)
-          assert(() => response.statusCode === 200)
-          assert(() => response.headers['Cache-Control'] === 'no-cache')
-          assert(() => response.headers['Last-Modified'] === 'Wed, 30 Sep 2020 18:51:00 GMT')
-          assert(() => response.headers['Content-Type'] === textMimeType)
-          assert(() => response.headers['Content-Length'] === '12')
+          assert.strictEqual(value, undefined)
+          assert.strictEqual(response.statusCode, 200)
+          assert.strictEqual(response.headers['Cache-Control'], 'no-cache')
+          assert.strictEqual(response.headers['Last-Modified'], 'Wed, 30 Sep 2020 18:51:00 GMT')
+          assert.strictEqual(response.headers['Content-Type'], textMimeType)
+          assert.strictEqual(response.headers['Content-Length'], '12')
           if (verb === 'GET') {
-            assert(() => response.toString() === 'Hello World!')
+            assert.strictEqual(response.toString(), 'Hello World!')
           }
         }))
       ))
@@ -719,9 +720,9 @@ describe('handlers/file', () => {
       }
     })
       .then(({ promise, response }) => promise.then(value => {
-        assert(() => value === undefined)
-        assert(() => response.statusCode === 200)
-        assert(() => response.headers['Content-Type'] === 'not-even-existing')
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.headers['Content-Type'], 'not-even-existing')
       }))
     )
   })
