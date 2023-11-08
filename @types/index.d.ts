@@ -174,7 +174,7 @@ declare module 'reserve' {
     noBody?: boolean
   }
 
-  function send (response: ServerResponse, data: string | object | ReadableStream, options?: ISendOptions): Promise<void>
+  function send (response: ServerResponse, data?: string | object | ReadableStream, options?: ISendOptions): Promise<void>
 
   function check (configuration: Configuration): Promise<Configuration>
 
