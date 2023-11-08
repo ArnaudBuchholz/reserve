@@ -29,7 +29,7 @@ describe('send', () => {
     assert.strictEqual(response.headers['content-length'], '19')
   })
 
-  it('handles ReadableStream', async () => {
+  it('handles ReadableStream (application/octet-stream)', async () => {
     function * data () {
       yield 'Hello'
       yield ' '
@@ -42,6 +42,23 @@ describe('send', () => {
     assert.strictEqual(response.statusCode, 200)
     assert.deepStrictEqual(response.toString(), 'Hello World !')
     assert.strictEqual(response.headers['content-type'], 'application/octet-stream')
+  })
+
+  it('handles undefined', async () => {
+    await send(response, undefined)
+    assert.strictEqual(response.statusCode, 200)
+    assert.deepStrictEqual(response.toString(), '')
+    assert.strictEqual(response.headers['content-type'], undefined)
+  })
+
+  it('handles undefined with options', async () => {
+    await send(response, undefined, {
+      statusCode: 204,
+      noBody: true
+    })
+    assert.strictEqual(response.statusCode, 204)
+    assert.deepStrictEqual(response.toString(), '')
+    assert.strictEqual(response.headers['content-type'], undefined)
   })
 
   it('handles ReadableStream (stream error)', async () => {

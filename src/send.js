@@ -6,11 +6,13 @@ const CONTENT_TYPE = 'content-type'
 const CONTENT_LENGTH = 'content-length'
 
 module.exports = async function (response, data, options = {}) {
-  const { statusCode = 200, noBody } = options
+  let { statusCode = 200, noBody } = options
   const headers = { ...options.headers }
   let stream = false
   let contentType
-  if (typeof data === 'string') {
+  if (data === undefined) {
+    noBody = true
+  } else if (typeof data === 'string') {
     contentType = 'text/plain'
   } else if (typeof data.on === 'function') {
     contentType = 'application/octet-stream'
@@ -19,10 +21,10 @@ module.exports = async function (response, data, options = {}) {
     contentType = 'application/json'
     data = JSON.stringify(data)
   }
-  if (!headers[CONTENT_TYPE]) {
+  if (!headers[CONTENT_TYPE] && contentType) {
     headers[CONTENT_TYPE] = contentType
   }
-  if (!stream && !headers[CONTENT_LENGTH]) {
+  if (data && !stream && !headers[CONTENT_LENGTH]) {
     headers[CONTENT_LENGTH] = (new TextEncoder().encode(data)).length
   }
   response.writeHead(statusCode, headers)
