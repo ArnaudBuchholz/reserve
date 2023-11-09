@@ -1,18 +1,21 @@
 # `capture` helper
 
-Since version 1.8.0, the package offers a mechanism to **capture the response stream** and **duplicate its content** to another **writable stream**.
+```typescript
+function capture (response: ServerResponse, stream: WritableStream): Promise<void>
+```
+
+REserve offers a mechanism to **capture the response stream** and **duplicate its content** to another **writable stream**.
 
 **NOTE** : The content is decoded if the [`content-encoding`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding) header contains: `gzip`, `deflate` or `br` *(only one, no combination is supported)*.
 
 **NOTE** : Check the [version of Node.js](https://nodejs.org/api/zlib.html#zlib_class_zlib_brotlicompress) to enable `br` compression support.
 
-For instance, it enables the caching of downloaded resources :
+For instance, it enables the caching of proxified resources :
 
 ```JavaScript
 mappings: [{
   match: /^\/(.*)/,
-  file: './cache/$1',
-  'ignore-if-not-found': true
+  file: './cache/$1'
 }, {
   method: 'GET',
   custom: async (request, response) => {

@@ -27,7 +27,7 @@ These two options are now enabled by default and the only way to 'revert' it is 
 Before version 2, the `file` handler was returning a `404` error if the path could not be found / read or was invalid.
 
 It was possible to prevent this by setting `ignore-if-not-found` to `true`.
-The same thing can be added by adding another mapping right after that uses the [`status`](status.md) handler with the code `404` (with the same matching criteria if needed).
+The `404` behavior can then be reproduced by adding another mapping right after that uses the [`status`](status.md) handler with the code `404` (with the same matching criteria if needed).
 
 Hence the option is now removed and the `file` handler never generates a `404`.
 
@@ -48,3 +48,9 @@ The request url goes through normalization, meaning :
 
 * `mock.request('GET', 'count')` generates `'/count'` url
 * `mock.request('GET', '/echo/hello world')` generates `'/echo/hello%20world'` url
+
+## `body` helper
+
+By default, [`body`](body.md) nows resolve to a [`Buffer`](https://nodejs.org/docs/latest/api/buffer.html) or, if the `content-type` is specified in the request headers a `string` (`text/plain`) or an `object` (`application/json`).
+
+To **preserve** former behavior, simply replace `body(request)` calls to `body(request).text()`

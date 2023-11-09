@@ -179,9 +179,9 @@ declare module 'reserve' {
   function capture (response: ServerResponse, stream: WritableStream): Promise<void>
 
   interface SendOptions {
-    statusCode?: number
+    statusCode?: number /* defaulted to 200 */
     headers?: Headers
-    noBody?: boolean
+    noBody?: boolean /* do not send body */
   }
 
   function send (response: ServerResponse, data?: string | object | ReadableStream, options?: SendOptions): Promise<void>
