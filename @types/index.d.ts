@@ -164,17 +164,27 @@ declare module 'reserve' {
     dispatch: (request: IncomingMessage, response: ServerResponse) => void
   }
 
-  function body (request: IncomingMessage): Promise<string>
+  interface BodyOptions {
+    ignoreContentLength?: boolean
+  }
+
+  type BodyResult = Promise<Buffer | string | object> & {
+    buffer: () => Promise<Buffer>
+    text: () => Promise<string>
+    json: () => Promise<object>
+  }
+
+  function body (request: IncomingMessage, options?: BodyOptions): BodyResult
+
   function capture (response: ServerResponse, stream: WritableStream): Promise<void>
 
-
-  interface ISendOptions {
+  interface SendOptions {
     statusCode?: number
     headers?: Headers
     noBody?: boolean
   }
 
-  function send (response: ServerResponse, data?: string | object | ReadableStream, options?: ISendOptions): Promise<void>
+  function send (response: ServerResponse, data?: string | object | ReadableStream, options?: SendOptions): Promise<void>
 
   function check (configuration: Configuration): Promise<Configuration>
 

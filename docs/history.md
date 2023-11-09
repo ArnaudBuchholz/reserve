@@ -104,6 +104,8 @@
 ||BREAKING CHANGE: `mock` returns immediately even if the *server* is not ready (wait for `ready`)|
 ||BREAKING CHANGE: Headers of mocked Request and Response returns strings or array of strings|
 ||BREAKING CHANGE: Mocked Request normalizes the received URL|
+||BREAKING CHANGE: `body` helper leverages request headers and offers conversion interface|
 ||Fix `use` to handle middleware that are not calling next|
 ||Response status code is preserved when set before `file`|
 ||Fix types definition (`use` handler)|
+||Exposes `send` helper ([doc](send.md))|
