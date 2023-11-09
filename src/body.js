@@ -2,7 +2,7 @@
 
 module.exports = function (request, options = {}) {
   let type
-  const promise = new Promise((resolve, reject) => {
+  const readBuffer = new Promise((resolve, reject) => {
     request.on('error', reject)
     const { ignoreContentLength = false } = options
     const contentLength = !ignoreContentLength && request.headers && request.headers['content-length']
@@ -31,12 +31,18 @@ module.exports = function (request, options = {}) {
         .on('end', () => resolve(Buffer.concat(buffers)))
     }
   })
-  promise.buffer = () => promise
-  promise.text = () => {
-    return promise.then(buffer => buffer.toString())
+  const toText = buffer => buffer.toString()
+  const toJson = buffer => JSON.parse(buffer.toString())
+  let promise
+  if (type === 'text') {
+    promise = readBuffer.then(toText)
+  } else if (type === 'json') {
+    promise = readBuffer.then(toJson)
+  } else {
+    promise = readBuffer
   }
-  promise.json = () => {
-    return promise.then(buffer => JSON.parse(buffer.toString()))
-  }
+  promise.buffer = () => readBuffer
+  promise.text = () => readBuffer.then(toText)
+  promise.json = () => readBuffer.then(toJson)
   return promise
 }

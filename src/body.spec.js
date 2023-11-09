@@ -121,6 +121,61 @@ describe('body', () => {
     }))
       .then(text => assert.strictEqual(text, '{"hello":"World !"}'), notExpected)
     )
+
+    it('can be overridden using .json() if text/plain', async () => body(request([
+      '{',
+      '"hello"',
+      ':',
+      '"World !"',
+      '}'
+    ], {
+      'content-type': 'text/plain'
+    })).json()
+      .then(json => assert.deepStrictEqual(json, { hello: 'World !' }), notExpected)
+    )
+
+    it('returns json if application/json', async () => body(request([
+      '{',
+      '"hello"',
+      ':',
+      '"World !"',
+      '}'
+    ], {
+      'content-type': 'application/json'
+    }))
+      .then(json => assert.deepStrictEqual(json, { hello: 'World !' }), notExpected)
+    )
+
+    it('can be overridden using .text() if application/json', async () => body(request([
+      '{',
+      '"hello"',
+      ':',
+      '"World !"',
+      '}'
+    ], {
+      'content-type': 'application/json'
+    })).text()
+      .then(text => assert.strictEqual(text, '{"hello":"World !"}'), notExpected)
+    )
+
+    it('returns a buffer otherwise', async () => body(request([
+      '<xml/>'
+    ], {
+      'content-type': 'application/xml'
+    }))
+      .then(buffer => {
+        assert.ok(buffer instanceof Buffer)
+        assert.strictEqual(Buffer.compare(buffer, Buffer.from('<xml/>')), 0)
+      }, notExpected)
+    )
+
+    it('can be overridden using .text() otherwise', async () => body(request([
+      '<xml/>'
+    ], {
+      'content-type': 'application/xml'
+    })).text()
+      .then(text => assert.strictEqual(text, '<xml/>'), notExpected)
+    )
   })
 
   it('forwards the error', async () => body(request([

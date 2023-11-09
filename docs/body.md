@@ -30,4 +30,6 @@ Depending on the request's `content-type` *(if set)*, `body()` will automaticall
 * an object when `application/json`
 * a [Buffer]() otherwise
 
+**NOTE** : even if the `content-type` is specified, the caller may decide to use `.buffer()`, `.text()` or `.json()`.
+
 **NOTE** : if the request's `content-length` is set (and not ignored), the buffer is allocated accordingly meaning the result might be truncated (if too small) or padded with `\x00` (if too large).
