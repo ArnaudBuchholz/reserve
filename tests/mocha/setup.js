@@ -8,6 +8,7 @@ function cleanRequireCache () {
 }
 
 require('mock-require')('test-tools', {
+  notExpected: () => { throw new Error('Not expected') },
   wrapHandler: require('./wrap-handler'),
   http: require('./http'),
   console: {

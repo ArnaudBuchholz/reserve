@@ -2,6 +2,7 @@
 
 const mockRequire = require('mock-require')
 const assert = require('assert')
+const { notExpected } = require('test-tools')
 const { Request, Response } = require('../index')
 const useHandler = require('./use')
 
@@ -12,7 +13,7 @@ describe('handlers/use', () => {
       return function (request, response) {}
     }
   })
-    .then(assert.notExpected, function (reason) {
+    .then(notExpected, function (reason) {
       assert.ok(reason instanceof Error)
     })
   )
@@ -25,7 +26,7 @@ describe('handlers/use', () => {
       }
     }
   })
-    .then(assert.notExpected, function (reason) {
+    .then(notExpected, function (reason) {
       assert.ok(reason instanceof Error)
     })
   )
@@ -83,7 +84,7 @@ describe('handlers/use', () => {
     }
     await useHandler.validate(mapping)
     useHandler.redirect({ mapping, request: dispatchedRequest, response: dispatchedResponse })
-      .then(assert.notExpected, reason => assert.strictEqual(reason, error))
+      .then(notExpected, reason => assert.strictEqual(reason, error))
   })
 
   it('forward the middleware error (exception)', async () => {
@@ -99,7 +100,7 @@ describe('handlers/use', () => {
     }
     await useHandler.validate(mapping)
     return useHandler.redirect({ mapping, request: dispatchedRequest, response: dispatchedResponse })
-      .then(assert.notExpected, reason => assert.strictEqual(reason, error))
+      .then(notExpected, reason => assert.strictEqual(reason, error))
   })
 
   it('detects the response end even if next is not called (synchronous)', async () => {

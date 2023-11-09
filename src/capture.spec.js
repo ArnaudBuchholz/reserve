@@ -1,6 +1,7 @@
 'use strict'
 
 const assert = require('assert')
+const { notExpected } = require('test-tools')
 const capture = require('./capture')
 const Response = require('./mock/Response')
 const { readFile } = require('fs')
@@ -66,7 +67,7 @@ describe('capture', () => {
   it('fails if the response status is not 200', done => {
     const { response, promise } = setup()
     promise
-      .then(assert.notExpected, reason => {
+      .then(notExpected, reason => {
         assert.strictEqual(reason.message, 'Invalid status')
         return response.waitForFinish()
       })
@@ -88,7 +89,7 @@ describe('capture', () => {
       onwrite(new Error('Simulated error'))
     }
     promise
-      .then(assert.notExpected, reason => {
+      .then(notExpected, reason => {
         assert.strictEqual(reason.message, 'Simulated error')
         assert.strictEqual(numberOfWrites, 1)
         return response.waitForFinish()
@@ -166,7 +167,7 @@ describe('capture', () => {
     it('fails on unsupported encoding', done => {
       const { response, promise } = setup()
       promise
-        .then(assert.notExpected, reason => {
+        .then(notExpected, reason => {
           assert.ok(reason.message.startsWith('Unsupported encoding'))
           return response.waitForFinish()
         })

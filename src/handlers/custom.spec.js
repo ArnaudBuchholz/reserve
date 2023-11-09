@@ -1,7 +1,7 @@
 'use strict'
 
 const assert = require('assert')
-const { wrapHandler } = require('test-tools')
+const { notExpected, wrapHandler } = require('test-tools')
 const customHandler = require('./custom')
 
 const handle = wrapHandler(customHandler, {
@@ -68,7 +68,7 @@ describe('handlers/custom', () => {
       custom: () => { throw new Error('KO') }
     }
   })
-    .then(({ promise }) => promise.then(assert.notExpected, reason => {
+    .then(({ promise }) => promise.then(notExpected, reason => {
       assert.strictEqual(reason.message, 'KO')
     }))
   )
@@ -79,7 +79,7 @@ describe('handlers/custom', () => {
       custom: async () => { throw new Error('KO') }
     }
   })
-    .then(({ promise }) => promise.then(assert.notExpected, reason => {
+    .then(({ promise }) => promise.then(notExpected, reason => {
       assert.strictEqual(reason.message, 'KO')
     }))
   )

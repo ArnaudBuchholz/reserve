@@ -2,7 +2,7 @@
 
 const mockRequire = require('mock-require')
 const assert = require('assert')
-const { wrapHandler, http } = require('test-tools')
+const { notExpected, wrapHandler, http } = require('test-tools')
 const urlHandler = require('./url')
 const handle = wrapHandler(urlHandler)
 const { $configuration } = require('../symbols')
@@ -441,7 +441,7 @@ describe('handlers/url', () => {
         configuration: { [uid]: 'configuration' },
         match: { [uid]: 'match' }
       })
-        .then(({ promise, response }) => promise.then(assert.notExpected, reason => {
+        .then(({ promise, response }) => promise.then(notExpected, reason => {
           assert.ok(!!reason)
         }))
     })

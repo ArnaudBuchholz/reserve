@@ -1,6 +1,7 @@
 'use strict'
 
 const assert = require('assert')
+const { notExpected } = require('test-tools')
 const { Request, Response, check, log, mock } = require('./index')
 
 function checkConfiguration (configuration, mapping) {
@@ -89,7 +90,7 @@ describe('iconfiguration', () => {
         test: '$1'
       }]
     })
-      .then(assert.notExpected, reason => {
+      .then(notExpected, reason => {
         assert.ok(reason instanceof Error)
         assert.strictEqual(reason.message, 'mapping.ko')
       })

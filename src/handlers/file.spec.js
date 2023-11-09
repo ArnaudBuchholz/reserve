@@ -1,7 +1,7 @@
 'use strict'
 
 const assert = require('assert')
-const { wrapHandler } = require('test-tools')
+const { notExpected, wrapHandler } = require('test-tools')
 const fileHandler = require('./file')
 const handle = wrapHandler(fileHandler, { mapping: { cwd: '/' } })
 const fs = require('fs')
@@ -318,7 +318,7 @@ describe('handlers/file', () => {
         }
       }
     })
-      .then(assert.notExpected, reason => {
+      .then(notExpected, reason => {
         assert.ok(!!reason)
       })
     )
@@ -591,7 +591,7 @@ describe('handlers/file', () => {
         'caching-strategy': 'unknown'
       }
     })
-      .then(assert.notExpected, reason => {
+      .then(notExpected, reason => {
         assert.ok(reason.toString().includes('Invalid caching-strategy name'))
       })
     )

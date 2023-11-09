@@ -1,11 +1,12 @@
 'use strict'
 
 const assert = require('assert')
+const { notExpected } = require('test-tools')
 const { join } = require('path')
 const { read, check } = require('./configuration')
 const { $customCallback } = require('./symbols')
 
-const shouldFail = promise => promise.then(assert.notExpected, () => {
+const shouldFail = promise => promise.then(notExpected, () => {
   assert.ok(true) // expected
 })
 
@@ -125,7 +126,7 @@ describe('configuration', () => {
       it('validates http2', () => {
         return read('/folder/reserve.json')
           .then(configuration => check({ ...configuration, http2: 'abc' }))
-          .then(assert.notExpected, reason => assert.ok(!!reason))
+          .then(notExpected, reason => assert.ok(!!reason))
       })
 
       it('supports unsecured http2', () => {
