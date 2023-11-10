@@ -18,29 +18,11 @@ Example :
 * If the path resolves to a missing / unreadable / invalid file / directory, the handler does not process the request
 * Supports [`Range` HTTP header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range) *(only one range)*
 * If the response already owns a `statusCode` different from `200`, the file handler will keep it
-* Only a limited subset of mime types is pre-configured, use `mime-types` to extend :
-
-|Extension|mime type|
-|---|---|
-|bin|application/octet-stream|
-|css|text/css|
-|gif|image/gif|
-|html|text/html|
-|htm|text/html|
-|jpeg|image/jpeg|
-|jpg|image/jpeg|
-|js|application/javascript|
-|mp4|video/mp4|
-|pdf|application/pdf|
-|png|image/png|
-|svg|image/svg+xml|
-|text|text/plain|
-|txt|text/plain|
-|xml|application/xml|
+* Only a limited subset of mime types is pre-configured (see [mime.json](https://github.com/ArnaudBuchholz/reserve/blob/main/src/mime.json)), use `mime-types` to extend
 
 | option | type | default | description |
 |---|---|---|---|
-| `mime-types` | Object | `{}` | Dictionary indexed by file extension that overrides mime type resolution. For instance : `{ "csv": "text/csv" }`. |
+| `mime-types` | Object | `{}` | Dictionary indexed by file extension that overrides mime type resolution. For instance : `{ "gsf": "application/x-font-ghostscript" }`. |
 | `caching-strategy` | `'modified'` or Number | 0 | Configures caching strategy:  |
 |||| `'modified'`: use file last modification date, meaning the response header will contain [`Last-Modified`](https://developer.mozilla.org/fr/docs/Web/HTTP/Headers/Last-Modified) and the handler reacts to request headers [`If-Modified-Since`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Modified-Since) and [`If-Range`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Range)  |
 |||| any number: hard coded duration (in seconds), based on the response header [`Cache-Control` with `max-age`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) |
