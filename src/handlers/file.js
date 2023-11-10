@@ -3,32 +3,7 @@
 const { basename, createReadStream, dirname, isAbsolute, join, readdir, stat } = require('../node-api')
 const { $handlerPrefix } = require('../symbols')
 const send = require('../send')
-
-const app = 'application'
-const img = 'image'
-const txt = 'text'
-const html = `${txt}/html`
-const jpeg = `${img}/jpeg`
-const text = `${txt}/plain`
-
-const mimeTypes = {
-  bin: `${app}/octet-stream`,
-  css: `${txt}/css`,
-  gif: `${img}/gif`,
-  html,
-  htm: html,
-  jpeg,
-  jpg: jpeg,
-  js: `${app}/javascript`,
-  json: `${app}/json`,
-  mp4: 'video/mp4',
-  pdf: `${app}/pdf`,
-  png: `${img}/png`,
-  svg: `${img}/svg+xml`,
-  text,
-  txt: text,
-  xml: `${app}/xml`
-}
+const mimeTypes = require('../mime')
 
 const cfs = 'custom-file-system'
 const cache = 'caching-strategy'

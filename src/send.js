@@ -1,6 +1,7 @@
 'use strict'
 
 const { pipeline } = require('./node-api')
+const { bin, text, json } = require('./mime')
 
 const CONTENT_TYPE = 'content-type'
 const CONTENT_LENGTH = 'content-length'
@@ -13,12 +14,12 @@ module.exports = async function (response, data, options = {}) {
   if (data === undefined) {
     noBody = true
   } else if (typeof data === 'string') {
-    contentType = 'text/plain'
+    contentType = text
   } else if (typeof data.on === 'function') {
-    contentType = 'application/octet-stream'
+    contentType = bin
     stream = true
   } else {
-    contentType = 'application/json'
+    contentType = json
     data = JSON.stringify(data)
   }
   if (!headers[CONTENT_TYPE] && contentType) {

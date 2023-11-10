@@ -1,5 +1,7 @@
 'use strict'
 
+const { text, json } = require('./mime')
+
 module.exports = function (request, options = {}) {
   let type
   const readBuffer = new Promise((resolve, reject) => {
@@ -8,10 +10,10 @@ module.exports = function (request, options = {}) {
     const contentLength = !ignoreContentLength && request.headers && request.headers['content-length']
     const contentType = request.headers && request.headers['content-type']
     if (contentType) {
-      if (contentType.startsWith('text/plain')) {
-        type = 'text'
-      } else if (contentType.startsWith('application/json')) {
-        type = 'json'
+      if (contentType.startsWith(text)) {
+        type = text
+      } else if (contentType.startsWith(json)) {
+        type = json
       }
     }
     if (contentLength) {
@@ -34,9 +36,9 @@ module.exports = function (request, options = {}) {
   const toText = buffer => buffer.toString()
   const toJson = buffer => JSON.parse(buffer.toString())
   let promise
-  if (type === 'text') {
+  if (type === text) {
     promise = readBuffer.then(toText)
-  } else if (type === 'json') {
+  } else if (type === json) {
     promise = readBuffer.then(toJson)
   } else {
     promise = readBuffer
