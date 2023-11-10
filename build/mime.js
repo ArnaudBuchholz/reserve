@@ -3,6 +3,7 @@
 const { writeFileSync } = require('fs')
 const { join } = require('path')
 const mimeTypes = require(join(__dirname, '../src/mime.json'))
+const verbose = !process.argv.includes('--silent')
 
 const tokens = [
   'openxmlformats',
@@ -41,7 +42,9 @@ function * encode () {
 }
 
 const encoded = [...encode()].join('')
-console.log('Compression done', encoded.length, encoded)
+if (verbose) {
+  console.log('Compression done', encoded.length, encoded)
+}
 
 writeFileSync(join(__dirname, '../src/mime.js'), `'use strict'
 
@@ -64,20 +67,6 @@ source.split(',').forEach(line => {
 module.exports = mimeTypes
 `)
 
-function decode () {
-  const mimeTypes = {}
-  let source = encoded
-  tokens.forEach((token, index) => {
-    source = source.replace(new RegExp(String.fromCharCode(65 + index), 'g'), token)
-  })
-  let lastMimeType
-  source.split(',').forEach(line => {
-    const [type, mimeType] = line.split('=')
-    if (mimeType) {
-      lastMimeType = mimeType
-    }
-    mimeTypes[type] = lastMimeType
-  })
-  console.log(mimeTypes)
+if (verbose) {
+  console.log(require('../src/mime.js'))
 }
-decode()
