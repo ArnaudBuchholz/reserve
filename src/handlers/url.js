@@ -35,7 +35,7 @@ function noop () {}
 
 function validateHook (mapping, hookName) {
   if (typeof mapping[hookName] === 'string') {
-    mapping[hookName] = require(mapping[hookName])
+    mapping[hookName] = require(mapping[hookName]) // TODO CJS/EJS switch
   }
 }
 

@@ -129,7 +129,7 @@ module.exports = {
   method: 'GET,HEAD',
   validate: async mapping => {
     if (typeof mapping[cfs] === 'string') {
-      mapping[cfs] = require(join(mapping.cwd, mapping[cfs]))
+      mapping[cfs] = require(join(mapping.cwd, mapping[cfs])) // TODO CJS/EJS switch
     }
     const apis = ['stat', 'createReadStream', 'readdir']
     const invalids = apis.filter(name => typeof mapping[cfs][name] !== 'function')

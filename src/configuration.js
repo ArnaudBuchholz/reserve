@@ -78,7 +78,7 @@ function validateHandler (type) {
   const handlers = this.handlers
   let handler = handlers[type]
   if (typeof handler === 'string') {
-    handler = require(handler)
+    handler = require(handler) // TODO CJS/EJS switch
     handlers[type] = handler
   }
   checkHandler(handler, type)
@@ -108,7 +108,7 @@ function checkListeners (configuration) {
   configuration.listeners = listeners.map(register => {
     let registerType = typeof register
     if (registerType === 'string') {
-      register = require(join(configuration.cwd || process.cwd(), register))
+      register = require(join(configuration.cwd || process.cwd(), register)) // TODO CJS/EJS switch
       registerType = typeof register
     }
     if (registerType !== 'function') {

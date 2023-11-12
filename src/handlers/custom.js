@@ -15,7 +15,7 @@ module.exports = {
   },
   validate: async mapping => {
     if (typeof mapping.custom === 'string') {
-      mapping[$customCallback] = require(join(mapping.cwd, mapping.custom))
+      mapping[$customCallback] = require(join(mapping.cwd, mapping.custom)) // TODO CJS/EJS switch
     } else {
       mapping[$customCallback] = mapping.custom
     }

@@ -16,7 +16,7 @@ module.exports = {
     if (typeof mapping.use === 'function') {
       factory = mapping.use
     } else {
-      factory = require(mapping.use)
+      factory = require(mapping.use) // TODO CJS/EJS switch ?
     }
     const middleware = factory(mapping.options)
     if (middleware.length !== 3) {
