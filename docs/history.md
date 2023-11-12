@@ -108,4 +108,4 @@
 ||Fix `use` to handle middleware that are not calling next|
 ||Response status code is preserved when set before `file`|
 ||Fix types definition (`use` handler)|
-||Exposes `send` helper ([doc](send.md))|
+||Expose `send` helper ([doc](send.md))|
