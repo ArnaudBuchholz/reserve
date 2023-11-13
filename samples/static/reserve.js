@@ -7,4 +7,9 @@ check({
     "file": "./www/$1"
   }]
 })
-  .then(configuration => serve(configuration))
+  .then(configuration => {
+    serve(configuration)
+      .on('ready', ({ port }) => {
+        console.log(`Listening on port ${port}`)
+      })
+  })
