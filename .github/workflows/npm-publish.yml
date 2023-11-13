@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: 18
       - run: npm ci
-      - run: npm test
+      - run: npm test --workspace reserve
 
   publish-npm:
     needs: build
@@ -28,7 +28,7 @@ jobs:
           node-version: 18
           registry-url: https://registry.npmjs.org/
       - run: npm ci
-      - run: npm run build
-      - run: npm publish
+      - run: npm run build --workspace reserve
+      - run: npm publish --workspace reserve
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}

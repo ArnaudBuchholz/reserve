@@ -21,10 +21,6 @@ node_modules/
 .nyc_output
 coverage
 
-# tests
-tests/cache/
-tests/types.js
-
 # stryker temp files
 .stryker-tmp
 reports/
@@ -33,9 +29,7 @@ reports/
 docs/_site
 
 # build result
-dist/core.js
-dist/bundle.json
-dist/cli.js
+**/dist/*
 
 # npm pack
 *.tgz
