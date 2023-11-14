@@ -21,12 +21,17 @@ node_modules/
 .nyc_output
 coverage
 
-# tests
-tests/cache/
-tests/types.js
-
 # stryker temp files
 .stryker-tmp
 reports/
+
+# jekyll build
+docs/_site
+
+# build result
+**/dist/*
+
+# npm pack
+*.tgz
 
 .env

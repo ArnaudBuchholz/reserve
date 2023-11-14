@@ -1,0 +1,65 @@
+{
+  "mappings": [{
+    "use": "cors",
+    "options" : {
+      "origin": "http://example.com",
+      "methods": "GET,POST"
+    }
+  }, {
+    "match": "^/url/proxy/(https?)/(.*)",
+    "url": "$1://$2",
+    "unsecure-cookies": true
+  }, {
+    "match": "^/url/badssl",
+    "ignore-unverifiable-certificate": true,
+    "url": "https://expired.badssl.com/"
+  }, {
+    "match": "^/custom/echo(?:/(.*))?$",
+    "custom": "./echo.js"
+  }, {
+    "match": "^/custom/configuration",
+    "custom": "./configuration.js"
+  }, {
+    "match": "^/status/301",
+    "status": 301,
+    "headers": {
+      "location": "https://www.npmjs.com/package/reserve"
+    }
+  }, {
+    "match": "^/status/redirect/(.*)",
+    "status": 302,
+    "headers": {
+      "location": "https://www.npmjs.com/package/$1"
+    }
+  }, {
+    "match": "^/status/404",
+    "status": 404
+  }, {
+    "match": "^/status/508",
+    "status": 508
+  }, {
+    "match": "^/file/mime/(.*)",
+    "file": "./$1",
+    "mime-types": {
+      "txt": "application/x-httpd-php"
+    }
+  }, {
+    "match": "^/file/cache/modified/(.*)",
+    "file": "./$1",
+    "caching-strategy": "modified"
+  }, {
+    "match": "^/file/cache/max-age/(.*)",
+    "file": "./$1",
+    "caching-strategy": 360
+  }, {
+    "match": "^/file/status/(.*)",
+    "custom": "./status-205.js"
+  }, {
+    "match": "^/file/status/(.*)",
+    "file": "./$1"
+  }, {
+    "match": "^/file/(.*)",
+    "strict": true,
+    "file": "./$1"
+  }]
+}

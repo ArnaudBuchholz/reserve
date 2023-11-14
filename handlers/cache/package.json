@@ -1,0 +1,60 @@
+{
+  "name": "reserve-cache",
+  "version": "2.0.0",
+  "description": "cache handler for REserve",
+  "main": "./index.js",
+  "files": [
+    "*.js"
+  ],
+  "engines": {
+    "node": ">=12.22.12"
+  },
+  "scripts": {
+    "test": "standard && nyc mocha",
+    "lint": "standard --fix",
+    "mocha": "mocha",
+    "mocha-dbg": "node --inspect-brk node_modules/mocha/bin/_mocha",
+    "cover": "nyc mocha && nyc report --reporter=lcov"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ArnaudBuchholz/reserve.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ArnaudBuchholz/reserve/issues"
+  },
+  "keywords": [
+    "reserve",
+    "cache"
+  ],
+  "author": "Arnaud Buchholz",
+  "license": "MIT",
+  "homepage": "https://github.com/ArnaudBuchholz/reserve/handlers/cache#readme",
+  "dependencies": {
+    "reserve": "^2"
+  },
+  "devDependencies": {
+    "mocha": "^10",
+    "nyc": "^15",
+    "standard": "^17"
+  },
+  "standard": {
+    "env": [
+      "mocha",
+      "node"
+    ]
+  },
+  "mocha": {
+    "spec": [
+      "src/*.spec.js"
+    ]
+  },
+  "nyc": {
+    "check-coverage": true,
+    "branches": 100,
+    "lines": 100,
+    "functions": 100,
+    "statements": 100
+  }
+}
+ 

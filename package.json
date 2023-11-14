@@ -1,117 +1,35 @@
 {
   "name": "reserve",
-  "version": "1.15.5",
-  "description": "Lightweight http server statically configurable using regular expressions",
-  "main": "./index.js",
-  "files": [
-    "handlers/*.js",
-    "detect/*.js",
-    "mock/*.js",
-    "@types/*.d.ts",
-    "*.js"
-  ],
-  "bin": {
-    "reserve": "./index.js"
-  },
-  "types": "./@types/index.d.ts",
-  "engines": {
-    "node": ">=12.0.0"
-  },
-  "scripts": {
-    "test": "standard && node tests/all.js && nyc mocha && (node -e \"if (parseInt(process.version.match(/v(\\d+)/)[1]) > 14) process.exit(1) \" || npm run test:types)",
-    "test:mutation": "stryker run",
-    "lint": "standard --fix",
-    "mocha": "mocha",
-    "mocha-dbg": "node --inspect-brk node_modules/mocha/bin/_mocha",
-    "cover": "nyc mocha && nyc report --reporter=lcov",
-    "perf-serve": "node . --config ./tests/http.json --silent",
-    "perf-test": "autocannon localhost:5000",
-    "perf": "start-server-and-test perf-test http-get://localhost:5000 perf-serve",
-    "reserve": "node ./samples/reserve",
-    "test:types": "npm run install-local-reserve && npx tsc tests/types.ts",
-    "install-local-reserve": "node tests/install-local-reserve.js"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ArnaudBuchholz/reserve.git"
   },
-  "keywords": [
-    "http",
-    "serve",
-    "static",
-    "json",
-    "regexp"
-  ],
   "author": "Arnaud Buchholz",
-  "license": "MIT",
+  "scripts": {
+    "build": "npm run build --workspace reserve"
+  },
   "bugs": {
     "url": "https://github.com/ArnaudBuchholz/reserve/issues"
   },
   "homepage": "https://github.com/ArnaudBuchholz/reserve#readme",
+  "workspaces": [
+    "reserve",
+    "samples/*",
+    "handlers/*"
+  ],
   "devDependencies": {
-    "@stryker-mutator/core": "^7.2.0",
-    "@stryker-mutator/mocha-runner": "^7.2.0",
-    "autocannon": "^7.12.0",
-    "colors": "^1.4.0",
-    "dotenv": "^16.3.1",
+    "@stryker-mutator/core": "^7.3.0",
+    "@stryker-mutator/mocha-runner": "^7.3.0",
+    "@types/node": "^20.9.0",
+    "cors": "^2.8.5",
     "eslint-utils": "^3.0.0",
-    "express": "^4.18.2",
-    "express-session": "^1.17.3",
-    "gpf-js": "^1.0.0",
-    "jose": "^4.15.2",
-    "lodash": "^4.17.21",
-    "mime": "^3.0.0",
-    "minimist": ">=1.2.8",
     "mocha": "^10.2.0",
     "mock-require": "^3.0.3",
     "nyc": "^15.1.0",
-    "passport": "^0.6.0",
-    "socket.io": "^4.7.2",
+    "reserve": "^2",
     "standard": "^17.1.0",
-    "start-server-and-test": "^2.0.1",
+    "terser": "^5.24.0",
     "typescript": "^5.2.2"
   },
-  "standard": {
-    "env": [
-      "mocha",
-      "node"
-    ],
-    "globals": [
-      "sap"
-    ]
-  },
-  "mocha": {
-    "diff": false,
-    "spec": [
-      "tests/mocha/**/*.test.js"
-    ],
-    "require": [
-      "tests/mocha/mocked_modules/console.js",
-      "tests/mocha/mocked_modules/path.js",
-      "tests/mocha/mocked_modules/fs.js",
-      "tests/mocha/mocked_modules/http.js",
-      "tests/mocha/mocked_modules/https.js",
-      "tests/mocha/mocked_modules/http2.js",
-      "tests/mocha/mocked_modules/process.js",
-      "tests/mocha/mocked_modules/os.js"
-    ]
-  },
-  "nyc": {
-    "all": true,
-    "cache": false,
-    "check-coverage": true,
-    "exclude": [
-      "tests/*.js",
-      "tests/mocha/assert.js",
-      "tests/cache/**",
-      "console.js",
-      "coverage/**",
-      "samples/**",
-      "docs/**"
-    ],
-    "branches": 100,
-    "lines": 100,
-    "functions": 100,
-    "statements": 100
-  }
+  "license": "MIT"
 }

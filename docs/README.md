@@ -1,5 +1,9 @@
 # REserve Documentation
 
+## ⚠️ Migration guide
+
+* [From v1 to v2](v1_to_v2.md)
+
 ## Configuration
 
 There are two ways to **leverage** REserve :
@@ -34,7 +38,8 @@ The server object implements the [EventEmitter](https://nodejs.org/api/events.ht
 
 REserve also offers some helpers to simplify implementation :
 * [`body`](body.md) to read a request body
-* [`capture`](capture.md) to copy the response stream to another stream *(for instance: to create a cache)*
+* [`send`](send.md) to build a response
+* [`capture`](capture.md) to copy the response stream to another stream *(for instance: to create a [cache](cache%20and%20proxy.md))*
 
 ## Mocking
 

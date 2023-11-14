@@ -1,0 +1,104 @@
+{
+  "name": "reserve",
+  "version": "2.0.0",
+  "description": "Lightweight http server statically configurable using regular expressions",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "files": [
+    "dist/*.js",
+    "dist/*.mjs",
+    "@types/*.d.ts"
+  ],
+  "bin": {
+    "reserve": "./dist/cli.js"
+  },
+  "types": "./@types/index.d.ts",
+  "engines": {
+    "node": ">=12.22.12"
+  },
+  "scripts": {
+    "build:mime": "node build/mime --silent",
+    "build": "npm run build:mime && node build/bundle && terser dist/core.js --compress --keep-fnames --mangle -o dist/core.js && terser src/cli.js --compress --keep-fnames --mangle -o dist/cli.js",
+    "test": "standard && nyc mocha && node tests/integration.mjs && (node -e \"if (parseInt(process.version.match(/v(\\d+)/)[1]) > 14) process.exit(1) \" || npm run test:types)",
+    "test:build": "node tests/integration.mjs dist && node tests/integration.mjs mock && node tests/integration.mjs mjs",
+    "test:mutation": "stryker run",
+    "lint": "standard --fix",
+    "mocha": "mocha",
+    "mocha-dbg": "node --inspect-brk node_modules/mocha/bin/_mocha",
+    "cover": "nyc mocha && nyc report --reporter=lcov",
+    "perf-serve": "node . --config ./tests/http.json --silent",
+    "perf-test": "autocannon localhost:5000",
+    "perf": "start-server-and-test perf-test http-get://localhost:5000 perf-serve",
+    "reserve": "node ./samples/reserve",
+    "test:types": "tsc tests/types.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ArnaudBuchholz/reserve.git"
+  },
+  "keywords": [
+    "http",
+    "serve",
+    "static",
+    "json",
+    "regexp"
+  ],
+  "author": "Arnaud Buchholz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ArnaudBuchholz/reserve/issues"
+  },
+  "homepage": "https://github.com/ArnaudBuchholz/reserve#readme",
+  "devDependencies": {
+    "@stryker-mutator/core": "^7.3.0",
+    "@stryker-mutator/mocha-runner": "^7.3.0",
+    "@types/node": "^20.9.0",
+    "cors": "^2.8.5",
+    "eslint-utils": "^3.0.0",
+    "mocha": "^10.2.0",
+    "mock-require": "^3.0.3",
+    "nyc": "^15.1.0",
+    "reserve": "^2",
+    "standard": "^17.1.0",
+    "terser": "^5.24.0",
+    "typescript": "^5.2.2"
+  },
+  "standard": {
+    "env": [
+      "mocha",
+      "node"
+    ],
+    "globals": [
+      "sap"
+    ]
+  },
+  "mocha": {
+    "diff": false,
+    "spec": [
+      "src/**/*.spec.js"
+    ],
+    "require": [
+      "tests/mocha/setup.js"
+    ]
+  },
+  "nyc": {
+    "check-coverage": true,
+    "include": [
+      "src/**"
+    ],
+    "exclude": [
+      "src/cli.js",
+      "src/console.js",
+      "src/**/*.spec.js"
+    ],
+    "branches": 100,
+    "lines": 100,
+    "functions": 100,
+    "statements": 100
+  }
+}

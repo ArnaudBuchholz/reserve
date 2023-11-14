@@ -89,3 +89,23 @@
 |1.15.4|Fix types definition (Configuration)|
 ||Fix url IP in `ready` event|
 |1.15.5|Documentation as github pages|
+|2.0.0|Refactoring to improve project structure|
+||BREAKING CHANGE: Support of CommonJS and ESM imports|
+||BREAKING CHANGE: Remove support of `colors`|
+||BREAKING CHANGE: Remove support of `mime`|
+||BREAKING CHANGE: Remove option `watch` in `custom`|
+||BREAKING CHANGE: Remove option `strict` in `file`|
+||BREAKING CHANGE: Remove option `case-sensitive` in `file`, it is now always case sensitive|
+||BREAKING CHANGE: Remove option `ignore-if-not-found` in `file`, mapping is ignored if resolving to a missing / unreadable / invalid path|
+||BREAKING CHANGE: Remove option `http-status` in `file`|
+||BREAKING CHANGE: `readdir` is now mandatory in custom file system for `file`|
+||BREAKING CHANGE: In the `file` handler, **no** response is sent if the request is aborted while allocating the read stream|
+||BREAKING CHANGE: Default configuration does not include proxy|
+||BREAKING CHANGE: `mock` returns immediately even if the *server* is not ready (wait for `ready`)|
+||BREAKING CHANGE: Headers of mocked Request and Response returns strings or array of strings|
+||BREAKING CHANGE: Mocked Request normalizes the received URL|
+||BREAKING CHANGE: `body` helper leverages request headers and offers conversion interface|
+||Fix `use` to handle middleware that are not calling next|
+||Response status code is preserved when set before `file`|
+||Fix types definition (`use` handler)|
+||Expose `send` helper ([doc](send.md))|

@@ -1,0 +1,6 @@
+# tests
+tests/cache/
+tests/types.js
+
+# dist
+!dist/index*
