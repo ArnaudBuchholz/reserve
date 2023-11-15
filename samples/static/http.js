@@ -1,5 +1,6 @@
 const http = require('http')
 const { readFileSync } = require('fs')
+
 const host = 'localhost'
 const port = 8083
 
@@ -11,9 +12,9 @@ const requestListener = function (req, res) {
     'content-length': page.length
   })
   res.end(page)
-};
+}
 
-const server = http.createServer(requestListener);
+const server = http.createServer(requestListener)
 server.listen(port, host, () => {
-  console.log(`Listening on port ${port}`)
-});
+  console.log(`raw http listening on port ${port}`)
+})

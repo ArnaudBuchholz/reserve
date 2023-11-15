@@ -1,6 +1,7 @@
 const http = require('http')
 const { createReadStream, stat } = require('fs')
 const { pipeline } = require('stream')
+
 const host = 'localhost'
 const port = 8084
 
@@ -31,7 +32,7 @@ const requestListener = function (req, res) {
   })
 }
 
-const server = http.createServer(requestListener);
+const server = http.createServer(requestListener)
 server.listen(port, host, () => {
-  console.log(`Listening on port ${port}`)
+  console.log(`http-stream listening on port ${port}`)
 })

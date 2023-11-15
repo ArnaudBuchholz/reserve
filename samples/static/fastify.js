@@ -1,5 +1,6 @@
 const fastify = require('fastify')()
 const { join } = require('path')
+
 const port = 8082
 
 fastify.register(require('@fastify/static'), {
@@ -12,5 +13,5 @@ fastify.get('/', function (req, reply) {
 
 fastify.listen({ port }, (err, address) => {
   if (err) throw err
-  console.log(`Listening on port ${port}`)
+  console.log(`fastify listening on port ${port}`)
 })
