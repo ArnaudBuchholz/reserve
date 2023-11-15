@@ -28,8 +28,9 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - name: 📂 Setup package-lock.json
-      run: node ../package-lock.js
+    - name: 📂 Setup package-lock.json (Node.js > 14)
+      if: ${{ matrix.node-version != '12.x' && matrix.node-version != '14.x' }}
+      run: cp ../package-lock.json ./package-lock.json
     - name: 💿 Install dependencies
       run: npm ci
     - name: 🧪 Run tests
