@@ -63,7 +63,7 @@
     "mocha": "^10.2.0",
     "mock-require": "^3.0.3",
     "nyc": "^15.1.0",
-    "reserve": "^2",
+    "reserve": "",
     "standard": "^17.1.0",
     "terser": "^5.24.0",
     "typescript": "^5.2.2"
