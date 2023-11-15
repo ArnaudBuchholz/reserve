@@ -5,6 +5,8 @@ const { createWriteStream } = require('fs')
 const { mkdir, unlink } = require('fs').promises
 const { capture } = require('reserve')
 
+const job = {}
+
 const [, hostName] = /https?:\/\/([^/]*)/.exec(job.ui5)
 const [, version] = /(\d+\.\d+\.\d+)?$/.exec(job.ui5)
 const cacheBase = join(job.cwd, job.cache, hostName, version || '')
@@ -80,23 +82,22 @@ job.libs.forEach(({ relative, source }) => {
   })
 })
 
-
 module.exports = {
   schema: {
-    'version': {
+    version: {
       type: 'string',
       defaultValue: 'latest'
     },
-    'cache': {
+    cache: {
       type: 'string',
       defaultValue: ''
     },
-    'libs': {
+    libs: {
       type: 'object',
       defaultValue: {}
     }
   },
-  
+
   async validate (mapping) {
     // Validate UI5
   },

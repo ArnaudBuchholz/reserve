@@ -31,8 +31,8 @@
     "reserve": "^2"
   },
   "devDependencies": {
-    "mocha": "",
-    "standard": ""
+    "mocha": "^10",
+    "standard": "^17"
   },
   "standard": {
     "env": [
