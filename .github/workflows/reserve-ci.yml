@@ -29,7 +29,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - name: 📂 Setup package-lock.json
-      run: cp ../package-lock.json package-lock.json
+      run: node ../package-lock.js
     - name: 💿 Install dependencies
       run: npm ci
     - name: 🧪 Run tests
