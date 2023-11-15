@@ -1,7 +1,5 @@
-# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
-# For more information see: https://help.github.com/actions/language-and-framework-guides/publishing-nodejs-packages
-
-name: Node.js Package
+# Will not work since the version creation will impact *all* components of the mono-repo
+name: Publish for REserve
 
 on:
   release:
@@ -10,22 +8,28 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./reserve
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
       - run: npm ci
       - run: npm test --workspace reserve
 
   publish-npm:
     needs: build
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./reserve
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
           registry-url: https://registry.npmjs.org/
       - run: npm ci
       - run: npm run build --workspace reserve
