@@ -1,0 +1,35 @@
+name: CI for REserve
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'reserve/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'reserve/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./reserve
+    strategy:
+      matrix:
+        node-version: [12.x, 14.x, 16.x, 18.x, 20.x]
+    steps:
+    - name: 💾 Checkout project
+      uses: actions/checkout@v4
+    - name: 🅽 Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - name: 📂 Setup package-lock.json
+      run: cp ../package-lock.json package-lock.json
+    - name: 💿 Install dependencies
+      run: npm ci
+    - name: 🧪 Run tests
+      run: npm test
