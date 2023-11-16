@@ -15,8 +15,8 @@
   "homepage": "https://github.com/ArnaudBuchholz/reserve#readme",
   "workspaces": [
     "reserve",
-    "samples/*",
-    "handlers/*"
+    "plugins/*",
+    "samples/*"
   ],
   "devDependencies": {
     "@fastify/static": "^6.12.0",

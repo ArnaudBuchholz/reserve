@@ -1,6 +1,6 @@
 {
   "name": "reserve-ui5",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Resources handler for UI5",
   "main": "index.js",
   "files": [
@@ -27,7 +27,7 @@
   "author": "Arnaud Buchholz",
   "license": "MIT",
   "homepage": "https://github.com/ArnaudBuchholz/reserve/handlers/ui5#readme",
-  "dependencies": {
+  "peerDependencies": {
     "reserve": "^2"
   },
   "devDependencies": {

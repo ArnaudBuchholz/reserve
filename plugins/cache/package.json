@@ -30,7 +30,7 @@
   "author": "Arnaud Buchholz",
   "license": "MIT",
   "homepage": "https://github.com/ArnaudBuchholz/reserve/handlers/cache#readme",
-  "dependencies": {
+  "peerDependencies": {
     "reserve": "^2"
   },
   "devDependencies": {
