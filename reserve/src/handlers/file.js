@@ -4,10 +4,11 @@ const { basename, createReadStream, dirname, isAbsolute, join, readdir, stat } =
 const { $handlerPrefix } = require('../symbols')
 const send = require('../send')
 const mimeTypes = require('../mime')
+// const cacheFactory = require('punycache')
 
-const cfs = 'custom-file-system'
-const cache = 'caching-strategy'
-const mt = 'mime-types'
+const $customFileSystem = 'custom-file-system'
+const $cachingStrategy = 'caching-strategy'
+const $mimeTypes = 'mime-types'
 
 const nodeFs = {
   stat,
@@ -23,10 +24,10 @@ function processCache (request, cachingStrategy, { mtime }) {
     if (modifiedSince && lastModified === modifiedSince) {
       status = 304
     }
-    return { header: { 'cache-control': 'no-cache', 'last-modified': lastModified }, status }
+    return { header: { '$cache-control': 'no-cache', 'last-modified': lastModified }, status }
   }
-  if (cachingStrategy > 0) {
-    return { header: { 'cache-control': `public, max-age=${cachingStrategy}, immutable` } }
+  if ($cachingStrategy > 0) {
+    return { header: { 'cache-control': `public, max-age=${$cachingStrategy}, immutable` } }
   }
   return { header: { 'cache-control': 'no-store' } }
 }
@@ -58,7 +59,7 @@ async function sendFile ({ cachingStrategy, mapping, request, response, fs, file
     statusCode = cacheStatus || rangeStatus
   }
   const fileExtension = (/\.([^.]*)$/.exec(filePath) || [])[1]
-  const mimeType = mapping[mt][fileExtension] || mimeTypes[fileExtension] || mimeTypes.bin
+  const mimeType = mapping[$mimeTypes][fileExtension] || mimeTypes[fileExtension] || mimeTypes.bin
   const noBody = request.method === 'HEAD' || contentLength === 0 || request.aborted || statusCode === 304
   let stream
   if (!noBody) {
@@ -113,32 +114,32 @@ async function checkStrictPath (filePath) {
 module.exports = {
   [$handlerPrefix]: 'file',
   schema: {
-    [cfs]: {
+    [$customFileSystem]: {
       types: ['string', 'object'],
       defaultValue: nodeFs
     },
-    [cache]: {
+    [$cachingStrategy]: {
       types: ['string', 'number'],
       defaultValue: 0
     },
-    [mt]: {
+    [$mimeTypes]: {
       type: 'object',
       defaultValue: {}
     }
   },
   method: 'GET,HEAD',
   validate: async mapping => {
-    if (typeof mapping[cfs] === 'string') {
-      mapping[cfs] = require(join(mapping.cwd, mapping[cfs])) // TODO CJS/EJS switch
+    if (typeof mapping[$customFileSystem] === 'string') {
+      mapping[$customFileSystem] = require(join(mapping.cwd, mapping[$customFileSystem])) // TODO CJS/EJS switch
     }
     const apis = ['stat', 'createReadStream', 'readdir']
-    const invalids = apis.filter(name => typeof mapping[cfs][name] !== 'function')
+    const invalids = apis.filter(name => typeof mapping[$customFileSystem][name] !== 'function')
     if (invalids.length) {
-      throw new Error(`Invalid ${cfs} specification (${invalids.join(', ')})`)
+      throw new Error(`Invalid ${$customFileSystem} specification (${invalids.join(', ')})`)
     }
-    const cachingStrategy = mapping[cache]
-    if (typeof cachingStrategy === 'string' && cachingStrategy !== 'modified') {
-      throw new Error(`Invalid ${cache} name`)
+    const cachingStrategy = mapping[$cachingStrategy]
+    if (typeof $cachingStrategy === 'string' && $cachingStrategy !== 'modified') {
+      throw new Error(`Invalid ${cachingStrategy} name`)
     }
   },
   redirect: ({ request, mapping, redirect, response }) => {
@@ -151,8 +152,8 @@ module.exports = {
       filePath = filePath.substring(0, filePath.length - 1)
     }
     const context = {
-      cachingStrategy: mapping[cache],
-      fs: mapping[cfs],
+      $cachingStrategy: mapping[$cachingStrategy],
+      fs: mapping[$customFileSystem],
       filePath,
       mapping,
       request,
