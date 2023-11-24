@@ -13,7 +13,7 @@ const $mimeTypes = 'mime-types'
 const nodeFs = {
   stat,
   readdir,
-  createReadStream: (path, options) => Promise.resolve(createReadStream(path, options))
+  createReadStream: async (path, options) => createReadStream(path, options)
 }
 
 function processCache (request, cachingStrategy, { mtime }) {
@@ -24,10 +24,10 @@ function processCache (request, cachingStrategy, { mtime }) {
     if (modifiedSince && lastModified === modifiedSince) {
       status = 304
     }
-    return { header: { '$cache-control': 'no-cache', 'last-modified': lastModified }, status }
+    return { header: { 'cache-control': 'no-cache', 'last-modified': lastModified }, status }
   }
-  if ($cachingStrategy > 0) {
-    return { header: { 'cache-control': `public, max-age=${$cachingStrategy}, immutable` } }
+  if (cachingStrategy > 0) {
+    return { header: { 'cache-control': `public, max-age=${cachingStrategy}, immutable` } }
   }
   return { header: { 'cache-control': 'no-store' } }
 }
@@ -138,8 +138,8 @@ module.exports = {
       throw new Error(`Invalid ${$customFileSystem} specification (${invalids.join(', ')})`)
     }
     const cachingStrategy = mapping[$cachingStrategy]
-    if (typeof $cachingStrategy === 'string' && $cachingStrategy !== 'modified') {
-      throw new Error(`Invalid ${cachingStrategy} name`)
+    if (typeof cachingStrategy === 'string' && cachingStrategy !== 'modified') {
+      throw new Error(`Invalid ${$cachingStrategy} name`)
     }
   },
   redirect: ({ request, mapping, redirect, response }) => {
@@ -152,7 +152,7 @@ module.exports = {
       filePath = filePath.substring(0, filePath.length - 1)
     }
     const context = {
-      $cachingStrategy: mapping[$cachingStrategy],
+      cachingStrategy: mapping[$cachingStrategy],
       fs: mapping[$customFileSystem],
       filePath,
       mapping,
