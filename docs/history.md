@@ -109,3 +109,4 @@
 ||Response status code is preserved when set before `file`|
 ||Fix types definition (`use` handler)|
 ||Expose `send` helper ([doc](send.md))|
+||Expose `punycache` helper ([doc](https://www.npmjs.com/package/punycache))|

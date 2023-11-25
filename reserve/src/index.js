@@ -11,6 +11,7 @@ module.exports = {
   interpolate: require('./interpolate'),
   log: require('./log'),
   mock: require('./mock'),
+  punycache: require('punycache'),
   read,
   send: require('./send'),
   serve: require('./serve')

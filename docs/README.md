@@ -36,10 +36,11 @@ The server object implements the [EventEmitter](https://nodejs.org/api/events.ht
 
 ## Helpers
 
-REserve also offers some helpers to simplify implementation :
+REserve also offers some helpers to simplify implementations :
 * [`body`](body.md) to read a request body
 * [`send`](send.md) to build a response
 * [`capture`](capture.md) to copy the response stream to another stream *(for instance: to create a [cache](cache%20and%20proxy.md))*
+* [`punycache`](https://www.npmjs.com/package/punycache) a minimalist cache implementation
 
 ## Mocking
 

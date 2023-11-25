@@ -39,6 +39,7 @@ export const {
   interpolate,
   log,
   mock,
+  punycache,
   read,
   send,
   serve

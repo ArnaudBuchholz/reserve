@@ -4,7 +4,14 @@ const { mkdirSync, readFileSync, writeFileSync } = require('fs')
 const { dirname, join } = require('path')
 
 const stack = ['index.js']
-const modules = {}
+const modules = {
+  punycache: {
+    path: 'punycache',
+    depends: [],
+    exports: 'punycache',
+    content: readFileSync('../node_modules/punycache/punycache.js').toString()
+  }
+}
 
 while (stack.length) {
   const path = stack.shift()
@@ -95,6 +102,9 @@ while (remaining.length) {
       if (id.endsWith('node-api')) {
         return match
       }
+      if (modules[id]) {
+        return modules[id].exports
+      }
       const depPath = join(dirname(path), id).replace('\\', '/') + '.js'
       const moduleName = Object.keys(modules)
         .filter(path => depPath.endsWith(path))
@@ -102,7 +112,7 @@ while (remaining.length) {
       if (moduleName !== undefined) {
         return modules[moduleName].exports
       }
-      throw new Error('Unexpected required')
+      throw new Error(`Unexpected require '${id}'`)
     })
   }})()`
   writeFileSync('dist/core.js', transformed, { flag: 'a' })
