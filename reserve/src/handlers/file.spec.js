@@ -8,6 +8,7 @@ const fs = require('fs')
 const { promisify } = require('util')
 const mockRequire = require('mock-require')
 const Response = require('../mock/Response')
+const { $fileCache } = require('../symbols')
 
 const textMimeType = 'text/plain'
 const htmlMimeType = 'text/html'
@@ -724,5 +725,71 @@ describe('handlers/file', () => {
         assert.strictEqual(response.headers['Content-Type'], 'not-even-existing')
       }))
     )
+  })
+
+  describe('static', () => {
+    describe('default', () => {
+      it('caches file system by default', async () => {
+        const { promise, mapping } = await handle({
+          request: {
+            method: 'GET',
+            url: './file.txt'
+          }
+        })
+        await promise
+        assert.notStrictEqual(mapping[$fileCache], undefined)
+      })
+
+      it('does *not* cache file system when custom-file-system is used', async () => {
+        const { promise, mapping } = await handle({
+          request: {
+            method: 'GET',
+            url: './file.txt'
+          },
+          mapping: {
+            'custom-file-system': {
+              stat: promisify(fs.stat),
+              readdir: promisify(fs.readdir),
+              createReadStream: (path, options) => Promise.resolve(fs.createReadStream(path, options))
+            }
+          }
+        })
+        await promise
+        assert.strictEqual(mapping[$fileCache], undefined)
+      })
+    })
+
+    it('caches file system information', async () => {
+      const { promise, mapping } = await handle({
+        request: {
+          method: 'GET',
+          url: './file.txt'
+        }
+      })
+      await promise
+      const cache = mapping[$fileCache]
+      assert.notStrictEqual(cache.keys().length, 0)
+      const stat = await cache.get('stat:/file.txt')
+      assert.strictEqual(stat.size, 12)
+    })
+
+    it('can cache file system when custom-file-system is used', async () => {
+      const { promise, mapping } = await handle({
+        request: {
+          method: 'GET',
+          url: './file.txt'
+        },
+        mapping: {
+          static: true,
+          'custom-file-system': {
+            stat: promisify(fs.stat),
+            readdir: promisify(fs.readdir),
+            createReadStream: (path, options) => Promise.resolve(fs.createReadStream(path, options))
+          }
+        }
+      })
+      await promise
+      assert.notStrictEqual(mapping[$fileCache], undefined)
+    })
   })
 })

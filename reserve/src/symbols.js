@@ -19,5 +19,6 @@ module.exports = {
   $requestId: Symbol(`${ns}request.id`),
   $requestInternal: Symbol(`${ns}request.internal`),
   $responseEnded: Symbol(`${ns}response.ended`),
-  $useMiddleware: Symbol(`${ns}use.middleware`)
+  $useMiddleware: Symbol(`${ns}use.middleware`),
+  $fileCache: Symbol(`${ns}file.cache`)
 }

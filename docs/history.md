@@ -99,7 +99,9 @@
 ||BREAKING CHANGE: Remove option `ignore-if-not-found` in `file`, mapping is ignored if resolving to a missing / unreadable / invalid path|
 ||BREAKING CHANGE: Remove option `http-status` in `file`|
 ||BREAKING CHANGE: `readdir` is now mandatory in custom file system for `file`|
-||BREAKING CHANGE: In the `file` handler, **no** response is sent if the request is aborted while allocating the read stream|
+||BREAKING CHANGE: In `file`, **no** response is sent if the request is aborted while allocating the read stream|
+||BREAKING CHANGE: In `file`, **no** response is sent if the request is aborted while allocating the read stream|
+||BREAKING CHANGE: In `file`, `static` behavior added ([`doc`](file.md))|
 ||BREAKING CHANGE: Default configuration does not include proxy|
 ||BREAKING CHANGE: `mock` returns immediately even if the *server* is not ready (wait for `ready`)|
 ||BREAKING CHANGE: Headers of mocked Request and Response returns strings or array of strings|
@@ -107,6 +109,7 @@
 ||BREAKING CHANGE: `body` helper leverages request headers and offers conversion interface|
 ||Fix `use` to handle middleware that are not calling next|
 ||Response status code is preserved when set before `file`|
-||Fix types definition (`use` handler)|
+||`static` option for performant `file` delivery ([`doc`](file.md))|
 ||Expose `send` helper ([doc](send.md))|
 ||Expose `punycache` helper ([doc](https://www.npmjs.com/package/punycache))|
+||Fix types definition (`use` handler)|

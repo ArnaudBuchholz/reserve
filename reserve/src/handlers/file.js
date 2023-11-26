@@ -1,19 +1,48 @@
 'use strict'
 
-const { basename, createReadStream, dirname, isAbsolute, join, readdir, stat } = require('../node-api')
-const { $handlerPrefix } = require('../symbols')
+const { basename, createReadStream: createReadStreamSync, dirname, isAbsolute, join, readdir, stat } = require('../node-api')
+const { $handlerPrefix, $fileCache } = require('../symbols')
 const send = require('../send')
 const mimeTypes = require('../mime')
-// const cacheFactory = require('punycache')
+const cacheFactory = require('punycache')
 
 const $customFileSystem = 'custom-file-system'
 const $cachingStrategy = 'caching-strategy'
 const $mimeTypes = 'mime-types'
+const $static = 'static'
+
+const createReadStream = async (path, options) => createReadStreamSync(path, options)
+const defaultStatic = {}
 
 const nodeFs = {
   stat,
   readdir,
-  createReadStream: async (path, options) => createReadStream(path, options)
+  createReadStream
+}
+
+const buildStaticNodeFs = mapping => {
+  const cache = cacheFactory(mapping[$static])
+  const { stat, readdir, createReadStream } = mapping[$customFileSystem]
+  mapping[$fileCache] = cache
+
+  const wrap = (prefix, api) => {
+    return async path => {
+      const key = `${prefix}:${path}`
+      const existing = cache.get(key)
+      if (existing) {
+        return existing
+      }
+      const query = api(path)
+      cache.set(key, query)
+      return query
+    }
+  }
+
+  mapping[$customFileSystem] = {
+    stat: wrap('stat', stat),
+    readdir: wrap('dir', readdir),
+    createReadStream
+  }
 }
 
 function processCache (request, cachingStrategy, { mtime }) {
@@ -125,6 +154,10 @@ module.exports = {
     [$mimeTypes]: {
       type: 'object',
       defaultValue: {}
+    },
+    [$static]: {
+      types: ['boolean', 'object'],
+      defaultValue: defaultStatic
     }
   },
   method: 'GET,HEAD',
@@ -140,6 +173,15 @@ module.exports = {
     const cachingStrategy = mapping[$cachingStrategy]
     if (typeof cachingStrategy === 'string' && cachingStrategy !== 'modified') {
       throw new Error(`Invalid ${$cachingStrategy} name`)
+    }
+    if (mapping[$static] === defaultStatic) {
+      mapping[$static] = mapping[$customFileSystem] === nodeFs
+    }
+    if (mapping[$static] === true) {
+      mapping[$static] = {}
+    }
+    if (mapping[$static]) {
+      buildStaticNodeFs(mapping)
     }
   },
   redirect: ({ request, mapping, redirect, response }) => {

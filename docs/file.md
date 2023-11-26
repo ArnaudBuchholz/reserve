@@ -28,6 +28,9 @@ Example :
 |||| any number: hard coded duration (in seconds), based on the response header [`Cache-Control` with `max-age`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) |
 |||| 0 *(default)*: [`Cache-Control` with `no-store`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) |
 | `custom-file-system` | String or Object | undefined | Provides custom file system API *(see below)*. |
+| `static` | Boolean or Object | *depends on `custom-file-system`* | Cache file system information for performance. When `custom-file-system` is used, `static` is `false` by default *(but can be set)*. Otherwise, `static` is `true` by default. An object can be used to pass options to the cache handler, see [`punycache`](https://www.npmjs.com/package/punycache) documentation.|
+
+**NOTE** : When `static` is enabled, REserve does not expect the files / folders to change. For instance, if the file size changes while its information has been cached, the result might appear corrupted.
 
 ## Custom File System
 
