@@ -1,6 +1,6 @@
 'use strict'
 
-const { basename, createReadStream: createReadStreamSync, dirname, isAbsolute, join, readdir, stat } = require('../node-api')
+const { basename, createReadStream, dirname, isAbsolute, join, readdir, stat } = require('../node-api')
 const { $handlerPrefix, $fileCache } = require('../symbols')
 const send = require('../send')
 const mimeTypes = require('../mime')
@@ -11,7 +11,6 @@ const $cachingStrategy = 'caching-strategy'
 const $mimeTypes = 'mime-types'
 const $static = 'static'
 
-const createReadStream = async (path, options) => createReadStreamSync(path, options)
 const defaultStatic = {}
 
 const nodeFs = {
