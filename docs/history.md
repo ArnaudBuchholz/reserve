@@ -99,6 +99,7 @@
 ||BREAKING CHANGE: Remove option `ignore-if-not-found` in `file`, mapping is ignored if resolving to a missing / unreadable / invalid path|
 ||BREAKING CHANGE: Remove option `http-status` in `file`|
 ||BREAKING CHANGE: `readdir` is now mandatory in custom file system for `file`|
+||BREAKING CHANGE: In `file`, absolute path are forbidden, trying to access a folder above `cwd` fails|
 ||BREAKING CHANGE: In `file`, **no** response is sent if the request is aborted while allocating the read stream|
 ||BREAKING CHANGE: In `file`, **no** response is sent if the request is aborted while allocating the read stream|
 ||BREAKING CHANGE: In `file`, `static` behavior added ([`doc`](file.md))|

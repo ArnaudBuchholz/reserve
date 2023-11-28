@@ -1,6 +1,6 @@
 'use strict'
 
-const { basename, createReadStream, dirname, isAbsolute, join, readdir, stat } = require('../node-api')
+const { basename, createReadStream, dirname, join, readdir, stat } = require('../node-api')
 const { $handlerPrefix, $fileCache } = require('../symbols')
 const send = require('../send')
 const mimeTypes = require('../mime')
@@ -112,7 +112,6 @@ async function sendFile ({ cachingStrategy, mapping, request, response, fs, file
 
 async function sendIndex (context) {
   const filePath = join(context.filePath, 'index.html')
-  await context.checkPath(filePath)
   const stat = await context.fs.stat(filePath)
   if (stat.isDirectory()) {
     throw new Error('index.html not a file')
@@ -120,23 +119,20 @@ async function sendIndex (context) {
   return sendFile({ ...context, filePath }, stat)
 }
 
-async function checkCaseSensitivePath (filePath) {
-  const folderPath = dirname(filePath)
-  if (folderPath && folderPath !== filePath) {
-    const name = basename(filePath)
-    const names = await this.fs.readdir(folderPath)
+async function checkStrictPath (fs, cwd, filePath) {
+  if (!filePath.startsWith(cwd)) {
+    throw new Error('Unsecure access')
+  }
+  let path = filePath
+  while (path !== cwd) {
+    const folderPath = dirname(path)
+    const name = basename(path)
+    const names = await fs.readdir(folderPath)
     if (!names.includes(name)) {
       throw new Error('Not found')
     }
-    return checkCaseSensitivePath.call(this, folderPath)
+    path = folderPath
   }
-}
-
-async function checkStrictPath (filePath) {
-  if (filePath.includes('//')) {
-    throw new Error('Empty folder')
-  }
-  return checkCaseSensitivePath.call(this, filePath)
 }
 
 module.exports = {
@@ -185,9 +181,7 @@ module.exports = {
   },
   redirect: ({ request, mapping, redirect, response }) => {
     let filePath = /([^?#]+)/.exec(unescape(redirect))[1] // filter URL parameters & hash
-    if (!isAbsolute(filePath)) {
-      filePath = join(mapping.cwd, filePath)
-    }
+    filePath = join(mapping.cwd, filePath)
     const directoryAccess = !!filePath.match(/(\\|\/)$/) // Test known path separators
     if (directoryAccess) {
       filePath = filePath.substring(0, filePath.length - 1)
@@ -198,12 +192,11 @@ module.exports = {
       filePath,
       mapping,
       request,
-      response,
-      checkPath: checkStrictPath
+      response
     }
     return context.fs.stat(filePath)
       .then(async stat => {
-        await context.checkPath(filePath)
+        await checkStrictPath(context.fs, mapping.cwd, filePath)
         const isDirectory = stat.isDirectory()
         if (isDirectory ^ directoryAccess) {
           return

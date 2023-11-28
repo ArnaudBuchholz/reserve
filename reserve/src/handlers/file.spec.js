@@ -9,6 +9,7 @@ const { promisify } = require('util')
 const mockRequire = require('mock-require')
 const Response = require('../mock/Response')
 const { $fileCache } = require('../symbols')
+const Request = require('../mock/Request')
 
 const textMimeType = 'text/plain'
 const htmlMimeType = 'text/html'
@@ -26,7 +27,7 @@ describe('handlers/file', () => {
     })
   )
 
-  it('pipes file content (relative path)', () => handle({
+  it('pipes file content', () => handle({
     request: './file.txt'
   })
     .then(({ promise, response }) => promise.then(value => {
@@ -37,19 +38,17 @@ describe('handlers/file', () => {
     }))
   )
 
-  it('pipes file content (absolute path)', () => handle({
-    request: '/file.txt',
-    mapping: {
-      cwd: '/folder'
-    }
+  it('forbids access to parent path', async () => {
+    const request = new Request({ method: 'GET', url: 'anything' })
+    request.setForgedUrl('../file.txt')
+    await handle({
+      request,
+      mapping: {
+        cwd: '/folder'
+      }
+    })
+      .then(ignored)
   })
-    .then(({ promise, response }) => promise.then(value => {
-      assert.strictEqual(value, undefined)
-      assert.strictEqual(response.statusCode, 200)
-      assert.strictEqual(response.headers['Content-Type'], textMimeType)
-      assert.strictEqual(response.toString(), 'Hello World!')
-    }))
-  )
 
   it('uses statusCode if changed before', () => {
     const response = new Response()

@@ -12,7 +12,7 @@ Example :
 
 * Supports [GET](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET) and [HEAD](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD)
 * Capturing groups can be used as substitution parameters
-* Absolute or relative to the handler's `cwd` member *(see [mappings](configuration.md#mappings))*
+* Relative to the handler's `cwd` member *(see [mappings](configuration.md#mappings))*
 * Incoming URL parameters are automatically stripped out to simplify the matching expression
 * Directory access is internally redirected to the inner `index.html` file *(if any)*
 * If the path resolves to a missing / unreadable / invalid file / directory, the handler does not process the request
