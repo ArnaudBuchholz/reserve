@@ -15,7 +15,9 @@ module.exports = (handler, defaults = {}) => {
     if (typeof request === 'string') {
       request = { method: 'GET', url: request }
     }
-    request = new Request(request)
+    if (!(request instanceof Request)) {
+      request = new Request(request)
+    }
     if (!response) {
       response = new Response()
     }

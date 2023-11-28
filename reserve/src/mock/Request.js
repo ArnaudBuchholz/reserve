@@ -57,6 +57,10 @@ module.exports = class Request extends Readable {
     return this._url
   }
 
+  setForgedUrl (url) {
+    this._url = url
+  }
+
   get headers () {
     return this._headers
   }
