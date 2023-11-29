@@ -83,12 +83,15 @@ const defaultConfigurationPromise = check({
       response.end('if-match')
     }
   }, {
+    cwd: '/',
     match: '/subst/(.*)/(.*)',
     file: '/$1.$2'
   }, {
+    cwd: '/',
     match: '/subst-complex/(.*)/(.*)',
     file: '/$1$$1.$2$3'
   }, {
+    cwd: '/',
     match: '/file.txt',
     file: '/file.txt'
   }]
