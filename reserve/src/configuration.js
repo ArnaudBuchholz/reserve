@@ -144,7 +144,7 @@ async function checkProtocol (configuration) {
 async function checkMappings (configuration) {
   const configurationInterface = new IConfiguration(configuration)
   configuration[$configurationInterface] = configurationInterface
-  for await (const mapping of configuration.mappings) {
+  for (const mapping of configuration.mappings) {
     await check(configuration, mapping)
   }
 }

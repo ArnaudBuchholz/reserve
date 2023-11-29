@@ -12,7 +12,7 @@ const {
 } = require('./symbols')
 
 async function checkMappings (configuration, mappings) {
-  for await (const mapping of mappings) {
+  for (const mapping of mappings) {
     if (!mapping[$mappingChecked]) {
       await check(configuration, mapping)
     }
