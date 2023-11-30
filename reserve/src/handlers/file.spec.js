@@ -219,44 +219,41 @@ describe('handlers/file', () => {
     })
   })
 
-  describe('Strict mode (by default)', function () {
-    describe('Ensure empty folders are not ignored', () => {
-      beforeEach(() => {
-        fs.setIgnoreEmptyFolders(true)
+  describe('Strict mode', function () {
+    describe('Empty folders are ignored', () => {
+      const html = ({ promise, response }) => promise.then(value => {
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.headers['Content-Type'], htmlMimeType)
+        assert.strictEqual(response.toString(), '<html />')
       })
 
-      it('returns nothing if the path includes empty folders', () => handle({
+      it('returns result even if the path includes empty folders', () => handle({
         request: '/folder///index.html'
       })
-        .then(ignored)
+        .then(html)
       )
 
-      it('returns nothing if the path includes empty folders (root)', () => handle({
-        request: '///folder/index.html'
+      it('returns result even if the path includes empty folders (root)', () => {
+        const request = new Request({ method: 'GET', url: 'whatever' })
+        request.setForgedUrl('///folder/index.html')
+        return handle({
+          request
+        })
+          .then(html)
       })
-        .then(ignored)
-      )
 
-      it('fails with 404 if the path includes empty folders (folder)', () => handle({
+      it('returns result even if the path includes empty folders (folder)', () => handle({
         request: '/folder///'
       })
-        .then(ignored)
+        .then(html)
       )
 
       it('finds the file when the path strictly matches', () => handle({
         request: '/folder/index.html'
       })
-        .then(({ promise, response }) => promise.then(value => {
-          assert.strictEqual(value, undefined)
-          assert.strictEqual(response.statusCode, 200)
-          assert.strictEqual(response.headers['Content-Type'], htmlMimeType)
-          assert.strictEqual(response.toString(), '<html />')
-        }))
+        .then(html)
       )
-
-      afterEach(() => {
-        fs.setIgnoreEmptyFolders(false)
-      })
     })
   })
 
