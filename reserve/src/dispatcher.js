@@ -66,7 +66,9 @@ function error (reason) {
     statusCode = 500
   }
   emitError.call(this, reason)
-  if (this.failed) {
+  if (this.request.aborted) {
+    redirected.call(this) // TODO maybe a better status
+  } else if (this.failed) {
     // Error during error: finalize the response (whatever it means)
     this.response.end()
     redirected.call(this)
