@@ -1,6 +1,7 @@
 const { check, serve } = require('reserve')
 
 check({
+  cwd: __dirname,
   port: 8080,
   mappings: [{
     match: '^/(.*)',
