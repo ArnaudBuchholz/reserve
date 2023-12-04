@@ -12,9 +12,9 @@ const {
   $mappingMethod
 } = require('./symbols')
 
-function checkCwd (mapping) {
+function checkCwd (configuration, mapping) {
   if (!mapping.cwd) {
-    mapping.cwd = process.cwd()
+    mapping.cwd = configuration.cwd
   }
 }
 
@@ -79,7 +79,7 @@ function checkHandler (configuration, mapping) {
 
 module.exports = {
   async check (configuration, mapping) {
-    checkCwd(mapping)
+    checkCwd(configuration, mapping)
     checkMatch(mapping)
     checkInvertMatch(mapping)
     checkIfMatch(mapping)

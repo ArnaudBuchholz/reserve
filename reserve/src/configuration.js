@@ -25,6 +25,7 @@ const defaultHandlers = [
 }, {})
 
 const defaults = {
+  cwd: process.cwd(),
   hostname: undefined,
   port: 5000,
   'max-redirect': 10,
@@ -108,7 +109,7 @@ function checkListeners (configuration) {
   configuration.listeners = listeners.map(register => {
     let registerType = typeof register
     if (registerType === 'string') {
-      register = require(join(configuration.cwd || process.cwd(), register)) // TODO CJS/EJS switch
+      register = require(join(configuration.cwd, register)) // TODO CJS/EJS switch
       registerType = typeof register
     }
     if (registerType !== 'function') {
