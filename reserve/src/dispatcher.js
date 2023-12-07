@@ -9,7 +9,8 @@ const {
   $mappingMatch,
   $requestId,
   $requestInternal,
-  $responseEnded
+  $responseEnded,
+  $handlerPrefix
 } = require('./symbols')
 
 function hookEnd (response) {
@@ -44,10 +45,11 @@ function emitError (reason) {
 }
 
 function redirected () {
-  const end = new Date()
+  const perfEnd = performance.now()
   Object.assign(this.emitParameters, {
-    end,
-    timeSpent: end - this.emitParameters.start,
+    end: new Date(),
+    perfEnd,
+    timeSpent: Math.ceil(perfEnd - this.emitParameters.perfStart),
     statusCode: this.response.statusCode
   })
   try {
@@ -89,6 +91,8 @@ function redispatch (url) {
 
 function redirecting ({ mapping = {}, match, handler, type, redirect, url, index = 0 }) {
   try {
+    const prefix = handler[$handlerPrefix] || 'external'
+    const start = performance.now()
     emit.call(this.eventEmitter, 'redirecting', this.emitParameters, { type, redirect })
     if (mapping['exclude-from-holding-list']) {
       this.setAsNonHolding()
@@ -102,6 +106,12 @@ function redirecting ({ mapping = {}, match, handler, type, redirect, url, index
       response: hookEnd(this.response)
     })
       .then(result => {
+        const end = performance.now()
+        this.emitParameters.perfHandlers.push({
+          prefix,
+          start,
+          end
+        })
         if (undefined !== result) {
           redispatch.call(this, result)
         } else if (this.response[$responseEnded]) {
@@ -153,7 +163,10 @@ module.exports = function (configuration, request, response) {
     method: request.method,
     url: request.url,
     headers: Object.assign({}, request.headers),
-    start: new Date()
+    start: new Date(),
+    // performances
+    perfStart: performance.now(),
+    perfHandlers: []
   }
   let dispatched
   const dispatching = new Promise(resolve => { dispatched = resolve })
