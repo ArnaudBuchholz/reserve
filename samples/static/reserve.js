@@ -1,14 +1,41 @@
-const { check, serve, send } = require('../../reserve/src/index.js')
+const { check, serve, send, punycache } = require('../../reserve/src/index.js')
+const { createReadStream, stat, readFileSync } = require('fs')
+const { pipeline } = require('stream')
 
 const perfData = []
+const fileStatCache = punycache({
+  ttl: 500
+})
+const INDEX_PATH = './www/index.html'
+const INDEX_CONTENT = readFileSync(INDEX_PATH).toString()
 
 check({
   cwd: __dirname,
   port: 8080,
   mappings: [{
+    match: '^/stream',
+    custom: async request => {
+      let pendingFileStat = fileStatCache.get(INDEX_PATH)
+      if (!pendingFileStat) {
+        pendingFileStat = new Promise((resolve, reject) => stat(INDEX_PATH, (err, fileStat) => err ? reject(err) : resolve(fileStat)))
+        fileStatCache.set(INDEX_PATH, pendingFileStat)
+      }
+      request.fileStat = await pendingFileStat
+    }
+  }, {
+    match: '^/stream',
+    custom: async (request, response) => {
+      response.writeHead(200, {
+        'content-type': 'text/html',
+        'content-length': request.fileStat.size
+      })
+      const stream = createReadStream(INDEX_PATH)
+      await new Promise(resolve => pipeline(stream, response, () => resolve()))
+    }
+  }, {
     match: '^/static',
     custom: async (request, response) => {
-      send(response, 'Hello World !')
+      send(response, INDEX_CONTENT)
     }
   }, {
     match: '^/(.*)',
@@ -27,7 +54,6 @@ process.on('SIGINT', () => {
   const round = value => Math.floor(value * 100) / 100
   const stats = {}
   perfData.forEach(({
-    id,
     url,
     perfStart,
     perfEnd,
