@@ -1,5 +1,4 @@
 require('./http.js')
-require('./http-stream.js')
 require('./reserve.js')
 require('./express.js')
 require('./fastify.js')
