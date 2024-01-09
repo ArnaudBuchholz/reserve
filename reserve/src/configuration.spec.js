@@ -488,6 +488,7 @@ describe('configuration', () => {
       it('allows injecting listeners through require', () => {
         require('mock-require')('/mocked-listener', shouldFail)
         return check({
+          cwd: '/',
           listeners: ['mocked-listener']
         })
           .then(configuration => {
