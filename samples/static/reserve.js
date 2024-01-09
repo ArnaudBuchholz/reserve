@@ -36,6 +36,11 @@ check({
       send(response, INDEX_CONTENT)
     }
   }, {
+    match: '^/hello',
+    custom: async (request, response) => {
+      await send(response, 'Hello World !')
+    }
+  }, {
     match: '^/(.*)',
     file: './www/$1'
   }]
