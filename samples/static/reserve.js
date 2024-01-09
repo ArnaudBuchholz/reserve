@@ -1,10 +1,12 @@
 const { check, serve, send, punycache } = require('../../reserve/src/index.js')
 const { createReadStream, stat, readFileSync } = require('fs')
 
-const perfData = []
+const perfStats = {}
 const fileStatCache = punycache()
 const INDEX_PATH = './www/index.html'
 const INDEX_CONTENT = readFileSync(INDEX_PATH).toString()
+
+const round = value => Math.floor(value * 100) / 100
 
 check({
   cwd: __dirname,
@@ -41,6 +43,15 @@ check({
       await send(response, 'Hello World !')
     }
   }, {
+    match: '^/hello-fast',
+    custom: async (request, response) => {
+      response.writeHead(200, {
+        'content-type': 'text/plain',
+        'content-length': 13
+      })
+      response.end('Hello World !')
+    }
+  }, {
     match: '^/(.*)',
     file: './www/$1'
   }]
@@ -50,47 +61,52 @@ check({
       .on('ready', ({ port }) => {
         console.log(`reserve listening on port ${port}`)
       })
-      .on('redirected', data => perfData.push(data))
+      .on('redirected', ({
+        url,
+        perfStart,
+        perfEnd,
+        perfHandlers
+      }) => {
+        const ts = perfEnd - perfStart
+        const urlStats = perfStats[url] ??= {
+          url,
+          count: 0,
+          min: Number.POSITIVE_INFINITY,
+          max: 0,
+          tsSummed: 0,
+          handlers: []
+        }
+        ++urlStats.count
+        urlStats.min = Math.min(urlStats.min, ts)
+        urlStats.max = Math.max(urlStats.max, ts)
+        urlStats.tsSummed += ts
+        const { count } = urlStats
+        let index = 0
+        for (const { prefix, start, end } of perfHandlers) {
+          const ts = end - start
+          const handlerStats = urlStats.handlers[index] ??= {
+            prefix,
+            min: Number.POSITIVE_INFINITY,
+            max: 0,
+            tsSummed: 0,
+            anomalies: 0
+          }
+          handlerStats.min = Math.min(handlerStats.min, ts)
+          handlerStats.max = Math.max(handlerStats.max, ts)
+          handlerStats.tsSummed += ts
+          if (count > 100) {
+            const avg = handlerStats.tsSummed / count
+            if (ts > avg * 2) {
+              ++handlerStats.anomalies
+            }
+          }
+          ++index
+        }
+      })
   })
 
 process.on('SIGINT', () => {
-  const round = value => Math.floor(value * 100) / 100
-  const stats = {}
-  perfData.forEach(({
-    url,
-    perfStart,
-    perfEnd,
-    perfHandlers
-  }) => {
-    const ts = perfEnd - perfStart
-    const urlStats = stats[url] ??= {
-      url,
-      count: 0,
-      min: Number.POSITIVE_INFINITY,
-      max: 0,
-      tsSummed: 0,
-      handlers: []
-    }
-    ++urlStats.count
-    urlStats.min = Math.min(urlStats.min, ts)
-    urlStats.max = Math.max(urlStats.max, ts)
-    urlStats.tsSummed += ts
-    perfHandlers.forEach(({ prefix, start, end }, index) => {
-      const ts = end - start
-      const handlerStats = urlStats.handlers[index] ??= {
-        prefix,
-        min: Number.POSITIVE_INFINITY,
-        max: 0,
-        tsSummed: 0,
-        tsArray: []
-      }
-      handlerStats.min = Math.min(handlerStats.min, ts)
-      handlerStats.max = Math.max(handlerStats.max, ts)
-      handlerStats.tsSummed += ts
-      handlerStats.tsArray.push(ts)
-    })
-  })
-  console.table(Object.values(stats).map(({
+  console.table(Object.values(perfStats).map(({
     url,
     min,
     max,
@@ -108,14 +124,14 @@ process.on('SIGINT', () => {
       min,
       max,
       tsSummed,
-      tsArray
+      anomalies
     }, index) => {
       handlersInfos[`handler${index}`] = prefix
       handlersInfos[`minh${index}`] = round(min)
       handlersInfos[`maxh${index}`] = round(max)
       const avg = round(tsSummed / count)
       handlersInfos[`avgh${index}`] = avg
-      handlersInfos[`>avg*2h${index}`] = tsArray.filter(ts => ts > 2 * avg).length
+      handlersInfos[`>avg*2h${index}`] = anomalies
       return handlersInfos
     }, {})
   })))
