@@ -1,11 +1,8 @@
 const { check, serve, send, punycache } = require('../../reserve/src/index.js')
 const { createReadStream, stat, readFileSync } = require('fs')
-const { pipeline } = require('stream')
 
 const perfData = []
-const fileStatCache = punycache({
-  ttl: 500
-})
+const fileStatCache = punycache()
 const INDEX_PATH = './www/index.html'
 const INDEX_CONTENT = readFileSync(INDEX_PATH).toString()
 
@@ -25,12 +22,13 @@ check({
   }, {
     match: '^/stream',
     custom: async (request, response) => {
-      response.writeHead(200, {
-        'content-type': 'text/html',
-        'content-length': request.fileStat.size
-      })
       const stream = createReadStream(INDEX_PATH)
-      await new Promise(resolve => pipeline(stream, response, () => resolve()))
+      await send(response, stream, {
+        headers: {
+          'content-type': 'text/html',
+          'content-length': request.fileStat.size
+        }
+      })
     }
   }, {
     match: '^/static',
@@ -78,11 +76,13 @@ process.on('SIGINT', () => {
         prefix,
         min: Number.POSITIVE_INFINITY,
         max: 0,
-        tsSummed: 0
+        tsSummed: 0,
+        tsArray: []
       }
       handlerStats.min = Math.min(handlerStats.min, ts)
       handlerStats.max = Math.max(handlerStats.max, ts)
       handlerStats.tsSummed += ts
+      handlerStats.tsArray.push(ts)
     })
   })
   console.table(Object.values(stats).map(({
@@ -102,12 +102,15 @@ process.on('SIGINT', () => {
       prefix,
       min,
       max,
-      tsSummed
+      tsSummed,
+      tsArray
     }, index) => {
       handlersInfos[`handler${index}`] = prefix
       handlersInfos[`minh${index}`] = round(min)
       handlersInfos[`maxh${index}`] = round(max)
-      handlersInfos[`avgh${index}`] = round(tsSummed / count)
+      const avg = round(tsSummed / count)
+      handlersInfos[`avgh${index}`] = avg
+      handlersInfos[`>avg*2h${index}`] = tsArray.filter(ts => ts > 2 * avg).length
       return handlersInfos
     }, {})
   })))
