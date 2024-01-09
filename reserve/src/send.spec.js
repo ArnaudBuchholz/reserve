@@ -44,6 +44,27 @@ describe('send', () => {
     assert.strictEqual(response.headers['content-type'], 'application/octet-stream')
   })
 
+  it('handles ReadableStream error and end response', async () => {
+    const error = new Error('Nope')
+    function * data () {
+      yield 'Hello'
+      yield ' '
+      throw error
+    }
+    const readableStream = Readable.from(data(), { encoding: 'utf8' })
+    let failed = false
+    try {
+      await send(response, readableStream)
+    } catch (e) {
+      failed = true
+      assert.strictEqual(e, error)
+    }
+    assert.strictEqual(failed, true)
+    assert.strictEqual(response.statusCode, 200)
+    assert.deepStrictEqual(response.toString(), 'Hello ')
+    assert.strictEqual(response.ended, true)
+  })
+
   it('handles undefined', async () => {
     await send(response, undefined)
     assert.strictEqual(response.statusCode, 200)

@@ -37,6 +37,7 @@ module.exports = async function (response, data, options = {}) {
       data.on('error', reject)
       pipeline(data, response, err => {
         if (err) {
+          response.end()
           reject(err)
         } else {
           resolve()
