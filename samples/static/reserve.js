@@ -8,6 +8,11 @@ const INDEX_CONTENT = readFileSync(INDEX_PATH).toString()
 
 const round = value => Math.floor(value * 100) / 100
 
+const report = process.argv.includes('--report')
+if (report) {
+  console.warn('Recording statistics, this may slow down reserve')
+}
+
 check({
   cwd: __dirname,
   port: 8080,
@@ -57,11 +62,12 @@ check({
   }]
 })
   .then(configuration => {
-    serve(configuration)
+    const server = serve(configuration)
       .on('ready', ({ port }) => {
         console.log(`reserve listening on port ${port}`)
       })
-      .on('redirected', ({
+    if (report) {
+      server.on('redirected', ({
         url,
         perfStart,
         perfEnd,
@@ -103,37 +109,40 @@ check({
           ++index
         }
       })
+    }
   })
 
 process.on('SIGINT', () => {
-  console.table(Object.values(perfStats).map(({
-    url,
-    min,
-    max,
-    tsSummed,
-    count,
-    handlers
-  }) => ({
-    url,
-    count,
-    min: round(min),
-    max: round(max),
-    avg: round(tsSummed / count),
-    ...handlers.reduce((handlersInfos, {
-      prefix,
+  if (report) {
+    console.table(Object.values(perfStats).map(({
+      url,
       min,
       max,
       tsSummed,
-      anomalies
-    }, index) => {
-      handlersInfos[`handler${index}`] = prefix
-      handlersInfos[`minh${index}`] = round(min)
-      handlersInfos[`maxh${index}`] = round(max)
-      const avg = round(tsSummed / count)
-      handlersInfos[`avgh${index}`] = avg
-      handlersInfos[`>avg*2h${index}`] = anomalies
-      return handlersInfos
-    }, {})
-  })))
+      count,
+      handlers
+    }) => ({
+      url,
+      count,
+      min: round(min),
+      max: round(max),
+      avg: round(tsSummed / count),
+      ...handlers.reduce((handlersInfos, {
+        prefix,
+        min,
+        max,
+        tsSummed,
+        anomalies
+      }, index) => {
+        handlersInfos[`handler${index}`] = prefix
+        handlersInfos[`minh${index}`] = round(min)
+        handlersInfos[`maxh${index}`] = round(max)
+        const avg = round(tsSummed / count)
+        handlersInfos[`avgh${index}`] = avg
+        handlersInfos[`>avg*2h${index}`] = anomalies
+        return handlersInfos
+      }, {})
+    })))
+  }
   process.exit(0)
 })
