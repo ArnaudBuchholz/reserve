@@ -4,3 +4,5 @@ tests/types.js
 
 # dist
 !dist/index*
+
+tests/*.jsonl
