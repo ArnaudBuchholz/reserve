@@ -1,6 +1,7 @@
 'use strict'
 
 const { parseArgs } = require('util')
+const v8 = require('v8')
 
 const {
   values,
@@ -27,6 +28,11 @@ const {
       type: 'boolean',
       short: 'm',
       default: true
+    },
+    heap: {
+      type: 'boolean',
+      short: 'h',
+      default: false
     }
   },
   allowPositionals: true
@@ -46,11 +52,12 @@ const parseDelay = value => {
 const duration = parseDelay(values.duration)
 const frequency = parseDelay(values.frequency)
 const parallel = parseInt(values.parallel, 10)
-const { memory } = values
+const { memory, heap } = values
 console.log('duration (ms) ', ':', duration)
 console.log('frequency (ms)', ':', frequency)
 console.log('parallel      ', ':', parallel)
 console.log('memory        ', ':', memory)
+console.log('v8 heap       ', ':', heap)
 console.log('script        ', ':', script)
 
 let callback
@@ -83,6 +90,9 @@ const measure = (tick = performance.now()) => {
   }
   if (memory) {
     data.memory = process.memoryUsage()
+  }
+  if (heap) {
+    data.heap = v8.getHeapStatistics()
   }
   measures.push(data)
 }
