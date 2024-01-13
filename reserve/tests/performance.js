@@ -33,7 +33,13 @@ const {
       type: 'boolean',
       short: 'h',
       default: false
+    },
+    promises: {
+      type: 'boolean',
+      short: 'q',
+      default: false
     }
+  
   },
   allowPositionals: true
 })
@@ -52,13 +58,14 @@ const parseDelay = value => {
 const duration = parseDelay(values.duration)
 const frequency = parseDelay(values.frequency)
 const parallel = parseInt(values.parallel, 10)
-const { memory, heap } = values
-console.log('duration (ms) ', ':', duration)
-console.log('frequency (ms)', ':', frequency)
-console.log('parallel      ', ':', parallel)
-console.log('memory        ', ':', memory)
-console.log('v8 heap       ', ':', heap)
-console.log('script        ', ':', script)
+const { memory, heap, promises } = values
+console.log('duration (ms)   ', ':', duration)
+console.log('frequency (ms)  ', ':', frequency)
+console.log('parallel        ', ':', parallel)
+console.log('memory          ', ':', memory)
+console.log('v8 heap         ', ':', heap)
+console.log('pending promises', ':', promises)
+console.log('script          ', ':', script)
 
 let callback
 try {
@@ -81,6 +88,12 @@ const endAfter = measureTick + duration
 let steps = 0
 let stepsCompleted = 0
 let stepsKilled = 0
+let pendingPromisesCount = 0
+
+if (promises) {
+  v8.promiseHooks.onInit(() => ++pendingPromisesCount)
+  v8.promiseHooks.onSettled(() => --pendingPromisesCount)
+}
 
 const measure = (tick = performance.now()) => {
   const data = {
@@ -93,6 +106,11 @@ const measure = (tick = performance.now()) => {
   }
   if (heap) {
     data.heap = v8.getHeapStatistics()
+  }
+  if (promises) {
+    data.promises = {
+      pending: pendingPromisesCount
+    }
   }
   measures.push(data)
 }
