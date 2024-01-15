@@ -89,7 +89,7 @@ function redispatch (url) {
   }
 }
 
-function redirecting ({ mapping = {}, match, handler, type, redirect, url, index = 0 }) {
+async function redirecting ({ mapping = {}, match, handler, type, redirect, url, index = 0 }) {
   try {
     const prefix = handler[$handlerPrefix] || 'external'
     const start = performance.now()
@@ -97,7 +97,7 @@ function redirecting ({ mapping = {}, match, handler, type, redirect, url, index
     if (mapping['exclude-from-holding-list']) {
       this.setAsNonHolding()
     }
-    return handler.redirect({
+    let result = handler.redirect({
       configuration: this.configuration[$configurationInterface],
       mapping,
       match,
@@ -105,21 +105,22 @@ function redirecting ({ mapping = {}, match, handler, type, redirect, url, index
       request: this.request,
       response: hookEnd(this.response)
     })
-      .then(result => {
-        const end = performance.now()
-        this.emitParameters.perfHandlers.push({
-          prefix,
-          start,
-          end
-        })
-        if (undefined !== result) {
-          redispatch.call(this, result)
-        } else if (this.response[$responseEnded]) {
-          redirected.call(this)
-        } else {
-          dispatch.call(this, url, index + 1)
-        }
-      }, error.bind(this))
+    if (result && result.then) {
+      result = await result
+    }
+    const end = performance.now()
+    this.emitParameters.perfHandlers.push({
+      prefix,
+      start,
+      end
+    })
+    if (undefined !== result) {
+      redispatch.call(this, result)
+    } else if (this.response[$responseEnded]) {
+      redirected.call(this)
+    } else {
+      dispatch.call(this, url, index + 1)
+    }
   } catch (e) {
     error.call(this, e)
   }
@@ -138,7 +139,10 @@ async function dispatch (url, index = 0) {
     const mapping = this.configuration.mappings[index]
     let match
     try {
-      match = await mapping[$mappingMatch](this.request, url)
+      match = mapping[$mappingMatch](this.request, url)
+      if (match && match.then) {
+        match = await match
+      }
     } catch (reason) {
       return error.call(this, reason)
     }
@@ -155,6 +159,7 @@ async function dispatch (url, index = 0) {
 }
 
 module.exports = function (configuration, request, response) {
+  // TODO hook response.end HERE !
   const configurationRequests = configuration[$configurationRequests]
   const { contexts } = configurationRequests
   const emitParameters = {
@@ -198,13 +203,14 @@ module.exports = function (configuration, request, response) {
     error.call(context, reason)
     return dispatching
   }
-  return configurationRequests.holding
+  return configurationRequests.holding // TODO do not wait if not set !
     .then(() => {
       contexts.push(context)
       dispatch.call(context, request.url)
       return dispatching
     })
     .then(() => {
+      // TODO convert into a dictionary  with id (faster)
       const index = contexts.findIndex(candidate => candidate === context)
       contexts.splice(index, 1)
     })
