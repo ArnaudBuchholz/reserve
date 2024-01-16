@@ -184,10 +184,10 @@ async function main () {
 
       const round = (value, factor = 100) => Math.floor(factor * value) / factor
 
-      const averageAndStdDev = values => {
+      const averageAndStdDev = (values, factor = 100) => {
         const mean = values.reduce((total, value) => total + value) / values.length
         const standardDeviation = Math.sqrt(values.reduce((total, value) => total + (value - mean) ** 2, 0))
-        return `${round(mean)} Δ±${round(standardDeviation)}`
+        return `${round(mean, factor)} Δ±${round(standardDeviation, factor)}`
       }
 
       const minMax = values => {
@@ -205,7 +205,7 @@ async function main () {
         return `${round(min)} ≤ ∑/n ${round(mean, 1)} ≤ ${round(max)}`
       }
 
-      console.log('• time spent (ms)', ':', averageAndStdDev(avgTimeSpent))
+      console.log('• time spent (ms)', ':', averageAndStdDev(avgTimeSpent, 10000))
       if (measureMemory) {
         console.log('• heapUsed       ', ':', minMax(heapUseds))
       }
