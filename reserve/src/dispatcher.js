@@ -5,32 +5,12 @@ const interpolate = require('./interpolate')
 const {
   $configurationInterface,
   $configurationRequests,
-  $dispatcherEnd,
   $mappingMatch,
   $requestId,
   $requestInternal,
   $responseEnded,
   $handlerPrefix
 } = require('./symbols')
-
-function hookEnd (response) {
-  if (!response[$dispatcherEnd]) {
-    function end () {
-      response[$responseEnded] = true
-      return response.end(...arguments)
-    }
-    const proxy = new Proxy(response, {
-      get (target, property) {
-        if (property === 'end') {
-          return end
-        }
-        return response[property]
-      }
-    })
-    response[$dispatcherEnd] = proxy
-  }
-  return response[$dispatcherEnd]
-}
 
 function emit (event, emitParameters, additionalParameters) {
   this.emit(event, { ...emitParameters, ...additionalParameters })
@@ -44,7 +24,7 @@ function emitError (reason) {
   }
 }
 
-function redirected () {
+function redirected (/* this: context */) {
   const perfEnd = performance.now()
   Object.assign(this.emitParameters, {
     end: new Date(),
@@ -89,13 +69,14 @@ function redispatch (url) {
   }
 }
 
-async function redirecting ({ mapping = {}, match, handler, type, redirect, url, index = 0 }) {
+async function redirecting (/* this: context, */ { mapping = {}, match, handler, type, redirect, url, index = 0 }) {
   try {
     const prefix = handler[$handlerPrefix] || 'external'
     const start = performance.now()
     emit.call(this.eventEmitter, 'redirecting', this.emitParameters, { type, redirect })
     if (mapping['exclude-from-holding-list']) {
-      this.setAsNonHolding()
+      this.nonHolding = true
+      this.holding = Promise.resolve()
     }
     let result = handler.redirect({
       configuration: this.configuration[$configurationInterface],
@@ -103,7 +84,7 @@ async function redirecting ({ mapping = {}, match, handler, type, redirect, url,
       match,
       redirect,
       request: this.request,
-      response: hookEnd(this.response)
+      response: this.response
     })
     if (result && result.then) {
       result = await result
@@ -158,60 +139,66 @@ async function dispatch (url, index = 0) {
   error.call(this, 501)
 }
 
-module.exports = function (configuration, request, response) {
-  // TODO hook response.end HERE !
+function hookedEnd (...args) {
+  const {
+    configuration,
+    id,
+    nativeEnd,
+    response
+  } = this
+  const { contexts } = configuration[$configurationRequests]
+  delete contexts[id]
+  return nativeEnd.apply(response, args)
+}
+
+module.exports = async function (configuration, request, response) {
   const configurationRequests = configuration[$configurationRequests]
   const { contexts } = configurationRequests
+  const id = ++configurationRequests.lastId
+
   const emitParameters = {
-    id: ++configurationRequests.lastId,
+    id,
     internal: !!request[$requestInternal],
     method: request.method,
     url: request.url,
-    headers: Object.assign({}, request.headers),
+    headers: { ...request.headers },
     start: new Date(),
-    // performances
     perfStart: performance.now(),
     perfHandlers: []
   }
+
   let dispatched
   const dispatching = new Promise(resolve => { dispatched = resolve })
-  let release
-  const holding = new Promise(resolve => { release = resolve })
+
   const context = {
     configuration,
     eventEmitter: this,
     emitParameters,
-    holding,
+    holding: dispatching,
+    nativeEnd: response.end,
     redirectCount: 0,
-    redirected () {
-      this.setAsNonHolding()
-      dispatched()
-    },
+    redirected: dispatched,
     request,
-    response,
-    setAsNonHolding () {
-      this.released = true
-      release()
-    }
+    response
   }
-  request[$requestId] = emitParameters.id
+
+  response.end = hookedEnd.bind(context)
+  request[$requestId] = id
   request.on('aborted', emit.bind(this, 'aborted', emitParameters))
   request.on('close', emit.bind(this, 'closed', emitParameters))
+
   try {
     emit.call(this, 'incoming', emitParameters)
   } catch (reason) {
     error.call(context, reason)
     return dispatching
   }
-  return configurationRequests.holding // TODO do not wait if not set !
-    .then(() => {
-      contexts.push(context)
-      dispatch.call(context, request.url)
-      return dispatching
-    })
-    .then(() => {
-      // TODO convert into a dictionary  with id (faster)
-      const index = contexts.findIndex(candidate => candidate === context)
-      contexts.splice(index, 1)
-    })
+
+  if (configurationRequests.holding) {
+    await configurationRequests.holding
+  }
+
+  contexts[id] = context
+  dispatch.call(context, request.url)
+  return dispatching
 }
