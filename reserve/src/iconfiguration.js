@@ -44,7 +44,7 @@ module.exports = class IConfiguration {
     const configuration = this[$configuration]
     await checkMappings(configuration, mappings)
     const configurationRequests = configuration[$configurationRequests]
-    const contexts = [...configurationRequests.contexts]
+    const contexts = Object.values(configurationRequests.contexts)
     const requestContext = contexts.filter(({ request: candidate }) => candidate === request)[0]
     const requestsHolding = contexts.filter(candidate => candidate !== requestContext).map(({ holding }) => holding)
     const holding = Promise.race([
@@ -60,11 +60,11 @@ module.exports = class IConfiguration {
     holding.then(undefined, () => {
       console.log('REserve blocked during configuration.setMappings')
       console.table(contexts.map(context => {
-        const { emitParameters, request, released } = context
+        const { emitParameters, request, nonHolding } = context
         let info
         if (emitParameters.statusCode) {
           info = { statusCode: emitParameters.statusCode }
-        } else if (released) {
+        } else if (nonHolding) {
           info = 'exclude-from-holding-list'
         } else if (context === requestContext) {
           info = 'configure.setMappings'

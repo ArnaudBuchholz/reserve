@@ -208,8 +208,8 @@ module.exports = {
     await checkMappings(checkedConfiguration)
     checkedConfiguration[$configurationRequests] = {
       lastId: 0,
-      holding: Promise.resolve(),
-      contexts: []
+      holding: null,
+      contexts: {}
     }
     return checkedConfiguration
   },
