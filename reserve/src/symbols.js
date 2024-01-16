@@ -9,7 +9,6 @@ module.exports = {
   $configurationEventEmitter: Symbol(`${ns}configuration.eventEmitter`),
   $customCallback: Symbol(`${ns}custom.callback`),
   $customConfiguration: Symbol(`${ns}custom.configuration`),
-  $dispatcherEnd: Symbol(`${ns}dispatcher.end`),
   $handlerPrefix: Symbol(`${ns}handler.prefix`),
   $handlerMethod: Symbol(`${ns}handler.method`),
   $handlerSchema: Symbol(`${ns}handler.schema`),
