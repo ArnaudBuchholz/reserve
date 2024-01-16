@@ -186,13 +186,15 @@ declare module 'reserve' {
     method?: string,
     url: string,
     headers?: Headers,
+    body?: string,
     properties?: object
   }
 
   interface MockServer extends Server {
     request: ((method: string, url: string) => Promise<MockedResponse>) &
       ((method: string, url: string, headers: Headers) => Promise<MockedResponse>) &
-      ((method: string, url: string, headers: Headers, properties: object) => Promise<MockedResponse>) &
+      ((method: string, url: string, headers: Headers, body: string) => Promise<MockedResponse>) &
+      ((method: string, url: string, headers: Headers, body: string, properties: object) => Promise<MockedResponse>) &
       ((definition: MockedRequestDefinition) => Promise<MockedResponse>)
   }
 
