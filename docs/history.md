@@ -89,6 +89,7 @@
 |1.15.4|Fix types definition (Configuration)|
 ||Fix url IP in `ready` event|
 |1.15.5|Documentation as github pages|
+|1.15.6|Fix types definition (MockServer)|
 |2.0.0|Refactoring to improve project structure|
 ||BREAKING CHANGE: Support of CommonJS and ESM imports|
 ||BREAKING CHANGE: Remove support of `colors`|
