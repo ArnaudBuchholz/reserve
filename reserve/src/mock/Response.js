@@ -49,13 +49,11 @@ module.exports = class Response extends Duplex {
     this._buffer = []
     this._headers = headersFactory()
     this._headersSent = false
-    let resolver
     this._waitForFinish = new Promise(resolve => {
-      resolver = resolve
+      this.on('finish', () => resolve(this))
     })
     this._statusCode = 200
     this._ended = false
-    this.on('finish', () => resolver(this))
   }
 
   get headers () {
