@@ -8,7 +8,6 @@ const {
   $mappingMatch,
   $requestId,
   $requestInternal,
-  $responseEnded,
   $handlerPrefix
 } = require('./symbols')
 
@@ -95,9 +94,9 @@ async function redirecting (/* this: context, */ { mapping = {}, match, handler,
       start,
       end
     })
-    if (undefined !== result) {
+    if (result !== undefined) {
       redispatch.call(this, result)
-    } else if (this.response[$responseEnded]) {
+    } else if (this.ended) {
       redirected.call(this)
     } else {
       dispatch.call(this, url, index + 1)
@@ -139,13 +138,14 @@ async function dispatch (url, index = 0) {
   error.call(this, 501)
 }
 
-function hookedEnd (...args) {
+function hookedEnd (/* this: context, */ ...args) {
   const {
     configuration,
     id,
     nativeEnd,
     response
   } = this
+  this.ended = true;
   const { contexts } = configuration[$configurationRequests]
   delete contexts[id]
   return nativeEnd.apply(response, args)
@@ -176,6 +176,7 @@ module.exports = async function (configuration, request, response) {
     emitParameters,
     holding: dispatching,
     nativeEnd: response.end,
+    ended: false,
     redirectCount: 0,
     redirected: dispatched,
     request,
