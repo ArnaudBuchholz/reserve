@@ -100,7 +100,9 @@ async function main () {
   const endAfter = measureTick + duration
   let steps = 0
   let stepsTimeSpent = 0
+  let stepsTimeSpentSinceLastMeasurement = 0
   let stepsCompleted = 0
+  let stepsCompletedSinceLastMeasurement = 0
   let stepsKilled = 0
   const promises = {
     init: 0,
@@ -132,8 +134,10 @@ async function main () {
     const data = {
       tick: Math.ceil(tick),
       started: steps,
-      completed: stepsCompleted,
-      timeSpent: stepsTimeSpent
+      totalCompleted: stepsCompleted,
+      totalTimeSpent: stepsTimeSpent,
+      tickCompleted: stepsCompletedSinceLastMeasurement,
+      tickTimeSpent: stepsTimeSpentSinceLastMeasurement
     }
     if (measureMemory) {
       data.memory = process.memoryUsage()
@@ -166,9 +170,10 @@ async function main () {
         .filter(line => !!line)
         .forEach(line => {
           const data = JSON.parse(line)
-          const { completed, timeSpent } = data
+          const { totalCompleted: completed, totalTimeSpent, tickCompleted, tickTimeSpent } = data
           if (completed > 1) {
-            avgTimeSpent.push(timeSpent / completed)
+            console.log(totalTimeSpent / completed, tickTimeSpent / tickCompleted)
+            avgTimeSpent.push(totalTimeSpent / completed)
           }
           if (measureMemory) {
             const { memory: { heapUsed } } = data
@@ -220,11 +225,16 @@ async function main () {
     const start = performance.now()
     await callback(id)
     const end = performance.now()
-    stepsTimeSpent += Math.ceil(end - start)
+    const timeSpent = end - start
+    stepsTimeSpent += timeSpent
+    stepsTimeSpentSinceLastMeasurement += timeSpent
     ++stepsCompleted
+    ++stepsCompletedSinceLastMeasurement
     if (measureInterval && start >= measureTick) {
       measure()
       measureTick = start + measureInterval
+      stepsTimeSpentSinceLastMeasurement = 0
+      stepsCompletedSinceLastMeasurement = 0
     }
     if (end + startDelay < endAfter) {
       setTimeout(step, startDelay)
