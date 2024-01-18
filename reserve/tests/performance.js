@@ -196,17 +196,23 @@ async function main () {
 
       const round = (value, factor = 100) => Math.floor(factor * value) / factor
       const sum = (total, value) => total + value
+      const Stats = {
+        mean: values => values.reduce(sum) / values.length,
+        stdDev: variances => Math.sqrt(variances.reduce(sum) / (variances.length - 1))
+      }
 
-      const averageAndStdDev = (values, factor = 100, percentiles) => {
-        const mean = values.reduce((total, value) => total + value) / values.length
+      const averageAndStdDev = (values, factor = 100, showPercentiles) => {
+        const mean = Stats.mean(values)
         const variances = values.map(value => (value - mean) ** 2).sort()
-        const standardDeviation = Math.sqrt(variances.reduce(sum))
-        let display = `${round(mean, factor)} Δ±${round(standardDeviation, factor)}`
-        if (percentiles !== undefined) {
-          percentiles.forEach(percentile => {
+        const stdDev = Stats.stdDev(variances)
+        let display = `${round(mean, factor)} Δ±${round(stdDev, factor)}`
+        if (showPercentiles) {
+          [{ l: '¾', p: .75 }, { l: '½', p: .5 }, { l: '¼', p: .25 }].forEach(({ p: percentile, l: label }) => {
             const count = Math.floor(variances.length * percentile)
-            const refinedStdDeviation = Math.sqrt(variances.slice(0, count).reduce(sum))
-            display += ` Δ±(${round(percentile * 100, 1)}%)${round(refinedStdDeviation, factor)}`
+            if (count > 1) {
+              const percentileStdDev = Stats.stdDev(variances.slice(0, count))
+              display += ` Δ${label}±${round(percentileStdDev, factor)}`
+            }
           })
         }
         return display
@@ -228,7 +234,7 @@ async function main () {
       }
 
       if (avgTimeSpent.length > 1) {
-        console.log('• time spent (ms)', ':', averageAndStdDev(avgTimeSpent, 10000, [0.9, 0.75, 0.5, 0.25]))
+        console.log('• time spent (ms)', ':', averageAndStdDev(avgTimeSpent, 10000, true))
       }
       if (measureMemory && heapUseds.length) {
         console.log('• heapUsed       ', ':', minMax(heapUseds))
