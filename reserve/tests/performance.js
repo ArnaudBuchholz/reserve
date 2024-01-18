@@ -96,14 +96,14 @@ async function main () {
 
   const TICKS = ['\u280b', '\u2819', '\u2839', '\u2838', '\u283c', '\u2834', '\u2826', '\u2827', '\u2807', '\u280f']
   const startedAt = performance.now()
-  let measureTick = startedAt
-  const endAfter = measureTick + duration
-  let steps = 0
-  let stepsTimeSpent = 0
-  let stepsTimeSpentSinceLastMeasurement = 0
-  let stepsCompleted = 0
-  let stepsCompletedSinceLastMeasurement = 0
-  let stepsKilled = 0
+  const endAfter = startedAt + duration
+  let nextTick = startedAt
+  let tasksStarted = 0
+  let tasksCompleted = 0
+  let totalTimeSpent = 0
+  let timeSpentSinceLastTick = 0
+  let tasksCompletedSinceLastTick = 0
+  let activeTasks = 0
   const promises = {
     init: 0,
     settled: 0
@@ -133,11 +133,11 @@ async function main () {
   const measure = (tick = performance.now()) => {
     const data = {
       tick: Math.ceil(tick),
-      started: steps,
-      totalCompleted: stepsCompleted,
-      totalTimeSpent: stepsTimeSpent,
-      tickCompleted: stepsCompletedSinceLastMeasurement,
-      tickTimeSpent: stepsTimeSpentSinceLastMeasurement
+      started: tasksStarted,
+      totalCompleted: tasksCompleted,
+      totalTimeSpent,
+      tickCompleted: tasksCompletedSinceLastTick,
+      tickTimeSpent: timeSpentSinceLastTick
     }
     if (measureMemory) {
       data.memory = process.memoryUsage()
@@ -157,7 +157,7 @@ async function main () {
     }
     clearInterval(progress)
     console.log('📜 report')
-    console.log('• completed      ', ':', stepsCompleted)
+    console.log('• completed      ', ':', tasksCompleted)
     if (measureInterval) {
       console.log('• path           ', ':', jsonl)
 
@@ -170,10 +170,9 @@ async function main () {
         .filter(line => !!line)
         .forEach(line => {
           const data = JSON.parse(line)
-          const { totalCompleted: completed, totalTimeSpent, tickCompleted, tickTimeSpent } = data
+          const { totalCompleted: completed, tickCompleted, tickTimeSpent } = data
           if (completed > 1) {
-            console.log(totalTimeSpent / completed, tickTimeSpent / tickCompleted)
-            avgTimeSpent.push(totalTimeSpent / completed)
+            avgTimeSpent.push(tickTimeSpent / tickCompleted)
           }
           if (measureMemory) {
             const { memory: { heapUsed } } = data
@@ -188,15 +187,25 @@ async function main () {
         })
 
       const round = (value, factor = 100) => Math.floor(factor * value) / factor
+      const sum = (total, value) => total + value
 
-      const averageAndStdDev = (values, factor = 100) => {
+      const averageAndStdDev = (values, factor = 100, percentiles) => {
         const mean = values.reduce((total, value) => total + value) / values.length
-        const standardDeviation = Math.sqrt(values.reduce((total, value) => total + (value - mean) ** 2, 0))
-        return `${round(mean, factor)} Δ±${round(standardDeviation, factor)}`
+        const variances = values.map(value => (value - mean) ** 2).sort()
+        const standardDeviation = Math.sqrt(variances.reduce(sum))
+        let display = `${round(mean, factor)} Δ±${round(standardDeviation, factor)}`
+        if (percentiles !== undefined) {
+          percentiles.forEach(percentile => {
+            const count = Math.floor(variances.length * percentile)
+            const refinedStdDeviation = Math.sqrt(variances.slice(0, count).reduce(sum))
+            display += ` Δ±(${round(percentile * 100, 1)}%)${round(refinedStdDeviation, factor)}`
+          })
+        }
+        return display
       }
 
       const minMax = values => {
-        const mean = values.reduce((total, value) => total + value) / values.length
+        const mean = values.reduce(sum) / values.length
         let min = Number.POSITIVE_INFINITY
         let max = 0
         values.forEach(value => {
@@ -210,7 +219,7 @@ async function main () {
         return `${round(min)} ≤ ∑/n ${round(mean, 1)} ≤ ${round(max)}`
       }
 
-      console.log('• time spent (ms)', ':', averageAndStdDev(avgTimeSpent, 10000))
+      console.log('• time spent (ms)', ':', averageAndStdDev(avgTimeSpent, 10000, [0.9, 0.75, 0.5, 0.25]))
       if (measureMemory) {
         console.log('• heapUsed       ', ':', minMax(heapUseds))
       }
@@ -220,27 +229,29 @@ async function main () {
     }
   }
 
-  const step = async () => {
-    const id = ++steps
+  const task = async () => {
+    ++activeTasks
+    const id = ++tasksStarted
     const start = performance.now()
     await callback(id)
     const end = performance.now()
     const timeSpent = end - start
-    stepsTimeSpent += timeSpent
-    stepsTimeSpentSinceLastMeasurement += timeSpent
-    ++stepsCompleted
-    ++stepsCompletedSinceLastMeasurement
-    if (measureInterval && start >= measureTick) {
+    totalTimeSpent += timeSpent
+    timeSpentSinceLastTick += timeSpent
+    ++tasksCompleted
+    ++tasksCompletedSinceLastTick
+    if (measureInterval && start >= nextTick) {
       measure()
-      measureTick = start + measureInterval
-      stepsTimeSpentSinceLastMeasurement = 0
-      stepsCompletedSinceLastMeasurement = 0
+      nextTick = start + measureInterval
+      timeSpentSinceLastTick = 0
+      tasksCompletedSinceLastTick = 0
     }
+    --activeTasks
     if (end + startDelay < endAfter) {
-      setTimeout(step, startDelay)
+      setTimeout(task, startDelay)
       return
     }
-    if (++stepsKilled === parallel) {
+    if (activeTasks === 0) {
       report()
     }
   }
@@ -249,7 +260,7 @@ async function main () {
     measure()
   }
   for (let i = 0; i < parallel; ++i) {
-    step()
+    setTimeout(task, startDelay)
   }
 }
 
