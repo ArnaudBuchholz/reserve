@@ -124,6 +124,14 @@ async function main () {
   }
   process.on('SIGINT', interrupted)
   process.on('SIGTERM', interrupted)
+  process.on('uncaughtException', error => {
+    console.log(error)
+    interrupted()
+  })
+  process.on('unhandledRejection', reason => {
+    console.log(reason)
+    interrupted()
+  })
 
   if (promises) {
     v8.promiseHooks.onInit(() => ++promises.init)
@@ -219,18 +227,19 @@ async function main () {
         return `${round(min)} ≤ ∑/n ${round(mean, 1)} ≤ ${round(max)}`
       }
 
-      console.log('• time spent (ms)', ':', averageAndStdDev(avgTimeSpent, 10000, [0.9, 0.75, 0.5, 0.25]))
-      if (measureMemory) {
+      if (avgTimeSpent.length > 1) {
+        console.log('• time spent (ms)', ':', averageAndStdDev(avgTimeSpent, 10000, [0.9, 0.75, 0.5, 0.25]))
+      }
+      if (measureMemory && heapUseds.length) {
         console.log('• heapUsed       ', ':', minMax(heapUseds))
       }
-      if (measurePromises) {
+      if (measurePromises && avgSettledPromises.length) {
         console.log('• promises       ', ':', averageAndStdDev(avgSettledPromises))
       }
     }
   }
 
   const task = async () => {
-    ++activeTasks
     const id = ++tasksStarted
     const start = performance.now()
     await callback(id)
@@ -246,12 +255,11 @@ async function main () {
       timeSpentSinceLastTick = 0
       tasksCompletedSinceLastTick = 0
     }
-    --activeTasks
     if (end + startDelay < endAfter) {
       setTimeout(task, startDelay)
       return
     }
-    if (activeTasks === 0) {
+    if (--activeTasks === 0) {
       report()
     }
   }
@@ -260,6 +268,7 @@ async function main () {
     measure()
   }
   for (let i = 0; i < parallel; ++i) {
+    ++activeTasks
     setTimeout(task, startDelay)
   }
 }
