@@ -1,6 +1,16 @@
-const { mock, send } = require('../src')
+const { mock, send, Request, Response } = require('../src')
 
-module.exports = () => new Promise(resolve => {
+module.exports = (config) => new Promise(resolve => {
+  if (config === 'base') {
+    resolve(async () => {
+      const request = new Request({ method: 'GET', url: '/hello' })
+      const response = new Response()
+      await send(response, 'Hello World !')
+      await response.waitForFinish()
+    })
+    return
+  }
+
   const mocked = mock({
     mappings: [{
       match: /^\/hello/,
