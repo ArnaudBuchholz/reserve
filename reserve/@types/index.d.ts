@@ -5,6 +5,17 @@ import { IncomingMessage, ServerResponse } from 'http'
 declare module 'reserve' {
   type RedirectResponse = void | number | string
 
+  class Request extends IncomingMessage {
+    setForgedUrl: (url: string) => void
+  }
+
+  class Response extends ServerResponse {
+    constructor(req?: Request)
+    waitForFinish: () => Promise<void>
+    isInitial: () => boolean
+    setAsynchronous: () => void
+  }
+
   type IfMatcher = (request: IncomingMessage, url: string, match: RegExpMatchArray) => boolean | RedirectResponse
 
   interface BaseMapping {
@@ -184,7 +195,8 @@ declare module 'reserve' {
     noBody?: boolean /* do not send body */
   }
 
-  function send (response: ServerResponse, data?: string | object | ReadableStream, options?: SendOptions): Promise<void>
+  function send (response: ServerResponse, data: ReadableStream, options?: SendOptions): Promise<void>
+  function send (response: ServerResponse, data?: string | object, options?: SendOptions): void
 
   function check (configuration: Configuration): Promise<Configuration>
 
