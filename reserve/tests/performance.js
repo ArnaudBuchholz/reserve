@@ -176,6 +176,7 @@ async function main () {
     console.log('📜 report')
     console.log('• completed      ', ':', tasksCompleted)
     if (measureInterval) {
+      console.log('• measures       ', ':', measures.length)
       if (fileData) {
         console.log('• path           ', ':', jsonl)
       }
@@ -204,24 +205,31 @@ async function main () {
       const sum = (total, value) => total + value
       const Stats = {
         mean: values => values.reduce(sum) / values.length,
-        stdDev: variances => Math.sqrt(variances.reduce(sum) / (variances.length - 1))
+        stdDev: (values, mean = Stats.mean(values)) => {
+          const variances = values.map(value => (value - mean) ** 2)
+          return Math.sqrt(variances.reduce(sum) / (variances.length - 1))
+        }
       }
 
-      const averageAndStdDev = (values, factor = 100, showPercentiles) => {
-        const mean = Stats.mean(values)
-        const variances = values.map(value => (value - mean) ** 2).sort()
-        const stdDev = Stats.stdDev(variances)
-        let display = `${round(mean, factor)} Δ±${round(stdDev, factor)}`
-        if (showPercentiles) {
-          [{ l: '¾', p: 0.75 }, { l: '½', p: 0.5 }, { l: '¼', p: 0.25 }].forEach(({ p: percentile, l: label }) => {
-            const count = Math.floor(variances.length * percentile)
-            if (count > 1) {
-              const percentileStdDev = Stats.stdDev(variances.slice(0, count))
-              display += ` Δ${label}±${round(percentileStdDev, factor)}`
-            }
-          })
+      const averageAndStdDev = (values, factor = 100, percentile = undefined) => {
+        let mean = Stats.mean(values)
+        let stdDev
+        if (percentile) {
+          // Isolate less significant values
+          const variances = values.map((value, index) => ({
+            value,
+            variance: (value - mean) ** 2
+          })).sort(({ variance: v1 }, { variance: v2}) => v1 - v2)
+          const count = Math.floor(variances.length * percentile)
+          if (count > 1) {
+            const percentileValues = variances.slice(0, count).map(({ value }) => value)
+            mean = Stats.mean(percentileValues)
+            stdDev = Stats.stdDev(percentileValues, mean)
+          }
+        } else {
+          stdDev = Stats.stdDev(values, mean)
         }
-        return display
+        return `${round(mean, factor)} Δ±${round(stdDev, factor)}`
       }
 
       const minMax = values => {
@@ -240,7 +248,9 @@ async function main () {
       }
 
       if (avgTimeSpent.length > 1) {
-        console.log('• time spent (ms)', ':', averageAndStdDev(avgTimeSpent, 10000, true))
+        console.log('• time spent (ms)', ':', averageAndStdDev(avgTimeSpent, 10000))
+        console.log('              75%', ':', averageAndStdDev(avgTimeSpent, 10000, 0.75))
+        console.log('              50%', ':', averageAndStdDev(avgTimeSpent, 10000, 0.5))
       }
       if (measureMemory && heapUseds.length) {
         console.log('• heapUsed       ', ':', minMax(heapUseds))
