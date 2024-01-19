@@ -8,12 +8,12 @@ const handle = wrapHandler(statusHandler)
 const textMimeType = 'text/plain'
 
 describe('handlers/status', () => {
-  it('returns a promise', () => handle({
+  it('does not return a promise', () => handle({
     mapping: null,
     redirect: 404
   })
-    .then(({ promise }) => {
-      assert.strictEqual(typeof promise.then, 'function')
+    .then(({ redirected }) => {
+      assert.strictEqual(redirected, undefined)
     })
   )
 
@@ -21,24 +21,24 @@ describe('handlers/status', () => {
     mapping: null,
     redirect: 404
   })
-    .then(({ promise, response }) => promise.then(value => {
-      assert.strictEqual(value, undefined)
+    .then(({ redirected, response }) => {
+      assert.strictEqual(redirected, undefined)
       assert.strictEqual(response.statusCode, 404)
       assert.strictEqual(response.headers['Content-Type'], textMimeType)
       assert.strictEqual(response.toString(), 'Not found')
-    }))
+    })
   )
 
   it('sends an empty response for unknonw codes', () => handle({
     mapping: null,
     redirect: 418
   })
-    .then(({ promise, response }) => promise.then(value => {
-      assert.strictEqual(value, undefined)
+    .then(({ redirected, response }) => {
+      assert.strictEqual(redirected, undefined)
       assert.strictEqual(response.statusCode, 418)
       assert.strictEqual(response.headers['Content-Type'], textMimeType)
       assert.strictEqual(response.toString(), '')
-    }))
+    })
   )
 
   it('can be used for redirections', () => handle({
@@ -51,12 +51,12 @@ describe('handlers/status', () => {
     redirect: 302,
     match: [undefined, 'https://www.npmjs.com/package/reserve']
   })
-    .then(({ promise, response }) => promise.then(value => {
-      assert.strictEqual(value, undefined)
+    .then(({ redirected, response }) => {
+      assert.strictEqual(redirected, undefined)
       assert.strictEqual(response.statusCode, 302)
       assert.strictEqual(response.headers['Content-Type'], textMimeType)
       assert.strictEqual(response.toString(), '')
       assert.strictEqual(response.headers.Location, 'https://www.npmjs.com/package/reserve')
-    }))
+    })
   )
 })
