@@ -3,6 +3,7 @@ const { mock, send, Request, Response } = require('../src')
 module.exports = (config) => new Promise(resolve => {
   if (config === 'base') {
     resolve(async () => {
+      // eslint-disable-next-line no-unused-vars
       const request = new Request({ method: 'GET', url: '/hello' })
       const response = new Response()
       await send(response, 'Hello World !')

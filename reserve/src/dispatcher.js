@@ -145,7 +145,7 @@ function hookedEnd (/* this: context, */ ...args) {
     nativeEnd,
     response
   } = this
-  this.ended = true;
+  this.ended = true
   const { contexts } = configuration[$configurationRequests]
   delete contexts[id]
   return nativeEnd.apply(response, args)

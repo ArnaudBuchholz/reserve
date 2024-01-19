@@ -207,7 +207,7 @@ async function main () {
         const stdDev = Stats.stdDev(variances)
         let display = `${round(mean, factor)} Δ±${round(stdDev, factor)}`
         if (showPercentiles) {
-          [{ l: '¾', p: .75 }, { l: '½', p: .5 }, { l: '¼', p: .25 }].forEach(({ p: percentile, l: label }) => {
+          [{ l: '¾', p: 0.75 }, { l: '½', p: 0.5 }, { l: '¼', p: 0.25 }].forEach(({ p: percentile, l: label }) => {
             const count = Math.floor(variances.length * percentile)
             if (count > 1) {
               const percentileStdDev = Stats.stdDev(variances.slice(0, count))
