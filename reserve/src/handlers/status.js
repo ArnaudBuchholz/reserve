@@ -23,7 +23,7 @@ module.exports = {
     }
   },
   redirect: function ({ mapping, match, response, redirect }) {
-    send(response, byStatus[redirect] || '', {
+    return send(response, byStatus[redirect] || '', {
       statusCode: redirect,
       headers: { ...interpolate(match, mapping ? mapping.headers : undefined) }
     })
