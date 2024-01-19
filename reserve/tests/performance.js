@@ -3,7 +3,7 @@
 const { parseArgs } = require('util')
 const v8 = require('v8')
 const { join } = require('path')
-const { readFileSync, writeFileSync } = require('fs')
+const { writeFileSync } = require('fs')
 
 async function main () {
   const {
@@ -26,6 +26,11 @@ async function main () {
         type: 'string',
         short: 's',
         default: '0'
+      },
+      fileData: {
+        type: 'boolean',
+        short: 'f',
+        default: false
       },
       measureInterval: {
         type: 'string',
@@ -66,7 +71,7 @@ async function main () {
   const measureInterval = parseDelay(values.measureInterval)
   const startDelay = parseDelay(values.startDelay)
   const parallel = parseInt(values.parallel, 10)
-  const { measureMemory, measureV8Heap, measurePromises } = values
+  const { fileData, measureMemory, measureV8Heap, measurePromises } = values
   console.log('duration (ms)    ', ':', duration)
   console.log('parallel         ', ':', parallel)
   console.log('start delay (ms) ', ':', startDelay)
@@ -97,6 +102,7 @@ async function main () {
   const TICKS = ['\u280b', '\u2819', '\u2839', '\u2838', '\u283c', '\u2834', '\u2826', '\u2827', '\u2807', '\u280f']
   const startedAt = performance.now()
   const endAfter = startedAt + duration
+  const measures = []
   let nextTick = startedAt
   let tasksStarted = 0
   let tasksCompleted = 0
@@ -156,7 +162,10 @@ async function main () {
     if (measurePromises) {
       data.promises = { ...promises }
     }
-    writeFileSync(jsonl, JSON.stringify(data) + '\n', { flag: 'a' })
+    measures.push(data)
+    if (fileData) {
+      writeFileSync(jsonl, JSON.stringify(data) + '\n', { flag: 'a' })
+    }
   }
 
   const report = () => {
@@ -167,32 +176,29 @@ async function main () {
     console.log('📜 report')
     console.log('• completed      ', ':', tasksCompleted)
     if (measureInterval) {
-      console.log('• path           ', ':', jsonl)
+      if (fileData) {
+        console.log('• path           ', ':', jsonl)
+      }
 
       const avgTimeSpent = []
       const heapUseds = []
       const avgSettledPromises = []
-      readFileSync(jsonl)
-        .toString()
-        .split('\n')
-        .filter(line => !!line)
-        .forEach(line => {
-          const data = JSON.parse(line)
-          const { totalCompleted: completed, tickCompleted, tickTimeSpent } = data
+      measures.forEach(data => {
+        const { totalCompleted: completed, tickCompleted, tickTimeSpent } = data
+        if (completed > 1) {
+          avgTimeSpent.push(tickTimeSpent / tickCompleted)
+        }
+        if (measureMemory) {
+          const { memory: { heapUsed } } = data
+          heapUseds.push(heapUsed)
+        }
+        if (measurePromises) {
+          const { promises: { settled } } = data
           if (completed > 1) {
-            avgTimeSpent.push(tickTimeSpent / tickCompleted)
+            avgSettledPromises.push(settled / completed)
           }
-          if (measureMemory) {
-            const { memory: { heapUsed } } = data
-            heapUseds.push(heapUsed)
-          }
-          if (measurePromises) {
-            const { promises: { settled } } = data
-            if (completed > 1) {
-              avgSettledPromises.push(settled / completed)
-            }
-          }
-        })
+        }
+      })
 
       const round = (value, factor = 100) => Math.floor(factor * value) / factor
       const sum = (total, value) => total + value
@@ -207,7 +213,7 @@ async function main () {
         const stdDev = Stats.stdDev(variances)
         let display = `${round(mean, factor)} Δ±${round(stdDev, factor)}`
         if (showPercentiles) {
-          [{ l: '¾', p: .75 }, { l: '½', p: .5 }, { l: '¼', p: .25 }].forEach(({ p: percentile, l: label }) => {
+          [{ l: '¾', p: 0.75 }, { l: '½', p: 0.5 }, { l: '¼', p: 0.25 }].forEach(({ p: percentile, l: label }) => {
             const count = Math.floor(variances.length * percentile)
             if (count > 1) {
               const percentileStdDev = Stats.stdDev(variances.slice(0, count))
