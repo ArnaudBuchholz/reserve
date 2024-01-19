@@ -11,7 +11,7 @@ A custom handler object may define:
   - **configuration** the [configuration interface](#configuration-interface)
 
 
-* **redirect** *(mandatory)* an [asynchronous](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) method that will be called with an **object** exposing:
+* **redirect** *(mandatory)* a method that may return a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) and that will be called with an **object** exposing:
   - **configuration** the [configuration interface](#configuration-interface)
   - **mapping** the mapping being executed
   - **match** the regular expression [exec result](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec)
