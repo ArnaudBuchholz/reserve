@@ -6,7 +6,7 @@ const { bin, text, json } = require('./mime')
 const CONTENT_TYPE = 'content-type'
 const CONTENT_LENGTH = 'content-length'
 
-module.exports = async function (response, data, options = {}) {
+module.exports = (response, data, options = {}) => {
   let { statusCode = 200, noBody } = options
   const headers = { ...options.headers }
   let stream = false
