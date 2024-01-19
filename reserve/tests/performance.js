@@ -3,7 +3,7 @@
 const { parseArgs } = require('util')
 const v8 = require('v8')
 const { join } = require('path')
-const { readFileSync, writeFileSync } = require('fs')
+const { writeFileSync } = require('fs')
 
 async function main () {
   const {
@@ -26,6 +26,11 @@ async function main () {
         type: 'string',
         short: 's',
         default: '0'
+      },
+      fileData: {
+        type: 'boolean',
+        short: 'f',
+        default: false
       },
       measureInterval: {
         type: 'string',
@@ -66,7 +71,7 @@ async function main () {
   const measureInterval = parseDelay(values.measureInterval)
   const startDelay = parseDelay(values.startDelay)
   const parallel = parseInt(values.parallel, 10)
-  const { measureMemory, measureV8Heap, measurePromises } = values
+  const { fileData, measureMemory, measureV8Heap, measurePromises } = values
   console.log('duration (ms)    ', ':', duration)
   console.log('parallel         ', ':', parallel)
   console.log('start delay (ms) ', ':', startDelay)
@@ -97,6 +102,7 @@ async function main () {
   const TICKS = ['\u280b', '\u2819', '\u2839', '\u2838', '\u283c', '\u2834', '\u2826', '\u2827', '\u2807', '\u280f']
   const startedAt = performance.now()
   const endAfter = startedAt + duration
+  const measures = []
   let nextTick = startedAt
   let tasksStarted = 0
   let tasksCompleted = 0
@@ -156,7 +162,10 @@ async function main () {
     if (measurePromises) {
       data.promises = { ...promises }
     }
-    writeFileSync(jsonl, JSON.stringify(data) + '\n', { flag: 'a' })
+    measures.push(data)
+    if (fileData) {
+      writeFileSync(jsonl, JSON.stringify(data) + '\n', { flag: 'a' })
+    }
   }
 
   const report = () => {
@@ -167,58 +176,63 @@ async function main () {
     console.log('📜 report')
     console.log('• completed      ', ':', tasksCompleted)
     if (measureInterval) {
-      console.log('• path           ', ':', jsonl)
+      console.log('• measures       ', ':', measures.length)
+      if (fileData) {
+        console.log('• path           ', ':', jsonl)
+      }
 
       const avgTimeSpent = []
       const heapUseds = []
       const avgSettledPromises = []
-      readFileSync(jsonl)
-        .toString()
-        .split('\n')
-        .filter(line => !!line)
-        .forEach(line => {
-          const data = JSON.parse(line)
-          const { totalCompleted: completed, tickCompleted, tickTimeSpent } = data
+      measures.forEach(data => {
+        const { totalCompleted: completed, tickCompleted, tickTimeSpent } = data
+        if (completed > 1) {
+          avgTimeSpent.push(tickTimeSpent / tickCompleted)
+        }
+        if (measureMemory) {
+          const { memory: { heapUsed } } = data
+          heapUseds.push(heapUsed)
+        }
+        if (measurePromises) {
+          const { promises: { settled } } = data
           if (completed > 1) {
-            avgTimeSpent.push(tickTimeSpent / tickCompleted)
+            avgSettledPromises.push(settled / completed)
           }
-          if (measureMemory) {
-            const { memory: { heapUsed } } = data
-            heapUseds.push(heapUsed)
-          }
-          if (measurePromises) {
-            const { promises: { settled } } = data
-            if (completed > 1) {
-              avgSettledPromises.push(settled / completed)
-            }
-          }
-        })
+        }
+      })
 
-      const round = (value, factor = 100) => Math.floor(factor * value) / factor
+      const round = (value, decimalDigits = 1) => {
+        const factor = 10 ** decimalDigits
+        const roundedValue = Math.floor(factor * value) / factor
+        return roundedValue.toFixed(decimalDigits)
+      }
       const sum = (total, value) => total + value
       const Stats = {
         mean: values => values.reduce(sum) / values.length,
-        stdDev: variances => Math.sqrt(variances.reduce(sum) / (variances.length - 1))
-      }
-
-      const averageAndStdDev = (values, factor = 100, showPercentiles) => {
-        const mean = Stats.mean(values)
-        const variances = values.map(value => (value - mean) ** 2).sort()
-        const stdDev = Stats.stdDev(variances)
-        let display = `${round(mean, factor)} Δ±${round(stdDev, factor)}`
-        if (showPercentiles) {
-          [{ l: '¾', p: 0.75 }, { l: '½', p: 0.5 }, { l: '¼', p: 0.25 }].forEach(({ p: percentile, l: label }) => {
-            const count = Math.floor(variances.length * percentile)
-            if (count > 1) {
-              const percentileStdDev = Stats.stdDev(variances.slice(0, count))
-              display += ` Δ${label}±${round(percentileStdDev, factor)}`
-            }
-          })
+        stdDev: (values, mean = Stats.mean(values)) => {
+          const variances = values.map(value => (value - mean) ** 2)
+          return Math.sqrt(variances.reduce(sum) / (variances.length - 1))
         }
-        return display
       }
 
-      const minMax = values => {
+      const averageAndStdDev = (values, decimalDigits = 2, trim = undefined) => {
+        let mean
+        let stdDev
+        if (trim) {
+          const sortedValues = values.sort()
+          const skip = Math.floor(values.length * trim)
+          const trimValues = sortedValues.slice(skip, -skip)
+          mean = Stats.mean(trimValues)
+          stdDev = Stats.stdDev(trimValues, mean)
+        } else {
+          mean = Stats.mean(values)
+          stdDev = Stats.stdDev(values, mean)
+        }
+        const ratio = round(100 * stdDev / mean)
+        return `${round(mean, decimalDigits)} Δ± ${round(stdDev, decimalDigits)} (${ratio}%)`
+      }
+
+      const minMax = (values, decimalDigits = 2) => {
         const mean = values.reduce(sum) / values.length
         let min = Number.POSITIVE_INFINITY
         let max = 0
@@ -230,14 +244,17 @@ async function main () {
             max = value
           }
         })
-        return `${round(min)} ≤ ∑/n ${round(mean, 1)} ≤ ${round(max)}`
+        return `${min} ≤ ∑/n ${round(mean, decimalDigits)} ≤ ${max}`
       }
 
       if (avgTimeSpent.length > 1) {
-        console.log('• time spent (ms)', ':', averageAndStdDev(avgTimeSpent, 10000, true))
+        console.log('• time spent (ms)', ':', averageAndStdDev(avgTimeSpent, 4))
+        console.log('          trim 5%', ':', averageAndStdDev(avgTimeSpent, 4, 0.05))
+        console.log('         trim 15%', ':', averageAndStdDev(avgTimeSpent, 4, 0.15))
+        console.log('         trim 25%', ':', averageAndStdDev(avgTimeSpent, 4, 0.25))
       }
       if (measureMemory && heapUseds.length) {
-        console.log('• heapUsed       ', ':', minMax(heapUseds))
+        console.log('• heapUsed       ', ':', minMax(heapUseds, 0))
       }
       if (measurePromises && avgSettledPromises.length) {
         console.log('• promises       ', ':', averageAndStdDev(avgSettledPromises))
