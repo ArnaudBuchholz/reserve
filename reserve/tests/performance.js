@@ -201,7 +201,11 @@ async function main () {
         }
       })
 
-      const round = (value, factor = 100) => Math.floor(factor * value) / factor
+      const round = (value, decimalDigits = 1) => {
+        const factor = 10 ** decimalDigits
+        const roundedValue = Math.floor(factor * value) / factor
+        return roundedValue.toFixed(decimalDigits)
+      }
       const sum = (total, value) => total + value
       const Stats = {
         mean: values => values.reduce(sum) / values.length,
@@ -211,28 +215,24 @@ async function main () {
         }
       }
 
-      const averageAndStdDev = (values, factor = 100, percentile = undefined) => {
-        let mean = Stats.mean(values)
+      const averageAndStdDev = (values, decimalDigits = 2, trim = undefined) => {
+        let mean
         let stdDev
-        if (percentile) {
-          // Isolate less significant values
-          const variances = values.map((value, index) => ({
-            value,
-            variance: (value - mean) ** 2
-          })).sort(({ variance: v1 }, { variance: v2}) => v1 - v2)
-          const count = Math.floor(variances.length * percentile)
-          if (count > 1) {
-            const percentileValues = variances.slice(0, count).map(({ value }) => value)
-            mean = Stats.mean(percentileValues)
-            stdDev = Stats.stdDev(percentileValues, mean)
-          }
+        if (trim) {
+          const sortedValues = values.sort()
+          const skip = Math.floor(values.length * trim)
+          const trimValues = sortedValues.slice(skip, -skip)
+          mean = Stats.mean(trimValues)
+          stdDev = Stats.stdDev(trimValues, mean)
         } else {
+          mean = Stats.mean(values)
           stdDev = Stats.stdDev(values, mean)
         }
-        return `${round(mean, factor)} Δ±${round(stdDev, factor)}`
+        const ratio = round(100 * stdDev / mean)
+        return `${round(mean, decimalDigits)} Δ± ${round(stdDev, decimalDigits)} (${ratio}%)`
       }
 
-      const minMax = values => {
+      const minMax = (values, decimalDigits = 2) => {
         const mean = values.reduce(sum) / values.length
         let min = Number.POSITIVE_INFINITY
         let max = 0
@@ -244,16 +244,17 @@ async function main () {
             max = value
           }
         })
-        return `${round(min)} ≤ ∑/n ${round(mean, 1)} ≤ ${round(max)}`
+        return `${min} ≤ ∑/n ${round(mean, decimalDigits)} ≤ ${max}`
       }
 
       if (avgTimeSpent.length > 1) {
-        console.log('• time spent (ms)', ':', averageAndStdDev(avgTimeSpent, 10000))
-        console.log('              75%', ':', averageAndStdDev(avgTimeSpent, 10000, 0.75))
-        console.log('              50%', ':', averageAndStdDev(avgTimeSpent, 10000, 0.5))
+        console.log('• time spent (ms)', ':', averageAndStdDev(avgTimeSpent, 4))
+        console.log('          trim 5%', ':', averageAndStdDev(avgTimeSpent, 4, 0.05))
+        console.log('         trim 15%', ':', averageAndStdDev(avgTimeSpent, 4, 0.15))
+        console.log('         trim 25%', ':', averageAndStdDev(avgTimeSpent, 4, 0.25))
       }
       if (measureMemory && heapUseds.length) {
-        console.log('• heapUsed       ', ':', minMax(heapUseds))
+        console.log('• heapUsed       ', ':', minMax(heapUseds, 0))
       }
       if (measurePromises && avgSettledPromises.length) {
         console.log('• promises       ', ':', averageAndStdDev(avgSettledPromises))
