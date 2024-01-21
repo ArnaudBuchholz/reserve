@@ -24,13 +24,13 @@ configurationFileNames.split(',').forEach(configurationFileName => {
       return {} // empty configuration will use all defaults
     })
     .then(configuration => {
-      let eventEmitter
+      let server
       if (silent) {
-        eventEmitter = serve(configuration)
+        server = serve(configuration)
       } else {
-        eventEmitter = log(serve(configuration), verbose)
+        server = log(serve(configuration), verbose)
       }
-      eventEmitter.on('ready', () => {
+      server.on('ready', () => {
         if (process.send) {
           process.send('ready')
         }
