@@ -1,6 +1,8 @@
 import { EventEmitter } from 'events'
 import { Stats } from 'fs'
-import { IncomingMessage, ServerResponse } from 'http'
+import { IncomingMessage, ServerResponse, Server as HttpServer } from 'http'
+import { Server as HttpsServer } from 'https'
+import { Server as Http2Server } from 'http2'
 
 declare module 'reserve' {
   type RedirectResponse = void | number | string
@@ -200,7 +202,76 @@ declare module 'reserve' {
 
   function check (configuration: Configuration): Promise<Configuration>
 
-  interface Server extends EventEmitter {
+  enum ServerEvent {
+    serverCreated = 'server-created',
+    ready = 'ready',
+    incoming = 'incoming',
+    error = 'error',
+    redirecting = 'redirecting',
+    redirected = 'redirected',
+    aborted = 'aborted',
+    closed = 'closed'
+  }
+
+  type ServerEventIncomingParameter = {
+    method: string
+    url: string
+    headers: Headers
+    start: Date
+    perfDate: number
+    id: number
+    internal: boolean
+  }
+
+  type ServerEventParameter = 
+  |
+    {
+      event: ServerEvent.serverCreated
+      server: HttpServer | HttpsServer | Http2Server
+      configuration: IConfiguration
+    }
+  |
+    {
+      event: ServerEvent.ready
+      url: string
+      port: number
+      http2 : boolean
+    }
+  |
+    {
+      event: ServerEvent.incoming
+    } & ServerEventIncomingParameter
+  |
+    {
+      event: ServerEvent.incoming
+      error: any
+    } & ServerEventIncomingParameter
+  | 
+    {
+      event: ServerEvent.redirecting
+      type: string
+      redirect: string | number
+    } & ServerEventIncomingParameter
+  | 
+    {
+      event: ServerEvent.redirected
+      end: Date
+      perfEnd: number
+      timeSpent: number
+      statusCode: number
+    } & ServerEventIncomingParameter
+  | 
+    {
+      event: ServerEvent.aborted
+    } & ServerEventIncomingParameter
+  | 
+    {
+      event: ServerEvent.closed
+    } & ServerEventIncomingParameter
+  }
+
+  interface Server {
+    on (event: ServerEvent, listener: (parameter: ServerEventParameter) => void)
     close: () => Promise<void>
   }
 
