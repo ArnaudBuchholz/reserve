@@ -3,35 +3,46 @@
 const assert = require('assert')
 const { console: { clean, collect } } = require('test-tools')
 const { log } = require('./index')
-const EventEmitter = require('events')
+const {
+  newEventEmitter,
+  EVENT_CREATED,
+  EVENT_READY,
+  EVENT_INCOMING,
+  EVENT_ERROR,
+  EVENT_REDIRECTED,
+  EVENT_REDIRECTING,
+  EVENT_ABORTED,
+  EVENT_CLOSED
+} = require('./EventEmitter')
 
 describe('log', () => {
   beforeEach(clean)
 
   describe('non verbose', () => {
-    let emitter
+    let emit
 
     before(() => {
-      emitter = new EventEmitter()
-      log(emitter, false)
+      const { on, emit: _emit } = newEventEmitter()
+      log({ on }, false)
+      emit = _emit
     })
 
-    const ignored = [
-      'created',
-      'incoming',
-      'redirecting',
-      'aborted',
-      'closed'
-    ]
+    const ignored = {
+      created: EVENT_CREATED,
+      incoming: EVENT_INCOMING,
+      redirecting: EVENT_REDIRECTING,
+      aborted: EVENT_ABORTED,
+      closed: EVENT_CLOSED
+    }
 
-    ignored.forEach(eventName => it(`ignores '${eventName}`, () => {
-      emitter.emit(eventName, {})
+    Object.keys(ignored).forEach(eventName => it(`ignores '${eventName}'`, () => {
+      emit(ignored[eventName])
       assert.strictEqual(collect().length, 0)
     }))
 
     it('logs \'ready\'', () => {
       const url = 'http://localhost:1234'
-      emitter.emit('ready', { url })
+      emit(EVENT_READY, { url })
       const output = collect()
       assert.strictEqual(output.length, 1)
       assert.strictEqual(output[0].type, 'log')
@@ -46,8 +57,7 @@ describe('log', () => {
     }
 
     it('logs \'redirected\'', () => {
-      emitter.emit('redirected', {
-        ...request,
+      emit(EVENT_REDIRECTED, request, {
         end: new Date(2020, 0, 1, 0, 0, 0, 100),
         timeSpent: 100,
         statusCode: 200
@@ -64,8 +74,7 @@ describe('log', () => {
     })
 
     it('logs \'redirected\' (no status code)', () => {
-      emitter.emit('redirected', {
-        ...request,
+      emit(EVENT_REDIRECTED, request, {
         end: new Date(2020, 0, 1, 0, 0, 0, 100),
         timeSpent: 100
       })
@@ -81,8 +90,7 @@ describe('log', () => {
     })
 
     it('logs \'redirected\' (error status code)', () => {
-      emitter.emit('redirected', {
-        ...request,
+      emit(EVENT_REDIRECTED, request, {
         end: new Date(2020, 0, 1, 0, 0, 0, 100),
         timeSpent: 100,
         statusCode: 400
@@ -99,8 +107,7 @@ describe('log', () => {
     })
 
     it('logs \'error\'', () => {
-      emitter.emit('error', {
-        ...request,
+      emit(EVENT_ERROR, request, {
         reason: 'REASON'
       })
       const output = collect()
@@ -114,21 +121,22 @@ describe('log', () => {
   })
 
   describe('verbose', () => {
-    let emitter
+    let emit
 
     before(() => {
-      emitter = new EventEmitter()
-      log(emitter, true)
+      const { on, emit: _emit } = newEventEmitter()
+      log({ on }, true)
+      emit = _emit
     })
 
     it('ignores \'created\'', () => {
-      emitter.emit('created', {})
+      emit(EVENT_CREATED)
       assert.strictEqual(collect().length, 0)
     })
 
     it('logs \'ready\'', () => {
       const url = 'http://localhost:1234'
-      emitter.emit('ready', { url })
+      emit(EVENT_READY, { url })
       const output = collect()
       assert.strictEqual(output.length, 1)
       assert.strictEqual(output[0].type, 'log')
@@ -143,7 +151,7 @@ describe('log', () => {
     }
 
     it('logs \'incoming\'', () => {
-      emitter.emit('incoming', request)
+      emit(EVENT_INCOMING, request)
       const output = collect()
       assert.strictEqual(output.length, 1)
       assert.strictEqual(output[0].type, 'log')
@@ -153,8 +161,7 @@ describe('log', () => {
     })
 
     it('logs \'incoming\' (longer ID)', () => {
-      emitter.emit('incoming', {
-        ...request,
+      emit(EVENT_INCOMING, request, {
         id: 34753475 // hex is 2124BC3
       })
       const output = collect()
@@ -166,8 +173,7 @@ describe('log', () => {
     })
 
     it('logs \'redirecting\'', () => {
-      emitter.emit('redirecting', {
-        ...request,
+      emit(EVENT_REDIRECTING, request, {
         type: 'HANDLER',
         redirect: 'REDIRECT'
       })
@@ -185,8 +191,7 @@ describe('log', () => {
     function REDIRECT () {}
 
     it('logs \'redirecting\' (redirect function)', () => {
-      emitter.emit('redirecting', {
-        ...request,
+      emit(EVENT_REDIRECTING, request, {
         type: 'HANDLER',
         redirect: REDIRECT
       })
@@ -204,8 +209,7 @@ describe('log', () => {
     const unnamed = (function () { return () => {} }())
 
     it('logs \'redirecting\' (redirect anonymous function)', () => {
-      emitter.emit('redirecting', {
-        ...request,
+      emit(EVENT_REDIRECTING, request, {
         type: 'HANDLER',
         redirect: unnamed
       })
@@ -220,8 +224,7 @@ describe('log', () => {
     })
 
     it('logs \'redirected\'', () => {
-      emitter.emit('redirected', {
-        ...request,
+      emit(EVENT_REDIRECTED, request, {
         end: new Date(2020, 0, 1, 0, 0, 0, 100),
         timeSpent: 100,
         statusCode: 200
@@ -237,8 +240,7 @@ describe('log', () => {
     })
 
     it('logs \'error\'', () => {
-      emitter.emit('error', {
-        ...request,
+      emit(EVENT_ERROR, request, {
         reason: 'REASON'
       })
       const output = collect()
@@ -251,7 +253,7 @@ describe('log', () => {
     })
 
     it('logs \'aborted\'', () => {
-      emitter.emit('aborted', request)
+      emit(EVENT_ABORTED, request)
       const output = collect()
       assert.strictEqual(output.length, 1)
       assert.strictEqual(output[0].type, 'log')
@@ -261,7 +263,7 @@ describe('log', () => {
     })
 
     it('logs \'closed\'', () => {
-      emitter.emit('closed', request)
+      emit(EVENT_CLOSED, request)
       const output = collect()
       assert.strictEqual(output.length, 1)
       assert.strictEqual(output[0].type, 'log')
