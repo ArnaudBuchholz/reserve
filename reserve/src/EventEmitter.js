@@ -1,36 +1,70 @@
 'use strict'
 
-const SERVER_CREATED = 0
-ready = 'ready',
-incoming = 'incoming',
-error = 'error',
-redirecting = 'redirecting',
-redirected = 'redirected',
-aborted = 'aborted',
-closed = 'closed'
+const names = 'created,ready,incoming,error,redirecting,redirected,aborted,closed'.split(',')
+const events = {}
+names.forEach((name, index) => {
+  events['EVENT_' + name.toUpperCase()] = index
+})
 
 module.exports = {
+  ...events,
 
-  factory () {
+  newEventEmitter () {
     const registry = []
 
-    const on = (name, callback) => {
-      const index = ...
-      if (registry[index] === undefined) {
-        registry[index] = []
+    const on = (event, callback) => {
+      const eventIndex = names.indexOf(event)
+      if (eventIndex === -1) {
+        throw new Error('Unknown event name')
       }
-      registry[index].push(callback)
+      if (typeof callback !== 'function') {
+        throw new Error('Invalid callback')
+      }
+      if (registry[eventIndex] === undefined) {
+        registry[eventIndex] = []
+      }
+      registry[eventIndex].push(callback)
     }
 
-    const emit = (event, parameters) => {
-      for (const callback of registry[event]) {
-        callback(parameters)
+    const emit = (eventIndex) => {
+      const callbacks = registry[eventIndex]
+      if (callbacks !== undefined) {
+        const event = {
+          type: names[eventIndex]
+        }
+        try {
+          for (const callback of callbacks) {
+            callback(event)
+          }
+        } catch (e) {
+          // absorb
+        }
       }
     }
 
-    return {
-      on,
-      emit
-    }
+    return { on, emit }
   }
-} 
+
+  // factory () {
+  //   const registry = []
+
+  //   const on = (name, callback) => {
+  //     const index = ...
+  //     if (registry[index] === undefined) {
+  //       registry[index] = []
+  //     }
+  //     registry[index].push(callback)
+  //   }
+
+  //   const emit = (event, parameters) => {
+  //     for (const callback of registry[event]) {
+  //       callback(parameters)
+  //     }
+  //   }
+
+  //   return {
+  //     on,
+  //     emit
+  //   }
+  // }
+}
