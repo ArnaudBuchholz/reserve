@@ -1,4 +1,3 @@
-import { EventEmitter } from 'events'
 import { Stats } from 'fs'
 import { IncomingMessage, ServerResponse, Server as HttpServer } from 'http'
 import { Server as HttpsServer } from 'https'
@@ -151,7 +150,7 @@ declare module 'reserve' {
 
   type Handlers = Record<string, Handler>
 
-  type Listener = string | ((eventEmitter: EventEmitter) => void)
+  type Listener = string | ServerListener
 
   type Mapping = BaseMapping | CustomMapping | FileMapping | StatusMapping | UrlMapping | UseMapping
 
@@ -202,7 +201,7 @@ declare module 'reserve' {
 
   function check (configuration: Configuration): Promise<Configuration>
 
-  enum ServerEvent {
+  enum ServerEventType {
     created = 'created',
     ready = 'ready',
     incoming = 'incoming',
@@ -213,7 +212,7 @@ declare module 'reserve' {
     closed = 'closed'
   }
 
-  type ServerEventIncomingParameter = {
+  type ServerEventIncoming = {
     method: string
     url: string
     headers: Headers
@@ -223,55 +222,57 @@ declare module 'reserve' {
     internal: boolean
   }
 
-  type ServerEventParameter = 
+  type ServerEvent = 
   |
     {
-      event: ServerEvent.created
+      event: ServerEventType.created
       server: HttpServer | HttpsServer | Http2Server
       configuration: IConfiguration
     }
   |
     {
-      event: ServerEvent.ready
+      event: ServerEventType.ready
       url: string
       port: number
       http2 : boolean
     }
   |
     {
-      event: ServerEvent.incoming
-    } & ServerEventIncomingParameter
+      event: ServerEventType.incoming
+    } & ServerEventIncoming
   |
     {
-      event: ServerEvent.incoming
+      event: ServerEventType.incoming
       error: any
-    } & ServerEventIncomingParameter
+    } & ServerEventIncoming
   | 
     {
-      event: ServerEvent.redirecting
+      event: ServerEventType.redirecting
       type: string
       redirect: string | number
-    } & ServerEventIncomingParameter
+    } & ServerEventIncoming
   | 
     {
-      event: ServerEvent.redirected
+      event: ServerEventType.redirected
       end: Date
       perfEnd: number
       timeSpent: number
       statusCode: number
-    } & ServerEventIncomingParameter
+    } & ServerEventIncoming
   | 
     {
-      event: ServerEvent.aborted
-    } & ServerEventIncomingParameter
+      event: ServerEventType.aborted
+    } & ServerEventIncoming
   | 
     {
-      event: ServerEvent.closed
-    } & ServerEventIncomingParameter
+      event: ServerEventType.closed
+    } & ServerEventIncoming
   }
 
+  type ServerListener = (event: ServerEvent) => void
+
   interface Server {
-    on (event: ServerEvent, listener: (parameter: ServerEventParameter) => void)
+    on (eventType: ServerEventType, listener: ServerListener)
     close: () => Promise<void>
   }
 
@@ -303,4 +304,3 @@ declare module 'reserve' {
 
   function mock (configuration: Configuration, mockedHandlers?: Handlers): Promise<MockServer>
 }
-
