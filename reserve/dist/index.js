@@ -1,5 +1,4 @@
 'use strict'
-const EventEmitter = require('events')
 const { createReadStream, readdir, readFile, stat } = require('fs')
 const http = require('http')
 const http2 = require('http2')
@@ -11,7 +10,6 @@ const { promisify } = require('util')
 const zlib = require('zlib')
 const factory = require('./core.js')
 module.exports = factory({
-  EventEmitter,
   createReadStream, readdir, readFile, stat,
   http,
   http2,
