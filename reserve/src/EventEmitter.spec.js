@@ -41,6 +41,11 @@ describe('EventEmitter', () => {
       it('validates the event name and callback', () => {
         assert.doesNotThrow(() => on('ready', () => {}))
       })
+
+      it('enables chaining', () => {
+        const object = { on }
+        assert.strictEqual(object.on('ready', () => {}), object)
+      })
     })
 
     describe('emit', () => {
