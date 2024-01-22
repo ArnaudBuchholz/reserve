@@ -5,8 +5,8 @@
 const { serve } = require('reserve')
 
 function socket (eventEmitter) {
-  eventEmitter.on('server-created', ({ server }) => {
-    console.log('server-created')
+  eventEmitter.on('created', ({ server }) => {
+    console.log('server created')
     socket.io = require('socket.io')(server)
 
     socket.io.on('connection', connection => {

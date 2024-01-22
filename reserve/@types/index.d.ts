@@ -203,7 +203,7 @@ declare module 'reserve' {
   function check (configuration: Configuration): Promise<Configuration>
 
   enum ServerEvent {
-    serverCreated = 'server-created',
+    created = 'created',
     ready = 'ready',
     incoming = 'incoming',
     error = 'error',
@@ -226,7 +226,7 @@ declare module 'reserve' {
   type ServerEventParameter = 
   |
     {
-      event: ServerEvent.serverCreated
+      event: ServerEvent.created
       server: HttpServer | HttpsServer | Http2Server
       configuration: IConfiguration
     }

@@ -17,7 +17,7 @@ describe('log', () => {
     })
 
     const ignored = [
-      'server-created',
+      'created',
       'incoming',
       'redirecting',
       'aborted',
@@ -121,8 +121,8 @@ describe('log', () => {
       log(emitter, true)
     })
 
-    it('ignores \'server-created\'', () => {
-      emitter.emit('server-created', {})
+    it('ignores \'created\'', () => {
+      emitter.emit('created', {})
       assert.strictEqual(collect().length, 0)
     })
 

@@ -109,6 +109,7 @@
 ||BREAKING CHANGE: Headers of mocked Request and Response returns strings or array of strings|
 ||BREAKING CHANGE: Mocked Request normalizes the received URL|
 ||BREAKING CHANGE: `body` helper leverages request headers and offers conversion interface|
+||BREAKING CHANGE: `server-created` event is now renamed to `created`|
 ||Fix `use` to handle middleware that are not calling next|
 ||Response status code is preserved when set before `file`|
 ||`static` option for performant `file` delivery ([`doc`](file.md))|

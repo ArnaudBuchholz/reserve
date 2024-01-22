@@ -35,7 +35,7 @@ function createServer (configuration, requestHandler) {
 function createServerAsync (eventEmitter, configuration, dispatcher) {
   return new Promise((resolve, reject) => {
     const server = createServer(configuration, dispatcher.bind(eventEmitter, configuration))
-    eventEmitter.emit('server-created', { configuration: configuration[$configurationInterface], server })
+    eventEmitter.emit('created', { configuration: configuration[$configurationInterface], server })
     let { port } = configuration
     if (port === 'auto') {
       port = 0

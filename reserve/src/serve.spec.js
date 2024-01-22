@@ -93,19 +93,19 @@ describe('serve', () => {
 
     it('fails if a listener throws an exception during server-create', () => promisifyWithError({
       listeners: [eventEmitter => {
-        eventEmitter.on('server-created', () => {
-          throw new Error('server-created')
+        eventEmitter.on('created', () => {
+          throw new Error('created')
         })
       }],
       hostname: '127.0.0.1',
       port: 3475
     }, reason => {
-      assert.strictEqual(reason.message, 'server-created')
+      assert.strictEqual(reason.message, 'created')
     }))
 
-    it('provides server instance to listeners (server-created)', () => promisify({
+    it('provides server instance to listeners (created)', () => promisify({
       listeners: [eventEmitter => {
-        eventEmitter.on('server-created', ({ server }) => {
+        eventEmitter.on('created', ({ server }) => {
           assert.ok(!!server)
         })
       }],
@@ -121,7 +121,7 @@ describe('serve', () => {
       let httpServer
       const server = serve({
         listeners: [eventEmitter => {
-          eventEmitter.on('server-created', ({ server }) => {
+          eventEmitter.on('created', ({ server }) => {
             httpServer = server
           })
         }],
