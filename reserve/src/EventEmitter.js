@@ -26,12 +26,12 @@ module.exports = {
       registry[eventIndex].push(callback)
     }
 
-    const emit = (eventIndex) => {
+    const emit = (eventIndex, ...parameters) => {
       const callbacks = registry[eventIndex]
       if (callbacks !== undefined) {
-        const event = {
+        const event = Object.assign({
           type: names[eventIndex]
-        }
+        }, ...parameters)
         try {
           for (const callback of callbacks) {
             callback(event)
@@ -39,7 +39,9 @@ module.exports = {
         } catch (e) {
           // absorb
         }
+        return callbacks.length
       }
+      return 0
     }
 
     return { on, emit }

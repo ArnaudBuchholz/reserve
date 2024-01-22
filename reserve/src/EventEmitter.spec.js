@@ -57,13 +57,65 @@ describe('EventEmitter', () => {
         assert.strictEqual(readyTriggered, false)
       })
 
-      it('forwards event to registered callbacks', () => {
+      it('forwards event to registered callback', () => {
         let readyTriggered = false
         on('ready', () => {
           readyTriggered = true
         })
         emit(EVENT_READY)
         assert.strictEqual(readyTriggered, true)
+      })
+
+      it('forwards event to registered callbacks', () => {
+        let readyTriggered = ''
+        on('ready', () => {
+          readyTriggered += 'A'
+        })
+        on('ready', () => {
+          readyTriggered += 'B'
+        })
+        emit(EVENT_READY)
+        assert.strictEqual(readyTriggered, 'AB')
+      })
+
+      it('protects against callback failure', () => {
+        on('ready', () => {
+          throw new Error('FAILED!')
+        })
+        assert.doesNotThrow(() => emit(EVENT_READY))
+      })
+
+      it('merges emit parameters to build one event object', () => {
+        let error
+        on('ready', (event) => {
+          try {
+            assert.strictEqual(event.type, 'ready')
+            assert.strictEqual(event.a, 'a')
+            assert.strictEqual(event.b, 'b')
+            assert.strictEqual(event.c, 'c')
+          } catch (e) {
+            error = e
+          }
+        })
+        emit(EVENT_READY, { a: 'a' }, { b: 'b', c: 'C' }, { c: 'c' })
+        if (error) {
+          throw error
+        }
+      })
+
+      it('returns the number of callbacks registered (0)', () => {
+        assert.strictEqual(emit(EVENT_READY), 0)
+      })
+
+      it('returns the number of callbacks registered (1)', () => {
+        on('ready', () => {})
+        assert.strictEqual(emit(EVENT_READY), 1)
+      })
+
+      it('returns the number of callbacks registered (2)', () => {
+        on('ready', () => {})
+        on('ready', () => {})
+        assert.strictEqual(emit(EVENT_READY), 2)
       })
     })
   })
