@@ -46,27 +46,4 @@ module.exports = {
 
     return { on, emit }
   }
-
-  // factory () {
-  //   const registry = []
-
-  //   const on = (name, callback) => {
-  //     const index = ...
-  //     if (registry[index] === undefined) {
-  //       registry[index] = []
-  //     }
-  //     registry[index].push(callback)
-  //   }
-
-  //   const emit = (event, parameters) => {
-  //     for (const callback of registry[event]) {
-  //       callback(parameters)
-  //     }
-  //   }
-
-  //   return {
-  //     on,
-  //     emit
-  //   }
-  // }
 }
