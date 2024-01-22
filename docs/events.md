@@ -1,6 +1,6 @@
 # Server events
 
-The REserve server object implements the [EventEmitter](https://nodejs.org/api/events.html) class and throws [**events with parameters**](events.md) to **notify** any listener of **its activity**.
+The REserve server object implements an interface that mimics the [EventEmitter::on method](https://nodejs.org/api/events.html#emitteroneventname-listener) and throws [**events with parameters**](events.md) to **notify** any listener of **its activity**.
 
 When a **request is being dispatched**, the following diagram illustrates the **sequence of events that are emitted**.
 

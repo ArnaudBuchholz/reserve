@@ -65,7 +65,7 @@ check({
 ## Serve
 
 The serve agent is responsible of :
-* building an [event emitter](https://nodejs.org/api/events.html#events_class_eventemitter) object
+* building a server object from the configuration
 * instantiating the http(s) server
 * **forwarding the incoming requests** to the dispatcher
 

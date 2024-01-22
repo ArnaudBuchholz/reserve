@@ -44,7 +44,7 @@ REserve also offers some helpers to simplify implementations :
 
 ## Mocking
 
-REserve includes a [mocking environment](mocking.md) to **simplify the tests**. It takes the **configuration** and asynchronously returns an [EventEmitter](https://nodejs.org/api/events.html) **augmented with a `request` method** to simulate incoming requests.
+REserve includes a [mocking environment](mocking.md) to **simplify the tests**. It takes the **configuration** and asynchronously returns a server object **augmented with a `request` method** to simulate incoming requests.
 
 ## Version history
 
