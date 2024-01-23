@@ -91,7 +91,7 @@ describe('serve', () => {
       assert.strictEqual(reason.message, 'immediate')
     }))
 
-    it('fails if a listener throws an exception during server-create', () => promisifyWithError({
+    it('fails if a listener throws an exception during created', () => promisifyWithError({
       listeners: [eventEmitter => {
         eventEmitter.on('created', () => {
           throw new Error('created')
