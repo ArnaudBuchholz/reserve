@@ -29,12 +29,13 @@ function emitError (context, reason) {
 
 function redirected (context) {
   const perfEnd = performance.now()
-  context.emit(EVENT_REDIRECTED, context.emitParameters, {
+  Object.assign(context.emitParameters, {
     end: new Date(),
     perfEnd,
     timeSpent: Math.ceil(perfEnd - context.emitParameters.perfStart),
     statusCode: context.response.statusCode
   })
+  context.emit(EVENT_REDIRECTED, context.emitParameters)
   context.redirected()
 }
 
@@ -46,6 +47,7 @@ function error (context, reason) {
     statusCode = 500
   }
   emitError(context, reason)
+  /* istanbul ignore if */ // Not sure how to test
   if (context.request.aborted) {
     redirected(context) // TODO maybe a better status
   } else if (context.failed) {

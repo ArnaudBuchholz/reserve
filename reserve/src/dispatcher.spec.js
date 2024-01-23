@@ -104,8 +104,7 @@ function hasError (emitted) {
 
 function absorbError () {}
 
-async function dispatch ({ configurationPromise, events, request }) {
-  const { abort } = request
+async function dispatch ({ configurationPromise, events, request, beforeWait }) {
   if (typeof request === 'string') {
     request = { method: 'GET', url: request }
   }
@@ -125,8 +124,8 @@ async function dispatch ({ configurationPromise, events, request }) {
     on('error', absorbError)
   }
   const promise = dispatcher(configuration, request, response)
-  if (abort) {
-    request.abort()
+  if (beforeWait) {
+    beforeWait(request)
   }
   await promise
   return {
@@ -157,7 +156,33 @@ describe('dispatcher', () => {
       })
     )
 
-    it('detects request abortion', () => dispatch({ request: { method: 'GET', url: '/redirect', abort: true } })
+    it('detects request closing', () => dispatch({
+      request: {
+        method: 'GET',
+        url: '/redirect'
+      },
+      beforeWait: request => request.emit('close')
+    })
+      .then(({ emitted, response }) => {
+        const [incoming] = emitted
+        assert.strictEqual(incoming.eventName, 'incoming')
+        assert.strictEqual(incoming.method, 'GET')
+        assert.strictEqual(incoming.url, '/redirect')
+        assert.strictEqual(typeof incoming.id, 'number')
+        assert.ok(incoming.id !== firstRequestId)
+        assert.ok(incoming.start instanceof Date)
+        const [closed] = emitted.filter(({ eventName }) => eventName === 'closed')
+        assert.strictEqual(closed.id, incoming.id)
+      })
+    )
+
+    it('detects request aborting', () => dispatch({
+      request: {
+        method: 'GET',
+        url: '/redirect'
+      },
+      beforeWait: request => request.abort()
+    })
       .then(({ emitted, response }) => {
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Content-Type'], textMimeType)
@@ -170,7 +195,6 @@ describe('dispatcher', () => {
         assert.ok(incoming.id !== firstRequestId)
         assert.ok(incoming.start instanceof Date)
         const [aborted] = emitted.filter(({ eventName }) => eventName === 'aborted')
-        assert.strictEqual(aborted.eventName, 'aborted')
         assert.strictEqual(aborted.id, incoming.id)
       })
     )
