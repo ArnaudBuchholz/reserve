@@ -201,7 +201,7 @@ declare module 'reserve' {
 
   function check (configuration: Configuration): Promise<Configuration>
 
-  enum ServerEventType {
+  enum ServerEventName {
     created = 'created',
     ready = 'ready',
     incoming = 'incoming',
@@ -225,35 +225,35 @@ declare module 'reserve' {
   type ServerEvent = 
   |
     {
-      event: ServerEventType.created
+      eventName: ServerEventName.created
       server: HttpServer | HttpsServer | Http2Server
       configuration: IConfiguration
     }
   |
     {
-      event: ServerEventType.ready
+      eventName: ServerEventName.ready
       url: string
       port: number
       http2 : boolean
     }
   |
     {
-      event: ServerEventType.incoming
+      eventName: ServerEventName.incoming
     } & ServerEventIncoming
   |
     {
-      event: ServerEventType.incoming
+      eventName: ServerEventName.incoming
       error: any
     } & ServerEventIncoming
   | 
     {
-      event: ServerEventType.redirecting
+      eventName: ServerEventName.redirecting
       type: string
       redirect: string | number
     } & ServerEventIncoming
   | 
     {
-      event: ServerEventType.redirected
+      eventName: ServerEventName.redirected
       end: Date
       perfEnd: number
       timeSpent: number
@@ -261,18 +261,18 @@ declare module 'reserve' {
     } & ServerEventIncoming
   | 
     {
-      event: ServerEventType.aborted
+      eventName: ServerEventName.aborted
     } & ServerEventIncoming
   | 
     {
-      event: ServerEventType.closed
+      eventName: ServerEventName.closed
     } & ServerEventIncoming
   }
 
   type ServerListener = (event: ServerEvent) => void
 
   interface Server {
-    on (eventType: ServerEventType, listener: ServerListener)
+    on (eventName: ServerEventName, listener: ServerListener)
     close: () => Promise<void>
   }
 
