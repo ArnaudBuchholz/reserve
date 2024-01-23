@@ -21,7 +21,7 @@ module.exports = (jsonConfiguration, mockedHandlers = {}) => {
     .then(configuration => {
       configuration[$configurationEventEmitter] = emit
       Object.assign(configuration.handlers, mockedHandlers)
-      configuration.listeners.forEach(listener => listener(instance))
+      configuration.listeners.forEach(listen => listen(instance))
       emit(EVENT_CREATED, {
         configuration: configuration[$configurationInterface],
         server: null
