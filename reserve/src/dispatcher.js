@@ -100,7 +100,7 @@ function redirecting (context, { mapping = {}, match, handler, type, redirect, u
       }
     }
     if (result && result.then) {
-      result.then(afterRedirect)
+      result.then(afterRedirect, reason => error(context, reason))
     } else {
       afterRedirect(result)
     }
