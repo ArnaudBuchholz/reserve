@@ -9,7 +9,7 @@ const {
   EVENT_REDIRECTED,
   EVENT_ABORTED,
   EVENT_CLOSED
-} = require('./EventEmitter')
+} = require('./event')
 const {
   $configurationInterface,
   $configurationRequests,
