@@ -3,156 +3,159 @@
 const logError = require('./logError')
 const interpolate = require('./interpolate')
 const {
+  EVENT_INCOMING,
+  EVENT_ERROR,
+  EVENT_REDIRECTING,
+  EVENT_REDIRECTED,
+  EVENT_ABORTED,
+  EVENT_CLOSED
+} = require('./EventEmitter')
+const {
   $configurationInterface,
   $configurationRequests,
   $mappingMatch,
   $requestId,
   $requestInternal,
-  $handlerPrefix
+  $handlerPrefix,
+  $configurationEventEmitter
 } = require('./symbols')
 
-function emit (event, emitParameters, additionalParameters) {
-  this.emit(event, { ...emitParameters, ...additionalParameters })
-}
-
-function emitError (reason) {
-  try {
-    emit.call(this.eventEmitter, 'error', this.emitParameters, { reason })
-  } catch (e) {
-    logError({ ...this.emitParameters, reason: e }) // Unhandled error
+function emitError (context, reason) {
+  const handled = context.emit(EVENT_ERROR, context.emitParameters, { reason })
+  if (!handled) {
+    logError({ ...context.emitParameters, reason }) // Unhandled error
   }
 }
 
-function redirected (/* this: context */) {
+function redirected (context) {
   const perfEnd = performance.now()
-  Object.assign(this.emitParameters, {
+  context.emit(EVENT_REDIRECTED, context.emitParameters, {
     end: new Date(),
     perfEnd,
-    timeSpent: Math.ceil(perfEnd - this.emitParameters.perfStart),
-    statusCode: this.response.statusCode
+    timeSpent: Math.ceil(perfEnd - context.emitParameters.perfStart),
+    statusCode: context.response.statusCode
   })
-  try {
-    emit.call(this.eventEmitter, 'redirected', this.emitParameters)
-  } catch (reason) {
-    emitError.call(this, reason)
-  }
-  this.redirected()
+  context.redirected()
 }
 
-function error (reason) {
+function error (context, reason) {
   let statusCode
   if (typeof reason === 'number') {
     statusCode = reason
   } else {
     statusCode = 500
   }
-  emitError.call(this, reason)
-  if (this.request.aborted) {
-    redirected.call(this) // TODO maybe a better status
-  } else if (this.failed) {
+  emitError(context, reason)
+  if (context.request.aborted) {
+    redirected(context) // TODO maybe a better status
+  } else if (context.failed) {
     // Error during error: finalize the response (whatever it means)
-    this.response.end()
-    redirected.call(this)
+    context.response.end()
+    redirected(context)
   } else {
-    this.failed = true
-    dispatch.call(this, statusCode)
+    context.failed = true
+    dispatch(context, statusCode)
   }
 }
 
-function redispatch (url) {
-  const redirectCount = ++this.redirectCount
-  if (redirectCount > this.configuration['max-redirect']) {
-    error.call(this, 508)
+function redispatch (context, url) {
+  const redirectCount = ++context.redirectCount
+  if (redirectCount > context.configuration['max-redirect']) {
+    error(context, 508)
   } else {
-    dispatch.call(this, url)
+    dispatch(context, url)
   }
 }
 
-async function redirecting (/* this: context, */ { mapping = {}, match, handler, type, redirect, url, index = 0 }) {
+function redirecting (context, { mapping = {}, match, handler, type, redirect, url, index = 0 }) {
   try {
     const prefix = handler[$handlerPrefix] || 'external'
     const start = performance.now()
-    emit.call(this.eventEmitter, 'redirecting', this.emitParameters, { type, redirect })
+    context.emit(EVENT_REDIRECTING, context.emitParameters, { type, redirect })
     if (mapping['exclude-from-holding-list']) {
-      this.nonHolding = true
-      this.holding = Promise.resolve()
+      context.nonHolding = true
+      context.holding = Promise.resolve()
     }
-    let result = handler.redirect({
-      configuration: this.configuration[$configurationInterface],
+    const result = handler.redirect({
+      configuration: context.configuration[$configurationInterface],
       mapping,
       match,
       redirect,
-      request: this.request,
-      response: this.response
+      request: context.request,
+      response: context.response
     })
-    if (result && result.then) {
-      result = await result
+    const afterRedirect = (result) => {
+      const end = performance.now()
+      context.emitParameters.perfHandlers.push({
+        prefix,
+        start,
+        end
+      })
+      if (result !== undefined) {
+        redispatch(context, result)
+      } else if (context.ended) {
+        redirected(context)
+      } else {
+        dispatch(context, url, index + 1)
+      }
     }
-    const end = performance.now()
-    this.emitParameters.perfHandlers.push({
-      prefix,
-      start,
-      end
-    })
-    if (result !== undefined) {
-      redispatch.call(this, result)
-    } else if (this.ended) {
-      redirected.call(this)
+    if (result && result.then) {
+      result.then(afterRedirect)
     } else {
-      dispatch.call(this, url, index + 1)
+      afterRedirect(result)
     }
   } catch (e) {
-    error.call(this, e)
+    error(context, e)
   }
 }
 
-async function dispatch (url, index = 0) {
+function dispatch (context, url, index = 0) {
+  const { configuration } = context
   if (typeof url === 'number') {
-    return redirecting.call(this, {
+    return redirecting(context, {
       type: 'status',
-      handler: this.configuration.handlers.status,
+      handler: configuration.handlers.status,
       redirect: url
     })
   }
-  const length = this.configuration.mappings.length
-  while (index < length) {
-    const mapping = this.configuration.mappings[index]
-    let match
-    try {
-      match = mapping[$mappingMatch](this.request, url)
-      if (match && match.then) {
-        match = await match
+  try {
+    const { mappings } = configuration
+    const { length } = mappings
+    while (index < length) {
+      const mapping = mappings[index]
+      const match = mapping[$mappingMatch](context.request, url)
+      if (match) {
+        if (['string', 'number'].includes(typeof match)) {
+          return redispatch(context, match)
+        }
+        const { handler, redirect, type } = configuration.handler(mapping)
+        return redirecting(context, { mapping, match, handler, type, redirect: interpolate(match, redirect), url, index })
       }
-    } catch (reason) {
-      return error.call(this, reason)
+      ++index
     }
-    if (match) {
-      if (['string', 'number'].includes(typeof match)) {
-        return redispatch.call(this, match)
-      }
-      const { handler, redirect, type } = this.configuration.handler(mapping)
-      return redirecting.call(this, { mapping, match, handler, type, redirect: interpolate(match, redirect), url, index })
-    }
-    ++index
+    error(context, 501)
+  } catch (reason) {
+    error(context, reason)
   }
-  error.call(this, 501)
 }
 
-function hookedEnd (/* this: context, */ ...args) {
+function hookedEnd (context, ...args) {
   const {
     configuration,
     id,
-    nativeEnd,
-    response
-  } = this
-  this.ended = true
+    nativeEnd
+  } = context
+  context.ended = true
   const { contexts } = configuration[$configurationRequests]
   delete contexts[id]
-  return nativeEnd.apply(response, args)
+  return nativeEnd.apply(this, args)
 }
 
-module.exports = async function (configuration, request, response) {
-  const configurationRequests = configuration[$configurationRequests]
+module.exports = function (configuration, request, response) {
+  const {
+    [$configurationRequests]: configurationRequests,
+    [$configurationEventEmitter]: emit
+  } = configuration
   const { contexts } = configurationRequests
   const id = ++configurationRequests.lastId
 
@@ -172,7 +175,7 @@ module.exports = async function (configuration, request, response) {
 
   const context = {
     configuration,
-    eventEmitter: this,
+    emit,
     emitParameters,
     holding: dispatching,
     nativeEnd: response.end,
@@ -183,23 +186,20 @@ module.exports = async function (configuration, request, response) {
     response
   }
 
-  response.end = hookedEnd.bind(context)
+  response.end = hookedEnd.bind(response, context)
   request[$requestId] = id
-  request.on('aborted', emit.bind(this, 'aborted', emitParameters))
-  request.on('close', emit.bind(this, 'closed', emitParameters))
+  request.on('aborted', () => emit(EVENT_ABORTED, emitParameters))
+  request.on('close', () => emit(EVENT_CLOSED, emitParameters))
 
-  try {
-    emit.call(this, 'incoming', emitParameters)
-  } catch (reason) {
-    error.call(context, reason)
-    return dispatching
-  }
-
-  if (configurationRequests.holding) {
-    await configurationRequests.holding
-  }
+  emit(EVENT_INCOMING, emitParameters)
 
   contexts[id] = context
-  dispatch.call(context, request.url)
+
+  if (configurationRequests.holding) {
+    configurationRequests.holding.then(() => dispatch(context, request.url))
+  } else {
+    dispatch(context, request.url)
+  }
+
   return dispatching
 }
