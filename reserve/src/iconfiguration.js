@@ -4,7 +4,6 @@ const { check } = require('./mapping')
 const dispatcher = require('./dispatcher')
 const {
   $configuration,
-  $configurationEventEmitter,
   $configurationRequests,
   $mappingChecked,
   $requestId,
@@ -84,8 +83,7 @@ module.exports = class IConfiguration {
 
   dispatch (request, response) {
     const configuration = this[$configuration]
-    const eventEmitter = configuration[$configurationEventEmitter]
     request[$requestInternal] = true
-    return dispatcher.call(eventEmitter, configuration, request, response)
+    return dispatcher(configuration, request, response)
   }
 }
