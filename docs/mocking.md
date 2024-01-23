@@ -1,6 +1,6 @@
 # Mocking
 
-Since version 1.1.0, REserve includes an **helper to build tests**. It receives a **configuration** and returns a **promise** resolving to an [EventEmitter](https://nodejs.org/api/events.html) **augmented with a `request` method** to simulate incoming requests.
+Since version 1.1.0, REserve includes an **helper to build tests**. It receives a **configuration** and returns a **promise** resolving to an object exposing the expected methods (`on`, `close`) **augmented with a `request` method** to simulate incoming requests.
 
 ```javascript
 const assert = require('assert')
