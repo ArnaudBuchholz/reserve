@@ -1,7 +1,7 @@
 import { Stats } from 'fs'
 import { IncomingMessage, ServerResponse, Server as HttpServer } from 'http'
 import { Server as HttpsServer } from 'https'
-import { Server as Http2Server } from 'http2'
+import { Http2Server } from 'http2'
 
 declare module 'reserve' {
   type RedirectResponse = void | number | string
@@ -267,7 +267,6 @@ declare module 'reserve' {
     {
       eventName: ServerEventName.closed
     } & ServerEventIncoming
-  }
 
   type ServerListener = (event: ServerEvent) => void
 
