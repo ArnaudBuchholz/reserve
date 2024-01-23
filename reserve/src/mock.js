@@ -2,7 +2,7 @@
 
 const { check } = require('./configuration')
 const dispatcher = require('./dispatcher')
-const { newEventEmitter, EVENT_CREATED, EVENT_READY } = require('./EventEmitter')
+const { newEventEmitter, EVENT_CREATED, EVENT_READY } = require('./event')
 const Request = require('./mock/Request')
 const Response = require('./mock/Response')
 const {

@@ -13,7 +13,7 @@ const {
   EVENT_REDIRECTING,
   EVENT_ABORTED,
   EVENT_CLOSED
-} = require('./EventEmitter')
+} = require('./event')
 
 describe('log', () => {
   beforeEach(clean)

@@ -1,7 +1,7 @@
 'use strict'
 
 const { http, http2, https } = require('./node-api')
-const { newEventEmitter, EVENT_CREATED, EVENT_READY, EVENT_ERROR } = require('./EventEmitter')
+const { newEventEmitter, EVENT_CREATED, EVENT_READY, EVENT_ERROR } = require('./event')
 const { check } = require('./configuration')
 const dispatcher = require('./dispatcher')
 const {
