@@ -46,7 +46,9 @@ module.exports = {
             callback(event)
           }
         } catch (e) {
-          // absorb
+          if (eventIndex === events.EVENT_CREATED) {
+            throw e
+          }
         }
         return callbacks.length
       }

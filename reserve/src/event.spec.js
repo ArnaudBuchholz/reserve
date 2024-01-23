@@ -2,7 +2,7 @@
 
 const assert = require('assert')
 const { newEventEmitter, ...events } = require('./event')
-const { EVENT_READY, EVENT_INCOMING } = events
+const { EVENT_CREATED, EVENT_READY, EVENT_INCOMING } = events
 
 describe('event', () => {
   describe('constants', () => {
@@ -87,11 +87,18 @@ describe('event', () => {
         assert.strictEqual(readyTriggered, 'AB')
       })
 
-      it('protects against callback failure', () => {
+      it('protects against most callback failure', () => {
         on('ready', () => {
           throw new Error('FAILED!')
         })
         assert.doesNotThrow(() => emit(EVENT_READY))
+      })
+
+      it('does not protect against \'created\' failure', () => {
+        on('created', () => {
+          throw new Error('FAILED!')
+        })
+        assert.throws(() => emit(EVENT_CREATED))
       })
 
       it('merges emit parameters to build one event object', () => {
