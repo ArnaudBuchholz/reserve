@@ -1,11 +1,11 @@
 'use strict'
 
 const assert = require('assert')
-const { newEventEmitter, ...events } = require('./EventEmitter')
+const { newEventEmitter, ...events } = require('./event')
 const { EVENT_READY, EVENT_INCOMING } = events
 
-describe('EventEmitter', () => {
-  describe('events', () => {
+describe('event', () => {
+  describe('constants', () => {
     const expected = 'created,ready,incoming,error,redirecting,redirected,aborted,closed'.split(',')
     expected.forEach(name => {
       const constantName = 'EVENT_' + name.toUpperCase()
@@ -45,6 +45,10 @@ describe('EventEmitter', () => {
       it('enables chaining', () => {
         const object = { on }
         assert.strictEqual(object.on('ready', () => {}), object)
+      })
+
+      it('supports *', () => {
+        assert.doesNotThrow(() => on('*', () => {}))
       })
     })
 
@@ -94,7 +98,7 @@ describe('EventEmitter', () => {
         let error
         on('ready', (event) => {
           try {
-            assert.strictEqual(event.type, 'ready')
+            assert.strictEqual(event.eventName, 'ready')
             assert.strictEqual(event.a, 'a')
             assert.strictEqual(event.b, 'b')
             assert.strictEqual(event.c, 'c')
@@ -121,6 +125,14 @@ describe('EventEmitter', () => {
         on('ready', () => {})
         on('ready', () => {})
         assert.strictEqual(emit(EVENT_READY), 2)
+      })
+
+      it('supports *', () => {
+        let triggered = 0
+        on('*', () => { ++triggered })
+        emit(EVENT_READY)
+        emit(EVENT_INCOMING)
+        assert.strictEqual(triggered, 2)
       })
     })
   })

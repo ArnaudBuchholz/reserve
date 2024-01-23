@@ -12,7 +12,7 @@ module.exports = {
   newEventEmitter () {
     const registry = []
 
-    const on = function (event, callback) {
+    const register = (event, callback) => {
       const eventIndex = names.indexOf(event)
       if (eventIndex === -1) {
         throw new Error('Unknown event name')
@@ -24,6 +24,14 @@ module.exports = {
         registry[eventIndex] = []
       }
       registry[eventIndex].push(callback)
+    }
+
+    const on = function (event, callback) {
+      if (event === '*') {
+        names.forEach(name => register(name, callback))
+      } else {
+        register(event, callback)
+      }
       return this
     }
 
@@ -31,7 +39,7 @@ module.exports = {
       const callbacks = registry[eventIndex]
       if (callbacks !== undefined) {
         const event = Object.assign({
-          type: names[eventIndex]
+          eventName: names[eventIndex]
         }, ...parameters)
         try {
           for (const callback of callbacks) {
