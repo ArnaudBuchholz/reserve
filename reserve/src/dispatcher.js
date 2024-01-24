@@ -16,27 +16,26 @@ const {
   $mappingMatch,
   $requestId,
   $requestInternal,
-  $handlerPrefix,
   $configurationEventEmitter
 } = require('./symbols')
 
-function emitError (context, reason) {
-  const handled = context.emit(EVENT_ERROR, context.emitParameters, { reason })
+function emitError ({ emit, emitParameters }, reason) {
+  const handled = emit(EVENT_ERROR, emitParameters, { reason })
   if (!handled) {
-    logError({ ...context.emitParameters, reason }) // Unhandled error
+    logError({ ...emitParameters, reason }) // Unhandled error
   }
 }
 
 function redirected (context) {
+  const { emit, emitParameters, response: { statusCode }, redirected, configuration: { [$configurationRequests]: contexts }, id } = context
   const perfEnd = performance.now()
-  Object.assign(context.emitParameters, {
-    end: new Date(),
-    perfEnd,
-    timeSpent: Math.ceil(perfEnd - context.emitParameters.perfStart),
-    statusCode: context.response.statusCode
-  })
-  context.emit(EVENT_REDIRECTED, context.emitParameters)
-  context.redirected()
+  emitParameters.end = new Date()
+  emitParameters.perfEnd = perfEnd
+  emitParameters.timeSpent = Math.ceil(perfEnd - emitParameters.perfStart)
+  emitParameters.statusCode = statusCode
+  emit(EVENT_REDIRECTED, emitParameters)
+  delete contexts[id]
+  redirected()
 }
 
 function error (context, reason) {
@@ -61,8 +60,7 @@ function error (context, reason) {
 }
 
 function redispatch (context, url) {
-  const redirectCount = ++context.redirectCount
-  if (redirectCount > context.configuration['max-redirect']) {
+  if (++context.redirectCount > context.configuration['max-redirect']) {
     error(context, 508)
   } else {
     dispatch(context, url)
@@ -71,40 +69,38 @@ function redispatch (context, url) {
 
 function redirecting (context, { mapping = {}, match, handler, type, redirect, url, index = 0 }) {
   try {
-    const prefix = handler[$handlerPrefix] || 'external'
-    const start = performance.now()
-    context.emit(EVENT_REDIRECTING, context.emitParameters, { type, redirect })
+    const { configuration, request, response, emit, emitParameters } = context
+    emit(EVENT_REDIRECTING, emitParameters, { type, redirect })
     if (mapping['exclude-from-holding-list']) {
       context.nonHolding = true
       context.holding = Promise.resolve()
     }
     const result = handler.redirect({
-      configuration: context.configuration[$configurationInterface],
+      configuration: configuration[$configurationInterface],
       mapping,
       match,
       redirect,
-      request: context.request,
-      response: context.response
+      request,
+      response
     })
-    const afterRedirect = (result) => {
-      const end = performance.now()
-      context.emitParameters.perfHandlers.push({
-        prefix,
-        start,
-        end
-      })
+    if (result && result.then) {
+      result.then((result) => {
+        if (result !== undefined) {
+          redispatch(context, result)
+        } else if (response.writableEnded) {
+          redirected(context)
+        } else {
+          dispatch(context, url, index + 1)
+        }
+      }, reason => error(context, reason))
+    } else {
       if (result !== undefined) {
         redispatch(context, result)
-      } else if (context.ended) {
+      } else if (response.writableEnded) {
         redirected(context)
       } else {
         dispatch(context, url, index + 1)
       }
-    }
-    if (result && result.then) {
-      result.then(afterRedirect, reason => error(context, reason))
-    } else {
-      afterRedirect(result)
     }
   } catch (e) {
     error(context, e)
@@ -141,18 +137,6 @@ function dispatch (context, url, index = 0) {
   }
 }
 
-function hookedEnd (context, ...args) {
-  const {
-    configuration,
-    id,
-    nativeEnd
-  } = context
-  context.ended = true
-  const { contexts } = configuration[$configurationRequests]
-  delete contexts[id]
-  return nativeEnd.apply(this, args)
-}
-
 module.exports = function (configuration, request, response) {
   const {
     [$configurationRequests]: configurationRequests,
@@ -168,8 +152,7 @@ module.exports = function (configuration, request, response) {
     url: request.url,
     headers: { ...request.headers },
     start: new Date(),
-    perfStart: performance.now(),
-    perfHandlers: []
+    perfStart: performance.now()
   }
 
   let dispatched
@@ -180,15 +163,12 @@ module.exports = function (configuration, request, response) {
     emit,
     emitParameters,
     holding: dispatching,
-    nativeEnd: response.end,
-    ended: false,
     redirectCount: 0,
     redirected: dispatched,
     request,
     response
   }
 
-  response.end = hookedEnd.bind(response, context)
   request[$requestId] = id
   request.on('aborted', () => emit(EVENT_ABORTED, emitParameters))
   request.on('close', () => emit(EVENT_CLOSED, emitParameters))
