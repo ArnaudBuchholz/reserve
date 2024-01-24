@@ -72,7 +72,7 @@ module.exports = class Response extends Duplex {
     return this._headersSent
   }
 
-  get ended () {
+  get writableEnded () {
     return this._ended
   }
 

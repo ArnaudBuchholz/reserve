@@ -424,7 +424,7 @@ describe('dispatcher', () => {
       it('prevents infinite loops in error handling', () => dispatch({ configurationPromise: loopConfigurationPromise, request: 'error' })
         .then(({ emitted, response }) => {
           assert.ok(hasError(emitted))
-          assert.ok(response.ended)
+          assert.ok(response.writableEnded)
         })
       )
     })
@@ -439,7 +439,7 @@ describe('dispatcher', () => {
       })
         .then(({ emitted, response }) => {
           assert.ok(!hasError(emitted))
-          assert.ok(response.ended)
+          assert.ok(response.writableEnded)
           assert.strictEqual(response.statusCode, 200)
           assert.strictEqual(response.headers['Content-Type'], textMimeType)
           assert.strictEqual(response.toString(), 'Hello World!')
@@ -455,7 +455,7 @@ describe('dispatcher', () => {
       })
         .then(({ emitted, response }) => {
           assert.ok(!hasError(emitted))
-          assert.ok(response.ended)
+          assert.ok(response.writableEnded)
           assert.strictEqual(response.statusCode, 200)
           assert.strictEqual(response.headers['Content-Type'], textMimeType)
           assert.strictEqual(response.toString(), 'Hello World!')

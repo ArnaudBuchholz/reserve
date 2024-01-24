@@ -62,7 +62,7 @@ describe('send', () => {
     assert.strictEqual(failed, true)
     assert.strictEqual(response.statusCode, 200)
     assert.deepStrictEqual(response.toString(), 'Hello ')
-    assert.strictEqual(response.ended, true)
+    assert.strictEqual(response.writableEnded, true)
   })
 
   it('handles undefined', async () => {
