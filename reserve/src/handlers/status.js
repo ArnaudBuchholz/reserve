@@ -22,8 +22,8 @@ module.exports = {
       defaultValue: {}
     }
   },
-  redirect: async function ({ mapping, match, response, redirect }) {
-    send(response, byStatus[redirect] || '', {
+  redirect: function ({ mapping, match, response, redirect }) {
+    return send(response, byStatus[redirect] || '', {
       statusCode: redirect,
       headers: { ...interpolate(match, mapping ? mapping.headers : undefined) }
     })

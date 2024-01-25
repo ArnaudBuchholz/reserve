@@ -124,7 +124,7 @@ module.exports = async (request, response) => response.setHeader('Access-Control
 
 ## listeners
 
-An array of **functions** or **module names exporting a function** which will be called with the **REserve [EventEmitter](https://nodejs.org/api/events.html) object**. The purpose is to allow events registration before the server starts and give access to the `server-created` event.
+An array of **functions** or **module names exporting a function** which will be called with the **REserve object**. The purpose is to allow events registration before the server starts and give access to the `created` event.
 
 ## extend
 

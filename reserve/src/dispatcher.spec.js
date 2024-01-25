@@ -1,9 +1,10 @@
 'use strict'
 
 const assert = require('assert')
-const EventEmitter = require('events')
 const { check, Request, Response } = require('./index')
 const dispatcher = require('./dispatcher')
+const { $configurationEventEmitter } = require('./symbols')
+const { newEventEmitter } = require('./event')
 
 const textMimeType = 'text/plain'
 const defaultConfigurationPromise = check({
@@ -97,33 +98,13 @@ const defaultConfigurationPromise = check({
   }]
 })
 
-class RecordedEventEmitter extends EventEmitter {
-  constructor () {
-    super()
-    this._emitted = []
-  }
-
-  emit (eventName, ...args) {
-    this._emitted.push({
-      eventName,
-      parameters: Object.assign({}, args[0])
-    })
-    super.emit(eventName, ...args)
-  }
-
-  get emitted () {
-    return this._emitted
-  }
-
-  get hasError () {
-    return this._emitted.filter(event => event.eventName === 'error').length !== 0
-  }
+function hasError (emitted) {
+  return emitted.some(({ eventName }) => eventName === 'error')
 }
 
 function absorbError () {}
 
-async function dispatch ({ configurationPromise, events, request }) {
-  const { abort } = request
+async function dispatch ({ configurationPromise, events, request, beforeWait }) {
   if (typeof request === 'string') {
     request = { method: 'GET', url: request }
   }
@@ -133,19 +114,22 @@ async function dispatch ({ configurationPromise, events, request }) {
   }
   const configuration = await configurationPromise
   const response = new Response()
-  const emitter = new RecordedEventEmitter()
+  const { on, emit } = newEventEmitter()
+  configuration[$configurationEventEmitter] = emit
+  const emitted = []
+  on('*', event => emitted.push(event))
   if (events) {
-    Object.keys(events).forEach(eventName => emitter.on(eventName, events[eventName]))
+    Object.keys(events).forEach(eventName => on(eventName, events[eventName]))
   } else {
-    emitter.on('error', absorbError)
+    on('error', absorbError)
   }
-  const promise = dispatcher.call(emitter, configuration, request, response)
-  if (abort) {
-    request.abort()
+  const promise = dispatcher(configuration, request, response)
+  if (beforeWait) {
+    beforeWait(request)
   }
   await promise
   return {
-    emitter,
+    emitted,
     request,
     response
   }
@@ -156,45 +140,70 @@ describe('dispatcher', () => {
     let firstRequestId
 
     it('provides request information on incoming and redirecting', () => dispatch({ request: '/redirect' })
-      .then(({ emitter, promise, response }) => {
+      .then(({ emitted, promise, response }) => {
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Content-Type'], textMimeType)
         assert.strictEqual(response.toString(), 'Hello World!')
-        const [incoming, redirecting] = emitter.emitted
+        const [incoming, redirecting] = emitted
         assert.strictEqual(incoming.eventName, 'incoming')
-        assert.strictEqual(incoming.parameters.method, 'GET')
-        assert.strictEqual(incoming.parameters.url, '/redirect')
-        assert.strictEqual(typeof incoming.parameters.id, 'number')
-        assert.ok(incoming.parameters.start instanceof Date)
-        firstRequestId = incoming.parameters.id
+        assert.strictEqual(incoming.method, 'GET')
+        assert.strictEqual(incoming.url, '/redirect')
+        assert.strictEqual(typeof incoming.id, 'number')
+        assert.ok(incoming.start instanceof Date)
+        firstRequestId = incoming.id
         assert.strictEqual(redirecting.eventName, 'redirecting')
-        assert.strictEqual(redirecting.parameters.id, firstRequestId)
+        assert.strictEqual(redirecting.id, firstRequestId)
       })
     )
 
-    it('detects request abortion', () => dispatch({ request: { method: 'GET', url: '/redirect', abort: true } })
-      .then(({ emitter, promise, response }) => {
+    it('detects request closing', () => dispatch({
+      request: {
+        method: 'GET',
+        url: '/redirect'
+      },
+      beforeWait: request => request.emit('close')
+    })
+      .then(({ emitted, response }) => {
+        const [incoming] = emitted
+        assert.strictEqual(incoming.eventName, 'incoming')
+        assert.strictEqual(incoming.method, 'GET')
+        assert.strictEqual(incoming.url, '/redirect')
+        assert.strictEqual(typeof incoming.id, 'number')
+        assert.ok(incoming.id !== firstRequestId)
+        assert.ok(incoming.start instanceof Date)
+        const [closed] = emitted.filter(({ eventName }) => eventName === 'closed')
+        assert.strictEqual(closed.id, incoming.id)
+      })
+    )
+
+    it('detects request aborting', () => dispatch({
+      request: {
+        method: 'GET',
+        url: '/redirect'
+      },
+      beforeWait: request => request.abort()
+    })
+      .then(({ emitted, response }) => {
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Content-Type'], textMimeType)
         assert.strictEqual(response.toString(), '')
-        const [incoming, aborted] = emitter.emitted
+        const [incoming] = emitted
         assert.strictEqual(incoming.eventName, 'incoming')
-        assert.strictEqual(incoming.parameters.method, 'GET')
-        assert.strictEqual(incoming.parameters.url, '/redirect')
-        assert.strictEqual(typeof incoming.parameters.id, 'number')
-        assert.ok(incoming.parameters.id !== firstRequestId)
-        assert.ok(incoming.parameters.start instanceof Date)
-        const secondRequestId = incoming.parameters.id
-        assert.strictEqual(aborted.eventName, 'aborted')
-        assert.strictEqual(aborted.parameters.id, secondRequestId)
+        assert.strictEqual(incoming.method, 'GET')
+        assert.strictEqual(incoming.url, '/redirect')
+        assert.strictEqual(typeof incoming.id, 'number')
+        assert.ok(incoming.id !== firstRequestId)
+        assert.ok(incoming.start instanceof Date)
+        const [aborted] = emitted.filter(({ eventName }) => eventName === 'aborted')
+        assert.strictEqual(aborted.id, incoming.id)
       })
     )
   })
 
   describe('redirection', () => {
     it('supports internal redirection', () => dispatch({ request: '/redirect' })
-      .then(({ emitter, response }) => {
-        assert.ok(!emitter.hasError)
+      .then(({ emitted, response }) => {
+        assert.ok(!hasError(emitted))
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Content-Type'], textMimeType)
         assert.strictEqual(response.toString(), 'Hello World!')
@@ -202,8 +211,8 @@ describe('dispatcher', () => {
     )
 
     it('supports internal status code', () => dispatch({ request: '/404' })
-      .then(({ emitter, response }) => {
-        assert.ok(!emitter.hasError)
+      .then(({ emitted, response }) => {
+        assert.ok(!hasError(emitted))
         assert.strictEqual(response.statusCode, 404)
       })
     )
@@ -211,8 +220,8 @@ describe('dispatcher', () => {
 
   describe('regexp matching', () => {
     it('supports capturing groups substitution', () => dispatch({ request: '/subst/file/txt' })
-      .then(({ emitter, response }) => {
-        assert.ok(!emitter.hasError)
+      .then(({ emitted, response }) => {
+        assert.ok(!hasError(emitted))
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Content-Type'], textMimeType)
         assert.strictEqual(response.toString(), 'Hello World!')
@@ -220,8 +229,8 @@ describe('dispatcher', () => {
     )
 
     it('supports capturing groups substitution (complex)', () => dispatch({ request: '/subst-complex/file/txt' })
-      .then(({ emitter, response }) => {
-        assert.ok(!emitter.hasError)
+      .then(({ emitted, response }) => {
+        assert.ok(!hasError(emitted))
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Content-Type'], textMimeType)
         assert.strictEqual(response.toString(), '$1')
@@ -231,15 +240,15 @@ describe('dispatcher', () => {
 
   describe('method matching', () => {
     it('matches the mapping method', () => dispatch({ request: { method: 'INFO', url: '/file.txt' } })
-      .then(({ emitter, response }) => {
-        assert.ok(!emitter.hasError)
+      .then(({ emitted, response }) => {
+        assert.ok(!hasError(emitted))
         assert.strictEqual(response.statusCode, 405)
       })
     )
 
     it('matches the handler method (no matching)', () => dispatch({ request: { method: 'POST', url: '/file.txt' } })
-      .then(({ emitter, response }) => {
-        assert.ok(emitter.hasError)
+      .then(({ emitted, response }) => {
+        assert.ok(hasError(emitted))
         assert.strictEqual(response.statusCode, 501)
       })
     )
@@ -247,21 +256,21 @@ describe('dispatcher', () => {
 
   describe('invert-match', () => {
     it('protects against unwanted verbs', () => dispatch({ request: { method: 'PUT', url: '/file.txt' } })
-      .then(({ emitter, response }) => {
-        assert.ok(!emitter.hasError)
+      .then(({ emitted, response }) => {
+        assert.ok(!hasError(emitted))
         assert.strictEqual(response.statusCode, 405)
       })
     )
 
     it('enables all but matching', () => dispatch({ request: { method: 'GET', url: '/file2.txt' } })
-      .then(({ emitter, response }) => {
+      .then(({ response }) => {
         assert.strictEqual(response.headers['x-not-file'], 'true')
         assert.strictEqual(response.statusCode, 501)
       })
     )
 
     it('enables all but matching (not matching)', () => dispatch({ request: { method: 'GET', url: '/file.txt' } })
-      .then(({ emitter, response }) => {
+      .then(({ response }) => {
         assert.strictEqual(response.headers['x-not-file'], undefined)
         assert.strictEqual(response.statusCode, 200)
       })
@@ -270,24 +279,24 @@ describe('dispatcher', () => {
 
   describe('if-match', () => {
     it('is not triggered if the mapping does not match', () => dispatch({ request: '/if-not-match.txt' })
-      .then(({ emitter, request, response }) => {
-        assert.ok(emitter.hasError)
+      .then(({ emitted, request, response }) => {
+        assert.ok(hasError(emitted))
         assert.ok(!request.ifMatched)
         assert.strictEqual(response.statusCode, 501)
       })
     )
 
     it('decides of the final match (prevent)', () => dispatch({ request: { method: 'GET', url: '/if-match.txt', headers: { 'x-prevent-match': true } } })
-      .then(({ emitter, request, response }) => {
-        assert.ok(emitter.hasError)
+      .then(({ emitted, request, response }) => {
+        assert.ok(hasError(emitted))
         assert.ok(request.ifMatched)
         assert.strictEqual(response.statusCode, 501)
       })
     )
 
     it('decides of the final match (allow)', () => dispatch({ request: { method: 'GET', url: '/if-match.txt' } })
-      .then(({ emitter, request, response }) => {
-        assert.ok(!emitter.hasError)
+      .then(({ emitted, request, response }) => {
+        assert.ok(!hasError(emitted))
         assert.ok(request.ifMatched)
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.toString(), 'if-match')
@@ -295,24 +304,24 @@ describe('dispatcher', () => {
     )
 
     it('handles errors', () => dispatch({ request: { method: 'GET', url: '/if-match.txt', headers: { 'x-error': 'KO' } } })
-      .then(({ emitter, request, response }) => {
-        assert.ok(emitter.hasError)
+      .then(({ emitted, request, response }) => {
+        assert.ok(hasError(emitted))
         assert.ok(request.ifMatched)
         assert.strictEqual(response.statusCode, 500)
       })
     )
 
     it('enables redirect (number)', () => dispatch({ request: { method: 'GET', url: '/if-match.txt', headers: { 'x-match-redirect': '508' } } })
-      .then(({ emitter, request, response }) => {
-        assert.ok(!emitter.hasError)
+      .then(({ emitted, request, response }) => {
+        assert.ok(!hasError(emitted))
         assert.ok(request.ifMatched)
         assert.strictEqual(response.statusCode, 508)
       })
     )
 
     it('enables redirect (string)', () => dispatch({ request: { method: 'GET', url: '/if-match.txt', headers: { 'x-match-redirect': '/file.txt' } } })
-      .then(({ emitter, request, response }) => {
-        assert.ok(!emitter.hasError)
+      .then(({ emitted, request, response }) => {
+        assert.ok(!hasError(emitted))
         assert.ok(request.ifMatched)
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Content-Type'], textMimeType)
@@ -323,8 +332,8 @@ describe('dispatcher', () => {
 
   describe('handlers', () => {
     it('redirects a request to the right handler', () => dispatch({ request: '/file.txt' })
-      .then(({ emitter, response }) => {
-        assert.ok(!emitter.hasError)
+      .then(({ emitted, response }) => {
+        assert.ok(!hasError(emitted))
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Content-Type'], textMimeType)
         assert.strictEqual(response.toString(), 'Hello World!')
@@ -332,8 +341,8 @@ describe('dispatcher', () => {
     )
 
     it('allows handlers that don\'t finalize response', () => dispatch({ request: '/file.txt' })
-      .then(({ emitter, response }) => {
-        assert.ok(!emitter.hasError)
+      .then(({ emitted, response }) => {
+        assert.ok(!hasError(emitted))
         assert.strictEqual(response.headers['x-flag'], 'true')
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Content-Type'], textMimeType)
@@ -345,22 +354,22 @@ describe('dispatcher', () => {
   describe('Error handling', () => {
     describe('Internal errors', () => {
       it('supports internal handler error', () => dispatch({ request: '/fail' })
-        .then(({ emitter, response }) => {
-          assert.ok(emitter.hasError)
+        .then(({ emitted, response }) => {
+          assert.ok(hasError(emitted))
           assert.strictEqual(response.statusCode, 500)
         })
       )
 
       it('supports internal custom error', () => dispatch({ request: '/throw' })
-        .then(({ emitter, response }) => {
-          assert.ok(emitter.hasError)
+        .then(({ emitted, response }) => {
+          assert.ok(hasError(emitted))
           assert.strictEqual(response.statusCode, 500)
         })
       )
 
       it('supports internal promise rejection', () => dispatch({ request: '/reject' })
-        .then(({ emitter, response }) => {
-          assert.ok(emitter.hasError)
+        .then(({ emitted, response }) => {
+          assert.ok(hasError(emitted))
           assert.strictEqual(response.statusCode, 500)
         })
       )
@@ -368,19 +377,20 @@ describe('dispatcher', () => {
 
     describe('No handler for the request', () => {
       it('fails with error 501', () => dispatch({ request: '/unhandled' })
-        .then(({ emitter, response }) => {
-          assert.ok(emitter.hasError)
+        .then(({ emitted, response }) => {
+          assert.ok(hasError(emitted))
           assert.strictEqual(response.statusCode, 501)
         })
       )
 
       it('logs error 501', () => dispatch({ request: '/unhandled' })
-        .then(({ emitter, response }) => {
-          const error = emitter.emitted.filter(event => event.eventName === 'error')[0]
-          assert.strictEqual(error.parameters.method, 'GET')
-          assert.strictEqual(error.parameters.url, '/unhandled')
-          assert.strictEqual(typeof error.parameters.id, 'number')
-          assert.strictEqual(error.parameters.reason, 501)
+        .then(({ emitted }) => {
+          assert.ok(hasError(emitted))
+          const error = emitted.filter(({ eventName }) => eventName === 'error')[0]
+          assert.strictEqual(error.method, 'GET')
+          assert.strictEqual(error.url, '/unhandled')
+          assert.strictEqual(typeof error.id, 'number')
+          assert.strictEqual(error.reason, 501)
         })
       )
     })
@@ -405,44 +415,50 @@ describe('dispatcher', () => {
       })
 
       it('prevents infinite redirection', () => dispatch({ configurationPromise: loopConfigurationPromise, request: 'a' })
-        .then(({ emitter, response }) => {
-          assert.ok(emitter.hasError)
+        .then(({ emitted, response }) => {
+          assert.ok(hasError(emitted))
           assert.strictEqual(response.statusCode, 508)
         })
       )
 
       it('prevents infinite loops in error handling', () => dispatch({ configurationPromise: loopConfigurationPromise, request: 'error' })
-        .then(({ emitter, response }) => {
-          assert.ok(emitter.hasError)
-          assert.ok(response.ended)
+        .then(({ emitted, response }) => {
+          assert.ok(hasError(emitted))
+          assert.ok(response.writableEnded)
         })
       )
     })
 
     describe('listeners', () => {
-      it('fails the request if the \'incoming\' listener fails', () => dispatch({
+      it('does not fail the request if the \'incoming\' listener fails', () => dispatch({
         request: '/file.txt',
         events: {
           error: absorbError,
           incoming: () => { throw new Error('FAIL') }
         }
       })
-        .then(({ emitter, response }) => {
-          assert.ok(emitter.hasError)
-          assert.strictEqual(response.statusCode, 500)
+        .then(({ emitted, response }) => {
+          assert.ok(!hasError(emitted))
+          assert.ok(response.writableEnded)
+          assert.strictEqual(response.statusCode, 200)
+          assert.strictEqual(response.headers['Content-Type'], textMimeType)
+          assert.strictEqual(response.toString(), 'Hello World!')
         })
       )
 
-      it('fails the request if the \'redirecting\' listener fails', () => dispatch({
+      it('does not fail the request if the \'redirecting\' listener fails', () => dispatch({
         request: '/file.txt',
         events: {
           error: absorbError,
           redirecting: () => { throw new Error('FAIL') }
         }
       })
-        .then(({ emitter, response }) => {
-          assert.ok(emitter.hasError)
-          assert.ok(response.ended)
+        .then(({ emitted, response }) => {
+          assert.ok(!hasError(emitted))
+          assert.ok(response.writableEnded)
+          assert.strictEqual(response.statusCode, 200)
+          assert.strictEqual(response.headers['Content-Type'], textMimeType)
+          assert.strictEqual(response.toString(), 'Hello World!')
         })
       )
 
@@ -452,7 +468,7 @@ describe('dispatcher', () => {
           error: () => { throw new Error('FAIL') }
         }
       })
-        .then(({ emitter, response }) => {
+        .then(({ response }) => {
           assert.strictEqual(response.statusCode, 500)
         })
       )
@@ -464,8 +480,8 @@ describe('dispatcher', () => {
           redirected: () => { throw new Error('FAIL') }
         }
       })
-        .then(({ emitter, response }) => {
-          assert.ok(emitter.hasError)
+        .then(({ emitted, response }) => {
+          assert.ok(!hasError(emitted))
           assert.strictEqual(response.statusCode, 200)
           assert.strictEqual(response.headers['Content-Type'], textMimeType)
           assert.strictEqual(response.toString(), 'Hello World!')

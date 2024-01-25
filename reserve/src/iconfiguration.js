@@ -4,7 +4,6 @@ const { check } = require('./mapping')
 const dispatcher = require('./dispatcher')
 const {
   $configuration,
-  $configurationEventEmitter,
   $configurationRequests,
   $mappingChecked,
   $requestId,
@@ -44,7 +43,7 @@ module.exports = class IConfiguration {
     const configuration = this[$configuration]
     await checkMappings(configuration, mappings)
     const configurationRequests = configuration[$configurationRequests]
-    const contexts = [...configurationRequests.contexts]
+    const contexts = Object.values(configurationRequests.contexts)
     const requestContext = contexts.filter(({ request: candidate }) => candidate === request)[0]
     const requestsHolding = contexts.filter(candidate => candidate !== requestContext).map(({ holding }) => holding)
     const holding = Promise.race([
@@ -60,11 +59,11 @@ module.exports = class IConfiguration {
     holding.then(undefined, () => {
       console.log('REserve blocked during configuration.setMappings')
       console.table(contexts.map(context => {
-        const { emitParameters, request, released } = context
+        const { emitParameters, request, nonHolding } = context
         let info
         if (emitParameters.statusCode) {
           info = { statusCode: emitParameters.statusCode }
-        } else if (released) {
+        } else if (nonHolding) {
           info = 'exclude-from-holding-list'
         } else if (context === requestContext) {
           info = 'configure.setMappings'
@@ -84,8 +83,7 @@ module.exports = class IConfiguration {
 
   dispatch (request, response) {
     const configuration = this[$configuration]
-    const eventEmitter = configuration[$configurationEventEmitter]
     request[$requestInternal] = true
-    return dispatcher.call(eventEmitter, configuration, request, response)
+    return dispatcher(configuration, request, response)
   }
 }

@@ -1,5 +1,5 @@
 module.exports = (eventEmitter) => {
-  eventEmitter.on('server-created', ({ server }) => {
+  eventEmitter.on('created', ({ server }) => {
     const io = require('socket.io')(server)
 
     const plots = require('./plots')

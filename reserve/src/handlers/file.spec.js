@@ -15,22 +15,22 @@ const textMimeType = 'text/plain'
 const htmlMimeType = 'text/html'
 const defaultMimeType = 'application/octet-stream'
 
-const ignored = ({ promise, response }) => promise.then(value => {
+const ignored = ({ redirected, response }) => redirected.then(value => {
   assert.strictEqual(value, undefined)
   assert.ok(response.isInitial())
 })
 
 describe('handlers/file', () => {
   it('returns a promise', () => handle('./file.txt')
-    .then(({ promise }) => {
-      assert.strictEqual(typeof promise.then, 'function')
+    .then(({ redirected }) => {
+      assert.strictEqual(typeof redirected.then, 'function')
     })
   )
 
   it('pipes file content', () => handle({
     request: './file.txt'
   })
-    .then(({ promise, response }) => promise.then(value => {
+    .then(({ redirected, response }) => redirected.then(value => {
       assert.strictEqual(value, undefined)
       assert.strictEqual(response.statusCode, 200)
       assert.strictEqual(response.headers['Content-Type'], textMimeType)
@@ -57,7 +57,7 @@ describe('handlers/file', () => {
       request: '/file.txt',
       response
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 201)
         assert.strictEqual(response.headers['Content-Type'], textMimeType)
@@ -68,7 +68,7 @@ describe('handlers/file', () => {
   it('pipes file content (trim parameters)', () => handle({
     request: '/file.txt?param=1#hash'
   })
-    .then(({ promise, response }) => promise.then(value => {
+    .then(({ redirected, response }) => redirected.then(value => {
       assert.strictEqual(value, undefined)
       assert.strictEqual(response.statusCode, 200)
       assert.strictEqual(response.headers['Content-Type'], textMimeType)
@@ -91,7 +91,7 @@ describe('handlers/file', () => {
   it('sends index.html if accessing a folder', () => handle({
     request: './folder/'
   })
-    .then(({ promise, response }) => promise.then(value => {
+    .then(({ redirected, response }) => redirected.then(value => {
       assert.strictEqual(value, undefined)
       assert.strictEqual(response.statusCode, 200)
       assert.strictEqual(response.headers['Content-Type'], htmlMimeType)
@@ -106,7 +106,7 @@ describe('handlers/file', () => {
       url: './folder/'
     }
   })
-    .then(({ promise, response }) => promise.then(value => {
+    .then(({ redirected, response }) => redirected.then(value => {
       assert.strictEqual(value, undefined)
       assert.strictEqual(response.statusCode, 200)
       assert.strictEqual(response.headers['Content-Type'], htmlMimeType)
@@ -118,7 +118,7 @@ describe('handlers/file', () => {
   it('defaults mimetype when no extension', () => handle({
     request: './file'
   })
-    .then(({ promise, response }) => promise.then(value => {
+    .then(({ redirected, response }) => redirected.then(value => {
       assert.strictEqual(value, undefined)
       assert.strictEqual(response.statusCode, 200)
       assert.strictEqual(response.headers['Content-Type'], defaultMimeType)
@@ -173,7 +173,7 @@ describe('handlers/file', () => {
     it('finds the file case sensitively when requested', () => handle({
       request: '/file.txt'
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Content-Type'], textMimeType)
@@ -188,7 +188,7 @@ describe('handlers/file', () => {
         url: '/file.txt'
       }
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Content-Type'], textMimeType)
@@ -206,7 +206,7 @@ describe('handlers/file', () => {
     it('finds the file case sensitively when requested (folder)', () => handle({
       request: '/folder/index.html'
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Content-Type'], htmlMimeType)
@@ -221,7 +221,7 @@ describe('handlers/file', () => {
 
   describe('Strict mode', function () {
     describe('Empty folders are ignored', () => {
-      const html = ({ promise, response }) => promise.then(value => {
+      const html = ({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Content-Type'], htmlMimeType)
@@ -298,7 +298,7 @@ describe('handlers/file', () => {
           'custom-file-system': '/cfs.js'
         }
       })
-        .then(({ promise, response }) => promise.then(value => {
+        .then(({ redirected, response }) => redirected.then(value => {
           assert.strictEqual(value, undefined)
           assert.strictEqual(response.statusCode, 200)
           assert.strictEqual(response.headers['Content-Type'], textMimeType)
@@ -325,7 +325,7 @@ describe('handlers/file', () => {
     it('supports range request', () => handle({
       request: './file.txt'
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Accept-Ranges'], 'bytes')
@@ -343,7 +343,7 @@ describe('handlers/file', () => {
         }
       }
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Content-Type'], textMimeType)
@@ -360,7 +360,7 @@ describe('handlers/file', () => {
         }
       }
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 206)
         assert.strictEqual(response.headers['Content-Type'], textMimeType)
@@ -379,7 +379,7 @@ describe('handlers/file', () => {
         }
       }
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 206)
         assert.strictEqual(response.headers['Content-Type'], textMimeType)
@@ -398,7 +398,7 @@ describe('handlers/file', () => {
         }
       }
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 206)
         assert.strictEqual(response.headers['Content-Type'], textMimeType)
@@ -417,7 +417,7 @@ describe('handlers/file', () => {
         }
       }
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 416)
         assert.strictEqual(response.headers['Content-Type'], textMimeType)
@@ -435,7 +435,7 @@ describe('handlers/file', () => {
         }
       }
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 416)
         assert.strictEqual(response.headers['Content-Type'], textMimeType)
@@ -456,7 +456,7 @@ describe('handlers/file', () => {
         'caching-strategy': 'modified'
       }
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 206)
         const lastModified = response.headers['Last-Modified']
@@ -475,7 +475,7 @@ describe('handlers/file', () => {
           }
         })
       }))
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 206)
         assert.strictEqual(response.headers['Content-Type'], textMimeType)
@@ -497,7 +497,7 @@ describe('handlers/file', () => {
         'caching-strategy': 'modified'
       }
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 206)
         const lastModified = response.headers['Last-Modified']
@@ -516,7 +516,7 @@ describe('handlers/file', () => {
           }
         })
       }))
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Content-Type'], textMimeType)
@@ -534,9 +534,9 @@ describe('handlers/file', () => {
         url: './file.txt'
       }
     })
-      .then(({ promise, request, response }) => {
+      .then(({ redirected, request, response }) => {
         request.abort()
-        return promise
+        return redirected
           .then(value => {
             assert.strictEqual(value, undefined)
             assert.strictEqual(response.statusCode, 200)
@@ -566,9 +566,9 @@ describe('handlers/file', () => {
           'custom-file-system': customFs
         }
       })
-        .then(({ promise, request, response }) => {
+        .then(({ redirected, request, response }) => {
           allocatedRequest = request
-          return promise
+          return redirected
             .then(value => {
               assert.strictEqual(value, undefined)
               assert.strictEqual(response.statusCode, 200)
@@ -603,7 +603,7 @@ describe('handlers/file', () => {
           'caching-strategy': 0
         }
       })
-        .then(({ promise, response }) => promise.then(value => {
+        .then(({ redirected, response }) => redirected.then(value => {
           assert.strictEqual(value, undefined)
           assert.strictEqual(response.statusCode, 200)
           assert.strictEqual(response.headers['Cache-Control'], 'no-store')
@@ -623,7 +623,7 @@ describe('handlers/file', () => {
           'caching-strategy': 3475
         }
       })
-        .then(({ promise, response }) => promise.then(value => {
+        .then(({ redirected, response }) => redirected.then(value => {
           assert.strictEqual(value, undefined)
           assert.strictEqual(response.statusCode, 200)
           assert.strictEqual(response.headers['Cache-Control'], 'public, max-age=3475, immutable')
@@ -643,7 +643,7 @@ describe('handlers/file', () => {
           'caching-strategy': 'modified'
         }
       })
-        .then(({ promise, response }) => promise.then(value => {
+        .then(({ redirected, response }) => redirected.then(value => {
           assert.strictEqual(value, undefined)
           assert.strictEqual(response.statusCode, 200)
           assert.strictEqual(response.headers['Cache-Control'], 'no-cache')
@@ -665,7 +665,7 @@ describe('handlers/file', () => {
           'caching-strategy': 'modified'
         }
       })
-        .then(({ promise, response }) => promise.then(value => {
+        .then(({ redirected, response }) => redirected.then(value => {
           assert.strictEqual(value, undefined)
           assert.strictEqual(response.statusCode, 304)
           assert.strictEqual(response.headers['Cache-Control'], 'no-cache')
@@ -688,7 +688,7 @@ describe('handlers/file', () => {
           'caching-strategy': 'modified'
         }
       })
-        .then(({ promise, response }) => promise.then(value => {
+        .then(({ redirected, response }) => redirected.then(value => {
           assert.strictEqual(value, undefined)
           assert.strictEqual(response.statusCode, 200)
           assert.strictEqual(response.headers['Cache-Control'], 'no-cache')
@@ -715,7 +715,7 @@ describe('handlers/file', () => {
         }
       }
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Content-Type'], 'not-even-existing')
@@ -726,18 +726,18 @@ describe('handlers/file', () => {
   describe('static', () => {
     describe('default', () => {
       it('caches file system by default', async () => {
-        const { promise, mapping } = await handle({
+        const { redirected, mapping } = await handle({
           request: {
             method: 'GET',
             url: './file.txt'
           }
         })
-        await promise
+        await redirected
         assert.notStrictEqual(mapping[$fileCache], undefined)
       })
 
       it('does *not* cache file system when custom-file-system is used', async () => {
-        const { promise, mapping } = await handle({
+        const { redirected, mapping } = await handle({
           request: {
             method: 'GET',
             url: './file.txt'
@@ -750,19 +750,19 @@ describe('handlers/file', () => {
             }
           }
         })
-        await promise
+        await redirected
         assert.strictEqual(mapping[$fileCache], undefined)
       })
     })
 
     it('caches file system information', async () => {
-      const { promise, mapping } = await handle({
+      const { redirected, mapping } = await handle({
         request: {
           method: 'GET',
           url: './file.txt'
         }
       })
-      await promise
+      await redirected
       const cache = mapping[$fileCache]
       assert.notStrictEqual(cache.keys().length, 0)
       const stat = await cache.get('stat:/file.txt')
@@ -770,7 +770,7 @@ describe('handlers/file', () => {
     })
 
     it('can cache file system when custom-file-system is used', async () => {
-      const { promise, mapping } = await handle({
+      const { redirected, mapping } = await handle({
         request: {
           method: 'GET',
           url: './file.txt'
@@ -784,7 +784,7 @@ describe('handlers/file', () => {
           }
         }
       })
-      await promise
+      await redirected
       assert.notStrictEqual(mapping[$fileCache], undefined)
     })
   })

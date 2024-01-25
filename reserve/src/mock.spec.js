@@ -85,10 +85,10 @@ describe('mock', () => {
         .then(configuration => {
           configuration.listeners = [
             function register (eventEmitter) {
-              eventEmitter.on('server-created', ({ configuration, server }) => {
+              eventEmitter.on('created', ({ configuration, server }) => {
                 assert.ok(!!configuration)
                 assert.strictEqual(server, null) // Can't have a server
-                events.push('server-created')
+                events.push('created')
               })
             }
           ]
@@ -99,7 +99,7 @@ describe('mock', () => {
           assert.strictEqual(response.statusCode, 200)
           assert.strictEqual(response.toString(), 'Hello World!')
           assert.strictEqual(events.length, 1)
-          assert.strictEqual(events[0], 'server-created')
+          assert.strictEqual(events[0], 'created')
         })
     })
   })

@@ -27,9 +27,25 @@ describe('handlers/custom', () => {
     assert.ok(!!exceptionCaught)
   })
 
-  it('returns a promise', () => handle({ request: '/any' })
-    .then(({ promise }) => {
-      assert.strictEqual(typeof promise.then, 'function')
+  it('does not return a promise if the custom function is sync', () => handle({
+    request: '/any',
+    mapping: {
+      custom: function () {}
+    }
+  })
+    .then(({ redirected }) => {
+      assert.strictEqual(redirected, undefined)
+    })
+  )
+
+  it('returns a promise if the custom function is async', () => handle({
+    request: '/any',
+    mapping: {
+      custom: async function () {}
+    }
+  })
+    .then(({ redirected }) => {
+      assert.strictEqual(typeof redirected.then, 'function')
     })
   )
 
@@ -37,12 +53,12 @@ describe('handlers/custom', () => {
     request: '/any',
     match: ['capturing groups are: ', 'first', 'second'],
     mapping: {
-      custom: function () {
+      custom: async function () {
         return arguments
       }
     }
   })
-    .then(({ promise, request, response }) => promise.then(args => {
+    .then(({ redirected, request, response }) => redirected.then(args => {
       assert.strictEqual(args.length, 4)
       assert.strictEqual(args[0], request)
       assert.strictEqual(args[1], response)
@@ -57,7 +73,7 @@ describe('handlers/custom', () => {
       custom: async () => 'OK'
     }
   })
-    .then(({ promise }) => promise.then(value => {
+    .then(({ redirected }) => redirected.then(value => {
       assert.strictEqual(value, 'OK')
     }))
   )
@@ -68,9 +84,9 @@ describe('handlers/custom', () => {
       custom: () => { throw new Error('KO') }
     }
   })
-    .then(({ promise }) => promise.then(notExpected, reason => {
+    .then(notExpected, reason => {
       assert.strictEqual(reason.message, 'KO')
-    }))
+    })
   )
 
   it('returns any rejected promise (will be intercepted by dispatcher)', () => handle({
@@ -79,7 +95,7 @@ describe('handlers/custom', () => {
       custom: async () => { throw new Error('KO') }
     }
   })
-    .then(({ promise }) => promise.then(notExpected, reason => {
+    .then(({ redirected }) => redirected.then(notExpected, reason => {
       assert.strictEqual(reason.message, 'KO')
     }))
   )
@@ -90,9 +106,7 @@ describe('handlers/custom', () => {
       custom: () => {}
     }
   })
-    .then(({ mapping, promise }) => promise.then(() => {
-      assert.ok(mapping.configuration[$configuration])
-    }))
+    .then(({ mapping }) => assert.ok(mapping.configuration[$configuration]))
   )
 
   it('does not pass configuration on mapping if member is defined', () => handle({
@@ -102,8 +116,5 @@ describe('handlers/custom', () => {
       configuration: {}
     }
   })
-    .then(({ mapping, promise }) => promise.then(() => {
-      assert.ok(!mapping.configuration[$configuration])
-    }))
-  )
+    .then(({ mapping }) => assert.ok(!mapping.configuration[$configuration])))
 })

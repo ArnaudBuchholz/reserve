@@ -13,8 +13,8 @@ describe('handlers/url', () => {
   it('returns a promise', () => handle({
     request: http.urls.echo
   })
-    .then(({ promise }) => {
-      assert.strictEqual(typeof promise.then, 'function')
+    .then(({ redirected }) => {
+      assert.strictEqual(typeof redirected.then, 'function')
     })
   )
 
@@ -30,7 +30,7 @@ describe('handlers/url', () => {
       body: 'Hello World!'
     }
   })
-    .then(({ promise, response }) => promise.then(value => {
+    .then(({ redirected, response }) => redirected.then(value => {
       assert.strictEqual(value, undefined)
       assert.strictEqual(response.statusCode, 200)
       assert.strictEqual(response.headers['x-value-1'], 'test')
@@ -51,9 +51,9 @@ describe('handlers/url', () => {
       body: 'Hello World!'
     }
   })
-    .then(({ promise, request, response }) => {
+    .then(({ redirected, request, response }) => {
       request.abort()
-      return promise
+      return redirected
         .then(value => {
           assert.strictEqual(value, undefined)
           assert.strictEqual(response.statusCode, 200)
@@ -77,7 +77,7 @@ describe('handlers/url', () => {
       'ignore-unverifiable-certificate': true // No real way to validate here (but for coverage)
     }
   })
-    .then(({ promise, response }) => promise.then(value => {
+    .then(({ redirected, response }) => redirected.then(value => {
       assert.strictEqual(value, undefined)
       assert.strictEqual(response.statusCode, 200)
       assert.strictEqual(response.toString(), 'Hello World!')
@@ -98,7 +98,7 @@ describe('handlers/url', () => {
         'unsecure-cookies': true
       }
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Set-Cookie'][0], 'name=value;')
@@ -118,7 +118,7 @@ describe('handlers/url', () => {
         'unsecure-cookies': true
       }
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Set-Cookie'][0], 'name=value;')
@@ -138,7 +138,7 @@ describe('handlers/url', () => {
         'unsecure-cookies': true
       }
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Set-Cookie'][0], 'name=value; SameSite=Lax;')
@@ -158,7 +158,7 @@ describe('handlers/url', () => {
         'unsecure-cookies': true
       }
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Set-Cookie'][0], 'name=value; SameSite=Lax;')
@@ -178,7 +178,7 @@ describe('handlers/url', () => {
         'unsecure-cookies': true
       }
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Set-Cookie'][0], 'name=value; SameSite=Lax;')
@@ -198,7 +198,7 @@ describe('handlers/url', () => {
         'unsecure-cookies': true
       }
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Set-Cookie'][0], 'name=value; SameSite=Strict;')
@@ -218,7 +218,7 @@ describe('handlers/url', () => {
         'unsecure-cookies': true
       }
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Set-Cookie'][0], 'name=value; SameSite=Strict;')
@@ -238,7 +238,7 @@ describe('handlers/url', () => {
         'unsecure-cookies': true
       }
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Set-Cookie'][0], 'name=value; SameSite=Strict')
@@ -258,7 +258,7 @@ describe('handlers/url', () => {
         'unsecure-cookies': true
       }
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Set-Cookie'][0], 'name=value; SameSite=Strict;')
@@ -277,7 +277,7 @@ describe('handlers/url', () => {
         'unsecure-cookies': true
       }
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 200)
         assert.ok(!response.headers['Set-Cookie'])
@@ -312,7 +312,7 @@ describe('handlers/url', () => {
       configuration: { [uid]: 'configuration' },
       match: { [uid]: 'match' }
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers.Cookie, 'a=b;c=d;')
@@ -345,7 +345,7 @@ describe('handlers/url', () => {
         configuration: { [uid]: 'configuration' },
         match: { [uid]: 'match' }
       })
-        .then(({ promise, response }) => promise.then(value => {
+        .then(({ redirected, response }) => redirected.then(value => {
           assert.strictEqual(value, undefined)
           assert.strictEqual(response.statusCode, 200)
           assert.strictEqual(response.headers.Cookie, 'a=b;c=d;')
@@ -381,7 +381,7 @@ describe('handlers/url', () => {
             }
           },
           mapping
-        }).then(({ promise }) => promise),
+        }).then(({ redirected }) => redirected),
         handle({
           request: {
             method: 'GET',
@@ -392,7 +392,7 @@ describe('handlers/url', () => {
             }
           },
           mapping
-        }).then(({ promise }) => promise)
+        }).then(({ redirected }) => redirected)
       ])
     })
   })
@@ -416,7 +416,7 @@ describe('handlers/url', () => {
         configuration: { [uid]: 'configuration' },
         match: { [uid]: 'match' }
       })
-        .then(({ promise, response }) => promise.then(value => {
+        .then(({ redirected, response }) => redirected.then(value => {
           assert.strictEqual(value, 'test')
           assert.ok(response.isInitial()) // Not yet answered
         }))
@@ -441,7 +441,7 @@ describe('handlers/url', () => {
         configuration: { [uid]: 'configuration' },
         match: { [uid]: 'match' }
       })
-        .then(({ promise, response }) => promise.then(notExpected, reason => {
+        .then(({ redirected, response }) => redirected.then(notExpected, reason => {
           assert.ok(!!reason)
         }))
     })
@@ -462,7 +462,7 @@ describe('handlers/url', () => {
         body: 'Hello World!'
       }
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.toString(), 'Hello World!')
@@ -487,7 +487,7 @@ describe('handlers/url', () => {
       mapping: {
       }
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.statusCode, 301)
         assert.strictEqual(response.headers.location, '/test')
@@ -507,7 +507,7 @@ describe('handlers/url', () => {
         'absolute-location': true
       }
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.headers.location, 'https://www.mocked.com/test')
       }))
@@ -526,7 +526,7 @@ describe('handlers/url', () => {
         'absolute-location': true
       }
     })
-      .then(({ promise, response }) => promise.then(value => {
+      .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
         assert.strictEqual(response.headers.location, 'http://my.website/test')
       }))

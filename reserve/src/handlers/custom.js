@@ -26,7 +26,7 @@ module.exports = {
       mapping[$customConfiguration] = true
     }
   },
-  redirect: async ({ configuration, mapping, match, request, response }) => {
+  redirect: ({ configuration, mapping, match, request, response }) => {
     const parameters = [request, response].concat([].slice.call(match, 1))
     if (mapping[$customConfiguration]) {
       mapping.configuration = configuration

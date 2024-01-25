@@ -105,7 +105,7 @@ check({
   })
 ```
 
-The resulting object implements the [EventEmitter](https://nodejs.org/api/events.html) class and throws events with parameters, see [Server events](doc/events.md).
+The resulting object exposes a method similar to the [EventEmitter::on method](https://nodejs.org/api/events.html#emitteroneventname-listener) and throws events with parameters, see [Server events](doc/events.md).
 It also exposes a `close` method (returning a `Promise`) to shutdown the server.
 
 The package also gives access to the configuration reader :

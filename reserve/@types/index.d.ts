@@ -1,9 +1,21 @@
-import { EventEmitter } from 'events'
 import { Stats } from 'fs'
-import { IncomingMessage, ServerResponse } from 'http'
+import { IncomingMessage, ServerResponse, Server as HttpServer } from 'http'
+import { Server as HttpsServer } from 'https'
+import { Http2Server } from 'http2'
 
 declare module 'reserve' {
   type RedirectResponse = void | number | string
+
+  class Request extends IncomingMessage {
+    setForgedUrl: (url: string) => void
+  }
+
+  class Response extends ServerResponse {
+    constructor(req?: Request)
+    waitForFinish: () => Promise<void>
+    isInitial: () => boolean
+    setAsynchronous: () => void
+  }
 
   type IfMatcher = (request: IncomingMessage, url: string, match: RegExpMatchArray) => boolean | RedirectResponse
 
@@ -138,7 +150,7 @@ declare module 'reserve' {
 
   type Handlers = Record<string, Handler>
 
-  type Listener = string | ((eventEmitter: EventEmitter) => void)
+  type Listener = string | ServerListener
 
   type Mapping = BaseMapping | CustomMapping | FileMapping | StatusMapping | UrlMapping | UseMapping
 
@@ -184,11 +196,82 @@ declare module 'reserve' {
     noBody?: boolean /* do not send body */
   }
 
-  function send (response: ServerResponse, data?: string | object | ReadableStream, options?: SendOptions): Promise<void>
+  function send (response: ServerResponse, data: ReadableStream, options?: SendOptions): Promise<void>
+  function send (response: ServerResponse, data?: string | object, options?: SendOptions): void
 
   function check (configuration: Configuration): Promise<Configuration>
 
-  interface Server extends EventEmitter {
+  enum ServerEventName {
+    created = 'created',
+    ready = 'ready',
+    incoming = 'incoming',
+    error = 'error',
+    redirecting = 'redirecting',
+    redirected = 'redirected',
+    aborted = 'aborted',
+    closed = 'closed'
+  }
+
+  type ServerEventIncoming = {
+    method: string
+    url: string
+    headers: Headers
+    start: Date
+    perfDate: number
+    id: number
+    internal: boolean
+  }
+
+  type ServerEvent = 
+  |
+    {
+      eventName: ServerEventName.created
+      server: HttpServer | HttpsServer | Http2Server
+      configuration: IConfiguration
+    }
+  |
+    {
+      eventName: ServerEventName.ready
+      url: string
+      port: number
+      http2 : boolean
+    }
+  |
+    {
+      eventName: ServerEventName.incoming
+    } & ServerEventIncoming
+  |
+    {
+      eventName: ServerEventName.incoming
+      error: any
+    } & ServerEventIncoming
+  | 
+    {
+      eventName: ServerEventName.redirecting
+      type: string
+      redirect: string | number
+    } & ServerEventIncoming
+  | 
+    {
+      eventName: ServerEventName.redirected
+      end: Date
+      perfEnd: number
+      timeSpent: number
+      statusCode: number
+    } & ServerEventIncoming
+  | 
+    {
+      eventName: ServerEventName.aborted
+    } & ServerEventIncoming
+  | 
+    {
+      eventName: ServerEventName.closed
+    } & ServerEventIncoming
+
+  type ServerListener = (event: ServerEvent) => void
+
+  interface Server {
+    on (eventName: ServerEventName, listener: ServerListener)
     close: () => Promise<void>
   }
 
@@ -220,4 +303,3 @@ declare module 'reserve' {
 
   function mock (configuration: Configuration, mockedHandlers?: Handlers): Promise<MockServer>
 }
-

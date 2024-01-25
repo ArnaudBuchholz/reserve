@@ -35,7 +35,7 @@ module.exports = (handler, defaults = {}) => {
     }
     return mappingReady
       .then(() => {
-        const promise = handler.redirect({
+        const redirected = handler.redirect({
           configuration: iconfiguration,
           match,
           request,
@@ -43,7 +43,7 @@ module.exports = (handler, defaults = {}) => {
           mapping,
           redirect: redirect || request.url
         })
-        return { mapping, promise, request, response }
+        return { mapping, redirected, request, response }
       })
   }
 }

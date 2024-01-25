@@ -7,7 +7,8 @@ interface SendOptions {
   noBody?: boolean /* do not send body */
 }
 
-function send (response: ServerResponse, data?: string | object | ReadableStream, options?: SendOptions): Promise<void>
+function send (response: ServerResponse, data: ReadableStream, options?: SendOptions): Promise<void>
+function send (response: ServerResponse, data?: string | object, options?: SendOptions): void
 ```
 
 REserve offers a way to easily build responses : `statusCode` and `headers` can be specified, `noBody` prevents the body sending.

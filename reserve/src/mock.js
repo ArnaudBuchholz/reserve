@@ -2,7 +2,7 @@
 
 const { check } = require('./configuration')
 const dispatcher = require('./dispatcher')
-const { EventEmitter } = require('./node-api')
+const { newEventEmitter, EVENT_CREATED, EVENT_READY } = require('./event')
 const Request = require('./mock/Request')
 const Response = require('./mock/Response')
 const {
@@ -12,19 +12,22 @@ const {
 const getHostName = require('./hostname')
 
 module.exports = (jsonConfiguration, mockedHandlers = {}) => {
-  const eventEmitter = new EventEmitter()
-  eventEmitter.close = () => Promise.resolve()
+  const { on, emit } = newEventEmitter()
+  const instance = {
+    on,
+    close: () => Promise.resolve()
+  }
   check(jsonConfiguration)
     .then(configuration => {
-      configuration[$configurationEventEmitter] = eventEmitter
+      configuration[$configurationEventEmitter] = emit
       Object.assign(configuration.handlers, mockedHandlers)
-      configuration.listeners.forEach(listener => listener(eventEmitter))
-      eventEmitter.emit('server-created', {
+      configuration.listeners.forEach(listen => listen(instance))
+      emit(EVENT_CREATED, {
         configuration: configuration[$configurationInterface],
         server: null
       })
-      const dispatch = dispatcher.bind(eventEmitter, configuration)
-      eventEmitter.request = function () {
+      const dispatch = dispatcher.bind(null, configuration)
+      instance.request = function () {
         const request = new Request(...arguments)
         const response = new Response()
         const finished = response.waitForFinish()
@@ -33,11 +36,11 @@ module.exports = (jsonConfiguration, mockedHandlers = {}) => {
       }
       const hostname = configuration.hostname || getHostName()
       const { port, http2 } = configuration
-      eventEmitter.emit('ready', {
+      emit(EVENT_READY, {
         url: `${configuration.protocol}://${hostname}:${port}/`,
         port,
         http2
       })
     })
-  return eventEmitter
+  return instance
 }
