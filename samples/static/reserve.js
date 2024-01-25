@@ -1,12 +1,11 @@
-const { check, serve, send, punycache } = require('../../reserve/src/index.js')
+const { serve, send, punycache } = require('../../reserve/src/index.js')
 const { createReadStream, stat, readFileSync } = require('fs')
 
-const perfStats = {}
 const fileStatCache = punycache()
 const INDEX_PATH = './www/index.html'
 const INDEX_CONTENT = readFileSync(INDEX_PATH).toString()
 
-check({
+serve({
   cwd: __dirname,
   port: 8080,
   mappings: [{
@@ -54,9 +53,6 @@ check({
     file: './www/$1'
   }]
 })
-  .then(configuration => {
-    const server = serve(configuration)
-      .on('ready', ({ port }) => {
-        console.log(`reserve listening on port ${port}`)
-      })
+  .on('ready', ({ port }) => {
+    console.log(`reserve listening on port ${port}`)
   })
