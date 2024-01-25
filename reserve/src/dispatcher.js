@@ -67,6 +67,16 @@ function redispatch (context, url) {
   }
 }
 
+function handled (context, { url, index }, result) {
+  if (result !== undefined) {
+    redispatch(context, result)
+  } else if (context.response.writableEnded) {
+    redirected(context)
+  } else {
+    dispatch(context, url, index + 1)
+  }
+}
+
 function redirecting (context, { mapping = {}, match, handler, type, redirect, url, index = 0 }) {
   try {
     const { configuration, request, response, emit, emitParameters } = context
@@ -84,23 +94,9 @@ function redirecting (context, { mapping = {}, match, handler, type, redirect, u
       response
     })
     if (result && result.then) {
-      result.then((result) => {
-        if (result !== undefined) {
-          redispatch(context, result)
-        } else if (response.writableEnded) {
-          redirected(context)
-        } else {
-          dispatch(context, url, index + 1)
-        }
-      }, reason => error(context, reason))
+      result.then(handled.bind(null, context, { url, index }), reason => error(context, reason))
     } else {
-      if (result !== undefined) {
-        redispatch(context, result)
-      } else if (response.writableEnded) {
-        redirected(context)
-      } else {
-        dispatch(context, url, index + 1)
-      }
+      handled(context, { url, index }, result)
     }
   } catch (e) {
     error(context, e)
