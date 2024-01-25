@@ -6,6 +6,7 @@ const http2 = require('http2')
 const https = require('https')
 const { networkInterfaces } = require('os')
 const { basename, dirname, isAbsolute, join } = require('path')
+const { performance } = require('perf_hooks')
 const { pipeline, Duplex, Readable } = require('stream')
 const { promisify } = require('util')
 const zlib = require('zlib')
@@ -27,6 +28,8 @@ module.exports = {
   dirname,
   isAbsolute,
   join,
+  // perf_hooks
+  performance,
   // stream
   pipeline,
   Duplex,

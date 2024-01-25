@@ -4,26 +4,20 @@ import http2 from 'http2'
 import https from 'https'
 import { networkInterfaces } from 'os'
 import { basename, dirname, isAbsolute, join } from 'path'
+import { performance } from 'perf_hooks'
 import { pipeline, Duplex, Readable } from 'stream'
 import { promisify } from 'util'
 import zlib from 'zlib'
 import factory from './core.js'
 const reserve = factory({
-  createReadStream,
-  readdir,
-  readFile,
-  stat,
+  createReadStream, readdir, readFile, stat,
   http,
   http2,
   https,
   networkInterfaces,
-  basename,
-  dirname,
-  isAbsolute,
-  join,
-  pipeline,
-  Duplex,
-  Readable,
+  basename, dirname, isAbsolute, join,
+  performance,
+  pipeline, Duplex, Readable,
   promisify,
   zlib
 })

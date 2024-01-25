@@ -1,5 +1,6 @@
 'use strict'
 
+const { performance } = require('./node-api')
 const logError = require('./logError')
 const interpolate = require('./interpolate')
 const {
