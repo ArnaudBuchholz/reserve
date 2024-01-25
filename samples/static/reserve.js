@@ -1,4 +1,4 @@
-const { serve, send, punycache } = require('../../reserve/src/index.js')
+const { serve, send, punycache } = require('reserve')
 const { createReadStream, stat, readFileSync } = require('fs')
 
 const fileStatCache = punycache()
