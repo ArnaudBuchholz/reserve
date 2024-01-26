@@ -18,7 +18,9 @@ while (stack.length) {
   if (Object.keys(modules).includes(path)) {
     continue
   }
-  const content = readFileSync(join('src', path)).toString()
+  const content = readFileSync(join('src', path))
+    .toString()
+    .replace(/Symbol\([^)]*\)/g, 'Symbol()') // No need to keep symbol key
   const module = {
     content,
     depends: {}
@@ -58,6 +60,10 @@ while (stack.length) {
     module.exports = 'reserve'
   } else {
     module.exports = `$export_${path.replace('.js', '').replace('/', '_')}`
+    const exportNames = content.match(/module\.exports\s+=\s+\{([^^}]*)\}/)
+    if (exportNames) {
+      module.names = exportNames[1]
+    }
   }
   modules[path] = module
 }
