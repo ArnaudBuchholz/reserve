@@ -1,8 +1,14 @@
-const { isAbsolute } = require('./node-api')
-
 module.exports = async (path) => {
-  if (isAbsolute(path) && (path.endsWith('.mjs') || typeof require === 'undefined')) {
+  if (path.endsWith('.mjs')) {
     return (await import(`file://${path}`)).default
   }
-  return require(path)
+  try {
+    return require(path)
+  } catch (e) {
+    /* istanbul ignore next */ // Not easy to reproduce with mocha
+    if (e.code === 'ERR_REQUIRE_ESM') {
+      return (await import(`file://${path}`)).default
+    }
+    throw e
+  }
 }
