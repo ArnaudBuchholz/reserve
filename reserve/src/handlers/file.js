@@ -121,9 +121,6 @@ async function sendIndex (context) {
 }
 
 async function checkStrictPath (fs, cwd, filePath) {
-  if (!filePath.startsWith(cwd)) {
-    throw new Error('Unsecure access')
-  }
   let path = filePath
   while (path !== cwd) {
     const folderPath = dirname(path)
@@ -183,6 +180,9 @@ module.exports = {
   redirect: ({ request, mapping, redirect, response }) => {
     let filePath = /([^?#]+)/.exec(unescape(redirect))[1] // filter URL parameters & hash
     filePath = join(mapping.cwd, filePath)
+    if (!filePath.startsWith(mapping.cwd)) {
+      return Promise.resolve()
+    }
     const directoryAccess = !!filePath.match(/(\\|\/)$/) // Test known path separators
     if (directoryAccess) {
       filePath = filePath.substring(0, filePath.length - 1)

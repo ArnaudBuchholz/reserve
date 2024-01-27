@@ -38,9 +38,21 @@ describe('handlers/file', () => {
     }))
   )
 
-  it('forbids access to parent path', async () => {
+  it('forbids access to parent path (../)', async () => {
     const request = new Request({ method: 'GET', url: 'anything' })
     request.setForgedUrl('../file.txt')
+    await handle({
+      request,
+      mapping: {
+        cwd: '/folder'
+      }
+    })
+      .then(ignored)
+  })
+
+  it('forbids access to parent path (%2E%2E/)', async () => {
+    const request = new Request({ method: 'GET', url: 'anything' })
+    request.setForgedUrl('%2E%2E/file.txt')
     await handle({
       request,
       mapping: {
