@@ -4,6 +4,7 @@ const { basename, createReadStream, dirname, join, readdir, stat } = require('..
 const { $handlerPrefix, $fileCache } = require('../symbols')
 const send = require('../send')
 const mimeTypes = require('../mime')
+const smartImport = require('../smartImport')
 const cacheFactory = require('punycache')
 
 const $customFileSystem = 'custom-file-system'
@@ -158,7 +159,7 @@ module.exports = {
   method: 'GET,HEAD',
   validate: async mapping => {
     if (typeof mapping[$customFileSystem] === 'string') {
-      mapping[$customFileSystem] = require(join(mapping.cwd, mapping[$customFileSystem])) // TODO CJS/EJS switch
+      mapping[$customFileSystem] = await smartImport(join(mapping.cwd, mapping[$customFileSystem]))
     }
     const apis = ['stat', 'createReadStream', 'readdir']
     const invalids = apis.filter(name => typeof mapping[$customFileSystem][name] !== 'function')

@@ -1,4 +1,4 @@
-const { isAbsolute } = require('./node-api.js')
+const { isAbsolute } = require('./node-api')
 
 module.exports = async (path) => {
   if (isAbsolute(path) && (path.endsWith('.mjs') || typeof require === 'undefined')) {

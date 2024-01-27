@@ -380,8 +380,9 @@ describe('configuration', () => {
         const mockedHandler = {
           redirect: okHandler
         }
-        require('mock-require')('mocked-handler', mockedHandler)
+        require('mock-require')('/folder/mocked-handler', mockedHandler)
         return check({
+          cwd: '/folder/',
           handlers: {
             mock: 'mocked-handler'
           },
@@ -436,7 +437,7 @@ describe('configuration', () => {
         const mockedHandler = {
           redirect: okHandler
         }
-        require('mock-require')('mocked-absolute-handler', mockedHandler)
+        require('mock-require')('/mocked-absolute-handler', mockedHandler)
         return read('/folder/reserve-absolute-handler.json')
           .then(check)
       })

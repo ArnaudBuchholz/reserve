@@ -1,6 +1,6 @@
 'use strict'
 
-const smartImport = require('./smartImport.js')
+const smartImport = require('./smartImport')
 const assert = require('assert')
 const { join } = require('path')
 

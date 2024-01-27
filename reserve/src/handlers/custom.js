@@ -1,12 +1,12 @@
 'use strict'
 
 const { join } = require('../node-api')
-
 const {
   $handlerPrefix,
   $customCallback,
   $customConfiguration
 } = require('../symbols')
+const smartImport = require('../smartImport')
 
 module.exports = {
   [$handlerPrefix]: 'custom',
@@ -15,7 +15,7 @@ module.exports = {
   },
   validate: async mapping => {
     if (typeof mapping.custom === 'string') {
-      mapping[$customCallback] = require(join(mapping.cwd, mapping.custom)) // TODO CJS/EJS switch
+      mapping[$customCallback] = await smartImport(join(mapping.cwd, mapping.custom))
     } else {
       mapping[$customCallback] = mapping.custom
     }

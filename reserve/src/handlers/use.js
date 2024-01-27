@@ -1,6 +1,7 @@
 'use strict'
 
 const { $useMiddleware, $handlerPrefix } = require('../symbols')
+const smartImport = require('../smartImport')
 
 module.exports = {
   [$handlerPrefix]: 'use',
@@ -16,7 +17,7 @@ module.exports = {
     if (typeof mapping.use === 'function') {
       factory = mapping.use
     } else {
-      factory = require(mapping.use) // TODO CJS/EJS switch ?
+      factory = await smartImport(mapping.use)
     }
     const middleware = factory(mapping.options)
     if (middleware.length !== 3) {

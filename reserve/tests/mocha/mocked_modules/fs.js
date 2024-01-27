@@ -84,7 +84,7 @@ const entries = {
     'reserve-absolute-handler.json': {
       content: JSON.stringify({
         handlers: {
-          test: 'mocked-absolute-handler'
+          test: '/mocked-absolute-handler'
         },
         mappings: [{
           match: '.*',

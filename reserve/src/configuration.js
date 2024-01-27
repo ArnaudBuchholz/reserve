@@ -12,6 +12,7 @@ const {
   $handlerMethod,
   $handlerSchema
 } = require('./symbols')
+const smartImport = require('./smartImport')
 
 const defaultHandlers = [
   require('./handlers/custom'),
@@ -75,25 +76,29 @@ function checkHandler (handler, type) {
   }
 }
 
-function validateHandler (type) {
-  const handlers = this.handlers
+async function validateHandler ({ cwd, handlers }, type) {
   let handler = handlers[type]
   if (typeof handler === 'string') {
-    handler = require(handler) // TODO CJS/EJS switch
+    if (!isAbsolute(handler)) {
+      handler = join(cwd, handler)
+    }
+    handler = await smartImport(handler)
     handlers[type] = handler
   }
   checkHandler(handler, type)
   Object.freeze(handler)
 }
 
-function setHandlers (configuration) {
+async function setHandlers (configuration) {
   if (configuration.handlers) {
     // Default hanlders can't be overridden
     configuration.handlers = Object.assign({}, configuration.handlers, defaultHandlers)
   } else {
     configuration.handlers = Object.assign({}, defaultHandlers)
   }
-  Object.keys(configuration.handlers).forEach(validateHandler.bind(configuration))
+  for (const type of Object.keys(configuration.handlers)) {
+    await validateHandler(configuration, type)
+  }
   configuration.handler = getHandler.bind(null, configuration.handlers, Object.keys(configuration.handlers))
 }
 
@@ -101,22 +106,23 @@ function invalidListeners () {
   throw new Error('Invalid listeners member, must be an array of functions')
 }
 
-function checkListeners (configuration) {
-  const listeners = configuration.listeners
+async function checkListeners ({ cwd, listeners }) {
   if (!Array.isArray(listeners)) {
     invalidListeners()
   }
-  configuration.listeners = listeners.map(register => {
+  let index = 0
+  for (let register of listeners) {
     let registerType = typeof register
     if (registerType === 'string') {
-      register = require(join(configuration.cwd, register)) // TODO CJS/EJS switch
+      register = await smartImport(join(cwd, register))
+      listeners[index] = register
       registerType = typeof register
     }
     if (registerType !== 'function') {
       invalidListeners()
     }
-    return register
-  })
+    ++index
+  }
 }
 
 async function readSslFile (configuration, filePath) {
@@ -202,8 +208,8 @@ module.exports = {
     }
     const checkedConfiguration = Object.assign({}, configuration)
     applyDefaults(checkedConfiguration)
-    setHandlers(checkedConfiguration)
-    checkListeners(checkedConfiguration)
+    await setHandlers(checkedConfiguration)
+    await checkListeners(checkedConfiguration)
     await checkProtocol(checkedConfiguration)
     await checkMappings(checkedConfiguration)
     checkedConfiguration[$configurationRequests] = {

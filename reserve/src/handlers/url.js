@@ -4,6 +4,7 @@ const { http, https } = require('../node-api')
 const headersFactory = require('../mock/headers')
 const defer = require('../defer')
 const { $handlerPrefix } = require('../symbols')
+const smartImport = require('../smartImport')
 
 const http2ForbiddenResponseHeaders = [
   'transfer-encoding',
@@ -33,9 +34,9 @@ function unsecureCookies (headers) {
 
 function noop () {}
 
-function validateHook (mapping, hookName) {
+async function validateHook (mapping, hookName) {
   if (typeof mapping[hookName] === 'string') {
-    mapping[hookName] = require(mapping[hookName]) // TODO CJS/EJS switch
+    mapping[hookName] = await smartImport(mapping[hookName])
   }
 }
 
@@ -64,8 +65,8 @@ module.exports = {
     }
   },
   validate: async mapping => {
-    validateHook(mapping, 'forward-request')
-    validateHook(mapping, 'forward-response')
+    await validateHook(mapping, 'forward-request')
+    await validateHook(mapping, 'forward-response')
   },
   redirect: async ({ configuration, mapping, match, redirect: url, request, response }) => {
     const [promise, done, fail] = defer()
