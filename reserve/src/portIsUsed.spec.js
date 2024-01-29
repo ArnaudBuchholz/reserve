@@ -3,7 +3,7 @@
 const { describe, it } = require('mocha')
 const assert = require('assert')
 const checkPortStatus = require('./portIsUsed')
-const http = require('node:http')
+const http = require('http')
 
 describe('checkPortIsUsed', () => {
   it('detects that the port is not used', async () => {
