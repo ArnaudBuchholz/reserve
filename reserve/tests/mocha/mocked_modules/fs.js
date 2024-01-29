@@ -50,7 +50,7 @@ const entries = {
     },
     'reserve-with-another-port.json': {
       content: JSON.stringify({
-        port: 220103,
+        port: 8080,
         extend: './reserve.json'
       })
     },

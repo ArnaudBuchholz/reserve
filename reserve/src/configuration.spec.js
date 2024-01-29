@@ -51,7 +51,7 @@ describe('configuration', () => {
     it('reads a configuration and extends it (relative path)', () => {
       return read('/folder/reserve-with-another-port.json')
         .then(configuration => {
-          assert.strictEqual(configuration.port, 220103)
+          assert.strictEqual(configuration.port, 8080)
           assert.ok(configuration.ssl)
           assert.strictEqual(configuration.mappings.length, 2)
           assert.strictEqual(configuration.mappings[0].match, '/folder/.*')

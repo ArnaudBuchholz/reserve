@@ -56,7 +56,7 @@ describe('serve', () => {
 
   it('allocates https server', () => read('/folder/reserve-with-another-port.json')
     .then(configuration => promisify(configuration, ({ url, http2 }) => {
-      assert.strictEqual(url, 'https://192.168.0.1:220103/')
+      assert.strictEqual(url, 'https://192.168.0.1:8080/')
       assert.strictEqual(http2, false)
     }))
   )
@@ -70,7 +70,7 @@ describe('serve', () => {
 
   it('allocates secured http2 server', () => read('/folder/reserve-with-another-port.json')
     .then(configuration => promisify({ ...configuration, http2: true }, ({ url, http2 }) => {
-      assert.strictEqual(url, 'https://192.168.0.1:220103/')
+      assert.strictEqual(url, 'https://192.168.0.1:8080/')
       assert.strictEqual(http2, true)
     }))
   )

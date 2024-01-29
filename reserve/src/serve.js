@@ -10,6 +10,7 @@ const {
 } = require('./symbols')
 const defer = require('./defer')
 const getHostName = require('./hostname')
+const portIsUsed = require('./portIsUsed')
 
 function createServer (configuration, requestHandler) {
   const { httpOptions } = configuration
@@ -50,21 +51,23 @@ module.exports = jsonConfiguration => {
   const instance = { on }
   const [serverAvailable, ready, failed] = defer()
   check(jsonConfiguration)
-    .then(configuration => {
+    .then(async configuration => {
+      let port = configuration.port
+      if (port !== 0 && await portIsUsed(port)) {
+        throw new Error(`Port ${port} is`)
+      }
       configuration[$configurationEventEmitter] = emit
       configuration.listeners.forEach(listen => listen(instance))
+      const server = await createServerAsync(emit, configuration, dispatcher)
       const hostname = configuration.hostname || getHostName()
-      return createServerAsync(emit, configuration, dispatcher)
-        .then(server => {
-          ready(server)
-          const { port } = server.address()
-          const { http2 } = configuration
-          emit(EVENT_READY, {
-            url: `${configuration.protocol}://${hostname}:${port}/`,
-            port,
-            http2
-          })
-        })
+      ready(server)
+      port = server.address().port
+      const { http2 } = configuration
+      emit(EVENT_READY, {
+        url: `${configuration.protocol}://${hostname}:${port}/`,
+        port,
+        http2
+      })
     })
     .catch(reason => {
       failed(reason)

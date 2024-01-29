@@ -2,6 +2,7 @@ import { createReadStream, readdir, readFile, stat } from 'fs'
 import http from 'http'
 import http2 from 'http2'
 import https from 'https'
+import { Socket } from 'net'
 import { networkInterfaces } from 'os'
 import { basename, dirname, isAbsolute, join } from 'path'
 import { performance } from 'perf_hooks'
@@ -14,6 +15,7 @@ const reserve = factory({
   http,
   http2,
   https,
+  Socket,
   networkInterfaces,
   basename, dirname, isAbsolute, join,
   performance,

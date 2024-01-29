@@ -3,6 +3,7 @@ const { createReadStream, readdir, readFile, stat } = require('fs')
 const http = require('http')
 const http2 = require('http2')
 const https = require('https')
+const { Socket } = require('net')
 const { networkInterfaces } = require('os')
 const { basename, dirname, isAbsolute, join } = require('path')
 const { performance } = require('perf_hooks')
@@ -15,6 +16,7 @@ module.exports = factory({
   http,
   http2,
   https,
+  Socket,
   networkInterfaces,
   basename, dirname, isAbsolute, join,
   performance,
