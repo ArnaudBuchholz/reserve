@@ -1,5 +1,6 @@
 'use strict'
 
+const { describe, it } = require('mocha')
 const assert = require('assert')
 const { check, Request, Response } = require('./index')
 const dispatcher = require('./dispatcher')

@@ -1,5 +1,6 @@
 'use strict'
 
+const { describe, it, before } = require('mocha')
 const assert = require('assert')
 const mock = require('./mock')
 const { read } = require('./configuration')

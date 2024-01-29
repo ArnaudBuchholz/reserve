@@ -1,5 +1,6 @@
 'use strict'
 
+const { describe, it, beforeEach } = require('mocha')
 const assert = require('assert')
 const { console: { clean, collect } } = require('test-tools')
 const logError = require('./logError')

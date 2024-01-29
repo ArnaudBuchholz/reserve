@@ -71,11 +71,7 @@
   },
   "standard": {
     "env": [
-      "mocha",
       "node"
-    ],
-    "globals": [
-      "sap"
     ]
   },
   "mocha": {

@@ -1,5 +1,6 @@
 'use strict'
 
+const { describe, it } = require('mocha')
 const assert = require('assert')
 const { wrapHandler } = require('test-tools')
 const statusHandler = require('./status')

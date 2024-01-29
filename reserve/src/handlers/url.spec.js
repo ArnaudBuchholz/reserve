@@ -1,6 +1,7 @@
 'use strict'
 
 const mockRequire = require('mock-require')
+const { describe, it } = require('mocha')
 const assert = require('assert')
 const { notExpected, wrapHandler, http } = require('test-tools')
 const urlHandler = require('./url')

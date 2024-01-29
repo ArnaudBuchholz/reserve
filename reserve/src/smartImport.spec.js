@@ -1,5 +1,6 @@
 'use strict'
 
+const { describe, it } = require('mocha')
 const smartImport = require('./smartImport')
 const assert = require('assert')
 const { join } = require('path')

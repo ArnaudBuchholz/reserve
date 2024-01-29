@@ -1,5 +1,6 @@
 'use strict'
 
+const { describe, it, beforeEach } = require('mocha')
 const assert = require('assert')
 const { newEventEmitter, ...events } = require('./event')
 const { EVENT_CREATED, EVENT_READY, EVENT_INCOMING } = events

@@ -1,5 +1,6 @@
 'use strict'
 
+const { describe, it, before, after } = require('mocha')
 const assert = require('assert')
 const { notExpected, wrapHandler } = require('test-tools')
 const fileHandler = require('./file')
