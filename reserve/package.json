@@ -55,9 +55,9 @@
   },
   "homepage": "https://github.com/ArnaudBuchholz/reserve#readme",
   "devDependencies": {
-    "@stryker-mutator/core": "^8.0.0",
-    "@stryker-mutator/mocha-runner": "^8.0.0",
-    "@types/node": "^20.11.7",
+    "@stryker-mutator/core": "^8.2.2",
+    "@stryker-mutator/mocha-runner": "^8.2.2",
+    "@types/node": "^20.11.10",
     "cors": "^2.8.5",
     "eslint-utils": "^3.0.0",
     "mocha": "^10.2.0",
