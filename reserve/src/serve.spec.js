@@ -4,6 +4,7 @@ const { describe, it } = require('mocha')
 const assert = require('assert')
 const serve = require('./serve')
 const { read } = require('./configuration')
+const http = require('http').__unmocked__
 
 function promisify (configuration, callback) {
   return new Promise((resolve, reject) => {
@@ -44,6 +45,32 @@ describe('serve', () => {
   }, ({ url, http2 }) => {
     assert.strictEqual(url, 'http://127.0.0.1:3475/')
     assert.strictEqual(http2, false)
+  }))
+
+  it('fails if port is already in use', () => new Promise((resolve, reject) => {
+    const server = http.createServer((req, res) => {
+      res.statusCode = 200
+      res.setHeader('Content-Type', 'text/plain')
+      res.end('Hello World\n')
+    })
+    server.listen(0, '127.0.0.1', (err) => {
+      if (err) {
+        reject(err)
+      }
+      const { port } = server.address()
+      resolve(
+        promisifyWithError({
+          hostname: '127.0.0.1',
+          port
+        }, reason => {
+          assert.strictEqual(reason.message, `Configured port ${port} already in use`)
+        })
+          .then(() => server.close(), reason => {
+            server.close()
+            throw reason
+          })
+      )
+    })
   }))
 
   it('allocates a port', () => promisify({

@@ -54,7 +54,7 @@ module.exports = jsonConfiguration => {
     .then(async configuration => {
       let port = configuration.port
       if (port !== 0 && await portIsUsed(port)) {
-        throw new Error(`Port ${port} is`)
+        throw new Error(`Configured port ${port} already in use`)
       }
       configuration[$configurationEventEmitter] = emit
       configuration.listeners.forEach(listen => listen(instance))
