@@ -5,7 +5,7 @@ const Response = require('../../src/mock/Response')
 const IConfiguration = require('../../src/iconfiguration')
 const { check } = require('../../src/mapping')
 const { checkHandler } = require('../../src/configuration')
-const { $handlerPrefix } = require('../../src/symbols')
+const { $handlerPrefix, $configurationInterface } = require('../../src/symbols')
 
 const $checked = Symbol('mapping-already-checked')
 
@@ -23,6 +23,7 @@ module.exports = (handler, defaults = {}) => {
     }
     configuration = { ...defaults.configuration, ...configuration, handler: () => { return { handler } } }
     const iconfiguration = new IConfiguration(configuration)
+    configuration[$configurationInterface] = iconfiguration
     if (!match) {
       match = []
     }

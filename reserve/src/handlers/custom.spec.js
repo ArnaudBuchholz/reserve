@@ -11,10 +11,6 @@ const handle = wrapHandler(customHandler, {
   }
 })
 
-const {
-  $configuration
-} = require('../symbols')
-
 describe('handlers/custom', () => {
   it('validates the custom function', async () => {
     let exceptionCaught
@@ -107,15 +103,15 @@ describe('handlers/custom', () => {
       custom: () => {}
     }
   })
-    .then(({ mapping }) => assert.ok(mapping.configuration[$configuration]))
+    .then(({ mapping }) => assert.ok(mapping.configuration))
   )
 
-  it('does not pass configuration on mapping if member is defined', () => handle({
+  it('passes configuration on mapping even if defined', () => handle({
     request: '/any',
     mapping: {
       custom: () => {},
-      configuration: {}
+      configuration: false
     }
   })
-    .then(({ mapping }) => assert.ok(!mapping.configuration[$configuration])))
+    .then(({ mapping }) => assert.strictEqual(typeof mapping.configuration, 'object')))
 })

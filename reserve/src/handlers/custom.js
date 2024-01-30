@@ -4,16 +4,20 @@ const { join } = require('../node-api')
 const {
   $handlerPrefix,
   $customCallback,
-  $customConfiguration
+  $customRedirect
 } = require('../symbols')
 const smartImport = require('../smartImport')
+
+function withMatch (callback, request, response, [, ...additional]) {
+  return callback.call(this, request, response, ...additional)
+}
 
 module.exports = {
   [$handlerPrefix]: 'custom',
   schema: {
     custom: ['function', 'string']
   },
-  validate: async mapping => {
+  validate: async (mapping, configuration) => {
     if (typeof mapping.custom === 'string') {
       mapping[$customCallback] = await smartImport(join(mapping.cwd, mapping.custom))
     } else {
@@ -22,15 +26,15 @@ module.exports = {
     if (typeof mapping[$customCallback] !== 'function') {
       throw new Error('Invalid custom handler, expected a function')
     }
-    if (mapping.configuration === undefined) {
-      mapping[$customConfiguration] = true
+    const { length } = mapping[$customCallback]
+    if (length === 0 || length > 2) {
+      mapping[$customRedirect] = withMatch.bind(mapping, mapping[$customCallback])
+    } else {
+      mapping[$customRedirect] = mapping[$customCallback]
     }
+    mapping.configuration = configuration
   },
-  redirect: ({ configuration, mapping, match, request, response }) => {
-    const parameters = [request, response].concat([].slice.call(match, 1))
-    if (mapping[$customConfiguration]) {
-      mapping.configuration = configuration
-    }
-    return mapping[$customCallback].apply(mapping, parameters)
+  redirect: ({ mapping, match, request, response }) => {
+    return mapping[$customRedirect](request, response, match)
   }
 }

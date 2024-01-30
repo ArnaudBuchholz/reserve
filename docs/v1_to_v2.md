@@ -20,6 +20,30 @@ REserve does not support `mime` or `colors` anymore. The main reasons are :
 The `watch` option was initially created to simplify development by *refreshing* the implementation if the external module file timestamp changes.
 As REserve starts very fast, it was rarely used and has been removed.
 
+### `configuration`
+
+Previously, a `configuration` member was added to the mapping to give access to the [configuration interface](iconfiguration.md) only if no existing member named `configuration` was existing.
+
+Now the member is **always** set.
+
+### callback function
+
+The capturing groups are passed to the callback only if the signature of the function ([`function.length`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/length)) is `0` or greater than `2`.
+
+⚠️ **WARNING** : the following function has a length of `2`.
+```javascript
+function (request, response, ...parameters) {
+
+}
+```
+
+Hence it is recommended to use this signature :
+```javascript
+function (request, response, firstParameter, ...otherParameters) {
+
+}
+```
+
 ## `file` handler
 
 ### `strict` and `case-sensitive` options

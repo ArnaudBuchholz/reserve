@@ -8,7 +8,7 @@ module.exports = {
   $configurationRequests: Symbol(`${ns}configuration.requests`),
   $configurationEventEmitter: Symbol(`${ns}configuration.eventEmitter`),
   $customCallback: Symbol(`${ns}custom.callback`),
-  $customConfiguration: Symbol(`${ns}custom.configuration`),
+  $customRedirect: Symbol(`${ns}custom.redirect`),
   $handlerPrefix: Symbol(`${ns}handler.prefix`),
   $handlerMethod: Symbol(`${ns}handler.method`),
   $handlerSchema: Symbol(`${ns}handler.schema`),
