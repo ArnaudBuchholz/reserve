@@ -77,22 +77,20 @@ function checkHandler (configuration, mapping) {
   return handler
 }
 
-module.exports = {
-  async check (configuration, mapping) {
-    checkCwd(configuration, mapping)
-    checkMatch(mapping)
-    checkInvertMatch(mapping)
-    checkIfMatch(mapping)
-    checkExcludeFromHoldingList(mapping)
-    const handler = checkHandler(configuration, mapping)
-    checkMethod(mapping, $mappingMethod, handler[$handlerMethod])
-    if (handler[$handlerSchema]) {
-      validate(handler[$handlerSchema], mapping)
-    }
-    if (handler.validate) {
-      await handler.validate(mapping, configuration[$configurationInterface])
-    }
-    mapping[$mappingMatch] = buildMatch(mapping)
-    mapping[$mappingChecked] = true
+module.exports = async (configuration, mapping) => {
+  checkCwd(configuration, mapping)
+  checkMatch(mapping)
+  checkInvertMatch(mapping)
+  checkIfMatch(mapping)
+  checkExcludeFromHoldingList(mapping)
+  const handler = checkHandler(configuration, mapping)
+  checkMethod(mapping, $mappingMethod, handler[$handlerMethod])
+  if (handler[$handlerSchema]) {
+    validate(handler[$handlerSchema], mapping)
   }
+  if (handler.validate) {
+    await handler.validate(mapping, configuration[$configurationInterface])
+  }
+  mapping[$mappingMatch] = buildMatch(mapping)
+  mapping[$mappingChecked] = true
 }

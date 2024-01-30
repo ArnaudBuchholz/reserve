@@ -13,7 +13,7 @@ function parseProperty (name, value) {
   return { name, types, defaultValue }
 }
 
-function validate (property, object, value = property.defaultValue) {
+function validateProperty (property, object, value = property.defaultValue) {
   const { name, types } = property
   if (value === undefined) {
     throw new Error(`Missing property ${name}`)
@@ -25,12 +25,15 @@ function validate (property, object, value = property.defaultValue) {
   object[property.name] = value
 }
 
-module.exports = {
-  parse (schema) {
-    return Object.keys(schema).map(name => parseProperty(name, schema[name]))
-  },
+function parse (schema) {
+  return Object.keys(schema).map(name => parseProperty(name, schema[name]))
+}
 
-  validate (schema, object) {
-    schema.forEach(property => validate(property, object, object[property.name]))
-  }
+function validate (schema, object) {
+  schema.forEach(property => validateProperty(property, object, object[property.name]))
+}
+
+module.exports = {
+  parse,
+  validate
 }

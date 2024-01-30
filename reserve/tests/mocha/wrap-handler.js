@@ -3,7 +3,7 @@
 const Request = require('../../src/mock/Request')
 const Response = require('../../src/mock/Response')
 const IConfiguration = require('../../src/iconfiguration')
-const { check } = require('../../src/mapping')
+const checkMapping = require('../../src/checkMapping')
 const { checkHandler } = require('../../src/configuration')
 const { $handlerPrefix, $configurationInterface } = require('../../src/symbols')
 
@@ -30,7 +30,7 @@ module.exports = (handler, defaults = {}) => {
     let mappingReady
     if (mapping !== null && (!mapping || !mapping[$checked])) {
       mapping = { ...defaults.mapping, ...mapping, [$checked]: true }
-      mappingReady = check(configuration, mapping)
+      mappingReady = checkMapping(configuration, mapping)
     } else {
       mappingReady = Promise.resolve()
     }

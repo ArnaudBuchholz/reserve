@@ -60,9 +60,28 @@ while (stack.length) {
     module.exports = 'reserve'
   } else {
     module.exports = `$export_${path.replace('.js', '').replace('/', '_')}`
-    const exportNames = content.match(/module\.exports\s+=\s+\{([^^}]*)\}/)
-    if (exportNames) {
-      module.names = exportNames[1]
+    const exportNames = []
+    const exportValues = []
+    const exports = content.match(/module\.exports\s+=\s+\{([^^}]*)\}/)
+    if (exports !== null && !path.startsWith('handlers/')) {
+      const [, exported] = exports
+      exported
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => !!line)
+        .filter(line => !line.startsWith('//'))
+        .forEach(line => {
+          const [name, value] = line.replace(',', '').split(': ')
+          if (!name.match(/^\$?\w+$/i)) {
+            throw new Error(`Invalid export "${name}" for module ${path}`)
+          }
+          exportNames.push(name)
+          exportValues.push(value)
+        })
+    }
+    if (exportNames.length) {
+      module['exports.names'] = exportNames
+      module['exports.values'] = exportValues
     }
   }
   modules[path] = module

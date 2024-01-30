@@ -2,7 +2,7 @@
 
 const { readFile, stat, dirname, isAbsolute, join } = require('./node-api')
 const IConfiguration = require('./iconfiguration')
-const { check } = require('./mapping')
+const checkMapping = require('./checkMapping')
 const checkMethod = require('./checkMethod')
 const { parse } = require('./schema')
 const {
@@ -152,7 +152,7 @@ async function checkMappings (configuration) {
   const configurationInterface = new IConfiguration(configuration)
   configuration[$configurationInterface] = configurationInterface
   for (const mapping of configuration.mappings) {
-    await check(configuration, mapping)
+    await checkMapping(configuration, mapping)
   }
 }
 
@@ -199,36 +199,38 @@ function extend (filePath, configuration) {
   return configuration
 }
 
+async function check (configuration) {
+  if (typeof configuration !== 'object' || configuration === null) {
+    throw new Error('Configuration must be an object')
+  }
+  const checkedConfiguration = Object.assign({}, configuration)
+  applyDefaults(checkedConfiguration)
+  await setHandlers(checkedConfiguration)
+  await checkListeners(checkedConfiguration)
+  await checkProtocol(checkedConfiguration)
+  await checkMappings(checkedConfiguration)
+  checkedConfiguration[$configurationRequests] = {
+    lastId: 0,
+    holding: null,
+    contexts: {}
+  }
+  return checkedConfiguration
+}
+
+async function read (fileName) {
+  let filePath
+  if (isAbsolute(fileName)) {
+    filePath = fileName
+  } else {
+    filePath = join(process.cwd(), fileName)
+  }
+  return stat(filePath)
+    .then(() => readFile(filePath).then(buffer => JSON.parse(buffer.toString())))
+    .then(configuration => extend(filePath, configuration))
+}
+
 module.exports = {
   checkHandler,
-
-  async check (configuration) {
-    if (typeof configuration !== 'object' || configuration === null) {
-      throw new Error('Configuration must be an object')
-    }
-    const checkedConfiguration = Object.assign({}, configuration)
-    applyDefaults(checkedConfiguration)
-    await setHandlers(checkedConfiguration)
-    await checkListeners(checkedConfiguration)
-    await checkProtocol(checkedConfiguration)
-    await checkMappings(checkedConfiguration)
-    checkedConfiguration[$configurationRequests] = {
-      lastId: 0,
-      holding: null,
-      contexts: {}
-    }
-    return checkedConfiguration
-  },
-
-  async read (fileName) {
-    let filePath
-    if (isAbsolute(fileName)) {
-      filePath = fileName
-    } else {
-      filePath = join(process.cwd(), fileName)
-    }
-    return stat(filePath)
-      .then(() => readFile(filePath).then(buffer => JSON.parse(buffer.toString())))
-      .then(configuration => extend(filePath, configuration))
-  }
+  check,
+  read
 }
