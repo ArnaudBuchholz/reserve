@@ -1,18 +1,26 @@
 # Migration from v1 to v2
 
-## Overview
+Following the breaking changes of v2, here are some recommendations on how to migrate from v1.
+
+## Dependencies
 
 REserve does not support `mime` or `colors` anymore. The main reasons are :
 - `colors` package does not provide much *functional value*
 - mime types, if needed, can be overloaded / completed directly on the [`file`](file.md) mapping making `mime` package useless for most use cases
 - to maintain compatibility with CommonJS **and** ESM, these packages were removed from the default build
 
-## `watch` option on `custom`
+## Events
+
+* The `server-created` event was shortened to `created`.
+
+## `custom` handler
+
+### `watch` option
 
 The `watch` option was initially created to simplify development by *refreshing* the implementation if the external module file timestamp changes.
 As REserve starts very fast, it was rarely used and has been removed.
 
-## `file` options change
+## `file` handler
 
 ### `strict` and `case-sensitive` options
 
@@ -35,12 +43,14 @@ Hence the option is now removed and the `file` handler never generates a `404`.
 
 This option has been removed. To achieve the same result, use a custom handler setting `response.statusCode` to the expected value *before* the file mapping.
 
-## `mock` behavior change
+## Helpers
+
+### `mock`
 
 Previously, the `mock` function was returning a promise giving back the mock server.
 To mimic the behavior of the `serve` function, the promise resolves to a server object and you **must** wait for the `ready` event to use the `request` function.
 
-### `Request` and `Response` behavior changes
+### `Request` and `Response`
 
 The headers are not storing numbers anymore, they are converted to string. This might impact your tests. A typical example is the `Content-Length` header attribute.
 
@@ -49,7 +59,7 @@ The request url goes through normalization, meaning :
 * `mock.request('GET', 'count')` generates `'/count'` url
 * `mock.request('GET', '/echo/hello world')` generates `'/echo/hello%20world'` url
 
-## `body` helper
+### `body`
 
 By default, [`body`](body.md) nows resolve to a [`Buffer`](https://nodejs.org/docs/latest/api/buffer.html) or, if the `content-type` is specified in the request headers a `string` (`text/plain`) or an `object` (`application/json`).
 

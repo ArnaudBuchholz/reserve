@@ -91,25 +91,25 @@
 |1.15.5|Documentation as github pages|
 |1.15.6|Fix types definition (MockServer)|
 |2.0.0|Refactoring to improve project structure|
-||BREAKING CHANGE: Support of CommonJS and ESM imports|
-||BREAKING CHANGE: Remove support of `colors`|
-||BREAKING CHANGE: Remove support of `mime`|
-||BREAKING CHANGE: Remove option `watch` in `custom`|
-||BREAKING CHANGE: Remove option `strict` in `file`|
-||BREAKING CHANGE: Remove option `case-sensitive` in `file`, it is now always case sensitive|
-||BREAKING CHANGE: Remove option `ignore-if-not-found` in `file`, mapping is ignored if resolving to a missing / unreadable / invalid path|
-||BREAKING CHANGE: Remove option `http-status` in `file`|
-||BREAKING CHANGE: `readdir` is now mandatory in custom file system for `file`|
-||BREAKING CHANGE: In `file`, absolute path are forbidden, trying to access a folder above `cwd` fails|
-||BREAKING CHANGE: In `file`, **no** response is sent if the request is aborted while allocating the read stream|
-||BREAKING CHANGE: In `file`, **no** response is sent if the request is aborted while allocating the read stream|
-||BREAKING CHANGE: In `file`, `static` behavior added ([`doc`](file.md))|
-||BREAKING CHANGE: Default configuration does not include proxy|
-||BREAKING CHANGE: `mock` returns immediately even if the *server* is not ready (wait for `ready`)|
-||BREAKING CHANGE: Headers of mocked Request and Response returns strings or array of strings|
-||BREAKING CHANGE: Mocked Request normalizes the received URL|
-||BREAKING CHANGE: `body` helper leverages request headers and offers conversion interface|
-||BREAKING CHANGE: `server-created` event is now renamed to `created`|
+||⚠️BREAKING CHANGE: Support of CommonJS and ESM imports|
+||⚠️BREAKING CHANGE: Remove support of `colors`|
+||⚠️BREAKING CHANGE: Remove support of `mime`|
+||⚠️BREAKING CHANGE: Remove option `watch` in `custom`|
+||⚠️BREAKING CHANGE: Remove option `strict` in `file`|
+||⚠️BREAKING CHANGE: Remove option `case-sensitive` in `file`, it is now always case sensitive|
+||⚠️BREAKING CHANGE: Remove option `ignore-if-not-found` in `file`, mapping is ignored if resolving to a missing / unreadable / invalid path|
+||⚠️BREAKING CHANGE: Remove option `http-status` in `file`|
+||⚠️BREAKING CHANGE: `readdir` is now mandatory in custom file system for `file`|
+||⚠️BREAKING CHANGE: In `file`, absolute path are forbidden, trying to access a folder above `cwd` fails|
+||⚠️BREAKING CHANGE: In `file`, **no** response is sent if the request is aborted while allocating the read stream|
+||⚠️BREAKING CHANGE: In `file`, **no** response is sent if the request is aborted while allocating the read stream|
+||⚠️BREAKING CHANGE: In `file`, `static` behavior added ([`doc`](file.md))|
+||⚠️BREAKING CHANGE: Default configuration does not include proxy|
+||⚠️BREAKING CHANGE: `mock` returns immediately even if the *server* is not ready (wait for `ready`)|
+||⚠️BREAKING CHANGE: Headers of mocked Request and Response returns strings or array of strings|
+||⚠️BREAKING CHANGE: Mocked Request normalizes the received URL|
+||⚠️BREAKING CHANGE: `body` helper leverages request headers and offers conversion interface|
+||⚠️BREAKING CHANGE: `server-created` event is now renamed to `created`|
 ||Fix `use` to handle middleware that are not calling next|
 ||Response status code is preserved when set before `file`|
 ||`static` option for performant `file` delivery ([`doc`](file.md))|
