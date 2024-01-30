@@ -12,6 +12,8 @@ There are two ways to **leverage** REserve :
 
 In both cases, the configuration must comply with the properties and mappings [documented here](configuration.md).
 
+ⓘ [tips & tricks](tips-and-tricks.md). 
+
 ## Handlers
 
 REserve is **delivered** with the following default handlers :
