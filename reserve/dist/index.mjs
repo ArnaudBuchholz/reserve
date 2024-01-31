@@ -10,7 +10,7 @@ import { pipeline, Duplex, Readable } from 'stream'
 import { promisify } from 'util'
 import zlib from 'zlib'
 import factory from './core.js'
-const reserve = factory({
+const reserve = factory(
   createReadStream, readdir, readFile, stat,
   http,
   http2,
@@ -22,7 +22,7 @@ const reserve = factory({
   pipeline, Duplex, Readable,
   promisify,
   zlib
-})
+)
 export default reserve
 export const {
   Request,

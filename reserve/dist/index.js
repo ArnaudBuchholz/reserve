@@ -11,7 +11,7 @@ const { pipeline, Duplex, Readable } = require('stream')
 const { promisify } = require('util')
 const zlib = require('zlib')
 const factory = require('./core.js')
-module.exports = factory({
+module.exports = factory(
   createReadStream, readdir, readFile, stat,
   http,
   http2,
@@ -23,4 +23,4 @@ module.exports = factory({
   pipeline, Duplex, Readable,
   promisify,
   zlib
-})
+)

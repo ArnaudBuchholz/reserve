@@ -76,12 +76,12 @@ while (stack.length) {
             throw new Error(`Invalid export "${name}" for module ${path}`)
           }
           exportNames.push(name)
-          exportValues.push(value)
+          exportValues.push(value || name)
         })
     }
     if (exportNames.length) {
-      module['exports.names'] = exportNames
-      module['exports.values'] = exportValues
+      module.exportNames = exportNames
+      module.exportValues = exportValues
     }
   }
   modules[path] = module
@@ -100,10 +100,12 @@ nodeApi.replace(/const ([^=]+) = require\('([^']+)'\)/g, (match, imported, id) =
   }
 })
 
+// TODO: check that imports are matching the list in dist/index.js & dist/index.mjs
+
 const promisified = []
 nodeApi.replace(/(\w+): promisify\(\w+\)/g, (match, api) => promisified.push(api))
 
-writeFileSync('dist/core.js', `module.exports=function({${imports.join(',')}}){\n`)
+writeFileSync('dist/core.js', `module.exports=function(${imports.join(',')}){\n`)
 promisified.forEach(api => writeFileSync('dist/core.js', `${api}=promisify(${api})\n`, { flag: 'a' }))
 
 const written = ['node-api.js']
@@ -115,13 +117,19 @@ while (remaining.length) {
     console.error('Unable to complete.')
     process.exit(-1)
   }
-  const { path, content, exports } = remaining[pos]
+  const { path, content, exports, exportValues } = remaining[pos]
   remaining.splice(pos, 1)
   written.push(path)
   writeFileSync('dist/core.js', `// BEGIN OF ${path}\n`, { flag: 'a' })
   const transformed = `const ${exports} = (() => {${content
     .replace(/'use strict'\s*\n/g, '') // No more required
     .replace(/const [^\n]*= require\('[^']+node-api'\)/g, dependencies => '') // No more required
+    // .replace(/module\.exports\s+=\s+\{([^^}]*)\}/, match => {
+    //   if (exportValues) {
+    //     return `return [${exportValues.join(', ')}]`
+    //   }
+    //   return match
+    // })
     .replace(/module\.exports\s*=/, 'return')
     .replace(/require\('([^']*)'\)/g, (match, id) => {
       if (id.endsWith('node-api')) {
