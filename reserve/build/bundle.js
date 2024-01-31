@@ -13,6 +13,10 @@ const modules = {
   }
 }
 
+let exportIndex = 0
+const exportSymbols = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+const getNewExportName = path => `x${exportSymbols[exportIndex++]}`
+
 while (stack.length) {
   const path = stack.shift()
   if (Object.keys(modules).includes(path)) {
@@ -59,7 +63,7 @@ while (stack.length) {
   if (path === 'index.js') {
     module.exports = 'reserve'
   } else {
-    module.exports = `$export_${path.replace('.js', '').replace('/', '_')}`
+    module.exports = getNewExportName(path)
     const exportNames = []
     const exportValues = []
     const exports = content.match(/module\.exports\s+=\s+\{([^^}]*)\}/)
@@ -111,6 +115,20 @@ promisified.forEach(api => writeFileSync('dist/core.js', `${api}=promisify(${api
 const written = ['node-api.js']
 const remaining = Object.values(modules).filter(({ path }) => !written.includes(path))
 
+const getModule = (path, id) => {
+  if (modules[id]) {
+    return modules[id]
+  }
+  const depPath = join(dirname(path), id).replace('\\', '/') + '.js'
+  const moduleName = Object.keys(modules)
+    .filter(path => depPath.endsWith(path))
+    .sort((name1, name2) => name2.length - name1.length)[0] // keep longer match
+  if (moduleName) {
+    return modules[moduleName]
+  }
+  throw new Error(`Unexpected require '${id}' from '${path}'`)
+}
+
 while (remaining.length) {
   const pos = remaining.findIndex(module => Object.keys(module.depends).every(dep => written.includes(dep)))
   if (pos === -1) {
@@ -124,28 +142,43 @@ while (remaining.length) {
   const transformed = `const ${exports} = (() => {${content
     .replace(/'use strict'\s*\n/g, '') // No more required
     .replace(/const [^\n]*= require\('[^']+node-api'\)/g, dependencies => '') // No more required
-    // .replace(/module\.exports\s+=\s+\{([^^}]*)\}/, match => {
-    //   if (exportValues) {
-    //     return `return [${exportValues.join(', ')}]`
-    //   }
-    //   return match
-    // })
+    // Convert exports into return, replace dictionary with an array
+    .replace(/module\.exports\s+=\s+\{([^^}]*)\}/, match => {
+      if (exportValues) {
+        return `return [${exportValues.join(', ')}]`
+      }
+      return match
+    })
+    // Convert exports into return
     .replace(/module\.exports\s*=/, 'return')
+    // Convert named imports into array import
+    .replace(/const\s+{([^^}]*)\}\s*=\s*require\('([^']*)'\)/g, (match, imports, id) => {
+      if (id.endsWith('node-api')) {
+        return match
+      }
+      const names = imports
+        .split('\n')
+        .map(line => line.trim().split(',').map(part => part.trim()))
+        .flat()
+        .filter(name => !!name)
+      const { exportNames, exports, path: modulePath } = getModule(path, id)
+      if (!exportNames) {
+        return match
+      }
+      if (!exportNames) {
+        throw new Error(`Unexpected empty export names for ${id} (${modulePath}) from ${path}`)
+      }
+      const importedNames = exportNames.map(name => names.includes(name) ? name : undefined)
+        .join(',')
+        .replace(/,*$/, '') // trim ending ,
+      return `const [${importedNames}] = ${exports}`
+    })
+    // Convert require with the $export_ variable
     .replace(/require\('([^']*)'\)/g, (match, id) => {
       if (id.endsWith('node-api')) {
         return match
       }
-      if (modules[id]) {
-        return modules[id].exports
-      }
-      const depPath = join(dirname(path), id).replace('\\', '/') + '.js'
-      const moduleName = Object.keys(modules)
-        .filter(path => depPath.endsWith(path))
-        .sort((name1, name2) => name2.length - name1.length)[0] // keep longer match
-      if (moduleName !== undefined) {
-        return modules[moduleName].exports
-      }
-      throw new Error(`Unexpected require '${id}'`)
+      return getModule(path, id).exports
     })
   }})()`
   writeFileSync('dist/core.js', transformed, { flag: 'a' })
