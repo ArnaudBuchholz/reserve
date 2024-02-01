@@ -264,9 +264,15 @@ async function main () {
 
   const task = async () => {
     const id = ++tasksStarted
-    const start = performance.now()
-    await callback(id)
-    const end = performance.now()
+    let start, end
+    try {
+      start = performance.now()
+      await callback(id)
+      end = performance.now()
+    } catch (e) {
+      console.error(e)
+      process.exit(-1)
+    }
     const timeSpent = end - start
     totalTimeSpent += timeSpent
     timeSpentSinceLastTick += timeSpent
