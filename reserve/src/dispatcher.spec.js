@@ -26,35 +26,35 @@ const defaultConfigurationPromise = check({
       return 405
     }
   }, {
-    match: '/redirect',
+    match: /^\/redirect/,
     custom: async function redirect () {
       return '/file.txt'
     }
   }, {
-    match: '/404',
+    match: /^\/404/,
     custom: async function err404 () {
       return 404
     }
   }, {
-    match: '/fail',
+    match: /^\/fail/,
     fail: true
   }, {
-    match: '/throw',
+    match: /^\/throw/,
     custom: function throw_ () {
       throw new Error()
     }
   }, {
-    match: '/reject',
+    match: /^\/reject/,
     custom: function reject () {
       return Promise.reject(new Error())
     }
   }, {
-    match: '(.*)',
+    match: /^(.*)$/,
     custom: async function setXFlag (request, response) {
       response.setHeader('x-flag', 'true')
     }
   }, {
-    match: '/file.txt',
+    match: /^\/file\.txt/,
     'invert-match': true,
     custom: async function setXNotFile (request, response) {
       response.setHeader('x-not-file', 'true')
@@ -86,15 +86,15 @@ const defaultConfigurationPromise = check({
     }
   }, {
     cwd: '/',
-    match: '/subst/(.*)/(.*)',
+    match: /^\/subst\/(.*)\/(.*)/,
     file: '/$1.$2'
   }, {
     cwd: '/',
-    match: '/subst-complex/(.*)/(.*)',
+    match: /^\/subst-complex\/(.*)\/(.*)/,
     file: '/$1$$1.$2$3'
   }, {
     cwd: '/',
-    match: '/file.txt',
+    match: /^\/file\.txt/,
     file: '/file.txt'
   }]
 })
@@ -109,7 +109,9 @@ async function dispatch ({ configurationPromise, events, request, beforeWait }) 
   if (typeof request === 'string') {
     request = { method: 'GET', url: request }
   }
-  request = new Request(request)
+  if (!(request instanceof Request)) {
+    request = new Request(request)
+  }
   if (!configurationPromise) {
     configurationPromise = defaultConfigurationPromise
   }
@@ -488,6 +490,20 @@ describe('dispatcher', () => {
           assert.strictEqual(response.toString(), 'Hello World!')
         })
       )
+    })
+  })
+
+  describe('URL normalization', () => {
+    it('avoids path traversal by normalizing the URL if needed', () => {
+      const request = new Request('GET')
+      request.setForgedUrl('/../file.txt')
+      return dispatch({ request })
+        .then(({ emitted, response }) => {
+          assert.ok(!hasError(emitted))
+          assert.strictEqual(response.statusCode, 200)
+          assert.strictEqual(response.headers['Content-Type'], textMimeType)
+          assert.strictEqual(response.toString(), 'Hello World!')
+        })
     })
   })
 })
