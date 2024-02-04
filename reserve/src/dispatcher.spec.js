@@ -493,7 +493,7 @@ describe('dispatcher', () => {
     })
   })
 
-  describe.only('URL normalization for security', () => {
+  describe('URL normalization for security', () => {
     it('avoids path traversal by normalizing the URL if needed (using root ../)', () => {
       const request = new Request('GET')
       request.setForgedUrl('/../file.txt')
@@ -551,6 +551,30 @@ describe('dispatcher', () => {
           assert.strictEqual(response.statusCode, 200)
           assert.strictEqual(response.headers['Content-Type'], textMimeType)
           assert.strictEqual(response.toString(), 'Hello World!')
+        })
+    })
+
+    for (let i = 1; i < 32; ++i) {
+      it('works around forbidden chars', () => {
+        const request = new Request('GET')
+        request.setForgedUrl(`/test/%2E%2E/file%${Number(i).toString(8).padStart(2, '0')}.txt`)
+        return dispatch({ request })
+          .then(({ emitted, response }) => {
+            assert.ok(!hasError(emitted))
+            assert.strictEqual(response.statusCode, 200)
+            assert.strictEqual(response.headers['Content-Type'], textMimeType)
+            assert.strictEqual(response.toString(), 'Hello World!')
+          })
+      })
+    }
+
+    it('rejects malformed URLs', () => {
+      const request = new Request('GET')
+      request.setForgedUrl('/test/%2E%2E/file%0.txt')
+      return dispatch({ request })
+        .then(({ emitted, response }) => {
+          assert.ok(!hasError(emitted))
+          assert.strictEqual(response.statusCode, 400)
         })
     })
   })

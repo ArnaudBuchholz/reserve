@@ -137,8 +137,12 @@ function dispatch (context, url, index = 0) {
 module.exports = function (configuration, request, response) {
   let { url } = request
   if (url.indexOf('.') !== -1 || url.indexOf('%') !== -1) {
-    const { pathname, search, hash } = new URL(url, 'p:/')
-    url = decodeURIComponent(pathname) + search + hash
+    try {
+      const { pathname, search, hash } = new URL(url, 'p:/')
+      url = decodeURIComponent(pathname.replace(/%0\d|%1\d/g, '')) + search + hash
+    } catch (e) {
+      url = 400
+    }
   }
 
   const {
@@ -152,6 +156,7 @@ module.exports = function (configuration, request, response) {
     id,
     internal: !!request[$requestInternal],
     method: request.method,
+    incomingUrl: request.url,
     url,
     headers: { ...request.headers },
     start: new Date(),
