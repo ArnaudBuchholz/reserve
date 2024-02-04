@@ -1,6 +1,6 @@
 'use strict'
 
-const { text, json } = require('./mime')
+const { text, json } = require('../mime')
 
 module.exports = function (request, options = {}) {
   let type

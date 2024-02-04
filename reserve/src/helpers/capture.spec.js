@@ -4,7 +4,7 @@ const { describe, it, before } = require('mocha')
 const assert = require('assert')
 const { notExpected } = require('test-tools')
 const capture = require('./capture')
-const Response = require('./mock/Response')
+const Response = require('../mock/Response')
 const { readFile } = require('fs')
 const zlib = require('zlib')
 

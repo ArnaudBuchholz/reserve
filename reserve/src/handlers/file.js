@@ -2,7 +2,7 @@
 
 const { basename, createReadStream, dirname, join, readdir, stat } = require('../node-api')
 const { $handlerPrefix, $fileCache } = require('../symbols')
-const send = require('../send')
+const send = require('../helpers/send')
 const mimeTypes = require('../mime')
 const smartImport = require('../smartImport')
 const cacheFactory = require('punycache')

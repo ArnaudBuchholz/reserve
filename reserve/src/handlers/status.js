@@ -2,7 +2,7 @@
 
 const interpolate = require('../interpolate')
 const { $handlerPrefix } = require('../symbols')
-const send = require('../send')
+const send = require('../helpers/send')
 
 const byStatus = {
   403: 'Forbidden',

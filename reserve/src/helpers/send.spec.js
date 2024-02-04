@@ -4,7 +4,7 @@ const { describe, it, beforeEach } = require('mocha')
 const assert = require('assert')
 const { Readable } = require('stream')
 const send = require('./send')
-const Response = require('./mock/Response')
+const Response = require('../mock/Response')
 
 describe('send', () => {
   let response

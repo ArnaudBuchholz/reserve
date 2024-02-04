@@ -1,7 +1,7 @@
 'use strict'
 
-const { pipeline } = require('./node-api')
-const { bin, text, json } = require('./mime')
+const { pipeline } = require('../node-api')
+const { bin, text, json } = require('../mime')
 
 const CONTENT_TYPE = 'content-type'
 const CONTENT_LENGTH = 'content-length'
