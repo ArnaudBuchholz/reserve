@@ -249,9 +249,9 @@ async function test (config, base) {
     statusCode: 200,
     headers: {
       'content-type': 'text/plain',
-      'content-length': '17'
+      'content-length': '13'
     },
-    body: 'Hello%20World%20!'
+    body: 'Hello World !'
   })
   await match({
     method: 'POST',

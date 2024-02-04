@@ -3,6 +3,7 @@
 const { performance } = require('./node-api')
 const logError = require('./logError')
 const interpolate = require('./interpolate')
+const normalize = require('./normalize')
 const {
   EVENT_INCOMING,
   EVENT_ERROR,
@@ -135,16 +136,7 @@ function dispatch (context, url, index = 0) {
 }
 
 module.exports = function (configuration, request, response) {
-  let { url } = request
-  if (url.indexOf('.') !== -1 || url.indexOf('%') !== -1) {
-    try {
-      const { pathname, search, hash } = new URL(url, 'p:/')
-      url = decodeURIComponent(pathname.replace(/%0\d|%1\d/g, '')) + search + hash
-    } catch (e) {
-      url = 400
-    }
-  }
-
+  const url = normalize(request.url)
   const {
     [$configurationRequests]: configurationRequests,
     [$configurationEventEmitter]: emit
