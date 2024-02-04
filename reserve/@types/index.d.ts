@@ -214,7 +214,8 @@ declare module 'reserve' {
 
   type ServerEventIncoming = {
     method: string
-    url: string
+    incomingUrl: string // before normalization
+    url: string // after normalization
     headers: Headers
     start: Date
     perfDate: number
