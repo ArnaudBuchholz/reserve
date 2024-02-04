@@ -493,10 +493,58 @@ describe('dispatcher', () => {
     })
   })
 
-  describe('URL normalization', () => {
-    it('avoids path traversal by normalizing the URL if needed', () => {
+  describe.only('URL normalization for security', () => {
+    it('avoids path traversal by normalizing the URL if needed (using root ../)', () => {
       const request = new Request('GET')
       request.setForgedUrl('/../file.txt')
+      return dispatch({ request })
+        .then(({ emitted, response }) => {
+          assert.ok(!hasError(emitted))
+          assert.strictEqual(response.statusCode, 200)
+          assert.strictEqual(response.headers['Content-Type'], textMimeType)
+          assert.strictEqual(response.toString(), 'Hello World!')
+        })
+    })
+
+    it('avoids path traversal by normalizing the URL if needed (using intermediate ../)', () => {
+      const request = new Request('GET')
+      request.setForgedUrl('/test/../file.txt')
+      return dispatch({ request })
+        .then(({ emitted, response }) => {
+          assert.ok(!hasError(emitted))
+          assert.strictEqual(response.statusCode, 200)
+          assert.strictEqual(response.headers['Content-Type'], textMimeType)
+          assert.strictEqual(response.toString(), 'Hello World!')
+        })
+    })
+
+    it('avoids path traversal by normalizing the URL if needed (using root %2E%2E/)', () => {
+      const request = new Request('GET')
+      request.setForgedUrl('/%2E%2E/file.txt')
+      return dispatch({ request })
+        .then(({ emitted, response }) => {
+          assert.ok(!hasError(emitted))
+          assert.strictEqual(response.statusCode, 200)
+          assert.strictEqual(response.headers['Content-Type'], textMimeType)
+          assert.strictEqual(response.toString(), 'Hello World!')
+        })
+    })
+
+    it('avoids path traversal by normalizing the URL if needed (using intermediate %2E%2E/)', () => {
+      const request = new Request('GET')
+      request.setForgedUrl('/test/%2E%2E/file.txt')
+      return dispatch({ request })
+        .then(({ emitted, response }) => {
+          assert.ok(!hasError(emitted))
+          assert.strictEqual(response.statusCode, 200)
+          assert.strictEqual(response.headers['Content-Type'], textMimeType)
+          assert.strictEqual(response.toString(), 'Hello World!')
+        })
+    })
+
+    it('works around poison null attack', () => {
+      const request = new Request('GET')
+      request.setForgedUrl('/test/%2E%2E/file%00.txt')
       return dispatch({ request })
         .then(({ emitted, response }) => {
           assert.ok(!hasError(emitted))

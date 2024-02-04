@@ -135,6 +135,12 @@ function dispatch (context, url, index = 0) {
 }
 
 module.exports = function (configuration, request, response) {
+  let { url } = request
+  if (url.indexOf('.') !== -1 || url.indexOf('%') !== -1) {
+    const { pathname, search, hash } = new URL(url, 'p:/')
+    url = decodeURIComponent(pathname) + search + hash
+  }
+
   const {
     [$configurationRequests]: configurationRequests,
     [$configurationEventEmitter]: emit
@@ -146,7 +152,7 @@ module.exports = function (configuration, request, response) {
     id,
     internal: !!request[$requestInternal],
     method: request.method,
-    url: request.url,
+    url,
     headers: { ...request.headers },
     start: new Date(),
     perfStart: performance.now()
@@ -175,9 +181,9 @@ module.exports = function (configuration, request, response) {
   contexts[id] = context
 
   if (configurationRequests.holding) {
-    configurationRequests.holding.then(() => dispatch(context, request.url))
+    configurationRequests.holding.then(() => dispatch(context, url))
   } else {
-    dispatch(context, request.url)
+    dispatch(context, url)
   }
 
   return dispatching
