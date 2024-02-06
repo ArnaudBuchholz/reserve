@@ -4,7 +4,7 @@ const { basename, createReadStream, dirname, join, readdir, stat } = require('..
 const { $handlerPrefix, $fileCache } = require('../symbols')
 const send = require('../helpers/send')
 const mimeTypes = require('../mime')
-const smartImport = require('../smartImport')
+const smartImport = require('../helpers/smartImport')
 const cacheFactory = require('punycache')
 
 const $customFileSystem = 'custom-file-system'
@@ -178,7 +178,7 @@ module.exports = {
     }
   },
   redirect: ({ request, mapping, redirect, response }) => {
-    let filePath = /([^?#]+)/.exec(unescape(redirect))[1] // filter URL parameters & hash
+    let filePath = /([^?#]+)/.exec(redirect)[1] // filter URL parameters & hash
     filePath = join(mapping.cwd, filePath)
     if (!filePath.startsWith(mapping.cwd)) {
       return Promise.resolve()

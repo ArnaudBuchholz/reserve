@@ -1,6 +1,6 @@
 'use strict'
 
-const { Socket } = require('./node-api')
+const { Socket } = require('../node-api')
 
 module.exports = function (port, {
   timeout = 400,

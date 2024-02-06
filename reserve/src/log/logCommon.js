@@ -1,6 +1,6 @@
 'use strict'
 
-const { log, error } = require('./console')
+const { log, error } = require('../console')
 
 module.exports = function (type, showId, ...text) {
   let method

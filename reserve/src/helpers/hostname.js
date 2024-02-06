@@ -1,4 +1,4 @@
-const { networkInterfaces } = require('./node-api')
+const { networkInterfaces } = require('../node-api')
 
 module.exports = () => {
   let hostname = '127.0.0.1'

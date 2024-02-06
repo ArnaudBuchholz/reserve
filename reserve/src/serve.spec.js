@@ -3,7 +3,7 @@
 const { describe, it } = require('mocha')
 const assert = require('assert')
 const serve = require('./serve')
-const { read } = require('./configuration')
+const { read } = require('./config/configuration')
 const http = require('http').__unmocked__
 
 function promisify (configuration, callback) {

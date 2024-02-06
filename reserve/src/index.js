@@ -1,6 +1,6 @@
 'use strict'
 
-const { check, read } = require('./configuration')
+const { check, read } = require('./config/configuration')
 
 module.exports = {
   Request: require('./mock/Request'),
@@ -8,8 +8,8 @@ module.exports = {
   body: require('./helpers/body'),
   capture: require('./helpers/capture'),
   check,
-  interpolate: require('./interpolate'),
-  log: require('./log'),
+  interpolate: require('./helpers/interpolate'),
+  log: require('./log/log'),
   mock: require('./mock'),
   punycache: require('punycache'),
   read,

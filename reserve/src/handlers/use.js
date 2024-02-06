@@ -1,7 +1,7 @@
 'use strict'
 
 const { $useMiddleware, $handlerPrefix } = require('../symbols')
-const smartImport = require('../smartImport')
+const smartImport = require('../helpers/smartImport')
 
 module.exports = {
   [$handlerPrefix]: 'use',

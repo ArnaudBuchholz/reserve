@@ -1,14 +1,14 @@
 'use strict'
 
 const checkMapping = require('./checkMapping')
-const dispatcher = require('./dispatcher')
+const dispatcher = require('../dispatcher')
 const {
   $configuration,
   $configurationRequests,
   $mappingChecked,
   $requestId,
   $requestInternal
-} = require('./symbols')
+} = require('../symbols')
 
 async function checkMappings (configuration, mappings) {
   for (const mapping of mappings) {

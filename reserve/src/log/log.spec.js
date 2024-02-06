@@ -3,7 +3,7 @@
 const { describe, it, before, beforeEach } = require('mocha')
 const assert = require('assert')
 const { console: { clean, collect } } = require('test-tools')
-const { log } = require('./index')
+const { log } = require('../index')
 const {
   newEventEmitter,
   EVENT_CREATED,
@@ -14,7 +14,7 @@ const {
   EVENT_REDIRECTING,
   EVENT_ABORTED,
   EVENT_CLOSED
-} = require('./event')
+} = require('../event')
 
 describe('log', () => {
   beforeEach(clean)

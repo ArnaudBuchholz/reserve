@@ -1,9 +1,9 @@
 'use strict'
 
 const { performance } = require('./node-api')
-const logError = require('./logError')
-const interpolate = require('./interpolate')
-const normalize = require('./normalize')
+const logError = require('./log/logError')
+const interpolate = require('./helpers/interpolate')
+const normalize = require('./helpers/normalize')
 const {
   EVENT_INCOMING,
   EVENT_ERROR,

@@ -6,7 +6,7 @@ const {
   $customCallback,
   $customRedirect
 } = require('../symbols')
-const smartImport = require('../smartImport')
+const smartImport = require('../helpers/smartImport')
 
 function withMatch (callback, request, response, [, ...additional]) {
   return callback.call(this, request, response, ...additional)

@@ -2,10 +2,11 @@
 
 const Request = require('../../src/mock/Request')
 const Response = require('../../src/mock/Response')
-const IConfiguration = require('../../src/iconfiguration')
-const checkMapping = require('../../src/checkMapping')
-const { checkHandler } = require('../../src/configuration')
+const IConfiguration = require('../../src/config/iconfiguration')
+const checkMapping = require('../../src/config/checkMapping')
+const { checkHandler } = require('../../src/config/configuration')
 const { $handlerPrefix, $configurationInterface } = require('../../src/symbols')
+const normalize = require('../../src/helpers/normalize')
 
 const $checked = Symbol('mapping-already-checked')
 
@@ -42,7 +43,7 @@ module.exports = (handler, defaults = {}) => {
           request,
           response,
           mapping,
-          redirect: redirect || request.url
+          redirect: redirect || normalize(request.url)
         })
         return { mapping, redirected, request, response }
       })

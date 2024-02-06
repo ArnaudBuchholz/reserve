@@ -1,6 +1,6 @@
 'use strict'
 
-const { readFile, stat, dirname, isAbsolute, join } = require('./node-api')
+const { readFile, stat, dirname, isAbsolute, join } = require('../node-api')
 const IConfiguration = require('./iconfiguration')
 const checkMapping = require('./checkMapping')
 const checkMethod = require('./checkMethod')
@@ -11,15 +11,15 @@ const {
   $handlerPrefix,
   $handlerMethod,
   $handlerSchema
-} = require('./symbols')
-const smartImport = require('./smartImport')
+} = require('../symbols')
+const smartImport = require('../helpers/smartImport')
 
 const defaultHandlers = [
-  require('./handlers/custom'),
-  require('./handlers/file'),
-  require('./handlers/status'),
-  require('./handlers/url'),
-  require('./handlers/use')
+  require('../handlers/custom'),
+  require('../handlers/file'),
+  require('../handlers/status'),
+  require('../handlers/url'),
+  require('../handlers/use')
 ].reduce((handlers, handler) => {
   handlers[handler[$handlerPrefix]] = handler
   return handlers

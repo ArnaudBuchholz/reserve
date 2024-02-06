@@ -1,6 +1,6 @@
 'use strict'
 
-const { check } = require('./configuration')
+const { check } = require('./config/configuration')
 const dispatcher = require('./dispatcher')
 const { newEventEmitter, EVENT_CREATED, EVENT_READY } = require('./event')
 const Request = require('./mock/Request')
@@ -9,7 +9,7 @@ const {
   $configurationEventEmitter,
   $configurationInterface
 } = require('./symbols')
-const getHostName = require('./hostname')
+const getHostName = require('./helpers/hostname')
 
 module.exports = (jsonConfiguration, mockedHandlers = {}) => {
   const { on, emit } = newEventEmitter()

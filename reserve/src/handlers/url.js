@@ -2,9 +2,9 @@
 
 const { http, https } = require('../node-api')
 const headersFactory = require('../mock/headers')
-const defer = require('../defer')
+const defer = require('../helpers/defer')
 const { $handlerPrefix } = require('../symbols')
-const smartImport = require('../smartImport')
+const smartImport = require('../helpers/smartImport')
 
 const http2ForbiddenResponseHeaders = [
   'transfer-encoding',

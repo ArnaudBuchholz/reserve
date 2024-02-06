@@ -3,7 +3,7 @@
 const { describe, it, before } = require('mocha')
 const assert = require('assert')
 const mock = require('./mock')
-const { read } = require('./configuration')
+const { read } = require('./config/configuration')
 
 function waitForReady (server) {
   return new Promise(resolve => {

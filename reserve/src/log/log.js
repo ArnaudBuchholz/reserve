@@ -1,6 +1,6 @@
 'use strict'
 
-const { log } = require('./console')
+const { log } = require('../console')
 const logCommon = require('./logCommon')
 const logError = require('./logError')
 

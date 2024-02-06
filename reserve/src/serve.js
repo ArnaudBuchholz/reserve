@@ -2,15 +2,15 @@
 
 const { http, http2, https } = require('./node-api')
 const { newEventEmitter, EVENT_CREATED, EVENT_READY, EVENT_ERROR } = require('./event')
-const { check } = require('./configuration')
+const { check } = require('./config/configuration')
 const dispatcher = require('./dispatcher')
 const {
   $configurationEventEmitter,
   $configurationInterface
 } = require('./symbols')
-const defer = require('./defer')
-const getHostName = require('./hostname')
-const portIsUsed = require('./portIsUsed')
+const defer = require('./helpers/defer')
+const getHostName = require('./helpers/hostname')
+const portIsUsed = require('./helpers/portIsUsed')
 
 function createServer (configuration, requestHandler) {
   const { httpOptions } = configuration

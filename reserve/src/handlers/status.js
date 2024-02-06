@@ -1,6 +1,6 @@
 'use strict'
 
-const interpolate = require('../interpolate')
+const interpolate = require('../helpers/interpolate')
 const { $handlerPrefix } = require('../symbols')
 const send = require('../helpers/send')
 

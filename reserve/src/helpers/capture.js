@@ -1,7 +1,7 @@
 'use strict'
 
 const { pipeline, zlib } = require('../node-api')
-const defer = require('../defer')
+const defer = require('./defer')
 
 const decoderFactories = {
   gzip: zlib.createGunzip,

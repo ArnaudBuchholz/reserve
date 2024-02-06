@@ -10,7 +10,7 @@ const {
   $mappingChecked,
   $mappingMatch,
   $mappingMethod
-} = require('./symbols')
+} = require('../symbols')
 
 function checkCwd (configuration, mapping) {
   if (!mapping.cwd) {

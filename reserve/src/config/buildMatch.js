@@ -1,6 +1,6 @@
 'use strict'
 
-const { $mappingMethod } = require('./symbols')
+const { $mappingMethod } = require('../symbols')
 
 const methods = [
   function (request, url) {

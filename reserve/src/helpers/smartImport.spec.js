@@ -5,7 +5,7 @@ const smartImport = require('./smartImport')
 const assert = require('assert')
 const { join } = require('path')
 
-const base = join(__dirname, '../tests')
+const base = join(__dirname, '../../tests')
 
 describe('smartImport', () => {
   it('imports CommonJS file if ending with .cjs', async () => {
