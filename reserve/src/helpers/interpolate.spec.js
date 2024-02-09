@@ -20,7 +20,7 @@ function compare (result, expected) {
 
 const match = [0, 'a', 'b', '%26', '%20']
 
-describe('interpolate', () => {
+describe('helpers/interpolate', () => {
   describe('string', () => {
     it('substitutes capturing groups', () => {
       assert.strictEqual(interpolate(match, '$1$2'), 'ab')

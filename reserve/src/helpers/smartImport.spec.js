@@ -7,7 +7,7 @@ const { join } = require('path')
 
 const base = join(__dirname, '../../tests')
 
-describe('smartImport', () => {
+describe('helpers/smartImport', () => {
   it('imports CommonJS file if ending with .cjs', async () => {
     const func = await smartImport(join(base, 'import.cjs'))
     assert.strictEqual(typeof func, 'function')

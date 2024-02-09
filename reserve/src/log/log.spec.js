@@ -16,7 +16,7 @@ const {
   EVENT_CLOSED
 } = require('../event')
 
-describe('log', () => {
+describe('log/log', () => {
   beforeEach(clean)
 
   describe('non verbose', () => {

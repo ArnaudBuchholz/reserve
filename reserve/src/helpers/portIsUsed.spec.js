@@ -5,7 +5,7 @@ const assert = require('assert')
 const portIsUsed = require('./portIsUsed')
 const http = require('http').__unmocked__
 
-describe('portIsUsed', () => {
+describe('helpers/portIsUsed', () => {
   it('detects that the port is not used', async () => {
     assert.strictEqual(await portIsUsed(80), false)
   })

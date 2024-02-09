@@ -24,7 +24,7 @@ function test (method, expected, allowed) {
   }
 }
 
-describe('checkMethod', () => {
+describe('config/checkMethod', () => {
   describe('value validation', () => {
     it('ignores undefined', test(undefined, undefined))
     it('validates string', test('post', ['POST']))

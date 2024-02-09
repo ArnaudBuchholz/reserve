@@ -4,7 +4,7 @@ const { describe, it } = require('mocha')
 const assert = require('assert')
 const normalize = require('./normalize')
 
-describe('normalize', () => {
+describe('helpers/normalize', () => {
   const tests = {
     'file.txt': '/file.txt',
     '/../file.txt': '/file.txt',

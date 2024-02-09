@@ -7,7 +7,7 @@ const { parse, validate } = require('./schema')
 /* istanbul ignore next */ // Will not be called
 function noop () {}
 
-describe('schema', () => {
+describe('config/schema', () => {
   describe('parsing', () => {
     it('expands property reduced to a type specification', () => {
       const schema = parse({

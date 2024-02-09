@@ -58,7 +58,7 @@ function write (stream, content, steps, useEnd) {
   loop()
 }
 
-describe('capture', () => {
+describe('helpers/capture', () => {
   let loremIpsum
 
   before(async () => {

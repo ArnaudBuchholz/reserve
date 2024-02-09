@@ -66,7 +66,7 @@ const handler = {
   }
 }
 
-describe('iconfiguration', () => {
+describe('config/iconfiguration', () => {
   describe('validate', () => {
     it('passes mapping and configuration to the validate method', () => check({
       handlers: {

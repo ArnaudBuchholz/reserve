@@ -6,7 +6,7 @@ const { Readable } = require('stream')
 const send = require('./send')
 const Response = require('../mock/Response')
 
-describe('send', () => {
+describe('helpers/send', () => {
   let response
 
   beforeEach(() => {

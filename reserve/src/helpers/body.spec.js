@@ -23,7 +23,7 @@ function request (chunks, headers) {
   return stream
 }
 
-describe('body', () => {
+describe('helpers/body', () => {
   describe('without headers', () => {
     it('deserializes the request body', async () => body(request([
       'Hello',

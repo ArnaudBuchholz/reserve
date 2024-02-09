@@ -5,7 +5,7 @@ const assert = require('assert')
 const { console: { clean, collect } } = require('test-tools')
 const logError = require('./logError')
 
-describe('logError', () => {
+describe('log/logError', () => {
   beforeEach(clean)
 
   it('logs errors non related to requests', () => {

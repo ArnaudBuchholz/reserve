@@ -15,7 +15,7 @@ async function okHandler () {
   return 'OK'
 }
 
-describe('configuration', () => {
+describe('config/configuration', () => {
   describe('configuration.read', () => {
     beforeEach(() => {
       process.mockCwd('/')
