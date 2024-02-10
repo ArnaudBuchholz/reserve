@@ -13,9 +13,6 @@ module.exports = match => {
     throw new Error('Invalid value for match')
   }
   if (regexpClues.some(clue => match.includes(clue))) {
-    if (match.startsWith('/')) {
-      match = '^' + match
-    }
     return new RegExp(match)
   }
   return new RegExp(`^${

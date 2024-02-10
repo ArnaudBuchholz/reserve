@@ -100,10 +100,10 @@ describe('config/parseMatch', () => {
         assert.strictEqual(re.toString(), '/a{3,}/')
       })
 
-      it('adds the startWith operator if starting with /', () => {
+      it('keeps the regular expression as-is', () => {
         const re = parseMatch('/a*')
         assert.ok(re instanceof RegExp)
-        assert.strictEqual(re.toString(), '/^\\/a*/')
+        assert.strictEqual(re.toString(), '/\\/a*/')
       })
     })
 
