@@ -4,54 +4,32 @@ const { describe, it } = require('mocha')
 const assert = require('assert')
 const interpolate = require('./interpolate')
 
-function compare (result, expected) {
-  const keys = Object.keys(expected)
-  assert.strictEqual(keys.length, Object.keys(result).length)
-  keys.forEach(key => {
-    const expectedValue = expected[key]
-    const value = result[key]
-    if (typeof expectedValue === 'object') {
-      compare(value, expectedValue)
-    } else {
-      assert.strictEqual(expectedValue, value)
-    }
-  })
-}
-
-const match = [0, 'a', 'b', '%26', '%20']
-
 describe('helpers/interpolate', () => {
   describe('string', () => {
     it('substitutes capturing groups', () => {
-      assert.strictEqual(interpolate(match, '$1$2'), 'ab')
+      assert.strictEqual(interpolate([0, 'a', 'b'], '$1$2'), 'ab')
     })
 
     it('ignores non captured groups', () => {
-      assert.strictEqual(interpolate(match, '$1$99$2'), 'ab')
+      assert.strictEqual(interpolate([0, 'a', 'b'], '$1$99$2'), 'ab')
     })
 
     it('substitutes all occurrences of capturing groups', () => {
-      assert.strictEqual(interpolate(match, '$1$2$1$2'), 'abab')
+      assert.strictEqual(interpolate([0, 'a', 'b'], '$1$2$1$2'), 'abab')
+    })
+
+    it('substitutes all occurrences of named capturing groups', () => {
+      assert.strictEqual(interpolate({ groups: { id: 'a' } }, '$id$id'), 'aa')
     })
 
     it('unescapes $$', () => {
-      assert.strictEqual(interpolate(match, '$1$$$2'), 'a$b')
-    })
-
-    describe('decoding capturing groups', () => {
-      it('decodes with decodeURI ($&3)', () => {
-        assert.strictEqual(interpolate(match, '$&1$&2$&3$&4'), 'ab%26 ')
-      })
-
-      it('decodes with decodeURIComponent ($%3)', () => {
-        assert.strictEqual(interpolate(match, '$%1$%2$%3$%4'), 'ab& ')
-      })
+      assert.strictEqual(interpolate([0, 'a', 'b'], '$1$$$2'), 'a$b')
     })
   })
 
   describe('object', () => {
     it('interpolates properties', () => {
-      compare(interpolate(match, {
+      assert.deepStrictEqual(interpolate([0, 'a', 'b'], {
         a: '<$1>',
         b: '$$$2',
         string: 'string',
@@ -67,7 +45,7 @@ describe('helpers/interpolate', () => {
     })
 
     it('interpolates recursively', () => {
-      compare(interpolate(match, {
+      assert.deepStrictEqual(interpolate([0, 'a', 'b'], {
         c: {
           a: '<$1>',
           b: '$$$2'

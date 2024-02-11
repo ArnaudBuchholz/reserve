@@ -1,20 +1,14 @@
 'use strict'
 
-const unescape = {
-  '&': decodeURI,
-  '%': decodeURIComponent
-}
-
 const interpolatorsByType = {
-  string: (match, value) => value.replace(/\$(%|&)?(\d+)|\$\$/g, (token, sUnescapeType, sIndex) => {
-    if (!sIndex) {
-      return '$'
+  string: (match, value) => value.replace(/\$(\d+)|\$(\w+)|\$\$/g, (token, index, name) => {
+    if (index) {
+      return match[index] || ''
     }
-    const string = match[sIndex] || ''
-    if (sUnescapeType) {
-      return unescape[sUnescapeType](string)
+    if (name) {
+      return (match.groups && match.groups[name]) || ''
     }
-    return string
+    return '$'
   }),
 
   object: (match, object) => {
