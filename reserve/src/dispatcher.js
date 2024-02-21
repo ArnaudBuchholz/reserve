@@ -20,6 +20,7 @@ const {
   $requestInternal,
   $configurationEventEmitter
 } = require('./symbols')
+const defer = require('./helpers/defer')
 
 function emitError ({ emit, emitParameters }, reason) {
   const handled = emit(EVENT_ERROR, emitParameters, { reason })
@@ -155,8 +156,7 @@ module.exports = function (configuration, request, response) {
     perfStart: performance.now()
   }
 
-  let dispatched
-  const dispatching = new Promise(resolve => { dispatched = resolve })
+  const [dispatching, dispatched] = defer()
 
   const context = {
     configuration,
