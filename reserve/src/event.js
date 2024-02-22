@@ -52,6 +52,7 @@ function newEventEmitter () {
 }
 
 module.exports = {
+  newEventEmitter,
   EVENT_CREATED: 0,
   EVENT_READY: 1,
   EVENT_INCOMING: 2,
@@ -59,6 +60,5 @@ module.exports = {
   EVENT_REDIRECTING: 4,
   EVENT_REDIRECTED: 5,
   EVENT_ABORTED: 6,
-  EVENT_CLOSED: 7,
-  newEventEmitter
+  EVENT_CLOSED: 7
 }

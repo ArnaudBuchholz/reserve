@@ -17,6 +17,8 @@ let exportIndex = 0
 const exportSymbols = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 const getNewExportName = path => `x${exportSymbols[exportIndex++]}`
 
+const aliases = {}
+
 while (stack.length) {
   const path = stack.shift()
   if (Object.keys(modules).includes(path)) {
@@ -79,8 +81,12 @@ while (stack.length) {
           if (!name.match(/^\$?\w+$/i)) {
             throw new Error(`Invalid export "${name}" for module ${path}`)
           }
-          exportNames.push(name)
-          exportValues.push(value || name)
+          if (value && value.match(/^\d+$/)) {
+            aliases[name] = value
+          } else {
+            exportNames.push(name)
+            exportValues.push(value || name)
+          }
         })
     }
     if (exportNames.length) {
@@ -171,7 +177,10 @@ while (remaining.length) {
       const importedNames = exportNames.map(name => names.includes(name) ? name : undefined)
         .join(',')
         .replace(/,*$/, '') // trim ending ,
-      return `const [${importedNames}] = ${exports}`
+      if (importedNames.length > 0) {
+        return `const [${importedNames}] = ${exports}`
+      }
+      return ''
     })
     // Convert require with the $export_ variable
     .replace(/require\('([^']*)'\)/g, (match, id) => {
@@ -180,6 +189,8 @@ while (remaining.length) {
       }
       return getModule(path, id).exports
     })
+    // Aliases
+    .replace(new RegExp(`\\b(${Object.keys(aliases).join('|')})\\b`, 'g'), match => aliases[match])
   }})()`
   writeFileSync('dist/core.js', transformed, { flag: 'a' })
   writeFileSync('dist/core.js', `\n// END OF ${path}\n`, { flag: 'a' })
