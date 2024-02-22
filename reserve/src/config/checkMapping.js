@@ -3,6 +3,7 @@
 const { validate } = require('./schema')
 const checkMethod = require('./checkMethod')
 const buildMatch = require('./buildMatch')
+const parseMatch = require('./parseMatch')
 const {
   $configurationInterface,
   $handlerMethod,
@@ -11,6 +12,14 @@ const {
   $mappingMatch,
   $mappingMethod
 } = require('../symbols')
+const {
+  throwError,
+  ERROR_MAPPING_INVALID_MATCH,
+  ERROR_MAPPING_INVALID_INVERT_MATCH,
+  ERROR_MAPPING_INVALID_IF_MATCH,
+  ERROR_MAPPING_INVALID_EXCLUDE_FROM_HOLDING_LIST,
+  ERROR_MAPPING_UNKNOWN_HANDLER
+} = require('../error')
 
 function checkCwd (configuration, mapping) {
   if (!mapping.cwd) {
@@ -19,20 +28,19 @@ function checkCwd (configuration, mapping) {
 }
 
 function invalidMatch () {
-  throw new Error('Invalid mapping match')
+  throwError(ERROR_MAPPING_INVALID_MATCH)
 }
 
+// TODO: do not alter mapping.match, use an intermediate symbol
 const matchTypes = {
   undefined: mapping => {
     mapping.match = /(.*)/
   },
   string: (mapping, match) => {
-    mapping.match = new RegExp(mapping.match)
+    mapping.match = parseMatch(mapping.match)
   },
   object: (mapping, match) => {
-    if (!(mapping.match instanceof RegExp)) {
-      invalidMatch()
-    }
+    mapping.match = parseMatch(mapping.match)
   }
 }
 
@@ -52,27 +60,27 @@ function notTrueOnly (value) {
 
 function checkInvertMatch (mapping) {
   if (notTrueOnly(mapping['invert-match'])) {
-    throw new Error('Invalid mapping invert-match')
+    throwError(ERROR_MAPPING_INVALID_INVERT_MATCH)
   }
 }
 
 function checkIfMatch (mapping) {
   const ifMatch = mapping['if-match']
   if (!['undefined', 'function'].includes(typeof ifMatch)) {
-    throw new Error('Invalid mapping if-match')
+    throwError(ERROR_MAPPING_INVALID_IF_MATCH)
   }
 }
 
 function checkExcludeFromHoldingList (mapping) {
   if (notTrueOnly(mapping['exclude-from-holding-list'])) {
-    throw new Error('Invalid mapping exclude-from-holding-list')
+    throwError(ERROR_MAPPING_INVALID_EXCLUDE_FROM_HOLDING_LIST)
   }
 }
 
 function checkHandler (configuration, mapping) {
   const { handler } = configuration.handler(mapping)
   if (!handler) {
-    throw new Error('Unknown handler for mapping: ' + JSON.stringify(mapping))
+    throwError(ERROR_MAPPING_UNKNOWN_HANDLER, { mapping: JSON.stringify(mapping) })
   }
   return handler
 }

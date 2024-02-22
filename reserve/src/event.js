@@ -1,5 +1,7 @@
 'use strict'
 
+const { throwError, ERROR_EVENT_UNKNOWN_NAME, ERROR_EVENT_INVALID_CALLBACK } = require('./error')
+
 const names = 'created,ready,incoming,error,redirecting,redirected,aborted,closed'.split(',')
 
 function newEventEmitter () {
@@ -8,10 +10,10 @@ function newEventEmitter () {
   const register = (event, callback) => {
     const eventIndex = names.indexOf(event)
     if (eventIndex === -1) {
-      throw new Error('Unknown event name')
+      throwError(ERROR_EVENT_UNKNOWN_NAME)
     }
     if (typeof callback !== 'function') {
-      throw new Error('Invalid callback')
+      throwError(ERROR_EVENT_INVALID_CALLBACK)
     }
     if (registry[eventIndex] === undefined) {
       registry[eventIndex] = []

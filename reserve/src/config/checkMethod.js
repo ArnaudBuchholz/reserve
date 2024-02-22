@@ -1,5 +1,7 @@
 'use strict'
 
+const { throwError, ERROR_METHOD_INVALID, ERROR_METHOD_NONE } = require('../error')
+
 module.exports = (object, checkedMember, allowed) => {
   let method = object.method
   if (method === undefined) {
@@ -10,14 +12,14 @@ module.exports = (object, checkedMember, allowed) => {
     method = method.split(',')
   }
   if (!Array.isArray(method)) {
-    throw new Error('Invalid method specification')
+    throwError(ERROR_METHOD_INVALID)
   }
   method = method.map(verb => verb.toUpperCase())
   if (allowed) {
     method = method.filter(verb => allowed.includes(verb))
   }
   if (!method.length) {
-    throw new Error('No method specified (or left)')
+    throwError(ERROR_METHOD_NONE)
   }
   object[checkedMember] = method
 }
