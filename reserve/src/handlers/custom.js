@@ -7,6 +7,7 @@ const {
   $customRedirect
 } = require('../symbols')
 const smartImport = require('../helpers/smartImport')
+const { throwError, ERROR_CUSTOM_EXPECTED_FUNCTION } = require('../error')
 
 function withMatch (callback, request, response, [, ...additional]) {
   return callback.call(this, request, response, ...additional)
@@ -24,7 +25,7 @@ module.exports = {
       mapping[$customCallback] = mapping.custom
     }
     if (typeof mapping[$customCallback] !== 'function') {
-      throw new Error('Invalid custom handler, expected a function')
+      throwError(ERROR_CUSTOM_EXPECTED_FUNCTION)
     }
     const { length } = mapping[$customCallback]
     if (length === 0 || length > 2) {

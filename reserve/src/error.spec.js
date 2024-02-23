@@ -5,6 +5,13 @@ const assert = require('assert')
 const { throwError, newError, ERROR_EVENT_UNKNOWN_NAME, ERROR_SERVE_PORT_ALREADY_USED, ERROR_CONFIG_INVALID_HANDLER } = require('./error')
 
 describe('error', () => {
+  it('builds a generic error', () => {
+    const error = newError()
+    assert.strictEqual(error.name, 'REserveError')
+    assert.strictEqual(error.message, 'An error occurred')
+    assert.strictEqual(error.code, -1)
+  })
+
   it('builds an error', () => {
     const error = newError(ERROR_EVENT_UNKNOWN_NAME)
     assert.strictEqual(error.name, 'REserveError')

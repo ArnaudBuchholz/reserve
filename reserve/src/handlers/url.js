@@ -5,6 +5,7 @@ const headersFactory = require('../mock/headers')
 const defer = require('../helpers/defer')
 const { $handlerPrefix } = require('../symbols')
 const smartImport = require('../helpers/smartImport')
+const { newError, ERROR_URL_BODY_CONSUMED } = require('../error')
 
 const http2ForbiddenResponseHeaders = [
   'transfer-encoding',
@@ -109,7 +110,7 @@ module.exports = {
       })
       if (result !== undefined) {
         if (!['GET', 'HEAD'].includes(request.method)) {
-          return fail(new Error('Internal redirection impossible because the body is already consumed'))
+          return fail(newError(ERROR_URL_BODY_CONSUMED))
         }
         return done(result)
       }

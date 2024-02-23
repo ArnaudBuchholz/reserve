@@ -3,6 +3,7 @@
 const { $useMiddleware, $handlerPrefix } = require('../symbols')
 const smartImport = require('../helpers/smartImport')
 const defer = require('../helpers/defer')
+const { throwError, ERROR_USE_UNSUPPORTED_MIDDLEWARE } = require('../error')
 
 module.exports = {
   [$handlerPrefix]: 'use',
@@ -22,7 +23,7 @@ module.exports = {
     }
     const middleware = factory(mapping.options)
     if (middleware.length !== 3) {
-      throw new Error('Unexpected middleware signature')
+      throwError(ERROR_USE_UNSUPPORTED_MIDDLEWARE)
     }
     mapping[$useMiddleware] = middleware
   },
