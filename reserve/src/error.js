@@ -4,8 +4,8 @@ const interpolate = require('./helpers/interpolate')
 
 const errors = 'Unknown event name|Invalid callback|Configured port $port already in use|Invalid mapping match|Invalid mapping invert-match|Invalid mapping if-match|Invalid mapping exclude-from-holding-list|Unknown handler for $mapping|Invalid method specification|No method specified (or left)|Invalid "$type" handler: redirect is not a function|Invalid listeners member, must be an array of functions|Invalid http2 setting|Configuration must be an object|iconfiguration.setMappings appears to be blocked|Missing property $name|Invalid type of property $name|Invalid custom handler, expected a function|index.html not a file|Invalid custom-file-system specification ($invalids}|Invalid caching-strategy name|Internal redirection impossible because the body is already consumed|Unexpected middleware signature|Unsupported encoding: $encoding|Invalid status'.split('|')
 
-function newError (code, groups) {
-  let message = errors[code]
+function newError (code = -1, groups) {
+  let message = errors[code] || 'An error occurred'
   if (groups) {
     message = interpolate({ groups }, message)
   }
@@ -15,8 +15,8 @@ function newError (code, groups) {
   return error
 }
 
-function throwError (code) {
-  throw newError(code)
+function throwError (code, groups) {
+  throw newError(code, groups)
 }
 
 module.exports = {

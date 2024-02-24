@@ -21,8 +21,8 @@ function newError (code, groups) {
   return error
 }
 
-function throwError (code) {
-  throw newError(code)
+function throwError (code, groups) {
+  throw newError(code, groups)
 }
 
 module.exports = {
