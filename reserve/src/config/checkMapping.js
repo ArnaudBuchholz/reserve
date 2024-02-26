@@ -10,11 +10,11 @@ const {
   $handlerSchema,
   $mappingChecked,
   $mappingMatch,
+  $mappingMatchFunction,
   $mappingMethod
 } = require('../symbols')
 const {
   throwError,
-  ERROR_MAPPING_INVALID_MATCH,
   ERROR_MAPPING_INVALID_INVERT_MATCH,
   ERROR_MAPPING_INVALID_IF_MATCH,
   ERROR_MAPPING_INVALID_EXCLUDE_FROM_HOLDING_LIST,
@@ -27,31 +27,13 @@ function checkCwd (configuration, mapping) {
   }
 }
 
-function invalidMatch () {
-  throwError(ERROR_MAPPING_INVALID_MATCH)
-}
-
-// TODO: do not alter mapping.match, use an intermediate symbol
-const matchTypes = {
-  undefined: mapping => {
-    mapping.match = /(.*)/
-  },
-  string: (mapping, match) => {
-    mapping.match = parseMatch(mapping.match)
-  },
-  object: (mapping, match) => {
-    mapping.match = parseMatch(mapping.match)
-  }
-}
-
-'boolean,number,bigint,symbol,function'
-  .split(',')
-  .forEach(type => {
-    matchTypes[type] = invalidMatch
-  })
-
 function checkMatch (mapping) {
-  matchTypes[typeof mapping.match](mapping, mapping.match)
+  const { match } = mapping
+  if (match === undefined) {
+    mapping[$mappingMatch] = /(.*)/
+  } else {
+    mapping[$mappingMatch] = parseMatch(match)
+  }
 }
 
 function notTrueOnly (value) {
@@ -99,6 +81,6 @@ module.exports = async (configuration, mapping) => {
   if (handler.validate) {
     await handler.validate(mapping, configuration[$configurationInterface])
   }
-  mapping[$mappingMatch] = buildMatch(mapping)
+  mapping[$mappingMatchFunction] = buildMatch(mapping)
   mapping[$mappingChecked] = true
 }

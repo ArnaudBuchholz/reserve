@@ -15,7 +15,7 @@ const {
 const {
   $configurationInterface,
   $configurationRequests,
-  $mappingMatch,
+  $mappingMatchFunction,
   $requestId,
   $requestInternal,
   $configurationEventEmitter
@@ -120,7 +120,7 @@ function dispatch (context, url, index = 0) {
     const { length } = mappings
     while (index < length) {
       const mapping = mappings[index]
-      const match = mapping[$mappingMatch](context.request, url)
+      const match = mapping[$mappingMatchFunction](context.request, url)
       if (match) {
         if (['string', 'number'].includes(typeof match)) {
           return redispatch(context, match)
