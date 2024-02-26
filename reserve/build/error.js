@@ -10,8 +10,8 @@ const interpolate = require('./helpers/interpolate')
 
 const errors = '${Object.values(errors).join('|')}'.split('|')
 
-function newError (code, groups) {
-  let message = errors[code]
+function newError (code = -1, groups) {
+  let message = errors[code] || 'An error occurred'
   if (groups) {
     message = interpolate({ groups }, message)
   }
