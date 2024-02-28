@@ -103,7 +103,7 @@ declare module 'reserve' {
   // region use
 
   interface UseMapping extends BaseMapping {
-    use: string | ((request: IncomingMessage, response: ServerResponse, next: (err: Error) => void) => void)
+    use: string | ((options?: object) => ((request: IncomingMessage, response: ServerResponse, next: (err: Error) => void) => void))
     options?: object
   }
 
