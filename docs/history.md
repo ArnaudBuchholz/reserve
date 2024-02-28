@@ -90,3 +90,4 @@
 ||Fix url IP in `ready` event|
 |1.15.5|Documentation as github pages|
 |1.15.6|Fix types definition (MockServer)|
+|1.15.7|Fix types definition (UseMapping)|
