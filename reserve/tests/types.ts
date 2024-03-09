@@ -9,15 +9,15 @@ export const configurations: Configuration[] = [{
   }, {
     use: 'package'
   }, {
-    use: (request: IncomingMessage, response: ServerResponse, next: (err: Error) => void): void => {},
+    use: (options?: object) => (request: IncomingMessage, response: ServerResponse, next: (err: Error) => void): void => {},
     options: {
       opt1: 1,
       optA: 'A'
     }
   }, {
-    use: (request: IncomingMessage, response: ServerResponse): void => {}
+    use: () => (request: IncomingMessage, response: ServerResponse): void => {}
   }, {
-    use: (request: IncomingMessage): void => {}
+    use: () => (request: IncomingMessage): void => {}
   }, {
     custom: async (request: IncomingMessage, response: ServerResponse): Promise<void> => {}
   }]
