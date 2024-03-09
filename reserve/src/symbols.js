@@ -14,6 +14,7 @@ module.exports = {
   $handlerSchema: Symbol(`${ns}handler.schema`),
   $mappingChecked: Symbol(`${ns}mapping.checked`),
   $mappingMatch: Symbol(`${ns}mapping.match`),
+  $mappingMatchFunc: Symbol(`${ns}mapping.matchFunction`),
   $mappingMethod: Symbol(`${ns}mapping.method`),
   $requestId: Symbol(`${ns}request.id`),
   $requestInternal: Symbol(`${ns}request.internal`),

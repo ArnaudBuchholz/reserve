@@ -5,7 +5,7 @@ const assert = require('assert')
 const { notExpected } = require('test-tools')
 const { join } = require('path')
 const { read, check } = require('./configuration')
-const { $customCallback } = require('../symbols')
+const { $customCallback, $mappingMatch } = require('../symbols')
 
 const shouldFail = promise => promise.then(notExpected, () => {
   assert.ok(true) // expected
@@ -163,7 +163,7 @@ describe('config/configuration', () => {
         }]
       })
         .then(configuration => {
-          assert.ok(configuration.mappings[0].match instanceof RegExp)
+          assert.ok(configuration.mappings[0][$mappingMatch] instanceof RegExp)
         })
       )
 

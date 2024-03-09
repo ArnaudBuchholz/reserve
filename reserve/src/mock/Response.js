@@ -2,6 +2,7 @@
 
 const { Duplex } = require('../node-api')
 const headersFactory = require('./headers')
+const defer = require('../helpers/defer')
 
 module.exports = class Response extends Duplex {
   _read () {
@@ -49,9 +50,9 @@ module.exports = class Response extends Duplex {
     this._buffer = []
     this._headers = headersFactory()
     this._headersSent = false
-    this._waitForFinish = new Promise(resolve => {
-      this.on('finish', () => resolve(this))
-    })
+    const [waitForFinish, finished] = defer()
+    this._waitForFinish = waitForFinish
+    this.on('finish', () => finished(this))
     this._statusCode = 200
     this._ended = false
   }

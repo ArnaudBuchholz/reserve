@@ -9,6 +9,8 @@ const {
   $requestId,
   $requestInternal
 } = require('../symbols')
+const defer = require('../helpers/defer')
+const { newError, ERROR_ICONFIG_SET_MAPPINGS_BLOCKED } = require('../error')
 
 async function checkMappings (configuration, mappings) {
   for (const mapping of mappings) {
@@ -46,13 +48,14 @@ module.exports = class IConfiguration {
     const contexts = Object.values(configurationRequests.contexts)
     const requestContext = contexts.filter(({ request: candidate }) => candidate === request)[0]
     const requestsHolding = contexts.filter(candidate => candidate !== requestContext).map(({ holding }) => holding)
+    const [timedOutPromise, , onTimeout] = defer()
+    const timeoutId = setTimeout(() => onTimeout(newError(ERROR_ICONFIG_SET_MAPPINGS_BLOCKED)), timeout)
     const holding = Promise.race([
       Promise.all(requestsHolding),
-      new Promise((resolve, reject) => setTimeout(() => {
-        reject(new Error('iconfiguration.setMappings appears to be blocked'))
-      }, timeout))
+      timedOutPromise
     ])
       .then(() => {
+        clearTimeout(timeoutId)
         configuration.mappings = mappings
       })
     configurationRequests.holding = holding.then(undefined, () => {}) // Absorb error to unblock server

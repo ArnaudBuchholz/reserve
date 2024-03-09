@@ -1,5 +1,7 @@
 'use strict'
 
+const { throwError, ERROR_MAPPING_INVALID_MATCH } = require('../error')
+
 const regexpClues = '()^$[]|\\?+*{}'.split('')
 
 module.exports = match => {
@@ -10,7 +12,7 @@ module.exports = match => {
     return new RegExp(match.re, match.flags)
   }
   if (typeof match !== 'string') {
-    throw new Error('Invalid value for match')
+    throwError(ERROR_MAPPING_INVALID_MATCH)
   }
   if (regexpClues.some(clue => match.includes(clue))) {
     return new RegExp(match)

@@ -13,6 +13,13 @@ const {
   $handlerSchema
 } = require('../symbols')
 const smartImport = require('../helpers/smartImport')
+const {
+  throwError,
+  ERROR_CONFIG_INVALID_HANDLER,
+  ERROR_CONFIG_INVALID_LISTENERS,
+  ERROR_CONFIG_INVALID_HTTP2_SETTING,
+  ERROR_CONFIG_NOT_AN_OBJECT
+} = require('../error')
 
 const defaultHandlers = [
   require('../handlers/custom'),
@@ -72,7 +79,7 @@ function checkHandler (handler, type) {
     delete handler.method
   }
   if (typeof handler.redirect !== 'function') {
-    throw new Error('Invalid "' + type + '" handler: redirect is not a function')
+    throwError(ERROR_CONFIG_INVALID_HANDLER, { type })
   }
 }
 
@@ -103,7 +110,7 @@ async function setHandlers (configuration) {
 }
 
 function invalidListeners () {
-  throw new Error('Invalid listeners member, must be an array of functions')
+  throwError(ERROR_CONFIG_INVALID_LISTENERS)
 }
 
 async function checkListeners ({ cwd, listeners }) {
@@ -141,7 +148,7 @@ async function checkProtocol (configuration) {
     configuration.protocol = 'http'
   }
   if (![true, false, undefined].includes(configuration.http2)) {
-    throw new Error('Invalid http2 setting')
+    throwError(ERROR_CONFIG_INVALID_HTTP2_SETTING)
   }
   if (!configuration.http2) {
     configuration.http2 = false
@@ -201,7 +208,7 @@ function extend (filePath, configuration) {
 
 async function check (configuration) {
   if (typeof configuration !== 'object' || configuration === null) {
-    throw new Error('Configuration must be an object')
+    throwError(ERROR_CONFIG_NOT_AN_OBJECT)
   }
   const checkedConfiguration = Object.assign({}, configuration)
   applyDefaults(checkedConfiguration)

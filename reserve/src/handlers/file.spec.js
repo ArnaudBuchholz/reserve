@@ -28,140 +28,147 @@ describe('handlers/file', () => {
     })
   )
 
-  it('pipes file content', () => handle({
-    request: './file.txt'
-  })
-    .then(({ redirected, response }) => redirected.then(value => {
-      assert.strictEqual(value, undefined)
-      assert.strictEqual(response.statusCode, 200)
-      assert.strictEqual(response.headers['Content-Type'], textMimeType)
-      assert.strictEqual(response.toString(), 'Hello World!')
-    }))
-  )
-
-  it('forbids access to parent path (../)', async () => {
-    const request = new Request({ method: 'GET', url: 'anything' })
-    request.setForgedUrl('../file.txt')
-    await handle({
-      request,
-      mapping: {
-        cwd: '/folder'
-      }
-    })
-      .then(ignored)
-  })
-
-  it('forbids access to parent path (%2E%2E/)', async () => {
-    const request = new Request({ method: 'GET', url: 'anything' })
-    request.setForgedUrl('%2E%2E/file.txt')
-    await handle({
-      request,
-      mapping: {
-        cwd: '/folder'
-      }
-    })
-      .then(ignored)
-  })
-
-  it('uses statusCode if changed before', () => {
-    const response = new Response()
-    response.statusCode = 201
-    return handle({
-      request: '/file.txt',
-      response
+  describe('basic', () => {
+    it('pipes file content', () => handle({
+      request: './file.txt'
     })
       .then(({ redirected, response }) => redirected.then(value => {
         assert.strictEqual(value, undefined)
-        assert.strictEqual(response.statusCode, 201)
+        assert.strictEqual(response.statusCode, 200)
         assert.strictEqual(response.headers['Content-Type'], textMimeType)
         assert.strictEqual(response.toString(), 'Hello World!')
       }))
+    )
+
+    it('pipes file content (trim URL parameters)', () => handle({
+      request: '/file.txt?param=1#hash'
+    })
+      .then(({ redirected, response }) => redirected.then(value => {
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.headers['Content-Type'], textMimeType)
+        assert.strictEqual(response.toString(), 'Hello World!')
+      }))
+    )
+
+    it('uses statusCode if changed before', () => {
+      const response = new Response()
+      response.statusCode = 201
+      return handle({
+        request: '/file.txt',
+        response
+      })
+        .then(({ redirected, response }) => redirected.then(value => {
+          assert.strictEqual(value, undefined)
+          assert.strictEqual(response.statusCode, 201)
+          assert.strictEqual(response.headers['Content-Type'], textMimeType)
+          assert.strictEqual(response.toString(), 'Hello World!')
+        }))
+    })
+
+    it('returns nothing if the file does not exist', () => handle({
+      request: './not-found'
+    })
+      .then(ignored)
+    )
   })
 
-  it('pipes file content (trim parameters)', () => handle({
-    request: '/file.txt?param=1#hash'
-  })
-    .then(({ redirected, response }) => redirected.then(value => {
-      assert.strictEqual(value, undefined)
-      assert.strictEqual(response.statusCode, 200)
-      assert.strictEqual(response.headers['Content-Type'], textMimeType)
-      assert.strictEqual(response.toString(), 'Hello World!')
-    }))
-  )
+  describe('security', () => {
+    it('forbids access to parent path (../)', async () => {
+      const request = new Request({ method: 'GET', url: 'anything' })
+      request.setForgedUrl('../file.txt')
+      await handle({
+        request,
+        mapping: {
+          cwd: '/folder'
+        }
+      })
+        .then(ignored)
+    })
 
-  it('checks file access (url must *not* end with /)', () => handle({
-    request: './file.txt/'
-  })
-    .then(ignored)
-  )
+    it('forbids access to parent path (%2E%2E/)', async () => {
+      const request = new Request({ method: 'GET', url: 'anything' })
+      request.setForgedUrl('%2E%2E/file.txt')
+      await handle({
+        request,
+        mapping: {
+          cwd: '/folder'
+        }
+      })
+        .then(ignored)
+    })
 
-  it('checks folder access (url must end with /)', () => handle({
-    request: './folder'
+    it('forbids access to parent path (forcing to ../)', async () => {
+      const request = new Request({ method: 'GET', url: 'anything' })
+      await handle({
+        request,
+        mapping: {
+          cwd: '/folder'
+        },
+        redirect: '../file.txt'
+      })
+        .then(ignored)
+    })
   })
-    .then(ignored)
-  )
 
-  it('sends index.html if accessing a folder', () => handle({
-    request: './folder/'
-  })
-    .then(({ redirected, response }) => redirected.then(value => {
-      assert.strictEqual(value, undefined)
-      assert.strictEqual(response.statusCode, 200)
-      assert.strictEqual(response.headers['Content-Type'], htmlMimeType)
-      assert.strictEqual(response.headers['Content-Length'], '8')
-      assert.strictEqual(response.toString(), '<html />')
-    }))
-  )
+  describe('file vs folder', () => {
+    it('checks file access (url must *not* end with /)', () => handle({
+      request: './file.txt/'
+    })
+      .then(ignored)
+    )
 
-  it('sends index.html if accessing a folder (HEAD)', () => handle({
-    request: {
-      method: 'HEAD',
-      url: './folder/'
-    }
-  })
-    .then(({ redirected, response }) => redirected.then(value => {
-      assert.strictEqual(value, undefined)
-      assert.strictEqual(response.statusCode, 200)
-      assert.strictEqual(response.headers['Content-Type'], htmlMimeType)
-      assert.strictEqual(response.headers['Content-Length'], '8')
-      assert.strictEqual(response.toString(), '')
-    }))
-  )
+    it('checks folder access (url must end with /)', () => handle({
+      request: './folder'
+    })
+      .then(ignored)
+    )
 
-  it('defaults mimetype when no extension', () => handle({
-    request: './file'
-  })
-    .then(({ redirected, response }) => redirected.then(value => {
-      assert.strictEqual(value, undefined)
-      assert.strictEqual(response.statusCode, 200)
-      assert.strictEqual(response.headers['Content-Type'], defaultMimeType)
-      assert.strictEqual(response.toString(), 'binary')
-    }))
-  )
+    it('sends index.html if accessing a folder', () => handle({
+      request: './folder/'
+    })
+      .then(({ redirected, response }) => redirected.then(value => {
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.headers['Content-Type'], htmlMimeType)
+        assert.strictEqual(response.headers['Content-Length'], '8')
+        assert.strictEqual(response.toString(), '<html />')
+      }))
+    )
 
-  it('returns nothing if the file does not exist', () => handle({
-    request: './not-found'
-  })
-    .then(ignored)
-  )
+    it('sends index.html if accessing a folder (HEAD)', () => handle({
+      request: {
+        method: 'HEAD',
+        url: './folder/'
+      }
+    })
+      .then(({ redirected, response }) => redirected.then(value => {
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.headers['Content-Type'], htmlMimeType)
+        assert.strictEqual(response.headers['Content-Length'], '8')
+        assert.strictEqual(response.toString(), '')
+      }))
+    )
 
-  it('returns nothing if the folder does not exist', () => handle({
-    request: './not-a-folder/not-found'
-  })
-    .then(ignored)
-  )
+    it('returns nothing if the folder does not exist', () => handle({
+      request: './not-a-folder/not-found'
+    })
+      .then(ignored)
+    )
 
-  it('returns nothing if the folder does not have index.html', () => handle({
-    request: './no-index/'
-  })
-    .then(ignored)
-  )
+    it('returns nothing if the folder does not have index.html', () => handle({
+      request: './no-index/'
+    })
+      .then(ignored)
+    )
 
-  it('returns nothing if the folder contains a sub folder named index.html', () => handle({
-    request: './wrong-index/'
+    it('returns nothing if the folder contains a sub folder named index.html', () => handle({
+      request: './wrong-index/'
+    })
+      .then(ignored)
+    )
   })
-    .then(ignored)
-  )
 
   describe('Case insensitive file system', function () {
     before(() => {
@@ -717,6 +724,17 @@ describe('handlers/file', () => {
   })
 
   describe('mime-types', () => {
+    it('defaults mimetype when no extension', () => handle({
+      request: './file'
+    })
+      .then(({ redirected, response }) => redirected.then(value => {
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.headers['Content-Type'], defaultMimeType)
+        assert.strictEqual(response.toString(), 'binary')
+      }))
+    )
+
     it('overrides default mime types', () => handle({
       request: {
         method: 'GET',

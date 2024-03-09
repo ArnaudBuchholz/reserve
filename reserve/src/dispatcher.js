@@ -15,11 +15,12 @@ const {
 const {
   $configurationInterface,
   $configurationRequests,
-  $mappingMatch,
+  $mappingMatchFunction,
   $requestId,
   $requestInternal,
   $configurationEventEmitter
 } = require('./symbols')
+const defer = require('./helpers/defer')
 
 function emitError ({ emit, emitParameters }, reason) {
   const handled = emit(EVENT_ERROR, emitParameters, { reason })
@@ -119,7 +120,7 @@ function dispatch (context, url, index = 0) {
     const { length } = mappings
     while (index < length) {
       const mapping = mappings[index]
-      const match = mapping[$mappingMatch](context.request, url)
+      const match = mapping[$mappingMatchFunction](context.request, url)
       if (match) {
         if (['string', 'number'].includes(typeof match)) {
           return redispatch(context, match)
@@ -155,8 +156,7 @@ module.exports = function (configuration, request, response) {
     perfStart: performance.now()
   }
 
-  let dispatched
-  const dispatching = new Promise(resolve => { dispatched = resolve })
+  const [dispatching, dispatched] = defer()
 
   const context = {
     configuration,

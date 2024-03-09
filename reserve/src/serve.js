@@ -11,6 +11,7 @@ const {
 const defer = require('./helpers/defer')
 const getHostName = require('./helpers/hostname')
 const portIsUsed = require('./helpers/portIsUsed')
+const { throwError, ERROR_SERVE_PORT_ALREADY_USED } = require('./error')
 
 function createServer (configuration, requestHandler) {
   const { httpOptions } = configuration
@@ -35,7 +36,7 @@ function createServer (configuration, requestHandler) {
 }
 
 function createServerAsync (emit, configuration, dispatcher) {
-  return new Promise((resolve, reject) => {
+  return defer.$((resolve, reject) => {
     const server = createServer(configuration, dispatcher.bind(null, configuration))
     emit(EVENT_CREATED, { configuration: configuration[$configurationInterface], server })
     let { port } = configuration
@@ -54,7 +55,7 @@ module.exports = jsonConfiguration => {
     .then(async configuration => {
       let port = configuration.port
       if (port !== 0 && await portIsUsed(port)) {
-        throw new Error(`Configured port ${port} already in use`)
+        throwError(ERROR_SERVE_PORT_ALREADY_USED, { port })
       }
       configuration[$configurationEventEmitter] = emit
       configuration.listeners.forEach(listen => listen(instance))

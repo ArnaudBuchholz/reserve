@@ -6,6 +6,7 @@ const send = require('../helpers/send')
 const mimeTypes = require('../mime')
 const smartImport = require('../helpers/smartImport')
 const cacheFactory = require('punycache')
+const { throwError, ERROR_FILE_INVALID_INDEX_HTML, ERROR_FILE_FILE_SYSTEM_SETTING, ERROR_FILE_CACHING_STRATEGY_SETTING } = require('../error')
 
 const $customFileSystem = 'custom-file-system'
 const $cachingStrategy = 'caching-strategy'
@@ -115,7 +116,7 @@ async function sendIndex (context) {
   const filePath = join(context.filePath, 'index.html')
   const stat = await context.fs.stat(filePath)
   if (stat.isDirectory()) {
-    throw new Error('index.html not a file')
+    throwError(ERROR_FILE_INVALID_INDEX_HTML)
   }
   return sendFile({ ...context, filePath }, stat)
 }
@@ -127,7 +128,7 @@ async function checkStrictPath (fs, cwd, filePath) {
     const name = basename(path)
     const names = await fs.readdir(folderPath)
     if (!names.includes(name)) {
-      throw new Error('Not found')
+      throwError()
     }
     path = folderPath
   }
@@ -161,11 +162,11 @@ module.exports = {
     const apis = ['stat', 'createReadStream', 'readdir']
     const invalids = apis.filter(name => typeof mapping[$customFileSystem][name] !== 'function')
     if (invalids.length) {
-      throw new Error(`Invalid ${$customFileSystem} specification (${invalids.join(', ')})`)
+      throwError(ERROR_FILE_FILE_SYSTEM_SETTING, { invalids: invalids.join(', ') })
     }
     const cachingStrategy = mapping[$cachingStrategy]
     if (typeof cachingStrategy === 'string' && cachingStrategy !== 'modified') {
-      throw new Error(`Invalid ${$cachingStrategy} name`)
+      throwError(ERROR_FILE_CACHING_STRATEGY_SETTING)
     }
     if (mapping[$static] === defaultStatic) {
       mapping[$static] = mapping[$customFileSystem] === nodeFs

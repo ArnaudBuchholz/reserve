@@ -2,12 +2,13 @@
 
 const { pipeline, zlib } = require('../node-api')
 const defer = require('./defer')
+const { throwError, newError, ERROR_CAPTURE_UNSUPPORTED_ENCODING, ERROR_CAPTURE_INVALID_STATUS } = require('../error')
 
 const decoderFactories = {
   gzip: zlib.createGunzip,
   deflate: zlib.createInflate,
   br: zlib.createBrotliDecompress,
-  default: encoding => { throw new Error(`Unsupported encoding: ${encoding}`) }
+  default: encoding => { throwError(ERROR_CAPTURE_UNSUPPORTED_ENCODING, { encoding }) }
 }
 
 function selectDecoder (headers) {
@@ -123,7 +124,7 @@ module.exports = (response, writableStream) => {
     if (status === 200) {
       done(capture(response, headers, writableStream))
     } else {
-      fail(new Error('Invalid status'))
+      fail(newError(ERROR_CAPTURE_INVALID_STATUS))
     }
     writeHead.apply(response, arguments)
   }

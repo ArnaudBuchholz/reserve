@@ -4,6 +4,7 @@ const { describe, it, before } = require('mocha')
 const assert = require('assert')
 const { notExpected } = require('test-tools')
 const { Request, Response, check, log, mock } = require('../index')
+const { $mappingMatch } = require('../symbols')
 
 function checkConfiguration (configuration, mapping) {
   assert.ok(configuration.handlers instanceof Object)
@@ -40,7 +41,7 @@ const handler = {
       throw new Error('mapping.ko')
     }
     assert.strictEqual(mapping.test, '$1')
-    assert.ok(mapping.match instanceof RegExp)
+    assert.ok(mapping[$mappingMatch] instanceof RegExp)
     mapping.ok = true
   },
 
@@ -162,7 +163,7 @@ describe('config/iconfiguration', () => {
     before(async () => {
       mocked = await mock({
         mappings: [{
-          match: 'dispatch',
+          match: '/dispatch',
           custom: async function (request, response) {
             const res1 = new Response()
             const res2 = new Response()
@@ -176,13 +177,13 @@ describe('config/iconfiguration', () => {
             response.end()
           }
         }, {
-          match: 'hello',
+          match: '/hello',
           custom: async (request, response) => {
             response.writeHead(200, { 'content-type': 'text/plain' })
             response.end('Hello ')
           }
         }, {
-          match: 'world',
+          match: '/world',
           custom: async (request, response) => {
             response.writeHead(200, { 'content-type': 'text/plain' })
             response.end('World !')

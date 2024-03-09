@@ -401,13 +401,13 @@ describe('dispatcher', () => {
     describe('Infinite loop', () => {
       const loopConfigurationPromise = check({
         mappings: [{
-          match: 'a',
-          custom: async () => 'b'
+          match: '/a',
+          custom: async () => '/b'
         }, {
-          match: 'b',
-          custom: async () => 'a'
+          match: '/b',
+          custom: async () => '/a'
         }, {
-          match: 'error',
+          match: '/error',
           custom: async (request, response) => {
             response.writeHead = () => {
               throw new Error('Simulates exception during writeHead')

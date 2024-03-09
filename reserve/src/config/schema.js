@@ -1,5 +1,7 @@
 'use strict'
 
+const { throwError, ERROR_SCHEMA_MISSING_PROPERTY, ERROR_SCHEMA_INVALID_TYPE } = require('../error')
+
 function parseProperty (name, value) {
   let types
   const { defaultValue } = value
@@ -16,11 +18,11 @@ function parseProperty (name, value) {
 function validateProperty (property, object, value = property.defaultValue) {
   const { name, types } = property
   if (value === undefined) {
-    throw new Error(`Missing property ${name}`)
+    throwError(ERROR_SCHEMA_MISSING_PROPERTY, { name })
   }
   const valueType = typeof value
   if (!types.includes(valueType)) {
-    throw new Error(`Invalid type of property ${name}`)
+    throwError(ERROR_SCHEMA_INVALID_TYPE, { name })
   }
   object[property.name] = value
 }

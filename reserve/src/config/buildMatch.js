@@ -1,19 +1,19 @@
 'use strict'
 
-const { $mappingMethod } = require('../symbols')
+const { $mappingMethod, $mappingMatch } = require('../symbols')
 
 const methods = [
   function (request, url) {
-    return this.match.exec(url)
+    return this[$mappingMatch].exec(url)
   },
   function ({ method }, url) {
-    return this[$mappingMethod].includes(method) && this.match.exec(url)
+    return this[$mappingMethod].includes(method) && this[$mappingMatch].exec(url)
   },
   function (request, url) {
-    return !this.match.exec(url)
+    return !this[$mappingMatch].exec(url)
   },
   function ({ method }, url) {
-    return !this[$mappingMethod].includes(method) || !this.match.exec(url)
+    return !this[$mappingMethod].includes(method) || !this[$mappingMatch].exec(url)
   }
 ]
 
