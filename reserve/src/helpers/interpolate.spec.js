@@ -6,20 +6,36 @@ const interpolate = require('./interpolate')
 
 describe('helpers/interpolate', () => {
   describe('string', () => {
-    it('substitutes capturing groups', () => {
-      assert.strictEqual(interpolate([0, 'a', 'b'], '$1$2'), 'ab')
+    describe('capturing groups', () => {
+      it('substitutes captured values', () => {
+        assert.strictEqual(interpolate([0, 'a', 'b'], '$1$2'), 'ab')
+      })
+
+      it('ignores missing values', () => {
+        assert.strictEqual(interpolate([0, 'a', 'b'], '$1$99$2'), 'ab')
+      })
+
+      it('substitutes all occurrences', () => {
+        assert.strictEqual(interpolate([0, 'a', 'b'], '$1$2$1$2'), 'abab')
+      })
     })
 
-    it('ignores non captured groups', () => {
-      assert.strictEqual(interpolate([0, 'a', 'b'], '$1$99$2'), 'ab')
-    })
+    describe('named capturing groups', () => {
+      it('substitutes captured values', () => {
+        assert.strictEqual(interpolate({ groups: { id: '-' } }, 'before&$id&after'), 'before&-&after')
+      })
 
-    it('substitutes all occurrences of capturing groups', () => {
-      assert.strictEqual(interpolate([0, 'a', 'b'], '$1$2$1$2'), 'abab')
-    })
+      it('ignores missing values', () => {
+        assert.strictEqual(interpolate({ groups: {} }, '$id'), '')
+      })
 
-    it('substitutes all occurrences of named capturing groups', () => {
-      assert.strictEqual(interpolate({ groups: { id: 'a' } }, '$id$id'), 'aa')
+      it('ignores missing values (no named capturing groups)', () => {
+        assert.strictEqual(interpolate([], '$id'), '')
+      })
+
+      it('substitutes all occurrences', () => {
+        assert.strictEqual(interpolate({ groups: { id: 'a' } }, '$id$id'), 'aa')
+      })
     })
 
     it('unescapes $$', () => {
