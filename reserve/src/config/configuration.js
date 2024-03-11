@@ -54,21 +54,6 @@ function applyDefaults (configuration) {
   })
 }
 
-function getHandler (handlers, types, mapping) {
-  for (let index = 0; index < types.length; ++index) {
-    const type = types[index]
-    const redirect = mapping[type]
-    if (redirect !== undefined) {
-      return {
-        handler: handlers[type],
-        redirect,
-        type
-      }
-    }
-  }
-  return {}
-}
-
 function checkHandler (handler, type) {
   if (handler.schema) {
     handler[$handlerSchema] = parse(handler.schema)
@@ -98,7 +83,7 @@ async function validateHandler ({ cwd, handlers }, type) {
 
 async function setHandlers (configuration) {
   if (configuration.handlers) {
-    // Default hanlders can't be overridden
+    // Default handlers can't be overridden
     configuration.handlers = Object.assign({}, configuration.handlers, defaultHandlers)
   } else {
     configuration.handlers = Object.assign({}, defaultHandlers)
@@ -106,7 +91,6 @@ async function setHandlers (configuration) {
   for (const type of Object.keys(configuration.handlers)) {
     await validateHandler(configuration, type)
   }
-  configuration.handler = getHandler.bind(null, configuration.handlers, Object.keys(configuration.handlers))
 }
 
 function invalidListeners () {
