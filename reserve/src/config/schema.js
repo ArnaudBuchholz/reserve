@@ -35,7 +35,12 @@ function validate (schema, object) {
   schema.forEach(property => validateProperty(property, object, object[property.name]))
 }
 
+function notTrueOrUndefined (value) {
+  return value !== true && value !== undefined
+}
+
 module.exports = {
   parse,
-  validate
+  validate,
+  notTrueOrUndefined
 }

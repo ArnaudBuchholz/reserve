@@ -2,7 +2,7 @@
 
 const { describe, it } = require('mocha')
 const assert = require('assert')
-const { parse, validate } = require('./schema')
+const { parse, validate, notTrueOrUndefined } = require('./schema')
 
 /* istanbul ignore next */ // Will not be called
 function noop () {}
@@ -126,6 +126,23 @@ describe('config/schema', () => {
           }
         }, object)
         assert.strictEqual(object.property, false)
+      })
+    })
+  })
+
+  describe('notTrueOrUndefined', () => {
+    it('converts true to false', () => {
+      assert.strictEqual(notTrueOrUndefined(true), false)
+    })
+
+    it('converts undefined to false', () => {
+      assert.strictEqual(notTrueOrUndefined(undefined), false)
+    })
+
+    const otherValues = [-1, 0, 1, false, noop, Symbol('no'), '', 'no', 1.2, {}]
+    otherValues.forEach(otherValue => {
+      it(`converts everything else to true (${JSON.stringify(otherValue)})`, () => {
+        assert.strictEqual(notTrueOrUndefined(otherValue), true)
       })
     })
   })
