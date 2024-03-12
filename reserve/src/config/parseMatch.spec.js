@@ -111,19 +111,19 @@ describe('config/parseMatch', () => {
       it('converts to regex', () => {
         const re = parseMatch('/path')
         assert.ok(re instanceof RegExp)
-        assert.strictEqual(re.toString(), '/^\\/path(.*)/')
+        assert.strictEqual(re.toString(), '/^\\/path\\b(.*)/')
       })
 
       it('handles query parameters (:)', () => {
         const re = parseMatch('/books/:id')
         assert.ok(re instanceof RegExp)
-        assert.strictEqual(re.toString(), '/^\\/books\\/(?<id>[^/]*)(.*)/')
+        assert.strictEqual(re.toString(), '/^\\/books\\/(?<id>[^/]*)\\b(.*)/')
       })
 
       it('handles query parameter (:) in the middle of the url', () => {
         const re = parseMatch('/books/:id/rentals')
         assert.ok(re instanceof RegExp)
-        assert.strictEqual(re.toString(), '/^\\/books\\/(?<id>[^/]*)\\/rentals(.*)/')
+        assert.strictEqual(re.toString(), '/^\\/books\\/(?<id>[^/]*)\\/rentals\\b(.*)/')
       })
     })
   })
