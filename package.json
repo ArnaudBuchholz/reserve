@@ -22,7 +22,7 @@
     "@fastify/static": "^7.0.1",
     "@stryker-mutator/core": "^8.2.6",
     "@stryker-mutator/mocha-runner": "^8.2.6",
-    "@types/node": "^20.11.25",
+    "@types/node": "^20.11.26",
     "autocannon": "^7.15.0",
     "cors": "^2.8.5",
     "eslint-utils": "^3.0.0",
