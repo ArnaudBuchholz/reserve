@@ -9,19 +9,11 @@ const {
 } = require('../error')
 const { $mappingMethod, $mappingMatch } = require('../symbols')
 
-const methods = [
-  function (request, url) {
-    return this[$mappingMatch].exec(url)
-  },
-  function ({ method }, url) {
-    return this[$mappingMethod].includes(method) && this[$mappingMatch].exec(url)
-  },
-  function (request, url) {
-    return !this[$mappingMatch].exec(url)
-  },
-  function ({ method }, url) {
-    return !this[$mappingMethod].includes(method) || !this[$mappingMatch].exec(url)
-  }
+const factories = [
+  ({ match }) => url => match.exec(url),
+  ({ match, methods }) => (url, { method }) => methods.includes(method) && match.exec(url),
+  ({ match }) => url => !match.exec(url),
+  ({ match, methods }) => (url, { method }) => !methods.includes(method) || !match.exec(url),
 ]
 
 module.exports = mapping => {
