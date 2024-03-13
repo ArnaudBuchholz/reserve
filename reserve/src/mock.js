@@ -2,7 +2,7 @@
 
 const { check } = require('./config/configuration')
 const dispatcher = require('./dispatcher')
-const { newEventEmitter, EVENT_CREATED, EVENT_READY } = require('./event')
+const { newEventEmitter, EVENT_CREATED, EVENT_READY, EVENT_ERROR } = require('./event')
 const Request = require('./mock/Request')
 const Response = require('./mock/Response')
 const {
@@ -20,7 +20,7 @@ module.exports = (jsonConfiguration, mockedHandlers = {}) => {
   check(jsonConfiguration)
     .then(configuration => {
       configuration[$configurationEventEmitter] = emit
-      Object.assign(configuration.handlers, mockedHandlers)
+      Object.keys(mockedHandlers).forEach(type => Object.assign(configuration.handlers[type], mockedHandlers[type]))
       configuration.listeners.forEach(listen => listen(instance))
       emit(EVENT_CREATED, {
         configuration: configuration[$configurationInterface],
@@ -41,6 +41,9 @@ module.exports = (jsonConfiguration, mockedHandlers = {}) => {
         port,
         http2
       })
+    })
+    .catch(error => {
+      emit(EVENT_ERROR, { error })
     })
   return instance
 }
