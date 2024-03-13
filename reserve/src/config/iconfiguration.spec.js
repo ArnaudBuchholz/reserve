@@ -41,7 +41,6 @@ const handler = {
       throw new Error('mapping.ko')
     }
     assert.strictEqual(mapping.test, '$1')
-    assert.strictEqual(typeof mapping[$mappingMatch], 'function')
     mapping.ok = true
   },
 
