@@ -78,7 +78,6 @@ async function validateHandler ({ cwd, handlers }, type) {
     handlers[type] = handler
   }
   checkHandler(handler, type)
-  Object.freeze(handler)
 }
 
 async function setHandlers (configuration) {
