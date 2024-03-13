@@ -243,7 +243,7 @@ declare module 'reserve' {
     } & ServerEventIncoming
   |
     {
-      eventName: ServerEventName.incoming
+      eventName: ServerEventName.error
       error: any
     } & ServerEventIncoming
   | 
