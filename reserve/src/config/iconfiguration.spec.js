@@ -4,7 +4,6 @@ const { describe, it, before } = require('mocha')
 const assert = require('assert')
 const { notExpected } = require('test-tools')
 const { Request, Response, check, log, mock } = require('../index')
-const { $mappingMatch } = require('../symbols')
 
 function checkConfiguration (configuration, mapping) {
   assert.ok(configuration.handlers instanceof Object)

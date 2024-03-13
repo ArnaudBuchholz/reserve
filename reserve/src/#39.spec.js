@@ -1,6 +1,6 @@
 'use strict'
 
-const { describe, it, beforeEach } = require('mocha')
+const { describe, it, before, beforeEach } = require('mocha')
 const assert = require('assert')
 const { check, mock } = require('./index')
 
@@ -22,7 +22,6 @@ const reconfigure = {
     response.end('OK')
   }
 }
-
 
 describe('#39 setMapings blocked by long request', () => {
   let defaultConfiguration
