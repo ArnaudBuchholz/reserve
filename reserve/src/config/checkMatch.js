@@ -10,10 +10,10 @@ const {
 const { $mappingMethod, $mappingMatch } = require('../symbols')
 
 const factories = [
-  ({ match }) => url => match.exec(url),
-  ({ match, methods }) => (url, { method }) => methods.includes(method) && match.exec(url),
-  ({ match }) => url => !match.exec(url),
-  ({ match, methods }) => (url, { method }) => !methods.includes(method) || !match.exec(url),
+  match => url => match.exec(url),
+  ( match, methods ) => (url, { method }) => methods.includes(method) && match.exec(url),
+  match => url => !match.exec(url),
+  ( match, methods ) => (url, { method }) => !methods.includes(method) || !match.exec(url),
 ]
 
 module.exports = mapping => {
@@ -32,21 +32,23 @@ module.exports = mapping => {
     throwError(ERROR_MAPPING_INVALID_IF_MATCH)
   }
   let index = 0
-  if (mapping[$mappingMethod]) {
+  const methods = mapping[$mappingMethod]
+  if (methods) {
     index += 1
   }
   if (invertMatch) {
     index += 2
   }
-  const matchMethod = methods[index]
+  const baseMatch = factories[index](match, methods)
   if (ifMatch) {
-    return function (request, url) {
-      const match = matchMethod.call(this, request, url)
+    mapping[$mappingMatch] = function (url, request) {
+      const match = matchMethod(url, request)
       if (match) {
         return ifMatch(request, url, match)
       }
-      return false
+      return null
     }
+  } else {
+    mapping[$mappingMatch] = baseMatch
   }
-  mapping[$mappingMatch] = matchMethod
 }

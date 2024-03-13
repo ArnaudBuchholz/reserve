@@ -122,10 +122,10 @@ function dispatch (context, url, index = 0) {
     while (index < length) {
       const mapping = mappings[index]
       const match = mapping[$mappingMatch](url, context.request)
+      // if (match && match.then) {
+
+      // }
       if (match) {
-        if (['string', 'number'].includes(typeof match)) {
-          return redispatch(context, match)
-        }
         const { handler, redirect, type } = mapping[$mappingHandler]
         return redirecting(context, { mapping, match, handler, type, redirect: interpolate(match, redirect), url, index })
       }
