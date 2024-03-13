@@ -6,10 +6,12 @@ const mock = require('./mock')
 const { read } = require('./config/configuration')
 
 function waitForReady (server) {
-  return new Promise(resolve => {
-    server.on('ready', () => {
-      resolve(server)
-    })
+  return new Promise((resolve, reject) => {
+    server
+      .on('ready', () => {
+        resolve(server)
+      })
+      .on('error', reject)
   })
 }
 
