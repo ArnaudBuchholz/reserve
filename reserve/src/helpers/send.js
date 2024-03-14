@@ -33,7 +33,7 @@ module.exports = (response, data, options = {}) => {
   if (noBody) {
     response.end()
   } else if (stream) {
-    return defer.$((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       response.on('finish', resolve)
       data.on('error', reject)
       pipeline(data, response, err => {

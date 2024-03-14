@@ -27,7 +27,7 @@ module.exports = {
     }
     mapping[$useMiddleware] = middleware
   },
-  redirect: ({ mapping, request, response }) => defer.$((resolve, reject) => {
+  redirect: ({ mapping, request, response }) => new Promise((resolve, reject) => {
     const useEnd = () => {
       resolve()
       response.end()

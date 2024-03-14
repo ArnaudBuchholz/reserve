@@ -16,8 +16,4 @@ describe('helpers/defer', () => {
     reject('ko')
     assert.rejects(promise)
   })
-
-  it('creates a promise', async () => {
-    assert.strictEqual(await defer.$(resolve => resolve('ok')), 'ok')
-  })
 })

@@ -116,8 +116,16 @@ nodeApi.replace(/const ([^=]+) = require\('([^']+)'\)/g, (match, imported, id) =
 const promisified = []
 nodeApi.replace(/(\w+): promisify\(\w+\)/g, (match, api) => promisified.push(api))
 
+
 writeFileSync('dist/core.js', `module.exports=function(${imports.join(',')}){\n`)
 promisified.forEach(api => writeFileSync('dist/core.js', `${api}=promisify(${api})\n`, { flag: 'a' }))
+writeFileSync('dist/core.js', `
+const
+  assign = Object.assign,
+  keys = Object.keys,
+  newPromise = executor => new Promise(executor)
+
+`, { flag: 'a' })
 
 const written = ['node-api.js']
 const remaining = Object.values(modules).filter(({ path }) => !written.includes(path))
@@ -148,6 +156,9 @@ while (remaining.length) {
   writeFileSync('dist/core.js', `// BEGIN OF ${path}\n`, { flag: 'a' })
   const transformed = `const ${exports} = (() => {${content
     .replace(/'use strict'\s*\n/g, '') // No more required
+    .replace(/Object\.assign/g, 'assign')
+    .replace(/Object\.keys/g, 'keys')
+    .replace(/new Promise/g, 'newPromise')
     .replace(/const [^\n]*= require\('[^']+node-api'\)/g, dependencies => '') // No more required
     // Convert exports into return, replace dictionary with an array
     .replace(/module\.exports\s+=\s+\{([^^}]*)\}/, match => {

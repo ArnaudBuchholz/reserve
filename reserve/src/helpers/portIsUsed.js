@@ -6,7 +6,7 @@ const defer = require('../helpers/defer')
 module.exports = (port, {
   timeout = 400,
   host = '127.0.0.1'
-} = {}) => defer.$(resolve => {
+} = {}) => new Promise(resolve => {
   const socket = new Socket()
   let status = false
 
