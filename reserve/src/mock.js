@@ -11,16 +11,15 @@ const {
 } = require('./symbols')
 const getHostName = require('./helpers/hostname')
 
-module.exports = (jsonConfiguration, mockedHandlers = {}) => {
+module.exports = (jsonConfiguration, mockedHandlers) => {
   const { on, emit } = newEventEmitter()
   const instance = {
     on,
     close: () => Promise.resolve()
   }
-  check(jsonConfiguration)
+  check(jsonConfiguration, mockedHandlers)
     .then(configuration => {
       configuration[$configurationEventEmitter] = emit
-      Object.keys(mockedHandlers).forEach(type => Object.assign(configuration.handlers[type], mockedHandlers[type]))
       configuration.listeners.forEach(listen => listen(instance))
       emit(EVENT_CREATED, {
         configuration: configuration[$configurationInterface],
