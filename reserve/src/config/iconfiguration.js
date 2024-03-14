@@ -26,7 +26,11 @@ module.exports = class IConfiguration {
   }
 
   get handlers () {
-    return Object.assign({}, this[$configuration].handlers)
+    const { handlers } = this[$configuration]
+    return Object.keys(handlers).reduce((readonly, type) => {
+      readonly[type] = Object.assign({}, handlers[type])
+      return readonly
+    }, {})
   }
 
   get mappings () {
