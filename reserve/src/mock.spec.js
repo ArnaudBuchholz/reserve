@@ -106,4 +106,19 @@ describe('mock', () => {
         })
     })
   })
+
+  describe('error handling', () => {
+    it('signals initialization errors', () => {
+      return assert.rejects(read('/reserve.json')
+        .then(configuration => {
+          configuration.listeners = [
+            function register (eventEmitter) {
+              throw new Error('KO')
+            }
+          ]
+          return waitForReady(mock(configuration))
+        })
+      )
+    })
+  })
 })
