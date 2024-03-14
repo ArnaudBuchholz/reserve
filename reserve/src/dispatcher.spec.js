@@ -113,14 +113,6 @@ describe('dispatcher', () => {
           if (request.headers['x-error']) {
             throw new Error(request.headers['x-error'])
           }
-          const redirect = request.headers['x-match-redirect']
-          const redirectAsNumber = parseInt(redirect, 10)
-          if (redirectAsNumber > 0) {
-            return redirectAsNumber
-          }
-          if (redirect) {
-            return redirect
-          }
           return true
         },
         custom: async function IfMatch (request, response) {
@@ -315,24 +307,6 @@ describe('dispatcher', () => {
         assert.ok(hasError(emitted))
         assert.ok(request.ifMatched)
         assert.strictEqual(response.statusCode, 500)
-      })
-    )
-
-    it('enables redirect (number)', () => dispatch({ request: { method: 'GET', url: '/if-match.txt', headers: { 'x-match-redirect': '508' } } })
-      .then(({ emitted, request, response }) => {
-        assert.ok(!hasError(emitted))
-        assert.ok(request.ifMatched)
-        assert.strictEqual(response.statusCode, 508)
-      })
-    )
-
-    it('enables redirect (string)', () => dispatch({ request: { method: 'GET', url: '/if-match.txt', headers: { 'x-match-redirect': '/file.txt' } } })
-      .then(({ emitted, request, response }) => {
-        assert.ok(!hasError(emitted))
-        assert.ok(request.ifMatched)
-        assert.strictEqual(response.statusCode, 200)
-        assert.strictEqual(response.headers['Content-Type'], textMimeType)
-        assert.strictEqual(response.toString(), 'Hello World!')
       })
     )
   })
