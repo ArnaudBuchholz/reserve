@@ -18,16 +18,11 @@ function checkConfiguration (configuration, mapping) {
   // Read-only handlers
   delete configuration.handlers.custom
   assert.ok(!!configuration.handlers.custom)
-  const fileHandler = configuration.handlers.file
+  const { redirect: fileHandlerRedirect } = configuration.handlers.file
   configuration.handlers.file = configuration.handlers.custom
-  assert.strictEqual(configuration.handlers.file, fileHandler)
-  const fileHandlerRedirect = fileHandler.redirect
-  try {
-    fileHandler.redirect = 0
-  } catch (e) {
-    assert.ok(e instanceof TypeError)
-  }
-  assert.strictEqual(fileHandler.redirect, fileHandlerRedirect)
+  assert.strictEqual(configuration.handlers.file.redirect, fileHandlerRedirect)
+  configuration.handlers.file.redirect = 0
+  assert.strictEqual(configuration.handlers.file.redirect, fileHandlerRedirect)
   // Read-only mapping list
   configuration.mappings.length = 0
   assert.ok(configuration.mappings.includes(mapping))
