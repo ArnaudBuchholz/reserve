@@ -111,6 +111,7 @@ nodeApi.replace(/const ([^=]+) = require\('([^']+)'\)/g, (match, imported, id) =
 })
 
 // TODO: check that imports are matching the list in dist/index.js & dist/index.mjs
+// TODO: create shortcuts for Object.assign & Object.keys (and new Promise ?)
 
 const promisified = []
 nodeApi.replace(/(\w+): promisify\(\w+\)/g, (match, api) => promisified.push(api))
