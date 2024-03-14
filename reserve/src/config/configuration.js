@@ -80,11 +80,12 @@ async function validateHandler ({ cwd, handlers }, type) {
 }
 
 async function setHandlers (configuration, mockedHandlers = {}) {
-  // Default handlers can't be overridden
-  configuration.handlers = Object.assign({}, configuration.handlers || {}, defaultHandlers)
-  Object.keys(mockedHandlers).forEach(type => {
-    configuration.handlers[type] = Object.assign({}, configuration.handlers[type], mockedHandlers[type])
-  })
+  const copyOfDefaultHandlers = Object.keys(defaultHandlers).reduce((handlers, type) => {
+    handlers[type] = Object.assign({}, defaultHandlers[type])
+    return handlers
+  }, {})
+  configuration.handlers = Object.assign({}, configuration.handlers || {}, copyOfDefaultHandlers)
+  Object.keys(mockedHandlers).forEach(type => Object.assign(configuration.handlers[type], mockedHandlers[type]))
   for (const type of Object.keys(configuration.handlers)) {
     await validateHandler(configuration, type)
   }
