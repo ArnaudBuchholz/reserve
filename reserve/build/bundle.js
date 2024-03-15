@@ -111,7 +111,6 @@ nodeApi.replace(/const ([^=]+) = require\('([^']+)'\)/g, (match, imported, id) =
 })
 
 // TODO: check that imports are matching the list in dist/index.js & dist/index.mjs
-// TODO: create shortcuts for Object.assign & Object.keys (and new Promise ?)
 
 const promisified = []
 nodeApi.replace(/(\w+): promisify\(\w+\)/g, (match, api) => promisified.push(api))
@@ -121,8 +120,8 @@ writeFileSync('dist/core.js', `module.exports=function(${imports.join(',')}){\n`
 promisified.forEach(api => writeFileSync('dist/core.js', `${api}=promisify(${api})\n`, { flag: 'a' }))
 writeFileSync('dist/core.js', `
 const
-  assign = Object.assign,
-  keys = Object.keys,
+  ObjectAssign = Object.assign,
+  ObjectKeys = Object.keys,
   newPromise = executor => new Promise(executor)
 
 `, { flag: 'a' })
@@ -156,8 +155,8 @@ while (remaining.length) {
   writeFileSync('dist/core.js', `// BEGIN OF ${path}\n`, { flag: 'a' })
   const transformed = `const ${exports} = (() => {${content
     .replace(/'use strict'\s*\n/g, '') // No more required
-    .replace(/Object\.assign/g, 'assign')
-    .replace(/Object\.keys/g, 'keys')
+    .replace(/Object\.assign/g, 'ObjectAssign')
+    .replace(/Object\.keys/g, 'ObjectKeys')
     .replace(/new Promise/g, 'newPromise')
     .replace(/const [^\n]*= require\('[^']+node-api'\)/g, dependencies => '') // No more required
     // Convert exports into return, replace dictionary with an array
