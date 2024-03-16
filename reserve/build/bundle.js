@@ -203,10 +203,21 @@ while (remaining.length) {
         throw new Error(`Unexpected empty export names for ${id} (${modulePath}) from ${path}`)
       }
       const importedNames = exportNames.map(name => names.includes(name) ? name : undefined)
+      const importedNamesAsArray = importedNames
         .join(',')
         .replace(/,*$/, '') // trim ending ,
-      if (importedNames.length > 0) {
-        return `const [${importedNames}] = ${exports}`
+      if (importedNamesAsArray.length > 0) {
+        // compare the two syntaxes
+        const asArray = `const [${importedNamesAsArray}] = ${exports}`
+        const asObject = `const {${
+          importedNames
+            .map((name, index) => name === undefined ? '' : `${index}: ${name}`)
+            .filter(value => !!value)
+        }} = ${exports}`
+        if (asArray.length < asObject.length) {
+          return asArray
+        }
+        return asObject
       }
       return ''
     })
