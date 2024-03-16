@@ -123,7 +123,16 @@ const
   ObjectAssign = Object.assign,
   ObjectKeys = Object.keys,
   newPromise = executor => new Promise(executor),
-  newSymbol = () => Symbol()
+  newSymbol = () => Symbol(),
+  [
+    $empty,
+    $object,
+    $string,
+    $number,
+    $function,
+    $boolean,
+    $error
+  ] = ',object,string,number,function,boolean,error'.split(',')
 
 `, { flag: 'a' })
 
@@ -159,6 +168,13 @@ while (remaining.length) {
     .replace(/Object\.assign/g, 'ObjectAssign')
     .replace(/Object\.keys/g, 'ObjectKeys')
     .replace(/new Promise/g, 'newPromise')
+    .replace(/''/g, '$empty')
+    .replace(/'object'/g, '$object')
+    .replace(/'string'/g, '$string')
+    .replace(/'number'/g, '$number')
+    .replace(/'function'/g, '$function')
+    .replace(/'boolean'/g, '$boolean')
+    .replace(/'error'/g, '$error')
     .replace(/const [^\n]*= require\('[^']+node-api'\)/g, dependencies => '') // No more required
     // Convert exports into return, replace dictionary with an array
     .replace(/module\.exports\s+=\s+\{([^^}]*)\}/, match => {
