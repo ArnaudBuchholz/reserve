@@ -6,10 +6,12 @@ const mock = require('./mock')
 const { read } = require('./config/configuration')
 
 function waitForReady (server) {
-  return new Promise(resolve => {
-    server.on('ready', () => {
-      resolve(server)
-    })
+  return new Promise((resolve, reject) => {
+    server
+      .on('ready', () => {
+        resolve(server)
+      })
+      .on('error', reject)
   })
 }
 
@@ -102,6 +104,21 @@ describe('mock', () => {
           assert.strictEqual(events.length, 1)
           assert.strictEqual(events[0], 'created')
         })
+    })
+  })
+
+  describe('error handling', () => {
+    it('signals initialization errors', () => {
+      return assert.rejects(read('/reserve.json')
+        .then(configuration => {
+          configuration.listeners = [
+            function register (eventEmitter) {
+              throw new Error('KO')
+            }
+          ]
+          return waitForReady(mock(configuration))
+        })
+      )
     })
   })
 })

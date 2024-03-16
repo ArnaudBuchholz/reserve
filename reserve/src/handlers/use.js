@@ -2,7 +2,6 @@
 
 const { $useMiddleware, $handlerPrefix } = require('../symbols')
 const smartImport = require('../helpers/smartImport')
-const defer = require('../helpers/defer')
 const { throwError, ERROR_USE_UNSUPPORTED_MIDDLEWARE } = require('../error')
 
 module.exports = {
@@ -27,7 +26,7 @@ module.exports = {
     }
     mapping[$useMiddleware] = middleware
   },
-  redirect: ({ mapping, request, response }) => defer.$((resolve, reject) => {
+  redirect: ({ mapping, request, response }) => new Promise((resolve, reject) => {
     const useEnd = () => {
       resolve()
       response.end()

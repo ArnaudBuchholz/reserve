@@ -4,7 +4,6 @@ const { describe, it, before } = require('mocha')
 const assert = require('assert')
 const { notExpected } = require('test-tools')
 const { Request, Response, check, log, mock } = require('../index')
-const { $mappingMatch } = require('../symbols')
 
 function checkConfiguration (configuration, mapping) {
   assert.ok(configuration.handlers instanceof Object)
@@ -19,16 +18,11 @@ function checkConfiguration (configuration, mapping) {
   // Read-only handlers
   delete configuration.handlers.custom
   assert.ok(!!configuration.handlers.custom)
-  const fileHandler = configuration.handlers.file
+  const { redirect: fileHandlerRedirect } = configuration.handlers.file
   configuration.handlers.file = configuration.handlers.custom
-  assert.strictEqual(configuration.handlers.file, fileHandler)
-  const fileHandlerRedirect = fileHandler.redirect
-  try {
-    fileHandler.redirect = 0
-  } catch (e) {
-    assert.ok(e instanceof TypeError)
-  }
-  assert.strictEqual(fileHandler.redirect, fileHandlerRedirect)
+  assert.strictEqual(configuration.handlers.file.redirect, fileHandlerRedirect)
+  configuration.handlers.file.redirect = 0
+  assert.strictEqual(configuration.handlers.file.redirect, fileHandlerRedirect)
   // Read-only mapping list
   configuration.mappings.length = 0
   assert.ok(configuration.mappings.includes(mapping))
@@ -41,7 +35,6 @@ const handler = {
       throw new Error('mapping.ko')
     }
     assert.strictEqual(mapping.test, '$1')
-    assert.ok(mapping[$mappingMatch] instanceof RegExp)
     mapping.ok = true
   },
 

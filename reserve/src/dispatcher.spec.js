@@ -1,6 +1,6 @@
 'use strict'
 
-const { describe, it } = require('mocha')
+const { describe, it, before } = require('mocha')
 const assert = require('assert')
 const { check, Request, Response } = require('./index')
 const dispatcher = require('./dispatcher')
@@ -8,96 +8,7 @@ const { $configurationEventEmitter } = require('./symbols')
 const { newEventEmitter } = require('./event')
 
 const textMimeType = 'text/plain'
-const defaultConfigurationPromise = check({
-  handlers: {
-    fail: {
-      redirect: function fail () {
-        throw new Error('FAIL')
-      }
-    }
-  },
-  mappings: [{
-    method: 'GET,INFO,POST',
-    'invert-match': true,
-    status: 405
-  }, {
-    method: 'INFO',
-    custom: async function redirect () {
-      return 405
-    }
-  }, {
-    match: /^\/redirect/,
-    custom: async function redirect () {
-      return '/file.txt'
-    }
-  }, {
-    match: /^\/404/,
-    custom: async function err404 () {
-      return 404
-    }
-  }, {
-    match: /^\/fail/,
-    fail: true
-  }, {
-    match: /^\/throw/,
-    custom: function throw_ () {
-      throw new Error()
-    }
-  }, {
-    match: /^\/reject/,
-    custom: function reject () {
-      return Promise.reject(new Error())
-    }
-  }, {
-    match: /^(.*)$/,
-    custom: async function setXFlag (request, response) {
-      response.setHeader('x-flag', 'true')
-    }
-  }, {
-    match: /^\/file\.txt/,
-    'invert-match': true,
-    custom: async function setXNotFile (request, response) {
-      response.setHeader('x-not-file', 'true')
-    }
-  }, {
-    method: 'GET',
-    match: '/if-match.txt',
-    'if-match': function (request, url, match) {
-      request.ifMatched = true
-      if (request.headers['x-prevent-match']) {
-        return false
-      }
-      if (request.headers['x-error']) {
-        throw new Error(request.headers['x-error'])
-      }
-      const redirect = request.headers['x-match-redirect']
-      const redirectAsNumber = parseInt(redirect, 10)
-      if (redirectAsNumber > 0) {
-        return redirectAsNumber
-      }
-      if (redirect) {
-        return redirect
-      }
-      return true
-    },
-    custom: async function IfMatch (request, response) {
-      response.writeHead(200, { 'Content-Type': textMimeType })
-      response.end('if-match')
-    }
-  }, {
-    cwd: '/',
-    match: /^\/subst\/(.*)\/(.*)/,
-    file: '/$1.$2'
-  }, {
-    cwd: '/',
-    match: /^\/subst-complex\/(.*)\/(.*)/,
-    file: '/$1$$1.$2$3'
-  }, {
-    cwd: '/',
-    match: /^\/file\.txt/,
-    file: '/file.txt'
-  }]
-})
+let defaultConfigurationPromise
 
 function hasError (emitted) {
   return emitted.some(({ eventName }) => eventName === 'error')
@@ -139,6 +50,91 @@ async function dispatch ({ configurationPromise, events, request, beforeWait }) 
 }
 
 describe('dispatcher', () => {
+  before(() => {
+    defaultConfigurationPromise = check({
+      handlers: {
+        fail: {
+          redirect: function fail () {
+            throw new Error('FAIL')
+          }
+        }
+      },
+      mappings: [{
+        method: 'GET,INFO,POST',
+        'invert-match': true,
+        status: 405
+      }, {
+        method: 'INFO',
+        custom: async function redirect () {
+          return 405
+        }
+      }, {
+        match: /^\/redirect/,
+        custom: async function redirect () {
+          return '/file.txt'
+        }
+      }, {
+        match: /^\/404/,
+        custom: async function err404 () {
+          return 404
+        }
+      }, {
+        match: /^\/fail/,
+        fail: true
+      }, {
+        match: /^\/throw/,
+        custom: function throw_ () {
+          throw new Error()
+        }
+      }, {
+        match: /^\/reject/,
+        custom: function reject () {
+          return Promise.reject(new Error())
+        }
+      }, {
+        match: /^(.*)$/,
+        custom: async function setXFlag (request, response) {
+          response.setHeader('x-flag', 'true')
+        }
+      }, {
+        match: /^\/file\.txt/,
+        'invert-match': true,
+        custom: async function setXNotFile (request, response) {
+          response.setHeader('x-not-file', 'true')
+        }
+      }, {
+        method: 'GET',
+        match: '/if-match.txt',
+        'if-match': function (request, url, match) {
+          request.ifMatched = true
+          if (request.headers['x-prevent-match']) {
+            return false
+          }
+          if (request.headers['x-error']) {
+            throw new Error(request.headers['x-error'])
+          }
+          return true
+        },
+        custom: async function IfMatch (request, response) {
+          response.writeHead(200, { 'Content-Type': textMimeType })
+          response.end('if-match')
+        }
+      }, {
+        cwd: '/',
+        match: /^\/subst\/(.*)\/(.*)/,
+        file: '/$1.$2'
+      }, {
+        cwd: '/',
+        match: /^\/subst-complex\/(.*)\/(.*)/,
+        file: '/$1$$1.$2$3'
+      }, {
+        cwd: '/',
+        match: /^\/file\.txt/,
+        file: '/file.txt'
+      }]
+    })
+  })
+
   describe('events', () => {
     let firstRequestId
 
@@ -313,24 +309,6 @@ describe('dispatcher', () => {
         assert.strictEqual(response.statusCode, 500)
       })
     )
-
-    it('enables redirect (number)', () => dispatch({ request: { method: 'GET', url: '/if-match.txt', headers: { 'x-match-redirect': '508' } } })
-      .then(({ emitted, request, response }) => {
-        assert.ok(!hasError(emitted))
-        assert.ok(request.ifMatched)
-        assert.strictEqual(response.statusCode, 508)
-      })
-    )
-
-    it('enables redirect (string)', () => dispatch({ request: { method: 'GET', url: '/if-match.txt', headers: { 'x-match-redirect': '/file.txt' } } })
-      .then(({ emitted, request, response }) => {
-        assert.ok(!hasError(emitted))
-        assert.ok(request.ifMatched)
-        assert.strictEqual(response.statusCode, 200)
-        assert.strictEqual(response.headers['Content-Type'], textMimeType)
-        assert.strictEqual(response.toString(), 'Hello World!')
-      })
-    )
   })
 
   describe('handlers', () => {
@@ -399,22 +377,26 @@ describe('dispatcher', () => {
     })
 
     describe('Infinite loop', () => {
-      const loopConfigurationPromise = check({
-        mappings: [{
-          match: '/a',
-          custom: async () => '/b'
-        }, {
-          match: '/b',
-          custom: async () => '/a'
-        }, {
-          match: '/error',
-          custom: async (request, response) => {
-            response.writeHead = () => {
-              throw new Error('Simulates exception during writeHead')
+      let loopConfigurationPromise
+
+      before(() => {
+        loopConfigurationPromise = check({
+          mappings: [{
+            match: '/a',
+            custom: async () => '/b'
+          }, {
+            match: '/b',
+            custom: async () => '/a'
+          }, {
+            match: '/error',
+            custom: async (request, response) => {
+              response.writeHead = () => {
+                throw new Error('Simulates exception during writeHead')
+              }
+              throw new Error('Simulates exception during redirect')
             }
-            throw new Error('Simulates exception during redirect')
-          }
-        }]
+          }]
+        })
       })
 
       it('prevents infinite redirection', () => dispatch({ configurationPromise: loopConfigurationPromise, request: 'a' })

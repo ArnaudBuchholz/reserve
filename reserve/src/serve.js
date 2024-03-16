@@ -36,7 +36,7 @@ function createServer (configuration, requestHandler) {
 }
 
 function createServerAsync (emit, configuration, dispatcher) {
-  return defer.$((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     const server = createServer(configuration, dispatcher.bind(null, configuration))
     emit(EVENT_CREATED, { configuration: configuration[$configurationInterface], server })
     let { port } = configuration

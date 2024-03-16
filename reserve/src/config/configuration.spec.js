@@ -163,7 +163,7 @@ describe('config/configuration', () => {
         }]
       })
         .then(configuration => {
-          assert.ok(configuration.mappings[0][$mappingMatch] instanceof RegExp)
+          assert.strictEqual(typeof configuration.mappings[0][$mappingMatch], 'function')
         })
       )
 

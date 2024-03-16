@@ -28,6 +28,7 @@ const defaultHandlers = [
   require('../handlers/url'),
   require('../handlers/use')
 ].reduce((handlers, handler) => {
+  checkHandler(handler)
   handlers[handler[$handlerPrefix]] = handler
   return handlers
 }, {})
@@ -54,29 +55,12 @@ function applyDefaults (configuration) {
   })
 }
 
-function getHandler (handlers, types, mapping) {
-  for (let index = 0; index < types.length; ++index) {
-    const type = types[index]
-    const redirect = mapping[type]
-    if (redirect !== undefined) {
-      return {
-        handler: handlers[type],
-        redirect,
-        type
-      }
-    }
-  }
-  return {}
-}
-
 function checkHandler (handler, type) {
-  if (handler.schema) {
+  if (handler.schema && !handler[$handlerSchema]) {
     handler[$handlerSchema] = parse(handler.schema)
-    delete handler.schema
   }
-  if (handler.method) {
+  if (handler.method && !handler[$handlerMethod]) {
     checkMethod(handler, $handlerMethod)
-    delete handler.method
   }
   if (typeof handler.redirect !== 'function') {
     throwError(ERROR_CONFIG_INVALID_HANDLER, { type })
@@ -93,20 +77,18 @@ async function validateHandler ({ cwd, handlers }, type) {
     handlers[type] = handler
   }
   checkHandler(handler, type)
-  Object.freeze(handler)
 }
 
-async function setHandlers (configuration) {
-  if (configuration.handlers) {
-    // Default hanlders can't be overridden
-    configuration.handlers = Object.assign({}, configuration.handlers, defaultHandlers)
-  } else {
-    configuration.handlers = Object.assign({}, defaultHandlers)
-  }
+async function setHandlers (configuration, mockedHandlers = {}) {
+  const copyOfDefaultHandlers = Object.keys(defaultHandlers).reduce((handlers, type) => {
+    handlers[type] = Object.assign({}, defaultHandlers[type])
+    return handlers
+  }, {})
+  configuration.handlers = Object.assign({}, configuration.handlers || {}, copyOfDefaultHandlers)
+  Object.keys(mockedHandlers).forEach(type => Object.assign(configuration.handlers[type], mockedHandlers[type]))
   for (const type of Object.keys(configuration.handlers)) {
     await validateHandler(configuration, type)
   }
-  configuration.handler = getHandler.bind(null, configuration.handlers, Object.keys(configuration.handlers))
 }
 
 function invalidListeners () {
@@ -206,13 +188,13 @@ function extend (filePath, configuration) {
   return configuration
 }
 
-async function check (configuration) {
+async function check (configuration, mockedHandlers) {
   if (typeof configuration !== 'object' || configuration === null) {
     throwError(ERROR_CONFIG_NOT_AN_OBJECT)
   }
   const checkedConfiguration = Object.assign({}, configuration)
   applyDefaults(checkedConfiguration)
-  await setHandlers(checkedConfiguration)
+  await setHandlers(checkedConfiguration, mockedHandlers)
   await checkListeners(checkedConfiguration)
   await checkProtocol(checkedConfiguration)
   await checkMappings(checkedConfiguration)

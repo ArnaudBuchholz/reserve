@@ -142,10 +142,10 @@ declare module 'reserve' {
   }
 
   interface Handler {
-    schema?: Record<string, string | string[] | PropertySchema>
-    method?: string
-    validate?: (mapping: BaseMapping, configuration: IConfiguration) => void
-    redirect: (context: RedirectContext) => Promise<RedirectResponse>
+    readonly schema?: Record<string, string | string[] | PropertySchema>
+    readonly method?: string
+    readonly validate?: (mapping: BaseMapping, configuration: IConfiguration) => void
+    readonly redirect: (context: RedirectContext) => Promise<RedirectResponse>
   }
 
   type Handlers = Record<string, Handler>
@@ -243,7 +243,7 @@ declare module 'reserve' {
     } & ServerEventIncoming
   |
     {
-      eventName: ServerEventName.incoming
+      eventName: ServerEventName.error
       error: any
     } & ServerEventIncoming
   | 

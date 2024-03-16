@@ -26,7 +26,8 @@ while (stack.length) {
   }
   const content = readFileSync(join('src', path))
     .toString()
-    .replace(/Symbol\([^)]*\)/g, 'Symbol()') // No need to keep symbol key
+    .replace(/Symbol\([^)]*\)/g, 'newSymbol()') // No need to keep symbol key
+
   const module = {
     content,
     depends: {}
@@ -117,6 +118,23 @@ nodeApi.replace(/(\w+): promisify\(\w+\)/g, (match, api) => promisified.push(api
 
 writeFileSync('dist/core.js', `module.exports=function(${imports.join(',')}){\n`)
 promisified.forEach(api => writeFileSync('dist/core.js', `${api}=promisify(${api})\n`, { flag: 'a' }))
+writeFileSync('dist/core.js', `
+const
+  ObjectAssign = Object.assign,
+  ObjectKeys = Object.keys,
+  newPromise = executor => new Promise(executor),
+  newSymbol = () => Symbol(),
+  [
+    $empty,
+    $object,
+    $string,
+    $number,
+    $function,
+    $boolean,
+    $error
+  ] = ',object,string,number,function,boolean,error'.split(',')
+
+`, { flag: 'a' })
 
 const written = ['node-api.js']
 const remaining = Object.values(modules).filter(({ path }) => !written.includes(path))
@@ -147,6 +165,16 @@ while (remaining.length) {
   writeFileSync('dist/core.js', `// BEGIN OF ${path}\n`, { flag: 'a' })
   const transformed = `const ${exports} = (() => {${content
     .replace(/'use strict'\s*\n/g, '') // No more required
+    .replace(/Object\.assign/g, 'ObjectAssign')
+    .replace(/Object\.keys/g, 'ObjectKeys')
+    .replace(/new Promise/g, 'newPromise')
+    .replace(/''/g, '$empty')
+    .replace(/'object'/g, '$object')
+    .replace(/'string'/g, '$string')
+    .replace(/'number'/g, '$number')
+    .replace(/'function'/g, '$function')
+    .replace(/'boolean'/g, '$boolean')
+    .replace(/'error'/g, '$error')
     .replace(/const [^\n]*= require\('[^']+node-api'\)/g, dependencies => '') // No more required
     // Convert exports into return, replace dictionary with an array
     .replace(/module\.exports\s+=\s+\{([^^}]*)\}/, match => {
@@ -175,10 +203,21 @@ while (remaining.length) {
         throw new Error(`Unexpected empty export names for ${id} (${modulePath}) from ${path}`)
       }
       const importedNames = exportNames.map(name => names.includes(name) ? name : undefined)
+      const importedNamesAsArray = importedNames
         .join(',')
         .replace(/,*$/, '') // trim ending ,
-      if (importedNames.length > 0) {
-        return `const [${importedNames}] = ${exports}`
+      if (importedNamesAsArray.length > 0) {
+        // compare the two syntaxes
+        const asArray = `const [${importedNamesAsArray}] = ${exports}`
+        const asObject = `const {${
+          importedNames
+            .map((name, index) => name === undefined ? '' : `${index}: ${name}`)
+            .filter(value => !!value)
+        }} = ${exports}`
+        if (asArray.length < asObject.length) {
+          return asArray
+        }
+        return asObject
       }
       return ''
     })

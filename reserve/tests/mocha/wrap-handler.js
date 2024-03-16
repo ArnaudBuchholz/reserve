@@ -22,7 +22,7 @@ module.exports = (handler, defaults = {}) => {
     if (!response) {
       response = new Response()
     }
-    configuration = { ...defaults.configuration, ...configuration, handler: () => { return { handler } } }
+    configuration = { ...defaults.configuration, ...configuration, handlers: { [handler[$handlerPrefix]]: handler } }
     const iconfiguration = new IConfiguration(configuration)
     configuration[$configurationInterface] = iconfiguration
     if (!match) {
@@ -30,7 +30,7 @@ module.exports = (handler, defaults = {}) => {
     }
     let mappingReady
     if (mapping !== null && (!mapping || !mapping[$checked])) {
-      mapping = { ...defaults.mapping, ...mapping, [$checked]: true }
+      mapping = { [handler[$handlerPrefix]]: '', ...defaults.mapping, ...mapping, [$checked]: true }
       mappingReady = checkMapping(configuration, mapping)
     } else {
       mappingReady = Promise.resolve()

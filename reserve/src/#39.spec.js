@@ -1,6 +1,6 @@
 'use strict'
 
-const { describe, it, beforeEach } = require('mocha')
+const { describe, it, before, beforeEach } = require('mocha')
 const assert = require('assert')
 const { check, mock } = require('./index')
 
@@ -23,43 +23,48 @@ const reconfigure = {
   }
 }
 
-const defaultConfigurationPromise = check({
-  handlers: { reconfigure },
-  mappings: [{
-    method: 'GET',
-    match: '/blocking',
-    custom: () => new Promise(() => {}) // blocked
-  }, {
-    method: 'GET',
-    match: '/non-holding',
-    'exclude-from-holding-list': true,
-    custom: () => new Promise(() => {}) // blocked
-  }, {
-    method: 'GET',
-    match: '/reconfigure',
-    reconfigure: true
-  }, {
-    method: 'GET',
-    match: '/hello',
-    custom: async (request, response) => {
-      response.writeHead(200, {
-        'content-type': 'text/plain'
-      })
-      response.end('Hello')
-    }
-  }, {
-    method: 'GET',
-    match: '/redirect',
-    custom: () => new Promise(resolve => {
-      setTimeout(() => resolve('/hello'), 50)
-    })
-  }]
-})
-
 describe('#39 setMapings blocked by long request', () => {
+  let defaultConfiguration
+
+  before(async () => {
+    defaultConfiguration = await check({
+      handlers: { reconfigure },
+      mappings: [{
+        method: 'GET',
+        match: '/blocking',
+        custom: () => new Promise(() => {}) // blocked
+      }, {
+        method: 'GET',
+        match: '/non-holding',
+        'exclude-from-holding-list': true,
+        custom: () => new Promise(() => {}) // blocked
+      }, {
+        method: 'GET',
+        match: '/reconfigure',
+        reconfigure: true
+      }, {
+        method: 'GET',
+        match: '/hello',
+        custom: async (request, response) => {
+          response.writeHead(200, {
+            'content-type': 'text/plain'
+          })
+          response.end('Hello')
+        }
+      }, {
+        method: 'GET',
+        match: '/redirect',
+        custom: () => new Promise(resolve => {
+          setTimeout(() => resolve('/hello'), 50)
+        })
+      }]
+    })
+  })
+
   let mocked
+
   beforeEach(async () => {
-    mocked = mock(await defaultConfigurationPromise)
+    mocked = mock(defaultConfiguration)
     return new Promise(resolve => mocked.on('ready', resolve))
   })
 

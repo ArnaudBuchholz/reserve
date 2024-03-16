@@ -24,7 +24,7 @@
   "scripts": {
     "build:sources": "node build/mime --silent && node build/error",
     "prebuild": "npm run build:sources",
-    "build": "node build/bundle && terser dist/core.js --compress --keep-fnames --mangle -o dist/core.js && terser src/cli.js --compress --keep-fnames --mangle -o dist/cli.js && node build/size",
+    "build": "node build/bundle && terser dist/core.js --compress --mangle -o dist/core.js && terser src/cli.js --compress --keep-fnames --mangle -o dist/cli.js && node build/size",
     "pretest": "npm run build:sources",
     "test": "standard && nyc mocha && node tests/integration.mjs && (node -e \"if (parseInt(process.version.match(/v(\\d+)/)[1]) > 14) process.exit(1) \" || npm run test:types)",
     "test:build": "node tests/integration.mjs dist && node tests/integration.mjs mock && node tests/integration.mjs mjs",
@@ -57,9 +57,9 @@
   },
   "homepage": "https://github.com/ArnaudBuchholz/reserve#readme",
   "devDependencies": {
-    "@stryker-mutator/core": "^8.2.3",
-    "@stryker-mutator/mocha-runner": "^8.2.3",
-    "@types/node": "^20.11.17",
+    "@stryker-mutator/core": "^8.2.6",
+    "@stryker-mutator/mocha-runner": "^8.2.6",
+    "@types/node": "^20.11.26",
     "cors": "^2.8.5",
     "eslint-utils": "^3.0.0",
     "mocha": "^10.3.0",
@@ -68,8 +68,8 @@
     "punycache": "^1.0.0",
     "reserve": "",
     "standard": "^17.1.0",
-    "terser": "^5.27.0",
-    "typescript": "^5.3.3"
+    "terser": "^5.29.1",
+    "typescript": "^5.4.2"
   },
   "standard": {
     "env": [
