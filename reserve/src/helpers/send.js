@@ -2,7 +2,6 @@
 
 const { pipeline } = require('../node-api')
 const { bin, text, json } = require('../mime')
-const defer = require('../helpers/defer')
 
 const CONTENT_TYPE = 'content-type'
 const CONTENT_LENGTH = 'content-length'

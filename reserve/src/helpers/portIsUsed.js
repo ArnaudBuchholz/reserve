@@ -1,7 +1,6 @@
 'use strict'
 
 const { Socket } = require('../node-api')
-const defer = require('../helpers/defer')
 
 module.exports = (port, {
   timeout = 400,
