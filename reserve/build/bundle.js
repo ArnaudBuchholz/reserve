@@ -26,7 +26,8 @@ while (stack.length) {
   }
   const content = readFileSync(join('src', path))
     .toString()
-    .replace(/Symbol\([^)]*\)/g, 'Symbol()') // No need to keep symbol key
+    .replace(/Symbol\([^)]*\)/g, 'newSymbol()') // No need to keep symbol key
+
   const module = {
     content,
     depends: {}
@@ -115,14 +116,14 @@ nodeApi.replace(/const ([^=]+) = require\('([^']+)'\)/g, (match, imported, id) =
 const promisified = []
 nodeApi.replace(/(\w+): promisify\(\w+\)/g, (match, api) => promisified.push(api))
 
-
 writeFileSync('dist/core.js', `module.exports=function(${imports.join(',')}){\n`)
 promisified.forEach(api => writeFileSync('dist/core.js', `${api}=promisify(${api})\n`, { flag: 'a' }))
 writeFileSync('dist/core.js', `
 const
   ObjectAssign = Object.assign,
   ObjectKeys = Object.keys,
-  newPromise = executor => new Promise(executor)
+  newPromise = executor => new Promise(executor),
+  newSymbol = () => Symbol()
 
 `, { flag: 'a' })
 
