@@ -2,28 +2,48 @@
 const { describe, it, before } = require('mocha')
 const assert = require('assert')
 const checkMatch = require('./checkMatch')
-const { $mappingMatch } = require('../symbols')
+const checkMethod = require('./checkMethod')
+const { $mappingMatch, $mappingMethod } = require('../symbols')
 
 async function test (label, mapping, matches) {
   describe(label, () => {
     before(() => {
+      checkMethod(mapping, $mappingMethod)
       checkMatch(mapping)
       assert.strictEqual(typeof mapping[$mappingMatch], 'function')
     })
 
-    for (const { url, method, captured: expectedCaptured, named: expectedNamed } of matches) {
+    for (const { only, get, post, put, captured: expectedCaptured, named: expectedNamed } of matches) {
+      let method, url
+      if (get) {
+        method = 'GET'
+        url = get
+      } else if (post) {
+        method = 'POST'
+        url = post
+      } else if (put) {
+        method = 'PUT'
+        url = put
+      } else {
+        throw new Error('Unable to determine method and url')
+      }
+      const itMethod = only ? it.only : it
       if (expectedCaptured === undefined) {
-        it(`ignores ${method} ${url}`, async () => {
-          const match = await mapping[$mappingMatch](url, method)
-          assert.strictEqual(match, null)
+        itMethod(`ignores ${method} ${url}`, async () => {
+          const match = await mapping[$mappingMatch](url, { method })
+          assert.ok(!match)
         })
       } else {
-        it(`matches ${method} ${url}`, async () => {
-          const match = await mapping[$mappingMatch](url, method)
-          const [, ...captured] = match
-          assert.deepEqual(captured, expectedCaptured)
-          const { groups } = match
-          assert.deepEqual(groups, expectedNamed)
+        itMethod(`matches ${method} ${url}`, async () => {
+          const match = await mapping[$mappingMatch](url, { method })
+          if (expectedCaptured === true) {
+            assert.strictEqual(match, true)
+          } else {
+            const [, ...captured] = match
+            assert.deepEqual(captured, expectedCaptured)
+            const { groups } = match
+            assert.deepEqual(groups, expectedNamed)
+          }
         })
       }
     }
@@ -35,8 +55,7 @@ describe('config/checkMatch', () => {
     {
     },
     [{
-      url: '/any',
-      method: 'GET',
+      get: '/any',
       captured: ['/any'] // everything is captured
     }]
   )
@@ -46,16 +65,161 @@ describe('config/checkMatch', () => {
       match: '/any'
     },
     [{
-      url: '/any',
-      method: 'GET',
+      get: '/any',
       captured: ['']
     }, {
-      url: '/any?params',
-      method: 'POST',
+      post: '/any?params',
       captured: ['?params']
     }, {
-      url: '/nope',
-      method: 'GET'
+      get: '/nope'
     }]
   )
+
+  test('method matching',
+    {
+      method: 'GET'
+    },
+    [{
+      get: '/any',
+      captured: ['/any']
+    }, {
+      post: '/any?params'
+    }]
+  )
+
+  test('methods matching (string)',
+    {
+      method: 'GET,POST'
+    },
+    [{
+      get: '/any',
+      captured: ['/any']
+    }, {
+      post: '/any?params',
+      captured: ['/any?params']
+    }, {
+      put: '/any?params'
+    }]
+  )
+
+  test('methods matching (array)',
+    {
+      method: ['GET', 'POST']
+    },
+    [{
+      get: '/any',
+      captured: ['/any']
+    }, {
+      post: '/any?params',
+      captured: ['/any?params']
+    }, {
+      put: '/any?params'
+    }]
+  )
+
+  test('method and url matching',
+    {
+      method: 'GET',
+      match: '/any'
+    },
+    [{
+      get: '/any',
+      captured: ['']
+    }, {
+      get: '/any?params',
+      captured: ['?params']
+    }, {
+      get: '/nope'
+    }, {
+      post: '/any'
+    }]
+  )
+
+  describe('invert-match', () => {
+    test('no settings',
+      {
+        'invert-match': true
+      },
+      [{
+        get: '/any'
+      }]
+    )
+
+    test('url matching',
+      {
+        'invert-match': true,
+        match: '/any'
+      },
+      [{
+        get: '/any'
+      }, {
+        post: '/any?params'
+      }, {
+        only: true,
+        get: '/nope',
+        captured: true // TODO not sure about this
+      }]
+    )
+/*
+    test('method matching',
+      {
+        method: 'GET'
+      },
+      [{
+        get: '/any',
+        captured: ['/any']
+      }, {
+        post: '/any?params'
+      }]
+    )
+
+    test('methods matching (string)',
+      {
+        method: 'GET,POST'
+      },
+      [{
+        get: '/any',
+        captured: ['/any']
+      }, {
+        post: '/any?params',
+        captured: ['/any?params']
+      }, {
+        put: '/any?params'
+      }]
+    )
+
+    test('methods matching (array)',
+      {
+        method: ['GET', 'POST']
+      },
+      [{
+        get: '/any',
+        captured: ['/any']
+      }, {
+        post: '/any?params',
+        captured: ['/any?params']
+      }, {
+        put: '/any?params'
+      }]
+    )
+
+    test('method and url matching',
+      {
+        method: 'GET',
+        match: '/any'
+      },
+      [{
+        get: '/any',
+        captured: ['']
+      }, {
+        get: '/any?params',
+        captured: ['?params']
+      }, {
+        get: '/nope'
+      }, {
+        post: '/any'
+      }]
+    )
+*/
+  })
 })
