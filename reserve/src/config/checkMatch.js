@@ -12,8 +12,8 @@ const { $mappingMethod, $mappingMatch } = require('../symbols')
 const factories = [
   match => url => match.exec(url),
   (match, methods) => (url, { method }) => methods.includes(method) && match.exec(url),
-  match => url => !match.exec(url),
-  (match, methods) => (url, { method }) => !methods.includes(method) || !match.exec(url)
+  match => url => match.exec(url) ? false : [],
+  (match, methods) => (url, { method }) => methods.includes(method) && match.exec(url) ? false : []
 ]
 
 module.exports = mapping => {

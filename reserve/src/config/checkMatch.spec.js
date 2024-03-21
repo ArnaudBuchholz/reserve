@@ -7,10 +7,17 @@ const { $mappingMatch, $mappingMethod } = require('../symbols')
 
 async function test (label, mapping, matches) {
   describe(label, () => {
+    let invertMatchMapping
+
     before(() => {
       checkMethod(mapping, $mappingMethod)
       checkMatch(mapping)
       assert.strictEqual(typeof mapping[$mappingMatch], 'function')
+
+      invertMatchMapping = { ...mapping, 'invert-match': true }
+      checkMethod(invertMatchMapping, $mappingMethod)
+      checkMatch(invertMatchMapping)
+      assert.strictEqual(typeof invertMatchMapping[$mappingMatch], 'function')
     })
 
     for (const { only, get, post, put, captured: expectedCaptured, named: expectedNamed } of matches) {
@@ -33,6 +40,11 @@ async function test (label, mapping, matches) {
           const match = await mapping[$mappingMatch](url, { method })
           assert.ok(!match)
         })
+
+        itMethod(`matches ${method} ${url} (invert-match)`, async () => {
+          const match = await invertMatchMapping[$mappingMatch](url, { method })
+          assert.deepStrictEqual(match, [])
+        })
       } else {
         itMethod(`matches ${method} ${url}`, async () => {
           const match = await mapping[$mappingMatch](url, { method })
@@ -40,10 +52,15 @@ async function test (label, mapping, matches) {
             assert.strictEqual(match, true)
           } else {
             const [, ...captured] = match
-            assert.deepEqual(captured, expectedCaptured)
+            assert.deepStrictEqual(captured, expectedCaptured)
             const { groups } = match
-            assert.deepEqual(groups, expectedNamed)
+            assert.deepStrictEqual(groups, expectedNamed)
           }
+        })
+
+        itMethod(`ignores ${method} ${url}  (invert-match)`, async () => {
+          const match = await invertMatchMapping[$mappingMatch](url, { method })
+          assert.ok(!match)
         })
       }
     }
@@ -51,6 +68,24 @@ async function test (label, mapping, matches) {
 }
 
 describe('config/checkMatch', () => {
+  describe('validation', () => {
+    describe('invert-match', () => {
+      [0, 1, -1, '', 'true', false].forEach(invalidOptionValue =>
+        it(`rejects ${JSON.stringify(invalidOptionValue)}`, () => {
+          assert.throws(() => checkMatch({ 'invert-match': invalidOptionValue }))
+        })
+      )
+    })
+
+    describe('if-match', () => {
+      [0, 1, -1, '', 'true', false].forEach(invalidOptionValue =>
+        it(`rejects ${JSON.stringify(invalidOptionValue)}`, () => {
+          assert.throws(() => checkMatch({ 'if-match': invalidOptionValue }))
+        })
+      )
+    })
+  })
+
   test('no settings',
     {
     },
@@ -134,92 +169,4 @@ describe('config/checkMatch', () => {
       post: '/any'
     }]
   )
-
-  describe('invert-match', () => {
-    test('no settings',
-      {
-        'invert-match': true
-      },
-      [{
-        get: '/any'
-      }]
-    )
-
-    test('url matching',
-      {
-        'invert-match': true,
-        match: '/any'
-      },
-      [{
-        get: '/any'
-      }, {
-        post: '/any?params'
-      }, {
-        only: true,
-        get: '/nope',
-        captured: true // TODO not sure about this
-      }]
-    )
-/*
-    test('method matching',
-      {
-        method: 'GET'
-      },
-      [{
-        get: '/any',
-        captured: ['/any']
-      }, {
-        post: '/any?params'
-      }]
-    )
-
-    test('methods matching (string)',
-      {
-        method: 'GET,POST'
-      },
-      [{
-        get: '/any',
-        captured: ['/any']
-      }, {
-        post: '/any?params',
-        captured: ['/any?params']
-      }, {
-        put: '/any?params'
-      }]
-    )
-
-    test('methods matching (array)',
-      {
-        method: ['GET', 'POST']
-      },
-      [{
-        get: '/any',
-        captured: ['/any']
-      }, {
-        post: '/any?params',
-        captured: ['/any?params']
-      }, {
-        put: '/any?params'
-      }]
-    )
-
-    test('method and url matching',
-      {
-        method: 'GET',
-        match: '/any'
-      },
-      [{
-        get: '/any',
-        captured: ['']
-      }, {
-        get: '/any?params',
-        captured: ['?params']
-      }, {
-        get: '/nope'
-      }, {
-        post: '/any'
-      }]
-    )
-*/
-  })
 })
