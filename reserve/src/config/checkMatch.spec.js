@@ -14,10 +14,12 @@ async function test (label, mapping, matches) {
       checkMatch(mapping)
       assert.strictEqual(typeof mapping[$mappingMatch], 'function')
 
-      invertMatchMapping = { ...mapping, 'invert-match': true }
-      checkMethod(invertMatchMapping, $mappingMethod)
-      checkMatch(invertMatchMapping)
-      assert.strictEqual(typeof invertMatchMapping[$mappingMatch], 'function')
+      if (mapping['if-match'] === undefined) {
+        invertMatchMapping = { ...mapping, 'invert-match': true }
+        checkMethod(invertMatchMapping, $mappingMethod)
+        checkMatch(invertMatchMapping)
+        assert.strictEqual(typeof invertMatchMapping[$mappingMatch], 'function')
+      }
     })
 
     for (const { only, get, post, put, captured: expectedCaptured, named: expectedNamed } of matches) {
@@ -41,10 +43,12 @@ async function test (label, mapping, matches) {
           assert.ok(!match)
         })
 
-        itMethod(`matches ${method} ${url} (invert-match)`, async () => {
-          const match = await invertMatchMapping[$mappingMatch](url, { method })
-          assert.deepStrictEqual(match, [])
-        })
+        if (invertMatchMapping !== undefined) {
+          itMethod(`matches ${method} ${url} (invert-match)`, async () => {
+            const match = await invertMatchMapping[$mappingMatch](url, { method })
+            assert.deepStrictEqual(match, [])
+          })
+        }
       } else {
         itMethod(`matches ${method} ${url}`, async () => {
           const match = await mapping[$mappingMatch](url, { method })
@@ -58,10 +62,12 @@ async function test (label, mapping, matches) {
           }
         })
 
-        itMethod(`ignores ${method} ${url}  (invert-match)`, async () => {
-          const match = await invertMatchMapping[$mappingMatch](url, { method })
-          assert.ok(!match)
-        })
+        if (invertMatchMapping !== undefined) {
+          itMethod(`ignores ${method} ${url}  (invert-match)`, async () => {
+            const match = await invertMatchMapping[$mappingMatch](url, { method })
+            assert.ok(!match)
+          })
+        }
       }
     }
   })
@@ -163,6 +169,42 @@ describe('config/checkMatch', () => {
     }, {
       get: '/any?params',
       captured: ['?params']
+    }, {
+      get: '/nope'
+    }, {
+      post: '/any'
+    }]
+  )
+
+  test('synchronous if-mach returning true',
+    {
+      method: 'GET',
+      match: '/any',
+      'if-match': () => true
+    },
+    [{
+      get: '/any',
+      captured: ['']
+    }, {
+      get: '/any?params',
+      captured: ['?params']
+    }, {
+      get: '/nope'
+    }, {
+      post: '/any'
+    }]
+  )
+
+  test('synchronous if-mach returning false',
+    {
+      method: 'GET',
+      match: '/any',
+      'if-match': () => false
+    },
+    [{
+      get: '/any'
+    }, {
+      get: '/any?params'
     }, {
       get: '/nope'
     }, {

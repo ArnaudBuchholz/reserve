@@ -42,9 +42,22 @@ module.exports = mapping => {
   const baseMatch = factories[index](match, methods)
   if (ifMatch) {
     mapping[$mappingMatch] = function (url, request) {
-      const match = baseMatch(url, request)
-      if (match) {
-        return ifMatch(request, url, match)
+      const initialMatch = baseMatch(url, request)
+      const process = result => {
+        if (result === true) {
+          return initialMatch
+        }
+        if (result) {
+          return result
+        }
+        return null
+      }
+      if (initialMatch) {
+        match = ifMatch(request, initialMatch)
+        if (match && match.then) {
+          return match.then(process)
+        }
+        return process(match)
       }
       return null
     }
