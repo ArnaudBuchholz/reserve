@@ -22,11 +22,11 @@
     "@fastify/static": "^7.0.1",
     "@stryker-mutator/core": "^8.2.6",
     "@stryker-mutator/mocha-runner": "^8.2.6",
-    "@types/node": "^20.11.26",
+    "@types/node": "^20.11.30",
     "autocannon": "^7.15.0",
     "cors": "^2.8.5",
     "eslint-utils": "^3.0.0",
-    "express": "^4.18.3",
+    "express": "^4.19.1",
     "fastify": "^4.26.2",
     "mocha": "^10.3.0",
     "mock-require": "^3.0.3",
@@ -34,8 +34,8 @@
     "punycache": "^1.0.0",
     "reserve": "^2",
     "standard": "^17.1.0",
-    "terser": "^5.29.1",
-    "typescript": "^5.4.2"
+    "terser": "^5.29.2",
+    "typescript": "^5.4.3"
   },
   "license": "MIT"
 }
