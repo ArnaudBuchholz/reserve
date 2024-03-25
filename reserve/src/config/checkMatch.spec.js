@@ -4,8 +4,9 @@ const assert = require('assert')
 const checkMatch = require('./checkMatch')
 const checkMethod = require('./checkMethod')
 const { $mappingMatch, $mappingMethod } = require('../symbols')
+const Request = require('../mock/Request')
 
-async function test (label, mapping, matches) {
+function test (label, mapping, matches) {
   describe(label, () => {
     let invertMatchMapping
 
@@ -36,24 +37,25 @@ async function test (label, mapping, matches) {
       } else {
         throw new Error('Unable to determine method and url')
       }
+      const request = new Request({ method, url })
       const itMethod = only ? it.only : it
       if (expectedCaptured === undefined) {
         itMethod(`ignores ${method} ${url}`, async () => {
-          const match = await mapping[$mappingMatch](url, { method })
+          const match = await mapping[$mappingMatch](url, request)
           assert.ok(!match)
         })
 
         if (invertMatchMapping !== undefined) {
           itMethod(`matches ${method} ${url} (invert-match)`, async () => {
-            const match = await invertMatchMapping[$mappingMatch](url, { method })
+            const match = await invertMatchMapping[$mappingMatch](url, request)
             assert.deepStrictEqual(match, [])
           })
         }
       } else {
         itMethod(`matches ${method} ${url}`, async () => {
-          const match = await mapping[$mappingMatch](url, { method })
-          if (expectedCaptured === true) {
-            assert.strictEqual(match, true)
+          const match = await mapping[$mappingMatch](url, request)
+          if (!Array.isArray(expectedCaptured)) {
+            assert.strictEqual(match, expectedCaptured)
           } else {
             const [, ...captured] = match
             assert.deepStrictEqual(captured, expectedCaptured)
@@ -64,13 +66,21 @@ async function test (label, mapping, matches) {
 
         if (invertMatchMapping !== undefined) {
           itMethod(`ignores ${method} ${url}  (invert-match)`, async () => {
-            const match = await invertMatchMapping[$mappingMatch](url, { method })
+            const match = await invertMatchMapping[$mappingMatch](url, request)
             assert.ok(!match)
           })
         }
       }
     }
   })
+}
+
+function testSyncAsync (label, mapping, matches) {
+  test(`synchronous ${label}`, mapping, matches)
+  test(`asynchronous ${label}`, {
+    ...mapping,
+    'if-match': async (...args) => mapping['if-match'](...args)
+  }, matches)
 }
 
 describe('config/checkMatch', () => {
@@ -176,7 +186,7 @@ describe('config/checkMatch', () => {
     }]
   )
 
-  test('synchronous if-mach returning true',
+  testSyncAsync('if-mach returning true',
     {
       method: 'GET',
       match: '/any',
@@ -195,7 +205,7 @@ describe('config/checkMatch', () => {
     }]
   )
 
-  test('synchronous if-mach returning false',
+  testSyncAsync('if-mach returning false',
     {
       method: 'GET',
       match: '/any',
@@ -205,6 +215,63 @@ describe('config/checkMatch', () => {
       get: '/any'
     }, {
       get: '/any?params'
+    }, {
+      get: '/nope'
+    }, {
+      post: '/any'
+    }]
+  )
+
+  testSyncAsync('if-match returning a string',
+    {
+      method: 'GET',
+      match: '/any',
+      'if-match': () => 'new_url'
+    },
+    [{
+      get: '/any',
+      captured: 'new_url'
+    }, {
+      get: '/any?params',
+      captured: 'new_url'
+    }, {
+      get: '/nope'
+    }, {
+      post: '/any'
+    }]
+  )
+
+  testSyncAsync('if-match returning a number',
+    {
+      method: 'GET',
+      match: '/any',
+      'if-match': () => 404
+    },
+    [{
+      get: '/any',
+      captured: 404
+    }, {
+      get: '/any?params',
+      captured: 404
+    }, {
+      get: '/nope'
+    }, {
+      post: '/any'
+    }]
+  )
+
+  testSyncAsync('if-match returning a modified match',
+    {
+      method: 'GET',
+      match: '/any',
+      'if-match': ({ method, url }, match) => [0, method, url, ...match]
+    },
+    [{
+      get: '/any',
+      captured: ['GET', '/any', '/any', '']
+    }, {
+      get: '/any?params',
+      captured: ['GET', '/any?params', '/any?params', '?params']
     }, {
       get: '/nope'
     }, {
