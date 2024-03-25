@@ -105,7 +105,7 @@ describe('dispatcher', () => {
       }, {
         method: 'GET',
         match: '/if-match.txt',
-        'if-match': function (request, url, match) {
+        'if-match': async function (request, url, match) {
           request.ifMatched = true
           if (request.headers['x-prevent-match']) {
             return false

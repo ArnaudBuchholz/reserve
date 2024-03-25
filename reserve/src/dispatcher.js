@@ -116,16 +116,30 @@ function dispatch (context, url, index = 0) {
       redirect: url
     })
   }
+  return evaluateMappings(context, url, index)
+}
+
+function evaluateMappings (context, url, index) {
   try {
-    const { mappings } = configuration
+    const { mappings } = context.configuration
     const { length } = mappings
     while (index < length) {
       const mapping = mappings[index]
       const match = mapping[$mappingMatch](url, context.request)
-      // if (match && match.then) {
-
-      // }
       if (match) {
+        if (match.then) {
+          match
+            .then(result => {
+              if (result) {
+                const { handler, redirect, type } = mapping[$mappingHandler]
+                redirecting(context, { mapping, match, handler, type, redirect: interpolate(match, redirect), url, index })
+              } else {
+                evaluateMappings(context, url, index + 1)
+              }
+            })
+            .catch(reason => error(context, reason))
+          return
+        }
         const { handler, redirect, type } = mapping[$mappingHandler]
         return redirecting(context, { mapping, match, handler, type, redirect: interpolate(match, redirect), url, index })
       }
