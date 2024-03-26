@@ -92,3 +92,4 @@
 |1.15.6|Fix types definition (MockServer)|
 |1.15.7|Fix types definition (UseMapping)|
 |1.15.8|Fix types definition (UseMapping)|
+|1.15.9|Documentation update|
