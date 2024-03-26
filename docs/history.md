@@ -92,6 +92,7 @@
 |1.15.6|Fix types definition (MockServer)|
 |1.15.7|Fix types definition (UseMapping)|
 |1.15.8|Fix types definition (UseMapping)|
+|1.15.9|Documentation update|
 |2.0.0|Refactoring to improve project structure|
 ||⚠️BREAKING CHANGE: Support of CommonJS and ESM imports|
 ||⚠️BREAKING CHANGE: Remove support of `colors`|
@@ -115,6 +116,7 @@
 ||⚠️BREAKING CHANGE: `body` helper leverages request headers and offers conversion interface|
 ||⚠️BREAKING CHANGE: `server-created` event is now renamed to `created`|
 ||⚠️BREAKING CHANGE: `match` interpretation and interpolation has evolved|
+||⚠️BREAKING CHANGE: `if-match` signature change|
 ||Fix `use` to handle middleware that are not calling next|
 ||Response status code is preserved when set before `file`|
 ||`static` option for performant `file` delivery ([`doc`](file.md))|
