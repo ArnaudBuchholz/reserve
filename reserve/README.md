@@ -1,6 +1,4 @@
-# ᖇᕮserve *(a.k.a. reserve)*
-
-<small>*Logo using [Canadian Aboriginal Syllabics characters](https://en.wikipedia.org/wiki/Canadian_Aboriginal_syllabics)*</small>
+# reserve
 
 [![Node.js CI](https://github.com/ArnaudBuchholz/reserve/actions/workflows/reserve-ci.yml/badge.svg)](https://github.com/ArnaudBuchholz/reserve/actions/workflows/node.js.yml)
 ![no dependencies](https://img.shields.io/badge/-no_dependencies-green)
@@ -13,7 +11,7 @@
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FArnaudBuchholz%2Freserve.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FArnaudBuchholz%2Freserve?ref=badge_shield)
 [![Documentation](https://img.shields.io/badge/-documentation-blueviolet)](https://arnaudbuchholz.github.io/reserve/)
-[![History](https://img.shields.io/badge/-history-blueviolet)](https://arnaudbuchholz.github.io/reserve/history.html)
+[![History](https://img.shields.io/badge/-history-blueviolet)](https://github.com/ArnaudBuchholz/reserve/blob/main/reserve/CHANGELOG.md)
 
 A **lightweight** web server **configurable** with regular expressions.
 It can also be **embedded** and **extended**. The name comes from the combination of `RE` for regular expressions and `serve`.

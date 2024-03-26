@@ -1,15 +1,12 @@
-# ᖇᕮserve
-
-*Logo using [Canadian Aboriginal Syllabics characters](https://en.wikipedia.org/wiki/Canadian_Aboriginal_syllabics)*
-
+# reserve
 
 ## 📚 Documentation
 
 The project is a monorepo aggregating :
-* the [REserve project](reserve/README.md),
-* its [documentation](docs/README.md),
-* some [samples](samples/README.md)
-* and custom [plugins](plugins/README.md).
+* [REserve project](reserve/README.md),
+* [Documentation](docs/README.md),
+* [Samples](samples/README.md)
+* Custom [plugins](plugins/README.md).
 
 ## 💿 How to install
 
