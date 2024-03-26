@@ -17,7 +17,6 @@
 </table>
 
 [![Node.js CI](https://github.com/ArnaudBuchholz/reserve/actions/workflows/node.js.yml/badge.svg)](https://github.com/ArnaudBuchholz/reserve/actions/workflows/node.js.yml)
-[![Coverage Status](https://coveralls.io/repos/github/ArnaudBuchholz/reserve/badge.svg?branch=master)](https://coveralls.io/github/ArnaudBuchholz/reserve?branch=master)
 [![Package Quality](https://npm.packagequality.com/shield/reserve.svg)](https://packagequality.com/#?package=reserve)
 [![Known Vulnerabilities](https://snyk.io/test/github/ArnaudBuchholz/reserve/badge.svg?targetFile=package.json)](https://snyk.io/test/github/ArnaudBuchholz/reserve?targetFile=package.json)
 [![reserve](https://badge.fury.io/js/reserve.svg)](https://www.npmjs.org/package/reserve)
@@ -26,8 +25,8 @@
 [![PackagePhobia](https://img.shields.io/badge/%F0%9F%93%A6package-phobia-lightgrey)](https://packagephobia.com/result?p=reserve)
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FArnaudBuchholz%2Freserve.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FArnaudBuchholz%2Freserve?ref=badge_shield)
-[![Documentation](https://img.shields.io/badge/-documentation-blueviolet)](https://arnaudbuchholz.github.io/reserve/)
-[![History](https://img.shields.io/badge/-history-blueviolet)](https://arnaudbuchholz.github.io/reserve/history.html)
+[![Documentation](https://img.shields.io/badge/-documentation-blueviolet)](https://github.com/ArnaudBuchholz/reserve/tree/1.x/docs#reserve-documentation)
+[![History](https://img.shields.io/badge/-history-blueviolet)](https://github.com/ArnaudBuchholz/reserve/blob/1.x/docs/history.md#version-history)
 
 A **lightweight** web server statically **configurable** with regular expressions.
 It can also be **embedded** and **extended**.
@@ -59,6 +58,8 @@ For instance, the definition of a server that **exposes files** of the current d
   }]
 }
 ```
+
+⚠️ This version of reserve is vulnerable to [path traversal](https://owasp.org/www-community/attacks/Path_Traversal).
 
 # Usage
 
@@ -118,7 +119,7 @@ check({
   })
 ```
 
-The resulting object implements the [EventEmitter](https://nodejs.org/api/events.html) class and throws events with parameters, see [Server events](doc/events.md).
+The resulting object implements the [EventEmitter](https://nodejs.org/api/events.html) class and throws events with parameters, see [Server events](https://github.com/ArnaudBuchholz/reserve/blob/1.x/docs/events.md#server-events).
 It also exposes a `close` method (returning a `Promise`) to shutdown the server.
 
 The package also gives access to the configuration reader :
@@ -150,5 +151,5 @@ read('reserve.json')
 
 # Complete documentation
 
-Go to this [page](https://github.com/ArnaudBuchholz/reserve/tree/master/doc/README.md) to access documentation and articles about REserve.
+Go to this [page](https://github.com/ArnaudBuchholz/reserve/blob/1.x/docs/README.md#reserve-documentation) to access documentation and articles about REserve.
 
