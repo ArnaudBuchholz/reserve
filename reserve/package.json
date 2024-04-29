@@ -1,6 +1,6 @@
 {
   "name": "reserve",
-  "version": "2.0.0",
+  "version": "2.0.0-beta",
   "description": "Lightweight http server statically configurable using regular expressions",
   "main": "./dist/index.js",
   "exports": {
@@ -59,17 +59,17 @@
   "devDependencies": {
     "@stryker-mutator/core": "^8.2.6",
     "@stryker-mutator/mocha-runner": "^8.2.6",
-    "@types/node": "^20.11.26",
+    "@types/node": "^20.12.7",
     "cors": "^2.8.5",
     "eslint-utils": "^3.0.0",
-    "mocha": "^10.3.0",
+    "mocha": "^10.4.0",
     "mock-require": "^3.0.3",
     "nyc": "^15.1.0",
     "punycache": "^1.0.0",
     "reserve": "",
     "standard": "^17.1.0",
-    "terser": "^5.29.1",
-    "typescript": "^5.4.2"
+    "terser": "^5.30.4",
+    "typescript": "^5.4.5"
   },
   "standard": {
     "env": [

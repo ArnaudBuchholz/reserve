@@ -28,7 +28,7 @@
   "license": "MIT",
   "homepage": "https://github.com/ArnaudBuchholz/reserve/handlers/ui5#readme",
   "peerDependencies": {
-    "reserve": "^2"
+    "reserve": ""
   },
   "devDependencies": {
     "mocha": "^10",

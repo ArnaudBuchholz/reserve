@@ -9,7 +9,7 @@
     "autocannon": "^7",
     "express": "^4",
     "fastify": "^4",
-    "reserve": "^2",
+    "reserve": "",
     "standard": "^17"
   },
   "author": "Arnaud Buchholz",
