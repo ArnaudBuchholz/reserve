@@ -4,8 +4,9 @@ const { describe, it, before } = require('mocha')
 const assert = require('assert')
 const { check, Request, Response } = require('./index')
 const dispatcher = require('./dispatcher')
-const { $configurationEventEmitter } = require('./symbols')
+const { $configurationEventEmitter, $mappingMatch } = require('./symbols')
 const { newEventEmitter } = require('./event')
+const status = require('./handlers/status')
 
 const textMimeType = 'text/plain'
 let defaultConfigurationPromise
@@ -354,6 +355,46 @@ describe('dispatcher', () => {
           assert.strictEqual(response.statusCode, 500)
         })
       )
+
+      it('supports internal failures (1)', () => dispatch({
+        configurationPromise: defaultConfigurationPromise
+          .then(configuration => {
+            const buggyConfiguration = {
+              ...configuration,
+              mappings: [...configuration.mappings]
+            }
+            buggyConfiguration.mappings[0] = {
+              ...buggyConfiguration.mappings[0],
+              [$mappingMatch]: () => { throw new Error('NOPE') }
+            }
+            return buggyConfiguration
+          }),
+        request: '/fail'
+      })
+        .then(({ emitted, response }) => {
+          assert.ok(hasError(emitted))
+          assert.strictEqual(response.statusCode, 500)
+        }))
+
+      it('supports internal failures (2)', () => dispatch({
+        configurationPromise: defaultConfigurationPromise
+          .then(configuration => {
+            const buggyConfiguration = {
+              ...configuration,
+              handlers: { ...configuration.handlers }
+            }
+            buggyConfiguration.handlers.status = {
+              ...status,
+              redirect: () => { throw new Error('NOPE') }
+            }
+            return buggyConfiguration
+          }),
+        request: '/fail'
+      })
+        .then(({ emitted, response }) => {
+          assert.ok(hasError(emitted))
+          assert.strictEqual(response.statusCode, 200)
+        }))
     })
 
     describe('No handler for the request', () => {
