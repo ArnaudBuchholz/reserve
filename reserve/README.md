@@ -1,4 +1,4 @@
-# reserve
+# REserve 2️⃣
 
 [![Node.js CI](https://github.com/ArnaudBuchholz/reserve/actions/workflows/reserve-ci.yml/badge.svg)](https://github.com/ArnaudBuchholz/reserve/actions/workflows/node.js.yml)
 ![no dependencies](https://img.shields.io/badge/-no_dependencies-green)
@@ -13,14 +13,13 @@
 [![Documentation](https://img.shields.io/badge/-documentation-blueviolet)](https://arnaudbuchholz.github.io/reserve/)
 [![History](https://img.shields.io/badge/-history-blueviolet)](https://github.com/ArnaudBuchholz/reserve/blob/main/reserve/CHANGELOG.md)
 
-A **lightweight** web server **configurable** with regular expressions.
-It can also be **embedded** and **extended**. The name comes from the combination of `RE` for regular expressions and `serve`.
+> A **lightweight** web server **configurable** with regular expressions. It can also be **embedded** and **extended**. The name comes from the combination of `RE` for regular expressions and `serve`.
 
 # 🍁 Rational
 
 Initially started to build a local **development environment** where static files are served and resources can be fetched from remote repositories, this **tool** is **versatile** and can support different scenarios :
 - A simple web server,
-- A reverse proxy to an existing server,
+- A reverse proxy,
 - A server that aggregates several sources,
 - ...
 
@@ -35,7 +34,7 @@ For instance, the definition of a server that **exposes files** of the current d
 {
   "port": 8080,
   "mappings": [{
-    "match": "^/private/.*",
+    "match": "^/private/",
     "status": 403
   }, {
     "match": "^/(.*)",
@@ -48,47 +47,18 @@ For instance, the definition of a server that **exposes files** of the current d
 
 # 💿 Usage
 
-## npm start
+## Command line
 
-* Install the package with `npm install reserve`
-* You may create a start script in `package.json` :
-
-```json
-{
-  "scripts": {
-    "start": "reserve"
-  }
-}
-```
-
-> Example of start script in `package.json`
+The package declares the executable `reserve` :
 
 * By default, it will look for a file named `reserve.json` in the current working directory
-* A configuration file name can be specified using `--config <file name>`, for instance :
+* One or more configuration files name can be specified using `--config <file names separated by ,>`
 
-```json
-{
-  "scripts": {
-    "start": "reserve",
-    "start-dev": "reserve --config reserve-dev.json"
-  }
-}
-```
-
-> Example of configuration file parameter in `package.json`
-
-## Global
-
-* Install the package with `npm install reserve --global`
-* Run `reserve`
-  * By default, it will look for a file named `reserve.json` in the current working directory
-  * A configuration file name can be specified using `--config <file name>`
-
-**NOTE** : if [`process.send`](https://nodejs.org/api/process.html#process_process_send_message_sendhandle_options_callback) is defined, REserve will notify the parent process when the server is ready by sending the message `'ready'`.
+**NOTE** : if [`process.send`](https://nodejs.org/api/process.html#process_process_send_message_sendhandle_options_callback) is available, REserve notifies the parent process when the server is ready by sending the message `'ready'`.
 
 ## Embedded
 
-It is possible to implement the server in an application using the `serve` export :
+The server can be embedded in an application using the `serve` export :
 
 ```javascript
 const { serve } = require('reserve')
@@ -141,13 +111,10 @@ read('reserve.json')
 
 # ⚖️ License
 
-The package is licensed MIT and it has **no** dependencies.
-
-# ⚠️ Breaking changes
-
-* [From v1 to v2](https://github.com/ArnaudBuchholz/reserve/tree/master/docs/v1_to_v2.md)
+The package is licensed MIT and has **no** dependencies.
 
 # 📚 Documentation
 
 Go to this [page](https://github.com/ArnaudBuchholz/reserve/tree/master/docs/README.md) to access documentation and articles about REserve.
 
+[⚠️ From v1 to v2](https://github.com/ArnaudBuchholz/reserve/tree/master/docs/v1_to_v2.md)
