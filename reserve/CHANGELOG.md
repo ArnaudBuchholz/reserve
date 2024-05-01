@@ -1,6 +1,6 @@
 |Version|content|
 |---|---|
-|2.0.0|Refactoring to improve project structure|
+|2.0.0|Refactoring to improve project structure and performances|
 ||⚠️BREAKING CHANGE: Support of CommonJS and ESM imports|
 ||⚠️BREAKING CHANGE: Remove support of `colors`|
 ||⚠️BREAKING CHANGE: Remove support of `mime`|
@@ -18,6 +18,8 @@
 ||⚠️BREAKING CHANGE: In `file`, `static` behavior added ([`doc`](file.md))|
 ||⚠️BREAKING CHANGE: Default configuration does not include proxy|
 ||⚠️BREAKING CHANGE: `mock` returns immediately even if the *server* is not ready (wait for `ready`)|
+||⚠️BREAKING CHANGE: `Request` and `Response` are direct exports|
+||⚠️BREAKING CHANGE: `Response`' `statusCode` is defaulted to `200`|
 ||⚠️BREAKING CHANGE: Headers of mocked Request and Response returns strings or array of strings|
 ||⚠️BREAKING CHANGE: Mocked Request normalizes the received URL|
 ||⚠️BREAKING CHANGE: `body` helper leverages request headers and offers conversion interface|
