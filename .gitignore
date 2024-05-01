@@ -36,3 +36,4 @@ docs/_site
 
 .env
 .clinic
+.vscode/
