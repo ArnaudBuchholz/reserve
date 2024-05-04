@@ -222,7 +222,7 @@ describe('config/checkMatch', () => {
     }]
   )
 
-  testSyncAsync('if-match returning a string',
+  testSyncAsync('if-match returning a string (truthy)',
     {
       method: 'GET',
       match: '/any',
@@ -230,10 +230,10 @@ describe('config/checkMatch', () => {
     },
     [{
       get: '/any',
-      captured: 'new_url'
+      captured: ['']
     }, {
       get: '/any?params',
-      captured: 'new_url'
+      captured: ['?params']
     }, {
       get: '/nope'
     }, {
@@ -241,7 +241,24 @@ describe('config/checkMatch', () => {
     }]
   )
 
-  testSyncAsync('if-match returning a number',
+  testSyncAsync('if-match returning a string (falsy)',
+    {
+      method: 'GET',
+      match: '/any',
+      'if-match': () => ''
+    },
+    [{
+      get: '/any'
+    }, {
+      get: '/any?params'
+    }, {
+      get: '/nope'
+    }, {
+      post: '/any'
+    }]
+  )
+
+  testSyncAsync('if-match returning a number (truthy)',
     {
       method: 'GET',
       match: '/any',
@@ -249,10 +266,10 @@ describe('config/checkMatch', () => {
     },
     [{
       get: '/any',
-      captured: 404
+      captured: ['']
     }, {
       get: '/any?params',
-      captured: 404
+      captured: ['?params']
     }, {
       get: '/nope'
     }, {
@@ -260,7 +277,24 @@ describe('config/checkMatch', () => {
     }]
   )
 
-  testSyncAsync('if-match returning a modified match',
+  testSyncAsync('if-match returning a number (falsy)',
+    {
+      method: 'GET',
+      match: '/any',
+      'if-match': () => 0
+    },
+    [{
+      get: '/any'
+    }, {
+      get: '/any?params'
+    }, {
+      get: '/nope'
+    }, {
+      post: '/any'
+    }]
+  )
+
+  testSyncAsync('if-match returning an array',
     {
       method: 'GET',
       match: '/any',
@@ -268,10 +302,10 @@ describe('config/checkMatch', () => {
     },
     [{
       get: '/any',
-      captured: ['GET', '/any', '/any', '']
+      captured: ['']
     }, {
       get: '/any?params',
-      captured: ['GET', '/any?params', '/any?params', '?params']
+      captured: ['?params']
     }, {
       get: '/nope'
     }, {

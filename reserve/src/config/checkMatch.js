@@ -44,11 +44,8 @@ module.exports = mapping => {
     mapping[$mappingMatch] = function (url, request) {
       const initialMatch = baseMatch(url, request)
       const process = result => {
-        if (result === true) {
-          return initialMatch
-        }
         if (result) {
-          return result
+          return initialMatch
         }
         return null
       }

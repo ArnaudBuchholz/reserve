@@ -105,20 +105,20 @@ describe('dispatcher', () => {
         }
       }, {
         method: 'GET',
-        match: '/if-match.txt',
+        match: '/if-match(.*)',
         'if-match': async function (request, url, match) {
           request.ifMatched = true
-          if (request.headers['x-prevent-match']) {
-            return false
-          }
           if (request.headers['x-error']) {
             throw new Error(request.headers['x-error'])
           }
+          if (request.headers['x-match-result']) {
+            return JSON.parse(request.headers['x-match-result'])
+          }
           return true
         },
-        custom: async function IfMatch (request, response) {
+        custom: async function IfMatch (request, response, captured) {
           response.writeHead(200, { 'Content-Type': textMimeType })
-          response.end('if-match')
+          response.end(`if-match${captured}`)
         }
       }, {
         cwd: '/',
@@ -278,7 +278,7 @@ describe('dispatcher', () => {
   })
 
   describe('if-match', () => {
-    it('is not triggered if the mapping does not match', () => dispatch({ request: '/if-not-match.txt' })
+    it('is not triggered if the mapping does not match', () => dispatch({ request: '/if-not-match' })
       .then(({ emitted, request, response }) => {
         assert.ok(hasError(emitted))
         assert.ok(!request.ifMatched)
@@ -286,24 +286,55 @@ describe('dispatcher', () => {
       })
     )
 
-    it('decides of the final match (prevent)', () => dispatch({ request: { method: 'GET', url: '/if-match.txt', headers: { 'x-prevent-match': true } } })
-      .then(({ emitted, request, response }) => {
-        assert.ok(hasError(emitted))
-        assert.ok(request.ifMatched)
-        assert.strictEqual(response.statusCode, 501)
-      })
-    )
+    const values = {
+      true: true,
+      false: false,
+      '"/looks_like_an_url_but_wont_redirect"': true,
+      0: false
+    }
 
-    it('decides of the final match (allow)', () => dispatch({ request: { method: 'GET', url: '/if-match.txt' } })
-      .then(({ emitted, request, response }) => {
-        assert.ok(!hasError(emitted))
-        assert.ok(request.ifMatched)
-        assert.strictEqual(response.statusCode, 200)
-        assert.strictEqual(response.toString(), 'if-match')
-      })
-    )
+    Object.keys(values).forEach(result => {
+      const expected = values[result]
+      if (expected) {
+        it(`allows the match (truthy: ${result})`, () => dispatch({
+          request: {
+            method: 'GET',
+            url: '/if-match-allowed',
+            headers: {
+              'x-match-result': result
+            }
+          }
+        })
+          .then(({ emitted, request, response }) => {
+            if (hasError(emitted)) {
+              console.log(emitted)
+            }
+            assert.ok(!hasError(emitted))
+            assert.ok(request.ifMatched)
+            assert.strictEqual(response.statusCode, 200)
+            assert.strictEqual(response.toString(), 'if-match-allowed')
+          })
+        )
+      } else {
+        it(`denies the match (falsy: ${result})`, () => dispatch({
+          request: {
+            method: 'GET',
+            url: '/if-match-allowed',
+            headers: {
+              'x-match-result': result
+            }
+          }
+        })
+          .then(({ emitted, request, response }) => {
+            assert.ok(hasError(emitted))
+            assert.ok(request.ifMatched)
+            assert.strictEqual(response.statusCode, 501)
+          })
+        )
+      }
+    })
 
-    it('handles errors', () => dispatch({ request: { method: 'GET', url: '/if-match.txt', headers: { 'x-error': 'KO' } } })
+    it('handles errors', () => dispatch({ request: { method: 'GET', url: '/if-match', headers: { 'x-error': 'KO' } } })
       .then(({ emitted, request, response }) => {
         assert.ok(hasError(emitted))
         assert.ok(request.ifMatched)

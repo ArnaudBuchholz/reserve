@@ -129,10 +129,10 @@ function evaluateMappings (context, url, index) {
       if (match) {
         if (match.then) {
           match
-            .then(result => {
-              if (result) {
+            .then(asyncMatch => {
+              if (asyncMatch) {
                 const { handler, redirect, type } = mapping[$mappingHandler]
-                redirecting(context, { mapping, match, handler, type, redirect: interpolate(match, redirect), url, index })
+                redirecting(context, { mapping, match: asyncMatch, handler, type, redirect: interpolate(asyncMatch, redirect), url, index })
               } else {
                 evaluateMappings(context, url, index + 1)
               }
