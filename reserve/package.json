@@ -1,6 +1,6 @@
 {
   "name": "reserve",
-  "version": "2.0.0-beta.1",
+  "version": "2.0.0-beta.2",
   "description": "Lightweight http server statically configurable using regular expressions",
   "main": "./dist/index.js",
   "exports": {
@@ -68,7 +68,7 @@
     "punycache": "^1.0.0",
     "reserve": "",
     "standard": "^17.1.0",
-    "terser": "^5.30.4",
+    "terser": "^5.31.0",
     "typescript": "^5.4.5"
   },
   "standard": {
