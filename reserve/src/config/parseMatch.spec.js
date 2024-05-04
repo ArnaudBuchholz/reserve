@@ -108,10 +108,16 @@ describe('config/parseMatch', () => {
     })
 
     describe('otherwise a pattern', () => {
-      it('converts to regex', () => {
+      it('converts to regex (no dot)', () => {
         const re = parseMatch('/path')
         assert.ok(re instanceof RegExp)
         assert.strictEqual(re.toString(), '/^\\/path\\b(.*)/')
+      })
+
+      it('converts to regex (with dot)', () => {
+        const re = parseMatch('/name.extension')
+        assert.ok(re instanceof RegExp)
+        assert.strictEqual(re.toString(), '/^\\/name\\.extension\\b(.*)/')
       })
 
       it('handles query parameters (:)', () => {

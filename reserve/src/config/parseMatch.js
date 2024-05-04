@@ -18,6 +18,8 @@ module.exports = match => {
     return new RegExp(match)
   }
   return new RegExp(`^${
-    match.replace(/:(\w+)/g, (_, id) => `(?<${id}>[^/]*)`)
+    match
+      .replace(/\./g, '\\.')
+      .replace(/:(\w+)/g, (_, id) => `(?<${id}>[^/]*)`)
   }\\b(.*)`)
 }
