@@ -163,7 +163,7 @@ module.exports = function (configuration, request, response) {
   const emitParameters = {
     id,
     internal: !!request[$requestInternal],
-    method: request.method,
+    method: request.method.toUpperCase(),
     incomingUrl: request.url,
     url,
     headers: { ...request.headers },
