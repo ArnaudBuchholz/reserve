@@ -57,7 +57,7 @@ declare module 'reserve' {
     'custom-file-system'?: string | CustomFileSystem
     'caching-strategy'?: 'modified' | number
     'strict'?: boolean
-    'mime-types'?: Record<string, string>
+    'mime-types'?: { [key: string]: string }
     'http-status'?: number
   }
 
@@ -67,14 +67,14 @@ declare module 'reserve' {
 
   interface StatusMapping extends BaseMapping {
     status: number
-    headers?: Record<string, string>
+    headers?: { [key: string]: string }
   }
 
   // endregion status
 
   // region url
 
-  type Headers = Record<string, string | string[]>
+  type Headers = { [key: string]: string | string[] }
 
   interface RequestSummary {
     method: string
@@ -142,13 +142,13 @@ declare module 'reserve' {
   }
 
   interface Handler {
-    readonly schema?: Record<string, string | string[] | PropertySchema>
+    readonly schema?: { [key: string]: string | string[] | PropertySchema }
     readonly method?: string
     readonly validate?: (mapping: BaseMapping, configuration: IConfiguration) => void
     readonly redirect: (context: RedirectContext) => Promise<RedirectResponse>
   }
 
-  type Handlers = Record<string, Handler>
+  type Handlers = { [key: string]: Handler }
 
   type Listener = string | ServerListener
 
@@ -213,7 +213,7 @@ declare module 'reserve' {
   }
 
   type ServerEventIncoming = {
-    method: string
+    method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS' | 'TRACE' | 'PATCH' | string
     incomingUrl: string // before normalization
     url: string // after normalization
     headers: Headers
