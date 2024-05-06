@@ -1,12 +1,10 @@
-# REserve Documentation
+# REserve 2️⃣ Documentation
 
-## ⚠️ Migration guide
-
-* [From v1 to v2](v1_to_v2.md)
+[🆙 Migration guide From v1 to v2](v1_to_v2.md)
 
 ## Configuration
 
-There are two ways to **leverage** REserve :
+There are two ways to use REserve :
 * Run as a **standalone command line** with a **configuration file** *(default name is `reserve.json`)*
 * **Embed** with its configuration in a **custom application**
 
@@ -18,9 +16,9 @@ In both cases, the configuration must comply with the properties and mappings [d
 
 REserve is **delivered** with the following default handlers :
 * [`file`](file.md) to serve resources from the file system
-* [`url`](url.md) to internally forward the request to any web address
+* [`url`](url.md) to serve resources from a web address
 * [`custom`](custom.md) to enable custom coding
-* [`use`](use.md) *(experimental)* to integrate [express middlewares](https://www.npmjs.com/search?q=keywords%3Aexpress%20keywords%3Amiddleware)
+* [`use`](use.md) to integrate packaged middlewares (express)
 
 Other additional handlers can be installed **separately** and plugged through the `handlers` configuration property.
 
@@ -34,11 +32,12 @@ If you plan to build your **own handler**, here is [what you need to know](handl
 
 ## Server events
 
-The server object implements the [EventEmitter](https://nodejs.org/api/events.html) class and, during execution, it throws [**events with parameters**](events.md) to **notify** any listener of **its activity**.
+The REserve server object implements an interface that mimics the [EventEmitter::on method](https://nodejs.org/api/events.html#emitteroneventname-listener) and, during execution, it triggers [**events with parameters**](events.md) to **notify** any listener of **its activity**.
 
 ## Helpers
 
 REserve also offers some helpers to simplify implementations :
+* [`log`](log.md) to handle and output server logs
 * [`body`](body.md) to read a request body
 * [`send`](send.md) to build a response
 * [`capture`](capture.md) to copy the response stream to another stream *(for instance: to create a [cache](cache%20and%20proxy.md))*
