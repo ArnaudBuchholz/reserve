@@ -218,7 +218,6 @@ declare module 'reserve' {
     url: string // after normalization
     headers: Headers
     start: Date
-    perfDate: number
     id: number
     internal: boolean
   }
@@ -256,7 +255,6 @@ declare module 'reserve' {
     {
       eventName: ServerEventName.redirected
       end: Date
-      perfEnd: number
       timeSpent: number
       statusCode: number
     } & ServerEventIncoming
