@@ -1,10 +1,12 @@
 # `capture` helper
 
+REserve offers a mechanism to **capture the response stream** and **duplicate its content** to another **writable stream**.
+
 ```typescript
 function capture (response: ServerResponse, stream: WritableStream): Promise<void>
 ```
 
-REserve offers a mechanism to **capture the response stream** and **duplicate its content** to another **writable stream**.
+> Types definition for `capture`
 
 **NOTE** : The content is decoded if the [`content-encoding`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding) header contains: `gzip`, `deflate` or `br` *(only one, no combination is supported)*.
 
@@ -36,3 +38,4 @@ mappings: [{
 }]
 ```
 
+> Example of `capture` used to cache resources

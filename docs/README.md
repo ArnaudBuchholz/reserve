@@ -36,7 +36,7 @@ The REserve server object implements an interface that mimics the [EventEmitter:
 
 ## Helpers
 
-REserve also offers some helpers to simplify implementations :
+REserve offers some helpers to simplify implementations :
 * [`log`](log.md) to handle and output server logs
 * [`body`](body.md) to read a request body
 * [`send`](send.md) to build a response
@@ -45,7 +45,7 @@ REserve also offers some helpers to simplify implementations :
 
 ## Mocking
 
-REserve includes a [mocking environment](mocking.md) to **simplify the tests**. It takes the **configuration** and asynchronously returns a server object **augmented with a `request` method** to simulate incoming requests.
+REserve includes a [mocking environment](mocking.md) to **ease the tests**. It takes the **configuration** and returns a fake server object **augmented with a `request` method** to simulate incoming requests.
 
 ## Version history
 

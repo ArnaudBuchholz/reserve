@@ -1,5 +1,7 @@
 # `send` helper
 
+REserve offers a way to **build** responses : `statusCode` and `headers` *may* be specified, `noBody` prevents the body sending.
+
 ```typescript
 interface SendOptions {
   statusCode?: number /* defaulted to 200 */
@@ -11,12 +13,13 @@ function send (response: ServerResponse, data: ReadableStream, options?: SendOpt
 function send (response: ServerResponse, data?: string | object, options?: SendOptions): void
 ```
 
-REserve offers a way to easily build responses : `statusCode` and `headers` can be specified, `noBody` prevents the body sending.
+> Types definition for `send`
 
 Headers are defaulted *(if not set)* depending on the `data` type :
 * `string` :
   * `content-type` is set to `text/plain`
-  * `content-length` is set computed a text encoder
+  * `content-length` is calculated based on the UTF-8 encoding byte length
 * `object` :
   * `content-type` is set to `application/json`
-  * `content-length` is set using a text encoder
+  * `content-length` is calculated based on the UTF-8 encoding byte length
+* `ReadableStream` : not set
