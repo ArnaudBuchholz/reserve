@@ -44,21 +44,30 @@ declare module 'reserve' {
     end: number
   }
 
+  interface CustomFileSystemStat {
+    isDirectory: () => boolean
+    size: number
+    mtime: Date
+  }
+
   interface CustomFileSystem {
-    readdir?: (folderPath: string) => Promise<string[]>
-    stat: (filePath: string) => Promise<Stats>
+    readdir: (folderPath: string) => Promise<string[]>
+    stat: (filePath: string) => Promise<CustomFileSystemStat>
     createReadStream: (filePath: string, options?: ReadStreamOptions) => Promise<ReadableStream>
+  }
+
+  interface PunycacheOptions {
+    ttl?: number
+    max?: number
+    policy?: 'lru' | 'lfu'
   }
 
   interface FileMapping extends BaseMapping {
     file: string
-    'case-sensitive'?: boolean
-    'ignore-if-not-found'?: boolean
-    'custom-file-system'?: string | CustomFileSystem
-    'caching-strategy'?: 'modified' | number
-    'strict'?: boolean
     'mime-types'?: { [key: string]: string }
-    'http-status'?: number
+    'caching-strategy'?: 'modified' | number
+    'custom-file-system'?: string | CustomFileSystem
+    'static'?: boolean | PunycacheOptions
   }
 
   // endregion file

@@ -2,7 +2,6 @@
 
 Answers the request using **file system**.
 
-Example :
 ```json
 {
   "match": "^/(.*)",
@@ -10,27 +9,30 @@ Example :
 }
 ```
 
+> Example of mapping with the `file` handler
+
+## Features
+
 * Supports [GET](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET) and [HEAD](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD)
 * Capturing groups can be used as substitution parameters
 * **Always relative** to the handler's `cwd` member *(see [mappings](configuration.md#mappings))* :
   * [🛂 Path traversal](https://owasp.org/www-community/attacks/Path_Traversal) is blocked
-* Incoming URL parameters are automatically stripped out to simplify the matching expression
-* Directory access is internally redirected to the inner `index.html` file *(if any)*
+* Incoming URL parameters (and hash) are removed when resolving to file
+* Directory access is mapped to the inner `index.html` file *(if any)*
 * If the path resolves to a missing / unreadable / invalid file or directory, the handler does **not** process the request
-  * Folder names are case-sensitively checked (Windows)
+  * Folder names are case-sensitively checked (⚠️ Windows)
 * Supports [`Range` HTTP header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range) *(only one range)*
 * If the response already owns a `statusCode` different from `200`, the file handler will keep it
 * Only a limited subset of mime types is pre-configured (see [mime.json](https://github.com/ArnaudBuchholz/reserve/blob/main/src/mime.json)), use `mime-types` to extend
 
+## Options
+
 | option | type | default | description |
 |---|---|---|---|
-| `mime-types` | Object | `{}` | Dictionary indexed by file extension that overrides mime type resolution. For instance : `{ "gsf": "application/x-font-ghostscript" }`. |
-| `caching-strategy` | `'modified'` or Number | 0 | Configures caching strategy:  |
-|||| `'modified'`: use file last modification date, meaning the response header will contain [`Last-Modified`](https://developer.mozilla.org/fr/docs/Web/HTTP/Headers/Last-Modified) and the handler reacts to request headers [`If-Modified-Since`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Modified-Since) and [`If-Range`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Range)  |
-|||| any number: hard coded duration (in seconds), based on the response header [`Cache-Control` with `max-age`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) |
-|||| 0 *(default)*: [`Cache-Control` with `no-store`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) |
-| `custom-file-system` | String or Object | undefined | Provides custom file system API *(see below)*. |
-| `static` | Boolean or Object | *depends on `custom-file-system`* | Cache file system information for performance. When `custom-file-system` is used, `static` is `false` by default *(but can be set)*. Otherwise, `static` is `true` by default. An object can be used to pass options to the cache handler, see [`punycache`](https://www.npmjs.com/package/punycache) documentation.|
+| `mime-types` | `{ [key: string]: string }` | `{}` | Dictionary indexed by file extension that overrides mime type resolution.<br>For instance : `{ "gsf": "application/x-font-ghostscript" }`. |
+| `caching-strategy` | `'modified'` \| `number` | `0` | Configures caching strategy:<br>• `'modified'` : use file last modification date, meaning the response header will contain [`Last-Modified`](https://developer.mozilla.org/fr/docs/Web/HTTP/Headers/Last-Modified) and the handler reacts to request headers [`If-Modified-Since`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Modified-Since) and [`If-Range`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Range),<br>• `number` : duration (in seconds), based on the response header [`Cache-Control` with `max-age`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control),<br>• `0` : [`Cache-Control` with `no-store`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control). |
+| `custom-file-system` | `string` \| `CustomFileSystem` | `undefined` | Provides custom file system API *(see below)*. |
+| `static` | `boolean` \| `PunycacheOptions` | *depends on `custom-file-system`* | Cache file system information for performance.<br>When `custom-file-system` is used, `static` is `false` by default *(but can be overridden)*.<br>Otherwise, `static` is `true` by default.<br>An object can be used to pass options to the cache handler, see [`punycache`](https://www.npmjs.com/package/punycache) documentation.|
 
 **NOTE** : When `static` is enabled, REserve does not expect the files / folders to change. For instance, if the file size changes while its information has been cached, the result might appear corrupted.
 
@@ -57,4 +59,4 @@ It must return an object equivalent to [fs.Stats](https://nodejs.org/api/fs.html
 
 This is the asynchronous equivalent of [fs.createReadStream](https://nodejs.org/api/fs.html#fs_fs_createreadstream_path_options).  When `options` is specified, it contains only `start` and `end`.
 
-It  must return a [readable stream](https://nodejs.org/api/fs.html#stream_class_stream_readable).
+It must return a [readable stream](https://nodejs.org/api/fs.html#stream_class_stream_readable).
