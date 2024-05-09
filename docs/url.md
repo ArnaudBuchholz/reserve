@@ -28,7 +28,7 @@ Example :
 | `unsecure-cookies` | `boolean` | `false` | When `true`, [secured cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#secure) are converted to unsecure ones. Hence, the browser will keep them even if not running on https.<br>**NOTE :** this applies **before** `forward-response` |
 | `forward-request` | [`ExternalModule`](external.md) \|<br>`((context: ForwardRequestContext) => Promise<void>` | - | when specified, the hook is called **before** generating the forward request. See below.
 | `forward-response` | [`ExternalModule`](external.md) \|<br>`((context: ForwardResponseContext) => Promise<RedirectResponse>)` | - | When specified, the hook is called **after** sending the forward request but **before** writing the current request's response. See below.
-| `ignore-unverifiable-certificate` | ` boolean` | `false` | When `true`, the request does not fail when contacting a server which SSL certificate can not be verified. |
+| `ignore-unverifiable-certificate` | `boolean` | `false` | When `true`, the request does not fail when contacting a server which SSL certificate can not be verified. |
 | `absolute-location` | `boolean` | `false` | When `true`, any relative `location` header is made absolute to the redirected URL.<br>**NOTE :** this applies **before** `forward-response` |
 
 **NOTE** : When a string is used for `forward-request` or `forward-response`, the corresponding function is loaded with [require](https://nodejs.org/api/modules.html#modules_require_id).
