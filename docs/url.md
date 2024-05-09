@@ -1,6 +1,6 @@
 # `url` handler
 
-Answers the request by **forwarding** it to a different URL. It does **not use the [HTTP status code 302](https://en.wikipedia.org/wiki/HTTP_302)**. The external URL is **requested internally** and the **response is piped** to the incoming request.
+Answers the request by **forwarding** it to a different URL. It does **not use the [HTTP status code 302](https://en.wikipedia.org/wiki/HTTP_302)**. The external URL is **requested internally** and the **internal response is piped** to the incoming response.
 
 Example :
 ```json
@@ -11,19 +11,25 @@ Example :
 }
 ```
 
+> Example of mapping with the `url` handler
+
+## Features
+
 * Supports [all HTTP methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods)
 * Capturing groups can be used as substitution parameters
 * Redirects to any URL (http or https)
 
 **NOTE** : It must redirect to an absolute URL
 
+## Options
+
 | option | type | default | description |
 |---|---|---|---|
-| `unsecure-cookies` | Boolean | `false` | when `true`, the secured cookies are converted to unsecure ones. Hence, the browser will keep them even if not running on https.<br>**NOTE :** this applies **before** `forward-response` |
-| `forward-request` | String or Function | - | when specified, the hook is called **before** generating the forward request. See below.
-| `forward-response` | String or Function | - | when specified, the hook is called **after** sending the forward request but **before** writing the current request's response. See below.
-| `ignore-unverifiable-certificate` | Boolean | `false` | when `true`, the request does not fail when contacting a server which SSL certificate can not be verified. |
-| `absolute-location` | Boolean | `false` | when `true`, any relative `location` header is made absolute to the redirected URL.<br>**NOTE :** this applies **before** `forward-response` |
+| `unsecure-cookies` | `boolean` | `false` | When `true`, [secured cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#secure) are converted to unsecure ones. Hence, the browser will keep them even if not running on https.<br>**NOTE :** this applies **before** `forward-response` |
+| `forward-request` | [`ExternalModule`](external.md) \|<br>`((context: ForwardRequestContext) => Promise<void>` | - | when specified, the hook is called **before** generating the forward request. See below.
+| `forward-response` | [`ExternalModule`](external.md) \|<br>`((context: ForwardResponseContext) => Promise<RedirectResponse>)` | - | When specified, the hook is called **after** sending the forward request but **before** writing the current request's response. See below.
+| `ignore-unverifiable-certificate` | ` boolean` | `false` | When `true`, the request does not fail when contacting a server which SSL certificate can not be verified. |
+| `absolute-location` | `boolean` | `false` | When `true`, any relative `location` header is made absolute to the redirected URL.<br>**NOTE :** this applies **before** `forward-response` |
 
 **NOTE** : When a string is used for `forward-request` or `forward-response`, the corresponding function is loaded with [require](https://nodejs.org/api/modules.html#modules_require_id).
 
@@ -50,7 +56,7 @@ With :
 
 Changing the `request` properties will **impact** the forward request.
 
-**NOTE** Do not consume the incoming request body or it won't be available for the forward request.
+**NOTE** : Do not consume the incoming request body or it won't be available for the forward request.
 
 ## `forward-response`
 
