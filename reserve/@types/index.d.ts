@@ -28,11 +28,12 @@ declare module 'reserve' {
     cwd?: string
   }
 
+  type ExternalModule = string
+
   // region custom
 
   interface CustomMapping extends BaseMapping {
-    custom: string | ((request: IncomingMessage, response: ServerResponse, ...capturedGroups: string[]) => Promise<RedirectResponse>)
-    watch?: boolean
+    custom: ExternalModule | ((request: IncomingMessage, response: ServerResponse, ...capturedGroups: string[]) => Promise<RedirectResponse>)
   }
 
   // endregion custom
@@ -66,7 +67,7 @@ declare module 'reserve' {
     file: string
     'mime-types'?: { [key: string]: string }
     'caching-strategy'?: 'modified' | number
-    'custom-file-system'?: string | CustomFileSystem
+    'custom-file-system'?: ExternalModule | CustomFileSystem
     'static'?: boolean | PunycacheOptions
   }
 
@@ -113,8 +114,8 @@ declare module 'reserve' {
   interface UrlMapping extends BaseMapping {
     url: string
     'unsecure-cookies'?: boolean
-    'forward-request'?: string | ((context: ForwardRequestContext) => Promise<void>)
-    'forward-response'?: string | ((context: ForwardResponseContext) => Promise<RedirectResponse>)
+    'forward-request'?: ExternalModule | ((context: ForwardRequestContext) => Promise<void>)
+    'forward-response'?: ExternalModule | ((context: ForwardResponseContext) => Promise<RedirectResponse>)
     'ignore-unverifiable-certificate'?: boolean
     'absolute-location'?: boolean
   }
@@ -124,7 +125,7 @@ declare module 'reserve' {
   // region use
 
   interface UseMapping extends BaseMapping {
-    use: string | ((options?: object) => ((request: IncomingMessage, response: ServerResponse, next: (err: Error) => void) => void))
+    use: ExternalModule | ((options?: object) => ((request: IncomingMessage, response: ServerResponse, next: (err: Error) => void) => void))
     options?: object
   }
 
@@ -159,7 +160,7 @@ declare module 'reserve' {
 
   type Handlers = { [key: string]: Handler }
 
-  type Listener = string | ServerListener
+  type Listener = ExternalModule | ServerListener
 
   type Mapping = BaseMapping | CustomMapping | FileMapping | StatusMapping | UrlMapping | UseMapping
 
