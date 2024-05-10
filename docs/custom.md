@@ -32,5 +32,5 @@ The `custom` property can be either an [external module](external.md) or a [func
 * The function is invoked with the **current mapping** being used as `this`
 * During the initialization, the **current mapping**'s member named `configuration` is set to the [configuration interface](iconfiguration.md)<br/>(⚠️ it *overwrites* any existing member with the same name)
 * The function may return a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-* If the promise is resolved to a value (i.e. not `undefined`), an internal redirection occurs i.e. the request is going over the mappings again (*infinite loops are prevented, see `max-redirect`*)
+* If the promise is resolved to a value (i.e. not `undefined`), an internal redirection occurs i.e. the request is going over the mappings again (*infinite loops are prevented, see [`max-redirect`](configuration.md#max-redirect-optional)*)
 * If the `response` is not **finalized** after executing the function *(i.e. [`response.end`](https://nodejs.org/api/http.html#http_response_end_data_encoding_callback) was not called)*, the `request` is going over the remaining mappings
