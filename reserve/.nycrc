@@ -1,0 +1,15 @@
+{
+  "check-coverage": true,
+  "include": [
+    "src/**"
+  ],
+  "exclude": [
+    "src/cli.js",
+    "src/console.js",
+    "src/**/*.spec.js"
+  ],
+  "branches": 100,
+  "lines": 100,
+  "functions": 100,
+  "statements": 100
+}

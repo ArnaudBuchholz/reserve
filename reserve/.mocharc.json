@@ -1,0 +1,9 @@
+{
+  "diff": false,
+  "spec": [
+    "src/**/*.spec.js"
+  ],
+  "require": [
+    "tests/mocha/setup.js"
+  ]
+}
