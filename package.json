@@ -14,8 +14,9 @@
   },
   "homepage": "https://github.com/ArnaudBuchholz/reserve#readme",
   "workspaces": [
-    "reserve",
+    "docs",
     "plugins/*",
+    "reserve",
     "samples/*"
   ],
   "devDependencies": {
