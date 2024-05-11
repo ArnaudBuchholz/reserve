@@ -8,7 +8,6 @@ const {
   $configurationEventEmitter,
   $configurationInterface
 } = require('./symbols')
-const defer = require('./helpers/defer')
 const getHostName = require('./helpers/hostname')
 const portIsUsed = require('./helpers/portIsUsed')
 const { throwError, ERROR_SERVE_PORT_ALREADY_USED } = require('./error')
@@ -50,7 +49,7 @@ function createServerAsync (emit, configuration, dispatcher) {
 module.exports = jsonConfiguration => {
   const { on, emit } = newEventEmitter()
   const instance = { on }
-  const [serverAvailable, ready, failed] = defer()
+  let server
   check(jsonConfiguration)
     .then(async configuration => {
       let port = configuration.port
@@ -59,9 +58,8 @@ module.exports = jsonConfiguration => {
       }
       configuration[$configurationEventEmitter] = emit
       configuration.listeners.forEach(listen => listen(instance))
-      const server = await createServerAsync(emit, configuration, dispatcher)
+      server = await createServerAsync(emit, configuration, dispatcher)
       const hostname = configuration.hostname || getHostName()
-      ready(server)
       port = server.address().port
       const { http2 } = configuration
       emit(EVENT_READY, {
@@ -71,14 +69,12 @@ module.exports = jsonConfiguration => {
       })
     })
     .catch(reason => {
-      failed(reason)
       emit(EVENT_ERROR, { reason })
     })
-  instance.close = function () {
-    return serverAvailable
-      .then(server => {
-        return new Promise(resolve => server.close(() => resolve()))
-      })
+  instance.close = () => {
+    if (server) {
+      return new Promise(resolve => server.close(() => resolve()))
+    }
   }
   return instance
 }
