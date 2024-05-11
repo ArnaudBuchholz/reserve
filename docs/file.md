@@ -23,7 +23,7 @@ Answers the request using **file system**.
   * Folder names are case-sensitively checked (⚠️ Windows)
 * Supports [`Range` HTTP header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range) *(only one range)*
 * If the response already owns a `statusCode` different from `200`, the file handler will keep it
-* Only a limited subset of mime types is pre-configured (see [mime.json](https://github.com/ArnaudBuchholz/reserve/blob/main/src/mime.json)), use `mime-types` to extend
+* Only a limited subset of mime types is pre-configured (see [mime.json](https://github.com/ArnaudBuchholz/reserve/blob/main/reserve/src/mime.json)), use `mime-types` to extend
 
 ## Options
 
