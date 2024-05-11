@@ -1,0 +1,21 @@
+{
+  "name": "reserve-docs",
+  "version": "1.0.0",
+  "scripts": {
+    "start": ""
+  },
+  "keywords": [
+    "reserve",
+    "documentation"
+  ],
+  "author": "Arnaud Buchholz <arnaud.buchholz@free.fr>",
+  "license": "MIT",
+  "devDependencies": {
+    "rehype-stringify": "^10.0.0",
+    "remark": "^15.0.1",
+    "remark-alerts": "^0.0.1",
+    "remark-github-blockquote-alert": "^1.2.1",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.0"
+  }
+}
