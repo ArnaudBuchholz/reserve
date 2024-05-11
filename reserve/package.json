@@ -50,7 +50,7 @@
     "json",
     "regexp"
   ],
-  "author": "Arnaud Buchholz",
+  "author": "Arnaud Buchholz <arnaud.buchholz@free.fr>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/ArnaudBuchholz/reserve/issues"
@@ -70,34 +70,5 @@
     "standard": "^17.1.0",
     "terser": "^5.31.0",
     "typescript": "^5.4.5"
-  },
-  "standard": {
-    "env": [
-      "node"
-    ]
-  },
-  "mocha": {
-    "diff": false,
-    "spec": [
-      "src/**/*.spec.js"
-    ],
-    "require": [
-      "tests/mocha/setup.js"
-    ]
-  },
-  "nyc": {
-    "check-coverage": true,
-    "include": [
-      "src/**"
-    ],
-    "exclude": [
-      "src/cli.js",
-      "src/console.js",
-      "src/**/*.spec.js"
-    ],
-    "branches": 100,
-    "lines": 100,
-    "functions": 100,
-    "statements": 100
   }
 }
