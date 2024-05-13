@@ -15,22 +15,26 @@
 | [`listeners`](#listeners) | `[]` |
 | [`extend`](#extend) | `undefined` |
 | [`mappings`](#mappings) | `[]` |
+| [mapping's `method`](#method) | `undefined` |
+| [mapping's `match`](#match) | `/(.*)/` |
+| [mapping's `invert-match`](#invert-match) | `false` |
+| [mapping's `exclude-from-holding-list`](#exclude-from-holding-list) | `false` |
 
 ## General settings
 
-### cwd
+### `cwd`
 
 Defines the current working folder. This value is **inherited** by mappings but can be **overridden** at mapping level.
 
 Optional, defaulted to [`process.cwd()`](https://nodejs.org/docs/latest/api/process.html#processcwd).
 
-### hostname
+### `hostname`
 
 Used to set the `host` parameter when calling http(s) server's [listen](https://nodejs.org/api/net.html#net_server_listen).
 
 Optional, defaulted to `undefined`.
 
-### port
+### `port`
 
 Used to set the `port` parameter when calling http(s) server's [listen](https://nodejs.org/api/net.html#net_server_listen).
 
@@ -38,13 +42,13 @@ The value `0` allocates automatically a free port.
 
 Optional, defaulted to `5000`.
 
-## max-redirect
+## `max-redirect`
 
 Limits the number of internal redirections. If the number of redirections goes beyond the parameter value, the request fails with error [`508`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/508).
 
 Optional, defaulted to `10`.
 
-## ssl
+## `ssl`
 
 This object provides certificate information to build an https server.
 
@@ -57,7 +61,7 @@ The object must contain two members :
 
 Optional, defaulted to `undefined`.
 
-## http2
+## `http2`
 
 When set to `true`, REserve allocates an [HTTP/2](https://en.wikipedia.org/wiki/HTTP/2) server.
 
@@ -66,7 +70,7 @@ When set to `true`, REserve allocates an [HTTP/2](https://en.wikipedia.org/wiki/
 
 Optional, defaulted to `false`.
 
-## httpOptions *(optional)*
+## `httpOptions`
 
 This object provides **additional server creation options** *(not validated)* being passed to the appropriate native API :
 
@@ -79,7 +83,7 @@ This object provides **additional server creation options** *(not validated)* be
 
 Optional, defaulted to `undefined`.
 
-## handlers
+## `handlers`
 
 An object associating a handler prefix to a handler definition.
 If the definition is a string, the handler is loaded as an [external module](external.md).
@@ -105,13 +109,13 @@ See [Custom handlers](handler.md) for more information.
 > 
 > **No error** will be thrown if a prefix collides with a predefined one.
 
-## listeners
+## `listeners`
 
 An array of **functions** or **[external module](external.md) exporting a function** which will be called with the **REserve server object**. The purpose is to allow events registration **before** the server starts and give access to the `created` event.
 
 Optional, defaulted to `[]`.
 
-## extend
+## `extend`
 
 > [!IMPORTANT]
 > Only for JSON configuration files.
@@ -127,64 +131,49 @@ Extended `mappings` are imported at the **end** of the resulting array, making t
 
 An array of mappings :
 
-* For each incoming request, the mappings are evaluated **in the order** of declaration
-* Several mappings *may* apply to the same request
-* Evaluation stops when the response is **finalized** *(`response.writableEnded === true`)*
-* When a handler triggers a redirection, the array of mappings is re-evaluated from the beginning
+* For each incoming request, the mappings are evaluated **in the order** of declaration,
+* Several mappings *may* apply to the same request,
+* Evaluation stops when the response is **finalized** *(after calling `response.end()`, when `response.writableEnded === true`)*.
+* When a handler triggers a redirection, the array of mappings is re-evaluated **from the beginning**.
+
+See [technical details](technical%20details.md) for more information.
 
 Each mapping is an object which :
 
-* *must* contain a handler prefix : for instance `custom`, `file`, `status`, `url`, `use`... which value may contain capturing groups *(see [Custom handlers](#custom-handlers))*
-
-* *may* contain the following properties (they are all optional).
+* *must* contain a handler prefix : for instance `custom`, `file`, `status`, `url`, `use`,
+* *may* define the `cwd` property to override the current working directory to consider for relative path within the mapping,
+* *may* contain the following properties (they are all optional) :
 
 ### `method`
 
+A comma separated string or an array of [HTTP verbs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) that is matched with the [request method](https://nodejs.org/api/http.html#http_message_method).
 
+> [!CAUTION]
+> Each **handler may provide its own `method` parameter** restricting the list of implemented verbs. For instance, `file` supports only `GET` and `HEAD`. The mapping's `method` value **cannot** allow a verb that is not implemented. As a consequence **an error is thrown** if the combination of handler and mapping `method` parameters leads to an empty list.
 
-* `method` *(optional)* : a comma separated string or an array of [HTTP verbs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) that is matched with the [request method](https://nodejs.org/api/http.html#http_message_method), defaulted to `undefined` *(meaning all methods are allowed)*.
+Optional, defaulted to `undefined` *(meaning all methods are allowed)*.
 
 ### `match`
 
-* `match` *(optional)* : a string or a regular expression that will be applied to the [request URL](https://nodejs.org/api/http.html#http_message_url), defaulted to `(.*)`. When defined as a string, the conversion depends on the string content :
+A string or a regular expression that will be applied to the [request URL](https://nodejs.org/api/http.html#http_message_url).
+
+When defined as a string, the conversion depends on the string content :
   * If the string contains any character amongst `()^$[]|\\?+*{}`, it is treated as a regular expression (`.` does **not** belong to this list).
   * Otherwise, the string is converted to a regular expression that matches the beginning of the string *(and captures the rest)*. For instance `/path` is converted to `/^\/path\b(.*)/`.
   * If the string is not treated as a regular expression and it contains query parameters (a word prefixed with `:`), then the regular expression captures the query parameter as a named group. For instance `/books/:id` is converted to `/^\/books\/(?<id>[^/]*)\\b(.*)/`.
 
+Optional, defaulted to `/(.*)/` *(meaning any url is matched)*.
+
 ### `invert-match`
 
-*  *(optional)* : inverts the matching process when set to `true` *(only allowed value)*. It enables the implementation of an *'all but'* pattern. A typical use forbids unexpected verbs by creating an inverted match on the list of supported verbs.
+*(optional)* : inverts the matching process when set to `true` *(only allowed value)*. It enables the implementation of an *'all but'* pattern. A typical use forbids unexpected verbs by creating an inverted match on the list of supported verbs.
 
-* `if-match` *(optional)* : a function being executed only if the mapping matches the request (*meaning after applying `match`, `method` and `invert-match`*). It receives the `request` object, the current `url` *(in case of internal redirection, it might differ from `request.url`)* and the current `match` result. If the result is truthy, the mapping is applied otherwise it is ignored.
+A function being executed only if the mapping matches the request (*meaning after applying `match`, `method` and `invert-match`*). It receives the `request` object, the current `url` *(in case of internal redirection, it might differ from `request.url`)* and the current `match` result. If the result is truthy, the mapping is applied otherwise it is ignored.
+
+Optional, defaulted to `false`.
 
 ### `exclude-from-holding-list`
 
 *  *(optional)* : when set to `true` *(only allowed value)*, it instructs REserve to ignore any request processed by this mapping when updating the list of mappings with [`configuration.setMappings`](iconfiguration.md#async-setmappings-mappings-request-timeout--5000).
 
-* `cwd` *(optional)* : the current working directory to consider for relative path, defaulted to the configuration file `cwd`
-
-**NOTE** : when using `custom` in a [JSON](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON) file, since functions can't be used in this format, the expected value is a string referencing the relative or absolute module to load. If relative, the `cwd` member is considered.
-
-**NOTE** : each **handler may provide its own `method` parameter** depending on which verbs are implemented. For instance, `file` supports only `GET` and `HEAD`. The mapping's `method` value **cannot** allow a verb that is not implemented. As a consequence **an error is thrown** if the combination of handler and mapping `method` parameters leads to an empty list.
-
-For instance :
-
-* `reserve.json` :
-
-```json
-{
-  "port": 8080,
-  "mappings": [{
-    "custom": "./cors"
-  }, {
-    "match": "^/(.*)",
-    "file": "./$1"
-  }]
-}
-```
-
-* `cors.js` :
-
-```javascript
-module.exports = async (request, response) => response.setHeader('Access-Control-Allow-Origin', '*')
-```
+Optional, defaulted to `false`.
