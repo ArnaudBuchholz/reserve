@@ -8,7 +8,7 @@ import rehypeStringify from 'rehype-stringify'
 import remarkGfm from 'remark-gfm'
 
 log(serve({
-  port: 8080,
+  port: 8099,
   mappings: [{
     match: '^/(.*\\.md)',
     custom: async (request, response, path) => {
@@ -20,6 +20,13 @@ log(serve({
         .use(remarkRehype, { allowDangerousHtml: true })
         .use(rehypeStringify)
         .processSync(markdown).toString()
+        .replace(/<h(\d)>(?:<code>)?([^<]*)(?:<\/code>)?<\/h\d>/g, (_, level, title) => {
+          const anchor = title
+            .toLowerCase()
+            .replace(/ /g, '-')
+            .replace(/[^a-z-]/g, '')
+          return `<a name="${anchor}"></a><h${level}>${title}</h${level}>`
+        })
       return send(response, `<html>
   <head>
     <title>${path}</title>
