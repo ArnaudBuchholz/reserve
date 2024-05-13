@@ -160,16 +160,38 @@ A string or a regular expression that will be compared with / applied to the [re
 
 [Capturing groups](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Regular_expressions/Capturing_group) and [named capturing groups](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Regular_expressions/Named_capturing_group) are supported and used to [interpolate](interpolate.md) the handler prefix.
 
-When defined as a string, the conversion depends on the string content :
-  * If the string contains any character amongst `()^$[]|\\?+*{}`, it is treated as a regular expression (`.` does **not** belong to this list).
-  * Otherwise, the string is converted to a regular expression that matches the beginning of the string *(and captures the rest)*. For instance `/path` is converted to `/^\/path\b(.*)/`.
-  * If the string is not treated as a regular expression and it contains query parameters (a word prefixed with `:`), then the regular expression captures the query parameter as a named group. For instance `/books/:id` is converted to `/^\/books\/(?<id>[^/]*)\\b(.*)/`.
+Strings are treated differently depending on their content :
 
-Optional, defaulted to `/(.*)/` *(meaning any url is matched)*.
+* If the string contains any character of `()^$[]|\\?+*{}`, it is treated as a regular expression.
+
+> [!IMPORTANT]
+> `.` does **not** belong to this list.
+
+* Otherwise, the string is converted to a regular expression that matches **the beginning of the URL** and **captures the rest**.
+
+For instance, `/path` is converted to `/^\/path\b(.*)/`.
+
+* If the string is not treated as a regular expression and contains **query parameters** (a word prefixed with `:`), then the regular expression captures the query parameter as a [**named group**](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Regular_expressions/Named_capturing_group).
+
+For instance `/books/:id` is converted to `/^\/books\/(?<id>[^/]*)\\b(.*)/`.
+
+Optional, defaulted to `/(.*)/` *(meaning any url is matched and captured)*.
 
 ### `invert-match`
 
-Inverts the matching process when set to `true` *(only allowed value)*. It enables the implementation of an *'all but'* pattern. A typical use forbids unexpected verbs by creating an inverted match on the list of supported verbs.
+Inverts the matching process when set to `true` *(only allowed value)*. It enables the implementation of an *'all but'* pattern.
+
+Typically used to filter out unsupported methods :
+
+```json
+{
+  "method": "GET,POST",
+  "invert-match": true,
+  "status": 400
+}
+```
+
+> Example of mapping rejecting unsupported methods
 
 Optional, defaulted to `false`.
 
@@ -179,6 +201,6 @@ A function being executed only if the mapping matches the request (*meaning afte
 
 ### `exclude-from-holding-list`
 
-*  *(optional)* : when set to `true` *(only allowed value)*, it instructs REserve to ignore any request processed by this mapping when updating the list of mappings with [`configuration.setMappings`](iconfiguration.md#async-setmappings-mappings-request-timeout--5000).
+When set to `true` *(only allowed value)*, it instructs REserve to ignore any request processed by this mapping when updating the list of mappings with [`configuration.setMappings`](iconfiguration.md#async-setmappings-mappings-request-timeout--5000).
 
 Optional, defaulted to `false`.
