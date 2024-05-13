@@ -132,7 +132,17 @@ An array of mappings :
 * Evaluation stops when the response is **finalized** *(`response.writableEnded === true`)*
 * When a handler triggers a redirection, the array of mappings is re-evaluated from the beginning
 
-Each mapping is an object which *may* contain :
+Each mapping is an object which :
+
+* *must* contain a handler prefix : for instance `custom`, `file`, `status`, `url`, `use`... which value may contain capturing groups *(see [Custom handlers](#custom-handlers))*
+
+* *may* contain the following properties (they are all optional).
+
+### `method`
+
+
+
+* `method` *(optional)* : a comma separated string or an array of [HTTP verbs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) that is matched with the [request method](https://nodejs.org/api/http.html#http_message_method), defaulted to `undefined` *(meaning all methods are allowed)*.
 
 ### `match`
 
@@ -141,17 +151,15 @@ Each mapping is an object which *may* contain :
   * Otherwise, the string is converted to a regular expression that matches the beginning of the string *(and captures the rest)*. For instance `/path` is converted to `/^\/path\b(.*)/`.
   * If the string is not treated as a regular expression and it contains query parameters (a word prefixed with `:`), then the regular expression captures the query parameter as a named group. For instance `/books/:id` is converted to `/^\/books\/(?<id>[^/]*)\\b(.*)/`.
 
-### `method`
+### `invert-match`
 
-* `method` *(optional)* : a comma separated string or an array of [HTTP verbs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) that is matched with the [request method](https://nodejs.org/api/http.html#http_message_method), defaulted to `undefined` *(meaning all methods are allowed)*.
-
-* `invert-match` *(optional)* : inverts the matching process when set to `true` *(only allowed value)*. It enables the implementation of an *'all but'* pattern. A typical use forbids unexpected verbs by creating an inverted match on the list of supported verbs.
+*  *(optional)* : inverts the matching process when set to `true` *(only allowed value)*. It enables the implementation of an *'all but'* pattern. A typical use forbids unexpected verbs by creating an inverted match on the list of supported verbs.
 
 * `if-match` *(optional)* : a function being executed only if the mapping matches the request (*meaning after applying `match`, `method` and `invert-match`*). It receives the `request` object, the current `url` *(in case of internal redirection, it might differ from `request.url`)* and the current `match` result. If the result is truthy, the mapping is applied otherwise it is ignored.
 
-* `exclude-from-holding-list` *(optional)* : when set to `true` *(only allowed value)*, it instructs REserve to ignore any request processed by this mapping when updating the list of mappings with [`configuration.setMappings`](iconfiguration.md#async-setmappings-mappings-request-timeout--5000).
+### `exclude-from-holding-list`
 
-* the handler prefix *(required)* : for instance `custom`, `file`, `status`, `url`, `use`... which value may contain capturing groups *(see [Custom handlers](#custom-handlers))*
+*  *(optional)* : when set to `true` *(only allowed value)*, it instructs REserve to ignore any request processed by this mapping when updating the list of mappings with [`configuration.setMappings`](iconfiguration.md#async-setmappings-mappings-request-timeout--5000).
 
 * `cwd` *(optional)* : the current working directory to consider for relative path, defaulted to the configuration file `cwd`
 
