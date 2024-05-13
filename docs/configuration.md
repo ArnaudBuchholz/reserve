@@ -18,6 +18,7 @@
 | [mapping's `method`](#method) | `undefined` |
 | [mapping's `match`](#match) | `/(.*)/` |
 | [mapping's `invert-match`](#invert-match) | `false` |
+| [mapping's `if-match`](#if-match) | `undefined` |
 | [mapping's `exclude-from-holding-list`](#exclude-from-holding-list) | `false` |
 
 ## General settings
@@ -141,7 +142,7 @@ See [technical details](technical%20details.md) for more information.
 Each mapping is an object which :
 
 * *must* contain a handler prefix : for instance `custom`, `file`, `status`, `url`, `use`,
-* *may* define the `cwd` property to override the current working directory to consider for relative path within the mapping,
+* *may* define the `cwd` property to override the current working directory,
 * *may* contain the following properties (they are all optional) :
 
 ### `method`
@@ -149,13 +150,15 @@ Each mapping is an object which :
 A comma separated string or an array of [HTTP verbs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) that is matched with the [request method](https://nodejs.org/api/http.html#http_message_method).
 
 > [!CAUTION]
-> Each **handler may provide its own `method` parameter** restricting the list of implemented verbs. For instance, `file` supports only `GET` and `HEAD`. The mapping's `method` value **cannot** allow a verb that is not implemented. As a consequence **an error is thrown** if the combination of handler and mapping `method` parameters leads to an empty list.
+> Each **handler may provide its own `method` definition** restricting the list of implemented verbs. For instance, `file` supports only `GET` and `HEAD`. The mapping's `method` value **cannot** allow a verb that is not implemented. As a consequence **an error is thrown** if the combination of handler and mapping `method` parameters leads to an empty list.
 
 Optional, defaulted to `undefined` *(meaning all methods are allowed)*.
 
 ### `match`
 
-A string or a regular expression that will be applied to the [request URL](https://nodejs.org/api/http.html#http_message_url).
+A string or a regular expression that will be compared with / applied to the [request URL](https://nodejs.org/api/http.html#http_message_url).
+
+[Capturing groups](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Regular_expressions/Capturing_group) and [named capturing groups](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Regular_expressions/Named_capturing_group) are supported and used to [interpolate](interpolate.md) the handler prefix.
 
 When defined as a string, the conversion depends on the string content :
   * If the string contains any character amongst `()^$[]|\\?+*{}`, it is treated as a regular expression (`.` does **not** belong to this list).
@@ -166,11 +169,13 @@ Optional, defaulted to `/(.*)/` *(meaning any url is matched)*.
 
 ### `invert-match`
 
-*(optional)* : inverts the matching process when set to `true` *(only allowed value)*. It enables the implementation of an *'all but'* pattern. A typical use forbids unexpected verbs by creating an inverted match on the list of supported verbs.
-
-A function being executed only if the mapping matches the request (*meaning after applying `match`, `method` and `invert-match`*). It receives the `request` object, the current `url` *(in case of internal redirection, it might differ from `request.url`)* and the current `match` result. If the result is truthy, the mapping is applied otherwise it is ignored.
+Inverts the matching process when set to `true` *(only allowed value)*. It enables the implementation of an *'all but'* pattern. A typical use forbids unexpected verbs by creating an inverted match on the list of supported verbs.
 
 Optional, defaulted to `false`.
+
+### `if-match`
+
+A function being executed only if the mapping matches the request (*meaning after applying `match`, `method` and `invert-match`*). It receives the `request` object, the current `url` *(in case of internal redirection, it might differ from `request.url`)* and the current `match` result. If the result is truthy, the mapping is applied otherwise it is ignored.
 
 ### `exclude-from-holding-list`
 
