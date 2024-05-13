@@ -17,7 +17,7 @@ REserve does not support `mime` and `colors` packages anymore :
 The `watch` option has been removed. If you need to refresh the implementation of a custom function when the module timestamp changes, create a wrapper to proxify the module and reload it when needed.
 
 ```javascript
-import { stat } from 'fs/promises'
+const { stat } = require('fs/promises')
 const $timestamp = Symbol('timestamp')
 const $callback = Symbol('callback')
 const moduleName = '/usr/dev/reserve/samples/example.js' // Must be an absolute path
