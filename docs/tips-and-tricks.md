@@ -1,4 +1,4 @@
-# Tips & Tricks
+# 💡 Tips & Tricks
 
 [🔝 REserve documentation](README.md)
 
@@ -23,4 +23,4 @@ const mapping = {
 > Example of `URLSearchParams` to capture URL parameters
 
 > [!NOTE]
-> When using a simple `match` (for instance : `/whatever`), REserve generates a regular expression that automatically captures the URL parameters.
+> When using a simple `match` (for instance : `/whatever`), REserve generates a regular expression that automatically captures the rest of the URL (here parameters).
