@@ -20,6 +20,7 @@ log(serve({
         .use(remarkRehype, { allowDangerousHtml: true })
         .use(rehypeStringify)
         .processSync(markdown).toString()
+        .replace(/&\#x3C;br>/g, '<br>')
         .replace(/<h(\d)>(?:<code>)?([^<]*)(?:<\/code>)?<\/h\d>/g, (_, level, title) => {
           const anchor = title
             .toLowerCase()
