@@ -1,63 +1,92 @@
-# Configuration
+# ✅ Configuration
 
-## cwd *(optional)*
+[🔝 REserve documentation](README.md)
 
-Defines the current working folder.
+| Setting | Default
+|---|---|
+| [`cwd`](#cwd) | `process.cwd()` |
+| [`hostname`](#hostname) | `undefined` |
+| [`port`](#port) | `5000` |
+| [`max-redirect`](#max-redirect) | `10` |
+| [`ssl`](#ssl) | `undefined` |
+| [`http2`](#http2) | `false` |
+| [`httpOptions`](#httpOptions) | `undefined` |
+| [`handlers`](#handlers) | `undefined` |
+| [`listeners`](#listeners) | `[]` |
+| [`extend`](#extend) | `undefined` |
+| [`mappings`](#mappings) | `[]` |
 
-Defaulted to `process.cwd()`.
+## General settings
 
-## hostname *(optional)*
+### cwd
+
+Defines the current working folder. This value is **inherited** by mappings but can be **overridden** at mapping level.
+
+Optional, defaulted to [`process.cwd()`](https://nodejs.org/docs/latest/api/process.html#processcwd).
+
+### hostname
 
 Used to set the `host` parameter when calling http(s) server's [listen](https://nodejs.org/api/net.html#net_server_listen).
 
-Default is `undefined`.
+Optional, defaulted to `undefined`.
 
-## port *(optional)*
+### port
 
 Used to set the `port` parameter when calling http(s) server's [listen](https://nodejs.org/api/net.html#net_server_listen).
 
-From version 1.9.3, the value `auto` allocates automatically a free port (equivalent to passing `0` to [listen](https://nodejs.org/api/net.html#net_server_listen)).
+The value `0` allocates automatically a free port.
 
-Default is `5000`.
+Optional, defaulted to `5000`.
 
-## max-redirect *(optional)*
+## max-redirect
 
 Limits the number of internal redirections. If the number of redirections goes beyond the parameter value, the request fails with error [`508`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/508).
 
-Default is `10`.
+Optional, defaulted to `10`.
 
-## ssl *(optional)*
+## ssl
 
-This object provides certificate information to build an https server. You might be interested by the article [An Express HTTPS server with a self-signed certificate](https://flaviocopes.com/express-https-self-signed-certificate/).
+This object provides certificate information to build an https server.
 
-The object must contain :
-* `cert` : a relative or absolute path to the certificate file
-* `key` : a relative or absolute path to the key file
+> [!TIP]
+> You might be interested by the article [An Express HTTPS server with a self-signed certificate](https://flaviocopes.com/express-https-self-signed-certificate/).
 
-If relative, the configuration file directory or the current working directory (when embedding) is considered.
+The object must contain two members :
+* `cert` : a relative *(to `cwd`)* or absolute path to the certificate file,
+* `key` : a relative *(to `cwd`)* or absolute path to the key file.
 
-## http2 *(optional)*
-*From version 1.11.0*
+Optional, defaulted to `undefined`.
+
+## http2
 
 When set to `true`, REserve allocates an [HTTP/2](https://en.wikipedia.org/wiki/HTTP/2) server.
 
-**NOTE** : Since browsers do not connect to an unsecure HTTP/2 server, use `ssl`.
+> [!IMPORTANT]
+> Since browsers do not connect to an unsecure HTTP/2 server, use `ssl`.
+
+Optional, defaulted to `false`.
 
 ## httpOptions *(optional)*
-*From version 1.11.0*
 
 This object provides **additional server creation options** *(not validated)* being passed to the appropriate native API :
-* [http.createServer](https://nodejs.org/api/http.html#http_http_createserver_options_requestlistener)
-* [https.createServer](https://nodejs.org/api/https.html#https_https_createserver_options_requestlistener)
-* [http2.createServer](https://nodejs.org/api/http2.html#http2_http2_createserver_options_onrequesthandler)
-* [http2.createSecureServer](https://nodejs.org/api/http2.html#http2_http2_createsecureserver_options_onrequesthandler)
+
+| ssl | http2 | API |
+|---|---|---|
+| `undefined` | `false` | [http.createServer](https://nodejs.org/api/http.html#http_http_createserver_options_requestlistener) |
+| *set* | `false` | [https.createServer](https://nodejs.org/api/https.html#https_https_createserver_options_requestlistener) |
+| `undefined` | `true` | [http2.createServer](https://nodejs.org/api/http2.html#http2_http2_createserver_options_onrequesthandler) |
+| *set* | `true` | [http2.createSecureServer](https://nodejs.org/api/http2.html#http2_http2_createsecureserver_options_onrequesthandler) |
+
+Optional, defaulted to `undefined`.
 
 ## handlers
 
-An object associating a handler prefix to a handler object.
-If the property value is a string, the handler is obtained using  [require](https://nodejs.org/api/modules.html#modules_require_id).
+An object associating a handler prefix to a handler definition.
+If the definition is a string, the handler is loaded as an [external module](external.md).
 
-For instance : every mapping containing the `cache` property will be associated to the [REserve/cache](https://www.npmjs.com/package/reserve-cache) handler.
+Optional, defaulted to `undefined`.
+
+In the following example : every mapping containing the `cache` property will be associated to the [REserve/cache](https://www.npmjs.com/package/reserve-cache) handler.
 
 ```json
 {
@@ -67,23 +96,52 @@ For instance : every mapping containing the `cache` property will be associated 
 }
 ```
 
-**NOTE** : it is not possible to change the associations of the default prefixes (`custom`, `file`, `status`, `url`, `use`). **No error** will be thrown if a prefix collides with a predefined one.
+> Associating `cache` prefix to `reserve-cache` handler
 
-See [Custom handlers](#custom-handlers) for more information.
+See [Custom handlers](handler.md) for more information.
+
+> [!WARNING]
+> It is not possible to change the associations of the default prefixes (`custom`, `file`, `status`, `url`, `use`).
+> 
+> **No error** will be thrown if a prefix collides with a predefined one.
+
+## listeners
+
+An array of **functions** or **[external module](external.md) exporting a function** which will be called with the **REserve server object**. The purpose is to allow events registration **before** the server starts and give access to the `created` event.
+
+Optional, defaulted to `[]`.
+
+## extend
+
+> [!IMPORTANT]
+> Only for JSON configuration files.
+
+A relative or absolute path to another configuration file to extend.
+If relative, the **current** configuration file directory is considered.
+
+The current settings **overwrite** the ones coming from the extended configuration file.
+
+Extended `mappings` are imported at the **end** of the resulting array, making the current ones **being evaluated first**. This way, it is possible to override the extended mappings.
 
 ## mappings
 
 An array of mappings :
-* For each incoming request, the mappings are evaluated in the order of declaration
-* Several mappings may apply to the same request
+
+* For each incoming request, the mappings are evaluated **in the order** of declaration
+* Several mappings *may* apply to the same request
 * Evaluation stops when the response is **finalized** *(`response.writableEnded === true`)*
 * When a handler triggers a redirection, the array of mappings is re-evaluated from the beginning
 
-Each mapping may contain :
+Each mapping is an object which *may* contain :
+
+### `match`
+
 * `match` *(optional)* : a string or a regular expression that will be applied to the [request URL](https://nodejs.org/api/http.html#http_message_url), defaulted to `(.*)`. When defined as a string, the conversion depends on the string content :
   * If the string contains any character amongst `()^$[]|\\?+*{}`, it is treated as a regular expression (`.` does **not** belong to this list).
   * Otherwise, the string is converted to a regular expression that matches the beginning of the string *(and captures the rest)*. For instance `/path` is converted to `/^\/path\b(.*)/`.
   * If the string is not treated as a regular expression and it contains query parameters (a word prefixed with `:`), then the regular expression captures the query parameter as a named group. For instance `/books/:id` is converted to `/^\/books\/(?<id>[^/]*)\\b(.*)/`.
+
+### `method`
 
 * `method` *(optional)* : a comma separated string or an array of [HTTP verbs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) that is matched with the [request method](https://nodejs.org/api/http.html#http_message_method), defaulted to `undefined` *(meaning all methods are allowed)*.
 
@@ -122,18 +180,3 @@ For instance :
 ```javascript
 module.exports = async (request, response) => response.setHeader('Access-Control-Allow-Origin', '*')
 ```
-
-## listeners
-
-An array of **functions** or **module names exporting a function** which will be called with the **REserve object**. The purpose is to allow events registration before the server starts and give access to the `created` event.
-
-## extend
-
-*Only for JSON configuration*
-
-A relative or absolute path to another configuration file to extend.
-If relative, the current configuration file directory is considered.
-
-The current settings overwrite the ones coming from the extended configuration file.
-
-Extended `mappings` are imported at the end of the resulting array, making the current ones being evaluated first. This way, it is possible to override the extended mappings.

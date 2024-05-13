@@ -1,5 +1,7 @@
 # Custom handler
 
+[🔝 REserve documentation](README.md)
+
 A custom handler is an **object** with predefined properties.
 
 ## Optional properties

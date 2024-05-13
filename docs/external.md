@@ -1,5 +1,7 @@
 # External modules
 
+[🔝 REserve documentation](README.md)
+
 Some of the settings allow the use of a string denoted as `ExternalModule` in types definition.
 An external module can be either an installed package or a standalone JavaScript file.
 

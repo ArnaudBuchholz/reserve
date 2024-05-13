@@ -1,5 +1,7 @@
 # `custom` handler
 
+[🔝 REserve documentation](README.md)
+
 Enables **custom** handlers.
 
 ```javascript

@@ -1,5 +1,7 @@
 # `url` handler
 
+[🔝 REserve documentation](README.md)
+
 Answers the request by **forwarding** it to a different URL. It does **not use the [HTTP status code 302](https://en.wikipedia.org/wiki/HTTP_302)**. The external URL is **requested internally** and the **internal response is piped** to the incoming response.
 
 Example :

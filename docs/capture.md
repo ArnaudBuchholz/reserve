@@ -1,5 +1,7 @@
 # `capture` helper
 
+[🔝 REserve documentation](README.md)
+
 REserve offers a mechanism to **capture the response stream** and **duplicate its content** to another **writable stream**.
 
 ```typescript

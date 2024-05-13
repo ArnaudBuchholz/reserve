@@ -1,5 +1,7 @@
 # `file` handler
 
+[🔝 REserve documentation](README.md)
+
 Answers the request using **file system**.
 
 ```json

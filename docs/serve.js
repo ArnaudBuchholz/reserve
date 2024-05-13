@@ -17,7 +17,7 @@ log(serve({
         .use(remarkParse)
         .use(remarkAlert)
         .use(remarkGfm)
-        .use(remarkRehype)
+        .use(remarkRehype, { allowDangerousHtml: true })
         .use(rehypeStringify)
         .processSync(markdown).toString()
       return send(response, `<html>
@@ -26,6 +26,7 @@ log(serve({
     <link rel="stylesheet" href="github.css">
     <style>
 body { padding: 1rem; }
+.markdown-body div.markdown-alert { padding-left: .5rem; }
     </style>
   </head>
   <body class="markdown-body">${converted}</body>

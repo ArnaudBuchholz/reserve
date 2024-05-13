@@ -1,5 +1,7 @@
 # `log` helper
 
+[🔝 REserve documentation](README.md)
+
 REserve offers a method to **output server events** in the standard console.
 
 ```typescript

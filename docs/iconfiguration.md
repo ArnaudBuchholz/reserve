@@ -1,5 +1,7 @@
 # Configuration interface
 
+[🔝 REserve documentation](README.md)
+
 ## Properties
 
 The configuration interface exposes **read-only** properties.

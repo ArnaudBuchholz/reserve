@@ -1,5 +1,7 @@
 # `status` handler
 
+[🔝 REserve documentation](README.md)
+
 **Ends** the request with a given status.
 
 Example :

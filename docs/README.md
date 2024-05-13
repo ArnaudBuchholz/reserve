@@ -1,8 +1,9 @@
 # REserve 2️⃣ Documentation
 
-[🆙 Migration guide From v1 to v2](v1_to_v2.md)
+> [!IMPORTANT]
+> [Migration guide From v1 to v2](v1_to_v2.md)
 
-## Configuration
+## ✅ Configuration
 
 There are two ways to use REserve :
 * Run as a **standalone command line** with a **configuration file** *(default name is `reserve.json`)*
@@ -10,9 +11,10 @@ There are two ways to use REserve :
 
 In both cases, the configuration must comply with the properties and mappings [documented here](configuration.md).
 
-ⓘ [tips & tricks](tips-and-tricks.md). 
+> [!TIP]
+> [tips & tricks](tips-and-tricks.md)
 
-## Handlers
+## ⚙ Handlers
 
 REserve is **delivered** with the following default handlers :
 * [`file`](file.md) : to serve resources from the file system
@@ -23,11 +25,11 @@ REserve is **delivered** with the following default handlers :
 Other additional handlers can be installed **separately** and plugged through the `handlers` configuration property.
 If you plan to build your **own handler**, here is [what you need to know](handler.md).
 
-## Server events
+## ⚡ Server events
 
 The REserve server object implements an interface that mimics the [EventEmitter::on method](https://nodejs.org/api/events.html#emitteroneventname-listener) and, during execution, it triggers [**events with parameters**](events.md) to **notify** any listener of **its activity**.
 
-## Helpers
+## 🧰 Helpers
 
 REserve offers some helpers to simplify implementations :
 * [`log`](log.md) : to handle and output server logs
@@ -37,15 +39,15 @@ REserve offers some helpers to simplify implementations :
 * [`capture`](capture.md) : to copy the response stream to another stream *(for instance: to create a [cache](cache%20and%20proxy.md))*
 * [`punycache`](https://www.npmjs.com/package/punycache) : a minimalist cache implementation
 
-## Mocking
+## 🧪 Testing / Mocking
 
 REserve includes a [mocking environment](mocking.md) to **ease the tests**. It takes the **configuration** and returns a fake server object **augmented with a `request` method** to simulate incoming requests.
 
-## Version history
+## ⌛ Version history
 
 Here is the [**history of versions**](history.md) with their associated changes.
 
-## Articles
+## 📚 Articles
 
 ### [Rational](rational.md)
 

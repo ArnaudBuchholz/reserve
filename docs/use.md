@@ -1,5 +1,7 @@
 # `use` handler
 
+[🔝 REserve documentation](README.md)
+
 Enables the use of [express middleware functions](https://www.npmjs.com/search?q=keywords%3Aexpress%20keywords%3Amiddleware).
 
 **NOTE** : Supports only middleware functions accepting exactly three parameters (`request`, `response` and `next`) as described [here](http://expressjs.com/en/guide/writing-middleware.html).

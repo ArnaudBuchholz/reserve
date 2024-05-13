@@ -1,5 +1,7 @@
 # Server events
 
+[🔝 REserve documentation](README.md)
+
 The REserve server object implements an interface that mimics the [EventEmitter::on method](https://nodejs.org/api/events.html#emitteroneventname-listener) and triggers **events with parameters** to `'notify'` any listener of **its activity**.
 
 When a **request is processed**, the following diagram illustrates the **sequence of events that are emitted**.
