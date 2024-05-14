@@ -35,7 +35,7 @@ The REserve server object implements an interface that mimics the [EventEmitter:
 
 REserve offers some helpers to simplify implementations :
 * [`log`](log.md) : to handle and output server logs
-* [`interpolate`](interpolate.md) : to interpolate values in a string
+* [`interpolate`](interpolate.md) : to interpolate values in a string or an object
 * [`body`](body.md) : to read a request body
 * [`send`](send.md) : to build a response
 * [`capture`](capture.md) : to copy the response stream to another stream *(for instance: to create a [cache](cache%20and%20proxy.md))*
@@ -47,7 +47,7 @@ REserve includes a [mocking environment](mocking.md) to **ease the tests**. It t
 
 ## ⌛ Version history
 
-Here is the [**history of versions**](history.md) with their associated changes.
+Here is the [**history of versions**](CHANGELOG.md) with their associated changes.
 
 ## 📚 Articles
 
