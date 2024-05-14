@@ -24,7 +24,7 @@ REserve is **delivered** with the following default handlers :
 * [`custom`](custom.md) : to enable custom coding
 * [`use`](use.md) : to integrate packaged middlewares (express)
 
-Other additional handlers can be installed **separately** and plugged through the `handlers` configuration property.
+Other additional handlers can be installed **separately** and plugged through the [`handlers` configuration property](configuration.md#handlers).
 If you plan to build your **own handler**, here is [what you need to know](handler.md).
 
 ## ⚡ Server events
