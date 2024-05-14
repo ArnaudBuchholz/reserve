@@ -47,7 +47,7 @@ REserve includes a [mocking environment](mocking.md) to **ease the tests**. It t
 
 ## ⌛ Version history
 
-Here is the [**history of versions**](https://github.com/reserve/CHANGELOG.md](https://github.com/ArnaudBuchholz/reserve/blob/main/reserve/CHANGELOG.md) with their associated changes.
+Here is the [**history of versions**](https://github.com/ArnaudBuchholz/reserve/blob/main/reserve/CHANGELOG.md) with their associated changes.
 
 ## 📚 Articles
 
