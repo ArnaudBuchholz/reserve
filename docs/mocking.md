@@ -2,26 +2,76 @@
 
 [🔝 REserve documentation](README.md)
 
-Since version 1.1.0, REserve includes an **helper to build tests**. It receives a **configuration** and returns a **promise** resolving to an object exposing the expected methods (`on`, `close`) **augmented with a `request` method** to simulate incoming requests.
+From the beginning, REserve includes an **helper to build tests**.
+
+It receives a **configuration** and returns a server object **augmented with a `request` method** to simulate incoming requests.
 
 ```javascript
 const assert = require('assert')
-const { mock, read } = require('reserve')
+const { mock, body, send } = require('reserve')
 
-read('/reserve.json')
-  .then(configuration => mock(configuration))
-  .then(mocked => mocked.request('POST', '/test', { 'content-type': 'application/json' }, JSON.stringify({ name: 'Arnaud' })))
+mock({
+  mappings: [{
+    method: 'POST',
+    match: '/test',
+    custom: async (request, response) => {
+      const { name } = await body(request).json()
+      return send(response, `Hello ${name} !`)
+    }
+  }]
+})
+  // Must wait for the mock to be ready
+  .then(mocked => new Promise((resolve, reject) =>
+    mocked
+      .on('ready', () => resolve(mocked))
+      .on('error', reason => reject(reason))
+  )
+  // Simulate a request
+  .then(() => mocked.request('POST', '/test', { 'content-type': 'application/json' }, JSON.stringify({ name: 'Arnaud' })))
+  // Response is returned when ready to be read, .toString() gives the body content 
   .then(response => {
       assert.strictEqual(response.toString(), 'Hello Arnaud !')
   })
 ```
+
+> Example of `mock`
+
+```typescript
+interface MockedResponse extends ServerResponse {
+  toString: () => string
+  waitForFinish: () => Promise<void>
+  isInitial: () => boolean
+  setAsynchronous: () => void
+}
+
+type MockedRequestDefinition = {
+  method?: string,
+  url: string,
+  headers?: Headers,
+  body?: string,
+  properties?: object
+}
+
+interface MockServer extends Server {
+  request: ((method: string, url: string) => Promise<MockedResponse>) &
+    ((method: string, url: string, headers: Headers) => Promise<MockedResponse>) &
+    ((method: string, url: string, headers: Headers, body: string) => Promise<MockedResponse>) &
+    ((method: string, url: string, headers: Headers, body: string, properties: object) => Promise<MockedResponse>) &
+    ((definition: MockedRequestDefinition) => Promise<MockedResponse>)
+}
+
+function mock (configuration: Configuration, mockedHandlers?: Handlers): Promise<MockServer>
+```
+
+> Type definitions for `mock`
 
 Call the `request` method to simulate an incoming request, it supports two different signatures :
 
 * `(method, url, headers = {}, body = '', properties = undefined)`
 * `({ method, url, headers = {}, body = '', properties = undefined})`
 
-*`properties` is a dictionary merged to the mocked request to simulate members like `socket`*
+> [!NOTE]
+> `properties` is a dictionary merged to the mocked request to simulate members like `socket`
 
 The method returns a promise resolving to a mocked response exposing the following members :
 
@@ -32,7 +82,8 @@ The method returns a promise resolving to a mocked response exposing the followi
 | **finished** | Boolean | `true`
 | **toString()** | String | Gives the response body
 
-**NOTE** : headers are managed **case insensitively** in both `Request` and `Response`.
+> [!IMPORTANT]
+> `headers` are managed **case insensitively** in both `Request` and `Response`.
 
 Example :
 
