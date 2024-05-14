@@ -10,7 +10,8 @@ When a **request is processed**, the following diagram illustrates the **sequenc
 
 > Diagram of events emitted by REserve while processing a request
 
-ⓘ These events are handled by the [`log`](log.md) helper.
+> [!NOTE]
+> These events are handled by the [`log`](log.md) helper.
 
 | Event<br>`eventName`| Parameters<br>_`...members`_ | Description |
 |---|---|---|
