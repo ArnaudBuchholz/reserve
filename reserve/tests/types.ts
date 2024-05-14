@@ -1,4 +1,4 @@
-import { Configuration, mock } from 'reserve'
+import { Configuration, mock, send, interpolate } from 'reserve'
 import { IncomingMessage, ServerResponse } from 'http'
 
 export const configurations: Configuration[] = [{
@@ -41,3 +41,9 @@ export async function main() {
     hello: 'World'
   }));
 }
+
+export const sendExample1 = (response: ServerResponse) => send(response, 'Hello World !')
+export const sendExample2 = (response: ServerResponse) => send(response, { hello: 'World !'})
+
+export const interpolateExample1 = interpolate('abc'.match(/b/), 'a$1c')
+export const interpolateExample2 = interpolate('abc'.match(/b/), { test: 'a$1c' })
