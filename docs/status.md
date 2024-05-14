@@ -11,7 +11,7 @@
 }
 ```
 
-> Example of a `status` mapping
+> Example of mapping with the `status` handler
 
 ## Features
 
