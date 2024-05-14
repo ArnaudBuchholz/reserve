@@ -2,7 +2,10 @@
 
 [🔝 REserve documentation](README.md)
 
-REserve offers a way to **build** responses : `statusCode` and `headers` *may* be specified, `noBody` prevents the body sending.
+REserve offers a way to **build** responses : 
+
+* `statusCode` and `headers` *may* be specified,
+* `noBody` prevents the body sending.
 
 ```typescript
 interface SendOptions {

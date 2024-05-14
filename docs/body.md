@@ -21,7 +21,7 @@ function body (request: IncomingMessage, options?: BodyOptions): BodyResult
 > Types definition for `body`
 
 ```javascript
-import { body }from 'reserve'
+import { body } from 'reserve'
 
 async function customHandler (request, response) {
   const requestBody = await body(request).json()
@@ -31,7 +31,10 @@ async function customHandler (request, response) {
 
 > Example of `body`
 
-If the `content-type` is specified in the request headers and starts with :
+The return of `await body(request)` depends on the request headers.
+
+If the `content-type` is specified and starts with :
+
 * `text/plain` : a `string` is returned
 * `application/json` : an `object` is returned _(after applying [`JSON.parse`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse) on the request content)_.
 * Otherwise, a [`Buffer`](https://nodejs.org/docs/latest/api/buffer.html) is returned
@@ -42,4 +45,7 @@ It is possible to force the return type using :
 * `await body(request).json()` : an `object` is returned
 * `await body(request).buffer()` : a [`Buffer`](https://nodejs.org/docs/latest/api/buffer.html) is returned
 
-**NOTE** : if the request's `content-length` is set (and not ignored), the buffer is allocated accordingly meaning the result might be truncated *(if too small)* or padded with `\x00` *(if too large)*.
+> [!CAUTION]
+> If the request's `content-length` is set *(and not ignored through the `ignoreContentLength` option)*, the buffer is allocated **accordingly**.
+> 
+> It means the result might be **truncated** *(if too small)* or **padded** with `\x00` *(if too large)*.

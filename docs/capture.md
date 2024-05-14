@@ -10,11 +10,17 @@ function capture (response: ServerResponse, stream: WritableStream): Promise<voi
 
 > Types definition for `capture`
 
-**NOTE** : The content is decoded if the [`content-encoding`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding) header contains: `gzip`, `deflate` or `br` *(only one, no combination is supported)*.
+> [!IMPORTANT]
+> The content is decoded if the [`content-encoding`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding) header contains: `gzip`, `deflate` or `br` *(only one, no combination is supported)*.
 
-**NOTE** : Check the [version of Node.js](https://nodejs.org/api/zlib.html#zlib_class_zlib_brotlicompress) to enable `br` compression support.
+> [!CAUTION]
+> Check the [version of Node.js](https://nodejs.org/api/zlib.html#zlib_class_zlib_brotlicompress) to enable `br` compression support.
 
-For instance, it enables the caching of proxified resources :
+In the following example, three mappings are used :
+
+1. If the request resource exists in the `cache` folder , it is returned.
+2. Otherwise, the second mapping captures and serializes locally the response returned by the last mapping.
+3. The last mapping redirects the request to an external site. 
 
 ```JavaScript
 mappings: [{
