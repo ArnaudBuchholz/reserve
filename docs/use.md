@@ -15,7 +15,7 @@ Enables the use of [express middleware functions](https://www.npmjs.com/search?q
 }
 ```
 
-> Example of `use` handler
+> Example of mapping with the `use` handler
 
 ## Features
 
@@ -26,4 +26,4 @@ Enables the use of [express middleware functions](https://www.npmjs.com/search?q
 
 | option | type | default | description |
 |---|---|---|---|
-| `options` | object | `{}` | Options passed to the middleware factory |
+| `options` | `object` | `{}` | Options passed to the middleware factory |
