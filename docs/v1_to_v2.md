@@ -2,19 +2,21 @@
 
 [🔝 REserve documentation](README.md)
 
-Because of the **breaking changes** in v2, here are some recommendations on how to migrate from v1.
+Because of the **breaking changes** in v2, here are some recommendations on how to migrate from [v1](https://github.com/ArnaudBuchholz/reserve/blob/1.x/docs/README.md).
 
 ## 📦 Dependencies
 
 REserve does not support `mime` and `colors` packages anymore :
 * The [`log` helper](log.md) produces non colored traces.
-* Mime types, if needed, can be overloaded / completed directly on the [`file`](file.md) mapping through the `mime-types` setting. The list of default mime types is available [here](https://github.com/ArnaudBuchholz/reserve/blob/main/reserve/src/mime.json).
+* Mime types, if needed, can be overloaded / completed directly on the [`file`](file.md) mapping through the `mime-types` setting. The default list of mime types is available [here](https://github.com/ArnaudBuchholz/reserve/blob/main/reserve/src/mime.json).
 
 ## ⚙ `custom` handler
 
-### `watch` option
+### 🚫 `watch` option
 
-The `watch` option has been removed. If you need to refresh the implementation of a custom function when the module timestamp changes, create a wrapper to proxify the module and reload it when needed.
+The `watch` option has been removed.
+
+If you need to refresh the implementation of a custom function when the implementation module timestamp changes, create a wrapper to proxify the module and reload it when needed.
 
 ```javascript
 const { stat } = require('fs/promises')
@@ -39,40 +41,41 @@ export const mapping = {
 
 ### `configuration`
 
-Previously, a `configuration` member was added to the mapping to give access to the [configuration interface](iconfiguration.md) only when no existing member named `configuration` was existing.
+Previously, a `configuration` member was added to the mapping to give access to the [configuration interface](iconfiguration.md) **only when** no existing member named `configuration` was existing.
 
 Now the member is **always** set. Rename the member `configuration` if you need one.
 
 ### callback function
 
-The capturing groups are passed to the callback only if the signature of the function ([`function.length`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/length)) is `0` or greater than `2`.
+The capturing groups are passed to the callback only if the signature of the function ([`function.length`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/length)) is `0` or strictly greater than `2`.
 
-⚠️ **WARNING** : with the [rest parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters), the following function has a length of `2`.
+> [!WARNING]
+> Because of [rest parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters), the following function has a length of `2`.
+
 ```javascript
 function (request, response, ...parameters) {
   /* ... */
 }
 ```
 
-Hence it is recommended to use this signature :
-```javascript
-function (request, response, firstParameter, ...otherParameters) {
-
-}
-```
-
 ## ⚙ `file` handler
 
-### `strict` and `case-sensitive` options
+### 🚫 `strict` and `case-sensitive` options
 
 > [!IMPORTANT]
-> Because the development was initiated on Windows, the path finding was done case insensitively. This was causing some issues when porting the implementation to other operating systems. Hence, the option `case-sensitive` was later added to compensate.
+> Because the development was initiated on Windows, the path finding was done *case insensitively*. This was causing some issues when porting the implementation to other operating systems. Hence, the option `case-sensitive` was later added to compensate.
 >
-> The same way, Node.js file system API is flexible with file access and *empty folders* are simply ignored. For instance, `src/index.js` is *equivalent* to `src///index.js`. This was obviously not right and the option `strict` was added to correct it (`strict` also implied `case-sensitive`).
+> The same way, Node.js file system API is flexible with file access and *empty folders* are simply ignored. For instance, `src/index.js` is *equivalent* to `src///index.js`. This was obviously not right and the option `strict` was added to address the issue (`strict` also implied `case-sensitive`).
 
-These two options are **removed** and **always enabled** by default. The only way to 'revert' them is to use a [custom file system](file.md#custom-file-system).
+These two options are **removed**. However,
 
-### `ignore-if-not-found`
+* The `file` handler checks path **case sensitively**,
+* REserve **normalizes** inbound URL limiting the risk of receiving empty folders.
+
+> [!TIP]
+> If you need case insensitive path finding, use a [custom file system](file.md#custom-file-system).
+
+### 🚫 `ignore-if-not-found`
 
 > [!NOTE]
 > In version 1, the `file` handler returned a `404` error if the path could not be found / read or was invalid.
@@ -83,7 +86,7 @@ The option is **removed** and the `file` handler **never** generates a `404`, me
 
 The `404` behavior can then be reproduced by adding another mapping with the same matching criteria but using the [`status`](status.md) handler with the code `404`.
 
-### `http-status`
+### 🚫 `http-status`
 
 This option has been **removed**. To achieve the same result, use a custom handler setting `response.statusCode` to the expected value *before* the file mapping.
 
@@ -106,6 +109,7 @@ To **preserve** the former behavior, simply replace `body(request)` calls to `bo
 ### `mock`
 
 Previously, the `mock` function was returning a promise giving back the mock server.
+
 To mimic the behavior of the `serve` function, the promise resolves to a server object and you **must** wait for the `ready` event to use the `request` function.
 
 ```javascript

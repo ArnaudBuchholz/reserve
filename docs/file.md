@@ -16,15 +16,25 @@ Answers the request using **file system**.
 ## Features
 
 * Supports [GET](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET) and [HEAD](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD)
+
 * Capturing groups can be used as substitution parameters
+
 * **Always relative** to the handler's `cwd` member *(see [mappings](configuration.md#mappings))*
   * [🛂 Path traversal](https://owasp.org/www-community/attacks/Path_Traversal) is blocked
+
 * Incoming URL parameters (and hash) are removed when resolving to file system names
+
 * Directory access is mapped to the inner `index.html` file *(if any)*
+
 * If the path resolves to a missing / unreadable / invalid file or directory, the handler does **not** process the request
-  * Folder names are case-sensitively checked (⚠️ Windows)
+
+> [!WARNING]
+> Folder names are case-sensitively checked (Windows)
+
 * Supports [`Range` HTTP header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range) *(only one range)*
+
 * If the response already owns a `statusCode` different from `200`, the file handler will keep it
+
 * Only a limited subset of mime types is pre-configured (see [mime.json](https://github.com/ArnaudBuchholz/reserve/blob/main/reserve/src/mime.json)), use `mime-types` to extend
 
 ## Options
