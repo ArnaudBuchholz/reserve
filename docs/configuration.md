@@ -128,7 +128,7 @@ The current settings **overwrite** the ones coming from the extended configurati
 
 Extended `mappings` are imported at the **end** of the resulting array, making the current ones **being evaluated first**. This way, it is possible to override the extended mappings.
 
-## mappings
+## ˋmappings`
 
 An array of mappings :
 
