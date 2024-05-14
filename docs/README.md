@@ -17,7 +17,9 @@ In both cases, the configuration must comply with the properties and mappings [d
 ## ⚙ Handlers
 
 REserve is **delivered** with the following default handlers :
+
 * [`file`](file.md) : to serve resources from the file system
+* [`status`](status.md) : to end response with a specific status
 * [`url`](url.md) : to serve resources from a web address
 * [`custom`](custom.md) : to enable custom coding
 * [`use`](use.md) : to integrate packaged middlewares (express)
