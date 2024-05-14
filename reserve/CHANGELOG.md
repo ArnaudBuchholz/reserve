@@ -31,7 +31,7 @@
 ||`static` option for performant `file` delivery ([`doc`](file.md))|
 ||Expose `send` helper ([doc](send.md))|
 ||Expose `punycache` helper ([doc](https://www.npmjs.com/package/punycache))|
-||Fix types definition (`use` handler)|
+||Fix types definitions|
 |1.15.9|Documentation update|
 |1.15.8|Fix types definition (UseMapping)|
 |1.15.7|Fix types definition (UseMapping)|

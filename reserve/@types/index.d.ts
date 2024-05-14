@@ -131,7 +131,6 @@ declare module 'reserve' {
 
   // endregion use
 
-
   // region helpers
 
   function log (server: Server, verbose?: boolean): Server
@@ -151,8 +150,6 @@ declare module 'reserve' {
 
   function body (request: IncomingMessage, options?: BodyOptions): BodyResult
 
-  function capture (response: ServerResponse, stream: WritableStream): Promise<void>
-
   interface SendOptions {
     statusCode?: number /* defaulted to 200 */
     headers?: Headers
@@ -161,6 +158,23 @@ declare module 'reserve' {
 
   function send (response: ServerResponse, data: ReadableStream, options?: SendOptions): Promise<void>
   function send (response: ServerResponse, data?: string | object, options?: SendOptions): void
+
+  function capture (response: ServerResponse, stream: WritableStream): Promise<void>
+
+  interface PunycacheOptions {
+    ttl?: number
+    max?: number
+    policy?: 'lru' | 'lfu'
+  }
+
+  interface PunycacheCache {
+    set (key: string, value: any): void
+    get (key: string): any
+    del (key: string): void
+    keys (): string[]
+  }
+
+  function punycache (options?: PunycacheOptions): PunycacheCache
 
   // endregion helpers
 
