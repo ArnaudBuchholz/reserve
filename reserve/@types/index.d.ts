@@ -131,6 +131,39 @@ declare module 'reserve' {
 
   // endregion use
 
+
+  // region helpers
+
+  function log (server: Server, verbose?: boolean): Server
+
+  function interpolate (match: RegExpMatchArray, pattern: string): string
+  function interpolate (match: RegExpMatchArray, pattern: object): object
+
+  interface BodyOptions {
+    ignoreContentLength?: boolean
+  }
+
+  type BodyResult = Promise<Buffer | string | object> & {
+    buffer: () => Promise<Buffer>
+    text: () => Promise<string>
+    json: () => Promise<object>
+  }
+
+  function body (request: IncomingMessage, options?: BodyOptions): BodyResult
+
+  function capture (response: ServerResponse, stream: WritableStream): Promise<void>
+
+  interface SendOptions {
+    statusCode?: number /* defaulted to 200 */
+    headers?: Headers
+    noBody?: boolean /* do not send body */
+  }
+
+  function send (response: ServerResponse, data: ReadableStream, options?: SendOptions): Promise<void>
+  function send (response: ServerResponse, data?: string | object, options?: SendOptions): void
+
+  // endregion helpers
+
   interface SSLSettings {
     cert: string
     key: string
@@ -185,29 +218,6 @@ declare module 'reserve' {
     setMappings: (mappings: Mapping[], request: IncomingMessage, timeout?: number) => Promise<void>
     dispatch: (request: IncomingMessage, response: ServerResponse) => void
   }
-
-  interface BodyOptions {
-    ignoreContentLength?: boolean
-  }
-
-  type BodyResult = Promise<Buffer | string | object> & {
-    buffer: () => Promise<Buffer>
-    text: () => Promise<string>
-    json: () => Promise<object>
-  }
-
-  function body (request: IncomingMessage, options?: BodyOptions): BodyResult
-
-  function capture (response: ServerResponse, stream: WritableStream): Promise<void>
-
-  interface SendOptions {
-    statusCode?: number /* defaulted to 200 */
-    headers?: Headers
-    noBody?: boolean /* do not send body */
-  }
-
-  function send (response: ServerResponse, data: ReadableStream, options?: SendOptions): Promise<void>
-  function send (response: ServerResponse, data?: string | object, options?: SendOptions): void
 
   function check (configuration: Configuration): Promise<Configuration>
 
@@ -284,7 +294,6 @@ declare module 'reserve' {
     close: () => Promise<void>
   }
 
-  function log (server: Server, verbose?: boolean): Server
   function serve (configuration: Configuration): Server
 
   interface MockedResponse extends ServerResponse {
