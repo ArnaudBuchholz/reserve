@@ -4,7 +4,38 @@
 
 From the beginning, REserve includes an **helper to build tests**.
 
-It receives a **configuration** and returns a server object **augmented with a `request` method** to simulate incoming requests.
+```typescript
+interface MockedResponse extends ServerResponse {
+  toString: () => string
+  waitForFinish: () => Promise<void>
+  isInitial: () => boolean
+  setAsynchronous: () => void
+}
+
+type MockedRequestDefinition = {
+  method?: string,
+  url: string,
+  headers?: Headers,
+  body?: string,
+  properties?: object
+}
+
+interface MockServer extends Server {
+  request: ((method: string, url: string) => Promise<MockedResponse>) &
+    ((method: string, url: string, headers: Headers) => Promise<MockedResponse>) &
+    ((method: string, url: string, headers: Headers, body: string) => Promise<MockedResponse>) &
+    ((method: string, url: string, headers: Headers, body: string, properties: object) => Promise<MockedResponse>) &
+    ((definition: MockedRequestDefinition) => Promise<MockedResponse>)
+}
+
+function mock (configuration: Configuration, mockedHandlers?: Handlers): Promise<MockServer>
+```
+
+> Types definitions for `mock`
+
+## Mocking requests
+
+The `mock` method accepts a **configuration** and returns a server object **augmented with a `request` method** to simulate incoming requests.
 
 ```javascript
 const assert = require('assert')
@@ -36,82 +67,33 @@ mock({
 
 > Example of `mock`
 
-```typescript
-interface MockedResponse extends ServerResponse {
-  toString: () => string
-  waitForFinish: () => Promise<void>
-  isInitial: () => boolean
-  setAsynchronous: () => void
-}
-
-type MockedRequestDefinition = {
-  method?: string,
-  url: string,
-  headers?: Headers,
-  body?: string,
-  properties?: object
-}
-
-interface MockServer extends Server {
-  request: ((method: string, url: string) => Promise<MockedResponse>) &
-    ((method: string, url: string, headers: Headers) => Promise<MockedResponse>) &
-    ((method: string, url: string, headers: Headers, body: string) => Promise<MockedResponse>) &
-    ((method: string, url: string, headers: Headers, body: string, properties: object) => Promise<MockedResponse>) &
-    ((definition: MockedRequestDefinition) => Promise<MockedResponse>)
-}
-
-function mock (configuration: Configuration, mockedHandlers?: Handlers): Promise<MockServer>
-```
-
-> Type definitions for `mock`
-
 Call the `request` method to simulate an incoming request, it supports two different signatures :
 
 * `(method, url, headers = {}, body = '', properties = undefined)`
 * `({ method, url, headers = {}, body = '', properties = undefined})`
 
 > [!NOTE]
-> `properties` is a dictionary merged to the mocked request to simulate members like `socket`
+> `properties` is a dictionary merged to the mocked request to simulate members like `socket`.
 
-The method returns a promise resolving to a mocked response exposing the following members :
+The method returns a promise resolving to a **mocked response** extending [ServerResponse](https://nodejs.org/api/http.html#class-httpserverresponse) with the following members :
 
 | Member | Type | Description |
 |---|---|---|
-| **headers** | Object | Response headers
-| **statusCode** | Number | Status code
-| **finished** | Boolean | `true`
-| **toString()** | String | Gives the response body
+| `toString()` | `string` | Gives the response body |
+| `isInitial` | `boolean` | The response is untouched *(i.e. not processed)* |
 
 > [!IMPORTANT]
 > `headers` are managed **case insensitively** in both `Request` and `Response`.
 
-Example :
+## Mocking handlers
+
+It is possible to specify mocked handlers *(based on their [actual implementation](https://github.com/ArnaudBuchholz/reserve/tree/master/reserve/src/handlers))*:
 
 ```javascript
 const { mock } = require('reserve')
 mock({
-  port: 8080,
   mappings: [{
-    match: /^\/(.*)/,
-    file: path.join(__dirname, '$1')
-  }]
-})
-  .then(mocked => mocked.request('GET', '/'))
-  .then(response => {
-    assert(response.statusCode === 200)
-    assert(response.toString() === '<html />')
-  })
-```
-
-You may provide mocked handlers *(based on their [actual implementation](https://github.com/ArnaudBuchholz/reserve/tree/master/handlers))*:
-
-```javascript
-const { mock } = require('reserve')
-mock({
-  port: 8080,
-  mappings: [{
-    match: /^\/(.*)/,
-    file: path.join(__dirname, '$1')
+    file: '$1'
   }]
 }, {
   file: {
@@ -128,10 +110,16 @@ mock({
     }
   }
 })
+  .then(mocked => new Promise((resolve, reject) =>
+    mocked
+      .on('ready', () => resolve(mocked))
+      .on('error', reason => reject(reason))
+  )
   .then(mocked => mocked.request('GET', '/'))
     .then(response => {
-      assert(response.statusCode === 201)
-      assert(response.toString() === 'MOCKED')
+      assert.strictEqual(response.statusCode, 201)
+      assert.strictEqual(response.toString(), 'MOCKED')
     })
 ```
 
+> Example of mocking the `file` handler
