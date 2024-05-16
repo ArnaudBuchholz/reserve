@@ -1,7 +1,8 @@
 # Serving an OpenUI5 application
 
 The best way to explain **what REserve can do** is to demonstrate some of its features through a **concrete use case**.
-In this article, we will illustrate how one can quickly setup a server to **facilitate the execution of OpenUI5 applications**.
+
+This article illustrates how one can quickly setup a server to **facilitate the execution of OpenUI5 applications**.
 
 ## Quick presentation of OpenUI5
 
@@ -20,7 +21,7 @@ It offers some **efficient** development concepts, such as :
 * Testing helpers (qUnit / [OPA](https://youtu.be/HiZq-kuIbt0))
 * ...
 
-More information can be found in [the documentation](https://openui5.hana.ondemand.com/).
+More information can be found in [the official documentation](https://ui5.sap.com/).
 
 ### Building an OpenUI5 application
 
@@ -28,7 +29,7 @@ The community around the framework is **growing** and **several tools** are publ
 
 When it comes to building an application, you must include the following NPM package to your project :
 
-* [@ui5/cli](https://www.npmjs.com/package/@ui5/cli) : it contains the required **UI5 tooling**.<br />It cumulates [27 MB](https://packagephobia.now.sh/result?p=@ui5/cli) of files *(including dependencies)*.
+* [@ui5/cli](https://www.npmjs.com/package/@ui5/cli) : it contains the required **UI5 tooling**.<br>It cumulates [27 MB](https://packagephobia.now.sh/result?p=@ui5/cli) of files *(including dependencies)*.
 
 The [UI5 tooling](https://sap.github.io/ui5-tooling/) helps the developer handle the **full lifecycle of the application** :
 * **Initiate and configure** the project *(including the UI5 dependencies)*.
@@ -37,13 +38,13 @@ The [UI5 tooling](https://sap.github.io/ui5-tooling/) helps the developer handle
 
 A minimalist application includes these dependencies :
 
-* [@openui5/sap.ui.core](https://www.npmjs.com/package/@openui5/sap.ui.core) : this is the OpenUI5 **core runtime**.<br /> It takes [26.4 MB](https://packagephobia.now.sh/result?p=@openui5/sap.ui.core).
+* [@openui5/sap.ui.core](https://www.npmjs.com/package/@openui5/sap.ui.core) : this is the OpenUI5 **core runtime**.<br>*It requires [70.2 MB](https://packagephobia.now.sh/result?p=@openui5/sap.ui.core) of disk space when installing.*
 
-* [@openui5/sap.m](https://www.npmjs.com/package/@openui5/sap.m) : this is the main OpenUI5 control library, with responsive controls that can be used in touch devices as well as desktop browsers.<br /> It weighs [10.2 MB](https://packagephobia.now.sh/result?p=@openui5/sap.m).
+* [@openui5/sap.m](https://www.npmjs.com/package/@openui5/sap.m) : this is the main OpenUI5 control library, with responsive controls that can be used in touch devices as well as desktop browsers.<br>*It requires [89.3 MB](https://packagephobia.now.sh/result?p=@openui5/sap.m) of disk space when installing.*
 
-* [@openui5/themelib_sap_fiori_3](https://www.npmjs.com/package/@openui5/themelib_sap_fiori_3) : the default theme *(including specific fonts)*. <br /> It requires [4.2 MB](https://packagephobia.now.sh/result?p=@openui5/themelib_sap_fiori_3).
+* [@openui5/themelib_sap_fiori_3](https://www.npmjs.com/package/@openui5/themelib_sap_fiori_3) : the default theme *(including specific fonts)*. <br>*It requires [4.12 MB](https://packagephobia.now.sh/result?p=@openui5/themelib_sap_fiori_3) of disk space when installing.*
 
-In the end, you basically need a total of **60 MB of packages** to start coding your application. Such a **digital footprint is quite common** for a standard Node.js development environment.
+In the end, you need a total of **160 MB of packages** to start coding your application. Such a **digital footprint is quite common** for a standard Node.js development environment.
 
 Once the **application is finalized**, depending on **its dependencies**, the deployment will live in a **fraction of this size**.
 
@@ -55,13 +56,13 @@ That can be a **tedious process** but, good news, the [version 2 of the cli tool
 
 ### OpenUI5 Content Delivery Network
 
-The framework is built on top of a [smart dependency management model](https://openui5.hana.ondemand.com/api/sap.ui#methods/sap.ui.define) that can load the missing dependencies when needed. To put it in a nutshell, these **additional modules** are usually **relative to the location where the [OpenUI5 bootstrap](https://openui5.hana.ondemand.com/1.76.0/resources/sap-ui-core.js)** is obtained.
+The framework is built on top of a [smart dependency management model](https://ui5.sap.com/api/sap.ui#methods/sap.ui.define) that can load the missing dependencies when needed. To put it in a nutshell, these **additional modules** are usually **relative to the location where the [OpenUI5 bootstrap](https://ui5.sap.com/1.76.0/resources/sap-ui-core.js)** is obtained.
 
 Furthermore, each released version of OpenUI5 is available from a public CDN:
-* 1.76.0 is available under [https://openui5.hana.ondemand.com/1.76.0/resources/](https://openui5.hana.ondemand.com/1.76.0/resources/sap-ui-version.json)
-* 1.75.0 is available under [https://openui5.hana.ondemand.com/1.75.0/resources/](https://openui5.hana.ondemand.com/1.75.0/resources/sap-ui-version.json)
+* 1.124.0 is available under [https://ui5.sap.com/1.124.0/resources/](https://ui5.sap.com/1.124.0/resources/sap-ui-version.json)
+* 1.84.31 is available under [https://ui5.sap.com/1.84.31/resources/](https://ui5.sap.com/1.84.31/resources/sap-ui-version.json)
 * ...
-* 1.65.0 is available under [https://openui5.hana.ondemand.com/1.65.0/resources/](https://openui5.hana.ondemand.com/1.65.0/resources/sap-ui-version.json)
+* 1.60.29 is available under [https://ui5.sap.com/1.60.29/resources/](https://ui5.sap.com/1.60.29/resources/sap-ui-version.json)
 * ...
 
 Hence, it is **possible to run an application** by loading the **OpenUI5 resources from the CDN**.
@@ -83,7 +84,7 @@ In the first version of the bootstrap (`static.html`), the OpenUI5 framework is 
   <meta charset="utf-8">
   <title>OpenUI5 Demo App</title>
   <script id="sap-ui-bootstrap"
-    src="https://openui5.hana.ondemand.com/1.76.0/resources/sap-ui-core.js"
+    src="https://ui5.sap.com/1.71.68/resources/sap-ui-core.js"
     data-sap-ui-theme="sap_fiori_3"
     data-sap-ui-libs="sap.m"
     data-sap-ui-resourceroots='{"Demo": "./"}'
@@ -112,7 +113,7 @@ Here are the steps to build a web server using [REserve](https://www.npmjs.com/p
 1. First you need to [install Node.js](https://nodejs.org/en/download/)
 2. Node.js comes with [NPM](https://www.npmjs.com/get-npm) but it may be updated separately using `npm install npm@latest -g`
 3. Install REserve *globally* using `npm install reserve -g` *(it is not mandatory to make it global, but this is the fastest way to use it)*
-4. Define a [**configuration file**](https://www.npmjs.com/package/reserve#configuration) that describes how the incoming requests must be served *(all paths are relative to the configuration file)*
+4. Define a [**configuration file**](configuration.md) that describes how the incoming requests must be served *(all paths are relative to the configuration file)*
 
 ```json
 {
@@ -181,7 +182,7 @@ REserve will **fill the gap**.
 
 One way to implement this path is to **instruct the browser to get the file from a different URL** when accessing the virtual one.
 
-For instance, when `/resources/sap-ui-core.js` is requested, REserve answers with the **[HTTP 302](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/302) status code** and the information to get the resource from `https://openui5.hana.ondemand.com/1.76.0/resources/sap-ui-core.js`.
+For instance, when `/resources/sap-ui-core.js` is requested, REserve answers with the **[HTTP 302](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/302) status code** and the information to get the resource from `https://ui5.sap.com/1.76.0/resources/sap-ui-core.js`.
 
 The [status handler](https://www.npmjs.com/package/reserve#status) takes care of answering the request, the new location is described in the **response header**.
 
@@ -191,7 +192,7 @@ The [status handler](https://www.npmjs.com/package/reserve#status) takes care of
   "mappings": [{
     "match": "/resources/(.*)",
     "headers": {
-      "Location": "https://openui5.hana.ondemand.com/1.76.0/resources/$1"
+      "Location": "https://ui5.sap.com/1.76.0/resources/$1"
     },
     "status": 302
   }, {
@@ -256,7 +257,7 @@ module.exports = async function (request, response, ui5Path) {
   const { referer } = request.headers
   const version = (/\bversion\b=(\d+\.\d+\.\d+)/.exec(referer) || [0, '1.76.0'])[1]
   response.writeHead(302, {
-    Location: `https://openui5.hana.ondemand.com/${version}/resources/${ui5Path}`
+    Location: `https://ui5.sap.com/${version}/resources/${ui5Path}`
   })
   response.end()
 }
@@ -288,7 +289,7 @@ As listed below, this new mapping has **no `match` specification**. Therefore, *
   "mappings": [{
     "match": "/resources/(.*)",
     "headers": {
-      "Location": "https://openui5.hana.ondemand.com/1.76.0/resources/$1"
+      "Location": "https://ui5.sap.com/1.76.0/resources/$1"
     },
     "status": 302
   }, {
@@ -340,7 +341,7 @@ Thus, the **redirect mapping is replaced with a new one** as shown below.
   "port": 8080,
   "mappings": [{
     "match": "/resources/(.*)",
-    "url": "https://openui5.hana.ondemand.com/1.76.0/resources/$1"
+    "url": "https://ui5.sap.com/1.76.0/resources/$1"
   }, {
     "custom": "./csp.js"
   }, {
@@ -380,7 +381,7 @@ As shown below, **two mappings** are necessary :
   "port": 8080,
   "mappings": [{
     "match": "/@openui5/([^/]*)/(.*)",
-    "url": "https://openui5.hana.ondemand.com/$1/resources/$2"
+    "url": "https://ui5.sap.com/$1/resources/$2"
   }, {
     "match": "/resources/(.*)",
     "custom": "./proxy-version.js"
