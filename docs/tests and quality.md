@@ -1,6 +1,6 @@
 # Tests & Quality
 
-After drafting the first working version of [REserve](https://npmjs.com/package/reserve), **behavior validation** and **quality assessment** were some of the remaining **challenges**. This article will detail the different **strategies** adopted for **testing** as well as the **tooling** used to ensure the **quality** of the project.
+After drafting the first working version of [REserve](https://npmjs.com/package/reserve), **behavior validation** and **quality assessment** were some of the remaining **challenges**. This article reveals the different **strategies** adopted for **testing** as well as the **tooling** used to ensure the **quality** of the project.
 
 ## Basic testing
 
