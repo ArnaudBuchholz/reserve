@@ -225,12 +225,12 @@ declare module 'reserve' {
   }
 
   interface IConfiguration {
-    readonly handlers: Handlers
-    readonly mappings: Mapping[]
+    readonly handlers: { [key: string]: readonly Handler }
+    readonly mappings: (readonly Mapping)[]
     readonly http2: boolean
     readonly protocol: string
     setMappings: (mappings: Mapping[], request: IncomingMessage, timeout?: number) => Promise<void>
-    dispatch: (request: IncomingMessage, response: ServerResponse) => void
+    dispatch: (request: IncomingMessage, response: ServerResponse) => Promise<void>
   }
 
   function check (configuration: Configuration): Promise<Configuration>
