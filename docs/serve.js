@@ -53,7 +53,8 @@ body { padding: 1rem; }
     file: './node_modules/github-markdown-css/github-markdown.css'
   }, {
     match: '^/(.*)',
-    file: '$1'
+    file: '$1',
+    static: false
   }, {
     status: 404
   }]
