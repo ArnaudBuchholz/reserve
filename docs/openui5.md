@@ -4,6 +4,10 @@ The best way to explain **what REserve can do** is to demonstrate some of its fe
 
 This article illustrates how one can quickly setup a server to **facilitate the execution of OpenUI5 applications**.
 
+> [!NOTE]
+> This article was written in 2020.
+> The code and links were updated but screenshots may not matched the documented versions.
+
 ## Quick presentation of OpenUI5
 
 ### Overview
@@ -52,11 +56,11 @@ There is one **little drawback** to this model. After installing all these packa
 
 However, this means **cleaning the package list and install new ones**.
 
-That can be a **tedious process** but, good news, the [version 2 of the cli tools](https://youtu.be/v6ImEbZRRlg) offers a mechanism to **simplify** this step.
+That can be a **tedious process** but, good news, since its [version 2](https://youtu.be/v6ImEbZRRlg) the cli tools offers a mechanism to **simplify** this step.
 
 ### OpenUI5 Content Delivery Network
 
-The framework is built on top of a [smart dependency management model](https://ui5.sap.com/api/sap.ui#methods/sap.ui.define) that can load the missing dependencies when needed. To put it in a nutshell, these **additional modules** are usually **relative to the location where the [OpenUI5 bootstrap](https://ui5.sap.com/1.76.0/resources/sap-ui-core.js)** is obtained.
+The framework is built on top of a [smart dependency management model](https://ui5.sap.com/api/sap.ui#methods/sap.ui.define) that can load the missing dependencies when needed. To put it in a nutshell, these **additional modules** are usually **relative to the location where the [OpenUI5 bootstrap](https://ui5.sap.com/1.71.68/resources/sap-ui-core.js)** is obtained.
 
 Furthermore, each released version of OpenUI5 is available from a public CDN:
 * 1.124.0 is available under [https://ui5.sap.com/1.124.0/resources/](https://ui5.sap.com/1.124.0/resources/sap-ui-version.json)
@@ -124,6 +128,8 @@ Here are the steps to build a web server using [REserve](https://www.npmjs.com/p
   }, {
     "match": "^/(.*)",
     "file": "./webapp/$1"
+  }, {
+    "status": 404
   }]
 }
 ```
@@ -142,7 +148,7 @@ Then, when the browser points to [`http://localhost:8080`](http://localhost:8080
 
 > The application running with REserve
 
-In the meantime, REserve **traces all the received requests** *(colors are available if you also install globally the [colors](https://www.npmjs.com/package/colors) package)*.
+In the meantime, REserve **traces all the received requests**.
 
 ![File access](openui5/static%20cmd.png)
 
@@ -182,7 +188,7 @@ REserve will **fill the gap**.
 
 One way to implement this path is to **instruct the browser to get the file from a different URL** when accessing the virtual one.
 
-For instance, when `/resources/sap-ui-core.js` is requested, REserve answers with the **[HTTP 302](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/302) status code** and the information to get the resource from `https://ui5.sap.com/1.76.0/resources/sap-ui-core.js`.
+For instance, when `/resources/sap-ui-core.js` is requested, REserve answers with the **[HTTP 302](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/302) status code** and the information to get the resource from `https://ui5.sap.com/1.71.68/resources/sap-ui-core.js`.
 
 The [status handler](https://www.npmjs.com/package/reserve#status) takes care of answering the request, the new location is described in the **response header**.
 
@@ -192,7 +198,7 @@ The [status handler](https://www.npmjs.com/package/reserve#status) takes care of
   "mappings": [{
     "match": "/resources/(.*)",
     "headers": {
-      "Location": "https://ui5.sap.com/1.76.0/resources/$1"
+      "Location": "https://ui5.sap.com/1.71.68/resources/$1"
     },
     "status": 302
   }, {
@@ -201,6 +207,8 @@ The [status handler](https://www.npmjs.com/package/reserve#status) takes care of
   }, {
     "match": "^/(.*)",
     "file": "./webapp/$1"
+  }, {
+    "status": 404
   }]
 }
 ```
@@ -241,6 +249,8 @@ The [custom handler](https://www.npmjs.com/package/reserve#custom) enables custo
   }, {
     "match": "^/(.*)",
     "file": "./webapp/$1"
+  }, {
+    "status": 404
   }]
 }
 ```
@@ -255,7 +265,7 @@ In the following code, the request object is used to **extract the Referer heade
 ```JavaScript
 module.exports = async function (request, response, ui5Path) {
   const { referer } = request.headers
-  const version = (/\bversion\b=(\d+\.\d+\.\d+)/.exec(referer) || [0, '1.76.0'])[1]
+  const version = (/\bversion\b=(\d+\.\d+\.\d+)/.exec(referer) || [0, '1.71.68'])[1]
   response.writeHead(302, {
     Location: `https://ui5.sap.com/${version}/resources/${ui5Path}`
   })
@@ -265,11 +275,11 @@ module.exports = async function (request, response, ui5Path) {
 
 > `redirect-version.js` custom code
 
-When running this new configuration file, one can now specify a **version number inside the URL** such as `localhost:8080?version=1.65.0`. This makes the application runs with the **requested OpenUI5 version** as demonstrated below.
+When running this new configuration file, one can now specify a **version number inside the URL** such as `localhost:8080?version=1.60.29`. This makes the application runs with the **requested OpenUI5 version** as demonstrated below.
 
 ![redirect](openui5/redirect-version.png)
 
-> The demonstration application running with version 1.65.0 of OpenUI5
+> The demonstration application running with version 1.60.29 of OpenUI5
 
 As far as the traces are concerned, this does not change the output of REserve.
 
@@ -289,7 +299,7 @@ As listed below, this new mapping has **no `match` specification**. Therefore, *
   "mappings": [{
     "match": "/resources/(.*)",
     "headers": {
-      "Location": "https://ui5.sap.com/1.76.0/resources/$1"
+      "Location": "https://ui5.sap.com/1.71.68/resources/$1"
     },
     "status": 302
   }, {
@@ -300,6 +310,8 @@ As listed below, this new mapping has **no `match` specification**. Therefore, *
   }, {
     "match": "^/(.*)",
     "file": "./webapp/$1"
+  }, {
+    "status": 404
   }]
 }
 ```
@@ -341,7 +353,7 @@ Thus, the **redirect mapping is replaced with a new one** as shown below.
   "port": 8080,
   "mappings": [{
     "match": "/resources/(.*)",
-    "url": "https://ui5.sap.com/1.76.0/resources/$1"
+    "url": "https://ui5.sap.com/1.71.68/resources/$1"
   }, {
     "custom": "./csp.js"
   }, {
@@ -350,6 +362,8 @@ Thus, the **redirect mapping is replaced with a new one** as shown below.
   }, {
     "match": "^/(.*)",
     "file": "./webapp/$1"
+  }, {
+    "status": 404
   }]
 }
 ```
@@ -393,6 +407,8 @@ As shown below, **two mappings** are necessary :
   }, {
     "match": "^/(.*)",
     "file": "./webapp/$1"
+  }, {
+    "status": 404
   }]
 }
 ```
@@ -404,7 +420,7 @@ The custom code is almost the **same as `redirect-version.js`** but with a **dif
 ```JavaScript
 module.exports = async function (request, response, ui5Path) {
   const { referer } = request.headers
-  const version = (/\bversion\b=(\d+\.\d+\.\d+)/.exec(referer) || [0, '1.76.0'])[1]
+  const version = (/\bversion\b=(\d+\.\d+\.\d+)/.exec(referer) || [0, '1.71.68'])[1]
   response.writeHead(302, {
     Location: `/@openui5/${version}/${ui5Path}`
   })
@@ -428,8 +444,8 @@ Again, the console looks like the previous example.
 
 ## Conclusion
 
-Not only REserve is designed to be **lightweight** *(less than [60 kB in version 1.6.1](https://packagephobia.now.sh/result?p=reserve@1.6.1))* but it is also **flexible and powerful**. It solves complex problems with its **specialized handlers**, and it can be easily **extended** with custom code.
+Not only REserve is designed to be **lightweight** but it is also **flexible and powerful**. It solves complex problems with its **specialized handlers**, and it can be easily **extended** with custom code.
 
 Through the article, **five websites with different behaviors** were setup with only **few lines of configuration / code**.
 
-It enabled the use of the OpenUI5 framework **without downloading 60 MB of modules**. Hence if you plan to try it, it can be a **fast alternative**.
+It enabled the use of the OpenUI5 framework **without downloading 160 MB of modules**. Hence if you plan to try it, it can be a **fast alternative**.
