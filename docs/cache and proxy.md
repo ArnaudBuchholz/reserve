@@ -2,6 +2,11 @@
 
 With version 1.8.0, [REserve](https://www.npmjs.com/package/reserve) offers **the capture helper** that enables the **copy of the response content while processing a request**. In this article, an example will be presented in two different flavors to illustrate the **new possibilities** introduced by this tool.
 
+> [!NOTE]
+> This article was written in 2020.
+> Unfortunately, the `facetheforce.today` website does not exist anymore.
+> Yet, the content is still relevant to REserve.
+
 # Caching the content of a site
 
 ## Redirecting
