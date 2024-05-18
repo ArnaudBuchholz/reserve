@@ -6,6 +6,7 @@ import { remarkAlert } from 'remark-github-blockquote-alert'
 import remarkRehype from 'remark-rehype'
 import rehypeStringify from 'rehype-stringify'
 import remarkGfm from 'remark-gfm'
+import rehypeRaw from 'rehype-raw'
 
 log(serve({
   port: 8099,
@@ -18,9 +19,9 @@ log(serve({
         .use(remarkAlert)
         .use(remarkGfm)
         .use(remarkRehype, { allowDangerousHtml: true })
+        .use(rehypeRaw)
         .use(rehypeStringify)
         .processSync(markdown).toString()
-        .replace(/&\#x3C;br>/g, '<br>')
         .replace(/<h(\d)>(?:<code>)?([^<]*)(?:<\/code>)?<\/h\d>/g, (_, level, title) => {
           const anchor = title
             .toLowerCase()
