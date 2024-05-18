@@ -3,7 +3,7 @@
   "mappings": [{
     "match": "/resources/(.*)",
     "headers": {
-      "Location": "https://openui5.hana.ondemand.com/1.76.0/resources/$1"
+      "Location": "https://ui5.sap.com/1.71.68/resources/$1"
     },
     "status": 302
   }, {
@@ -12,5 +12,7 @@
   }, {
     "match": "^/(.*)",
     "file": "./webapp/$1"
+  }, {
+    "status": 404
   }]
 }

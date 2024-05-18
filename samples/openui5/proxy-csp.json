@@ -2,7 +2,7 @@
   "port": 8080,
   "mappings": [{
     "match": "/resources/(.*)",
-    "url": "https://openui5.hana.ondemand.com/1.76.0/resources/$1"
+    "url": "https://ui5.sap.com/1.71.68/resources/$1"
   }, {
     "custom": "./csp.js"
   }, {
@@ -11,5 +11,7 @@
   }, {
     "match": "^/(.*)",
     "file": "./webapp/$1"
+  }, {
+    "status": 404
   }]
 }
