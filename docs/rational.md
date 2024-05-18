@@ -106,7 +106,7 @@ Not satisfied with the current solutions, I kept this problem in the back of my 
 
 ## Origin of REserve
 
-In 2019, I had the pleasure to present at [UI5Con](https://openui5.org/ui5con/) and I introduced [node-ui5](https://www.npmjs.com/package/node-ui5): a Node.js wrapper for [UI5](https://openui5.org/) to leverage tools like [MockServer](https://openui5.hana.ondemand.com/#/api/sap.ui.core.util.MockServer) or [ODataModel](https://openui5.hana.ondemand.com/#/api/sap.ui.model.odata.v2.ODataModel).
+In 2019, I had the pleasure to present at [UI5Con](https://openui5.org/ui5con/) and I introduced [node-ui5](https://www.npmjs.com/package/node-ui5): a Node.js wrapper for [UI5](https://openui5.org/) to leverage tools like [MockServer](https://ui5.sap.com/#/api/sap.ui.core.util.MockServer) or [ODataModel](https://ui5.sap.com/#/api/sap.ui.model.odata.v2.ODataModel).
 
  As a very [last part of this presentation](https://youtu.be/TB5bpvJo-zc?t=1612), a prototype demonstrates how [OPA](https://www.sap-press.com/5056/) could be used to do **end-to-end testing**. One of the key challenges is to be able to run the local test code on a remote iFrame. Because of the [same origin policy](https://en.wikipedia.org/wiki/Same-origin_policy), it is not possible. However, with the help of a **proxy that aggregates** the remote website and the local files under a unique server, it becomes possible.
 
