@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://arnaudbuchholz.github.io/gfx/REserve.png" alt="REserve logo" width="300px"/>
+</p>
+
 # REserve 2️⃣ Documentation
 
 > [!IMPORTANT]

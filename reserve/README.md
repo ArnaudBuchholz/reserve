@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://arnaudbuchholz.github.io/gfx/REserve.png" alt="REserve logo" width="300px"/>
+</p>
+
 # REserve 2️⃣
 
 [![Node.js CI](https://github.com/ArnaudBuchholz/reserve/actions/workflows/reserve-ci.yml/badge.svg)](https://github.com/ArnaudBuchholz/reserve/actions/workflows/node.js.yml)
