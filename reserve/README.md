@@ -14,7 +14,7 @@
 [![PackagePhobia](https://img.shields.io/badge/%F0%9F%93%A6package-phobia-lightgrey)](https://packagephobia.com/result?p=reserve)
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FArnaudBuchholz%2Freserve.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FArnaudBuchholz%2Freserve?ref=badge_shield)
-[![Documentation](https://img.shields.io/badge/-documentation-blueviolet)](https://arnaudbuchholz.github.io/reserve/)
+[![Documentation](https://img.shields.io/badge/-documentation-blueviolet)](https://github.com/ArnaudBuchholz/reserve/blob/main/docs/README.md)
 [![History](https://img.shields.io/badge/-history-blueviolet)](https://github.com/ArnaudBuchholz/reserve/blob/main/reserve/CHANGELOG.md)
 
 > A **lightweight** web server **configurable** with regular expressions. It can also be **embedded** and **extended**. The name comes from the combination of `RE` for regular expressions and `serve`.
