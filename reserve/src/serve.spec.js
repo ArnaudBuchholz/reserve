@@ -156,21 +156,26 @@ describe('serve', () => {
         hostname: '127.0.0.1',
         port: 3475
       })
+      await new Promise(resolve => server.on('ready', resolve))
       await server.close()
       assert.ok(httpServer._closed)
     })
 
-    it('forwards the error', async () => {
+    it('ignores the error', async () => {
       const server = serve({
         hostname: 'error'
       })
       let errorThrown
       try {
-        await server.close()
+        await new Promise((resolve, reject) => server
+          .on('ready', resolve)
+          .on('error', reject)
+        )
       } catch (e) {
         errorThrown = e
       }
       assert.ok(errorThrown !== undefined)
+      await server.close()
     })
   })
 })
