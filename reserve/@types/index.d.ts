@@ -224,16 +224,18 @@ declare module 'reserve' {
     extend?: string
   }
 
+  function read (filename: string): Promise<Configuration>
+
+  function check (configuration: Configuration): Promise<Configuration>
+
   interface IConfiguration {
-    readonly handlers: { [key: string]: readonly Handler }
-    readonly mappings: (readonly Mapping)[]
+    readonly handlers: { [key: string]: Handler }
+    readonly mappings: Mapping[]
     readonly http2: boolean
     readonly protocol: string
     setMappings: (mappings: Mapping[], request: IncomingMessage, timeout?: number) => Promise<void>
     dispatch: (request: IncomingMessage, response: ServerResponse) => Promise<void>
   }
-
-  function check (configuration: Configuration): Promise<Configuration>
 
   enum ServerEventName {
     created = 'created',
