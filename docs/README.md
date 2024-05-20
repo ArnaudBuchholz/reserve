@@ -10,8 +10,49 @@
 ## ✅ Configuration
 
 There are two ways to use REserve :
+
 * Run as a **standalone command line** with a **configuration file** *(default name is `reserve.json`)*
+
+```json
+{
+  "port": 8080,
+  "mappings": [{
+    "match": "^/private/",
+    "status": 403
+  }, {
+    "match": "^/(.*)",
+    "file": "./$1"
+  }, {
+    "status": 404
+  }]
+}
+```
+
+> Example of `reserve.json` configuration file
+
+> [!NOTE]
+> If [`process.send`](https://nodejs.org/api/process.html#process_process_send_message_sendhandle_options_callback) is available, REserve notifies the parent process when the server is ready by sending the message `'ready'`.
+
 * **Embed** with its configuration in a **custom application**
+
+```JavaScript
+import { serve, log } from 'reserve'
+
+log(serve({
+  "port": 8080,
+  "mappings": [{
+    "match": "^/private/",
+    "status": 403
+  }, {
+    "match": "^/(.*)",
+    "file": "./$1"
+  }, {
+    "status": 404
+  }]
+}))
+```
+
+> Example of reserve being embedded in an application
 
 In both cases, the configuration must comply with the properties and mappings [documented here](configuration.md).
 
@@ -35,9 +76,12 @@ If you plan to build your **own handler**, here is [what you need to know](handl
 
 The REserve server object implements an interface that mimics the [EventEmitter::on method](https://nodejs.org/api/events.html#emitteroneventname-listener) and, during execution, it triggers [**events with parameters**](events.md) to **notify** any listener of **its activity**.
 
-## 🧰 Helpers
+## 📦 Exports
 
-REserve offers some helpers to simplify implementations :
+REserve exports methods and helpers to simplify implementations :
+* [`serve`](serve.md) : to start the server
+* [`read`](read.md) : to read a configuration file, supports `extends`
+* [`check`](check.md) : to check a configuration
 * [`log`](log.md) : to handle and output server logs
 * [`interpolate`](interpolate.md) : to interpolate values in a string or an object
 * [`body`](body.md) : to read a request body

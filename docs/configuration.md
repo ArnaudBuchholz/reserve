@@ -119,7 +119,7 @@ Optional, defaulted to `[]`.
 ## `extend`
 
 > [!IMPORTANT]
-> Only for JSON configuration files.
+> Only for JSON configuration files accessed with [`read`](read.md).
 
 A relative or absolute path to another configuration file to extend.
 If relative, the **current** configuration file directory is considered.
