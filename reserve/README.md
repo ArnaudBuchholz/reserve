@@ -43,6 +43,8 @@ For instance, the definition of a server that **exposes files** of the current d
   }, {
     "match": "^/(.*)",
     "file": "./$1"
+  }, {
+    "status": 404
   }]
 }
 ```
@@ -58,8 +60,6 @@ The package declares the executable `reserve` :
 * By default, it will look for a file named `reserve.json` in the current working directory
 * One or more configuration files name can be specified using `--config <file names separated by ,>`
 
-**NOTE** : if [`process.send`](https://nodejs.org/api/process.html#process_process_send_message_sendhandle_options_callback) is available, REserve notifies the parent process when the server is ready by sending the message `'ready'`.
-
 ## Embedded
 
 The server can be embedded in an application using the `serve` export :
@@ -72,6 +72,8 @@ serve({
   mappings: [{
     match: /^\/(.*)/,
     file: '$1'
+  }, {
+    "status": 404
   }]
 })
   .on('ready', ({ url }) => {
