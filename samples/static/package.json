@@ -9,6 +9,8 @@
     "autocannon": "^7",
     "express": "^4",
     "fastify": "^4",
+    "koa": "^2.15.3",
+    "koa-send": "^5.0.1",
     "reserve": "",
     "standard": "^17"
   },
