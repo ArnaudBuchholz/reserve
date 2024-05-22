@@ -6,7 +6,6 @@ const {
   $configuration,
   $configurationRequests,
   $mappingChecked,
-  $requestId,
   $requestInternal
 } = require('../symbols')
 const defer = require('../helpers/defer')
@@ -66,7 +65,7 @@ module.exports = class IConfiguration {
     holding.then(undefined, () => {
       console.log('REserve blocked during configuration.setMappings')
       console.table(contexts.map(context => {
-        const { emitParameters, request, nonHolding } = context
+        const { emitParameters, request, nonHolding, id } = context
         let info
         if (emitParameters.statusCode) {
           info = { statusCode: emitParameters.statusCode }
@@ -78,7 +77,7 @@ module.exports = class IConfiguration {
           info = { ms: (new Date() - emitParameters.start) } // + ' ms'
         }
         return {
-          id: request[$requestId],
+          id,
           method: request.method,
           url: request.url,
           info

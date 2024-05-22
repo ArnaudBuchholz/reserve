@@ -17,7 +17,6 @@ const {
   $configurationRequests,
   $mappingMatch,
   $mappingHandler,
-  $requestId,
   $requestInternal,
   $configurationEventEmitter
 } = require('./symbols')
@@ -31,7 +30,7 @@ function emitError ({ emit, emitParameters }, reason) {
 }
 
 function redirected (context) {
-  const { emit, emitParameters, response: { statusCode }, redirected, configuration: { [$configurationRequests]: contexts }, id } = context
+  const { emit, emitParameters, response: { statusCode }, redirected, configuration: { [$configurationRequests]: { contexts } }, id } = context
   const perfEnd = performance.now()
   emitParameters.end = new Date()
   emitParameters.perfEnd = perfEnd
@@ -174,6 +173,7 @@ module.exports = function (configuration, request, response) {
   const [dispatching, dispatched] = defer()
 
   const context = {
+    id,
     configuration,
     emit,
     emitParameters,
@@ -184,7 +184,6 @@ module.exports = function (configuration, request, response) {
     response
   }
 
-  request[$requestId] = id
   request.on('aborted', () => emit(EVENT_ABORTED, emitParameters))
   request.on('close', () => emit(EVENT_CLOSED, emitParameters))
 
