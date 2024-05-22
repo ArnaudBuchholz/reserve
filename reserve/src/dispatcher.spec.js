@@ -4,7 +4,7 @@ const { describe, it, before } = require('mocha')
 const assert = require('assert')
 const { check, Request, Response } = require('./index')
 const dispatcher = require('./dispatcher')
-const { $configurationEventEmitter, $mappingMatch } = require('./symbols')
+const { $configurationEventEmitter, $mappingMatch, $configurationRequests } = require('./symbols')
 const { newEventEmitter } = require('./event')
 const status = require('./handlers/status')
 
@@ -43,6 +43,7 @@ async function dispatch ({ configurationPromise, events, request, beforeWait }) 
     beforeWait(request)
   }
   await promise
+  assert.strictEqual(Object.values(configuration[$configurationRequests].contexts).length, 0, 'No pending context')
   return {
     emitted,
     request,
