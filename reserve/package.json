@@ -1,6 +1,6 @@
 {
   "name": "reserve",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Lightweight http server statically configurable using regular expressions",
   "main": "./dist/index.js",
   "exports": {

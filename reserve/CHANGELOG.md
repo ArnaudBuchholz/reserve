@@ -1,5 +1,6 @@
 |Version|content|
 |---|---|
+|2.0.1|Fixed memory leak in the dispatcher ([#97](https://github.com/ArnaudBuchholz/reserve/issues/97))|
 |2.0.0|Refactoring to improve project structure and performances|
 ||⚠️BREAKING CHANGE: Support of CommonJS and ESM imports|
 ||⚠️BREAKING CHANGE: Remove support of `colors`|
