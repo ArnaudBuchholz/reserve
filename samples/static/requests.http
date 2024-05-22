@@ -1,0 +1,3 @@
+@reserve_port = 8081
+
+http://localhost:{{reserve_port}}/healthcheck

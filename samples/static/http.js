@@ -1,8 +1,8 @@
 const http = require('http')
 const { readFileSync } = require('fs')
+const { NATIVE_PORT: PORT } = require('./ports.js')
 
 const host = 'localhost'
-const port = 8083
 
 const page = readFileSync('www/index.html').toString()
 
@@ -23,6 +23,6 @@ const requestListener = function (req, res) {
 }
 
 const server = http.createServer(requestListener)
-server.listen(port, host, () => {
-  console.log(`raw http listening on port ${port}`)
+server.listen(PORT, host, () => {
+  console.log(`raw http listening on port ${PORT}`)
 })

@@ -1,0 +1,7 @@
+module.exports = {
+  NATIVE_PORT: 8080,
+  RESERVE_PORT: 8081,
+  EXPRESS_PORT: 8082,
+  FASTIFY_PORT: 8083,
+  KOA_PORT: 8084
+}
