@@ -1,6 +1,9 @@
 const Koa = require('koa')
-const app = new Koa()
 const { KOA_PORT: PORT } = require('./ports.js')
+const { join } = require('path')
+const send = require('koa-send')
+
+const app = new Koa()
 
 app.use(async (ctx, next) => {
   if (ctx.path !== '/hello') {
@@ -10,10 +13,10 @@ app.use(async (ctx, next) => {
 })
 
 app.use(async (ctx) => {
-  await send(ctx, ctx.path, { root: __dirname + '/www' })
+  await send(ctx, ctx.path, { root: join(__dirname, 'www') })
 })
 
-app.listen(PORT, (err, address) => {
+app.listen(PORT, (err) => {
   if (err) throw err
   console.log(`koa listening on port ${PORT}`)
 })
