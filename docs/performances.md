@@ -43,8 +43,8 @@ A [benchmark](https://github.com/ArnaudBuchholz/reserve/blob/main/samples/static
 | reserve | 47163 |
 | fastify | 48750 |
 
-> [!NOTE]
-> Some implementations cache the file information. It explains why they are faster than the native one.
+> [!NOTE]
+> Some implementations cache the file information. It explains why they are faster than the native one.
 
 ## Conclusions
 
