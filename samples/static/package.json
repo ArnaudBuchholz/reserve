@@ -11,6 +11,7 @@
     "fastify": "^4",
     "koa": "^2.15.3",
     "koa-send": "^5.0.1",
+    "mime": "3.0.0",
     "reserve": "",
     "standard": "^17"
   },
