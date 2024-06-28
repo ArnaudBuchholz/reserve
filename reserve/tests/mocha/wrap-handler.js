@@ -43,7 +43,7 @@ module.exports = (handler, defaults = {}) => {
           request,
           response,
           mapping,
-          redirect: redirect || normalize(request.url)
+          redirect: redirect === undefined ? normalize(request.url) : redirect
         })
         return { mapping, redirected, request, response }
       })
