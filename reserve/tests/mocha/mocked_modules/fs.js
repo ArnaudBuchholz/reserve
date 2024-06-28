@@ -116,7 +116,6 @@ const entries = {
 }
 
 let caseSensitive = true
-let ignoreEmptyFolders = false
 
 function getEntry (entryPath) {
   if (!caseSensitive) {
@@ -126,7 +125,7 @@ function getEntry (entryPath) {
     return entries
   }
   return entryPath.split(/\\|\//).slice(1).reduce((folder, name) => {
-    if (!folder || folder.content || (!name && ignoreEmptyFolders)) {
+    if (!folder || folder.content || !name) {
       return folder
     }
     return folder[name]
@@ -136,10 +135,6 @@ function getEntry (entryPath) {
 const mockedFs = Object.assign({}, fs, {
   setCaseSensitive (value) {
     caseSensitive = value
-  },
-
-  setIgnoreEmptyFolders (value) {
-    ignoreEmptyFolders = value
   },
 
   stat (entryPath, callback) {
