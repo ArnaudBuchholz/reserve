@@ -179,15 +179,12 @@ module.exports = {
     }
   },
   redirect: ({ request, mapping, redirect, response }) => {
-    let filePath = /([^?#]+)/.exec(redirect)[1] // filter URL parameters & hash
+    let filePath = /([^?#]*)/.exec(redirect)[1] // filter URL parameters & hash
     filePath = join(mapping.cwd, filePath)
     if (!filePath.startsWith(mapping.cwd)) {
       return Promise.resolve()
     }
-    const directoryAccess = !!filePath.match(/(\\|\/)$/) // Test known path separators
-    if (directoryAccess) {
-      filePath = filePath.substring(0, filePath.length - 1)
-    }
+    const fileAccess = !filePath.match(/(\\|\/)$/) // Test known path separators
     const context = {
       cachingStrategy: mapping[$cachingStrategy],
       fs: mapping[$customFileSystem],
@@ -200,7 +197,7 @@ module.exports = {
       .then(async stat => {
         await checkStrictPath(context.fs, mapping.cwd, filePath)
         const isDirectory = stat.isDirectory()
-        if (isDirectory ^ directoryAccess) {
+        if (!isDirectory && !fileAccess) {
           return
         }
         if (isDirectory) {
