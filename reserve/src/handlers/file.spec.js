@@ -71,6 +71,13 @@ describe('handlers/file', () => {
     })
       .then(ignored)
     )
+
+    it('does not fail on empty redirect', () => handle({
+      request: '/',
+      redirect: ''
+    })
+      .then(ignored)
+    )
   })
 
   describe('security', () => {
@@ -118,13 +125,19 @@ describe('handlers/file', () => {
       .then(ignored)
     )
 
-    it('checks folder access (url must end with /)', () => handle({
+    it('sends index.html if accessing a folder (url does not end with /)', () => handle({
       request: './folder'
     })
-      .then(ignored)
+      .then(({ redirected, response }) => redirected.then(value => {
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.headers['Content-Type'], htmlMimeType)
+        assert.strictEqual(response.headers['Content-Length'], '8')
+        assert.strictEqual(response.toString(), '<html />')
+      }))
     )
 
-    it('sends index.html if accessing a folder', () => handle({
+    it('sends index.html if accessing a folder (url ends with /)', () => handle({
       request: './folder/'
     })
       .then(({ redirected, response }) => redirected.then(value => {
@@ -167,6 +180,20 @@ describe('handlers/file', () => {
       request: './wrong-index/'
     })
       .then(ignored)
+    )
+
+    it('does not fail on empty redirect', () => handle({
+      mapping: { cwd: '/folder' },
+      request: '/',
+      redirect: ''
+    })
+      .then(({ redirected, response }) => redirected.then(value => {
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.headers['Content-Type'], htmlMimeType)
+        assert.strictEqual(response.headers['Content-Length'], '8')
+        assert.strictEqual(response.toString(), '<html />')
+      }))
     )
   })
 
@@ -286,12 +313,6 @@ describe('handlers/file', () => {
 
     it('returns nothing if the folder does not exist', () => handle({
       request: './not-a-folder/not-found'
-    })
-      .then(ignored)
-    )
-
-    it('returns nothing for incorrect folder access (url must end with /)', () => handle({
-      request: './folder'
     })
       .then(ignored)
     )
