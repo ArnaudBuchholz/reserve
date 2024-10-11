@@ -37,5 +37,9 @@ jobs:
     - name: 💿 Install dependencies (Node.js > 14)
       if: ${{ matrix.node-version != '12.x' && matrix.node-version != '14.x' }}
       run: npm ci
-    - name: 🧪 Run tests
+    - name: 🧪 Run tests (Node.js <= 14)
+      if: ${{ matrix.node-version == '12.x' || matrix.node-version == '14.x' }}
+      run: npm test:basic
+    - name: 🧪 Run tests (Node.js > 14)
+      if: ${{ matrix.node-version != '12.x' && matrix.node-version != '14.x' }}
       run: npm test
