@@ -31,6 +31,10 @@ export async function main() {
     }]
   });
 
+  mockServer
+    .on('ready', ({ url }) => console.log(`Listening on ${url}`))
+    .on('error', ({ error }) => console.error(error));
+
   mockServer.request('GET', '/hello');
   mockServer.request('GET', '/hello', {
     'x-server': 'reserve'

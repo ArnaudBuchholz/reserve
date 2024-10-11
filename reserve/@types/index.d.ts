@@ -145,7 +145,7 @@ declare module 'reserve' {
   type BodyResult = Promise<Buffer | string | object> & {
     buffer: () => Promise<Buffer>
     text: () => Promise<string>
-    json: () => Promise<object>
+    json: () => Promise<any>
   }
 
   function body (request: IncomingMessage, options?: BodyOptions): BodyResult
@@ -237,18 +237,17 @@ declare module 'reserve' {
     dispatch: (request: IncomingMessage, response: ServerResponse) => Promise<void>
   }
 
-  enum ServerEventName {
-    created = 'created',
-    ready = 'ready',
-    incoming = 'incoming',
-    error = 'error',
-    redirecting = 'redirecting',
-    redirected = 'redirected',
-    aborted = 'aborted',
-    closed = 'closed'
-  }
-
-  type ServerEventIncoming = {
+  type ServerEventName = 
+    | 'created'
+    | 'ready'
+    | 'incoming'
+    | 'error'
+    | 'redirecting'
+    | 'redirected'
+    | 'aborted'
+    | 'closed'
+  
+  type ServerEventCommon = {
     method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS' | 'TRACE' | 'PATCH' | string
     incomingUrl: string // before normalization
     url: string // after normalization
@@ -258,55 +257,71 @@ declare module 'reserve' {
     internal: boolean
   }
 
-  type ServerEvent = 
-  |
-    {
-      eventName: ServerEventName.created
-      server: HttpServer | HttpsServer | Http2Server
-      configuration: IConfiguration
-    }
-  |
-    {
-      eventName: ServerEventName.ready
-      url: string
-      port: number
-      http2 : boolean
-    }
-  |
-    {
-      eventName: ServerEventName.incoming
-    } & ServerEventIncoming
-  |
-    {
-      eventName: ServerEventName.error
-      error: any
-    } & ServerEventIncoming
-  | 
-    {
-      eventName: ServerEventName.redirecting
-      type: string
-      redirect: string | number
-    } & ServerEventIncoming
-  | 
-    {
-      eventName: ServerEventName.redirected
-      end: Date
-      timeSpent: number
-      statusCode: number
-    } & ServerEventIncoming
-  | 
-    {
-      eventName: ServerEventName.aborted
-    } & ServerEventIncoming
-  | 
-    {
-      eventName: ServerEventName.closed
-    } & ServerEventIncoming
+  type ServerEventCreated ={
+    eventName: 'created'
+    server: HttpServer | HttpsServer | Http2Server
+    configuration: IConfiguration
+  };
 
-  type ServerListener = (event: ServerEvent) => void
+  type ServerEventReady = {
+    eventName: 'ready'
+    url: string
+    port: number
+    http2 : boolean
+  }
+
+  type ServerEventIncoming = {
+    eventName: 'incoming'
+  } & ServerEventCommon
+
+  type ServerEventError = {
+    eventName: 'error'
+    error: any
+  } & ServerEventCommon
+
+  type ServerEventRedirecting = {
+    eventName: 'redirecting'
+    type: string
+    redirect: string | number
+  } & ServerEventCommon
+
+  type ServerEventRedirected = {
+    eventName: 'redirected'
+    end: Date
+    timeSpent: number
+    statusCode: number
+  } & ServerEventCommon
+
+  type ServerEventAborted = {
+    eventName: 'aborted'
+  } & ServerEventCommon
+
+  type ServerEventClosed = {
+    eventName: 'closed'
+  } & ServerEventCommon
+
+  type ServerEvent<eventName = unknown> = eventName extends 'created'
+    ? ServerEventCreated
+    : eventName extends 'ready'
+      ? ServerEventReady
+      : eventName extends 'incoming'
+        ? ServerEventIncoming
+        : eventName extends 'error'
+          ? ServerEventError
+          : eventName extends 'redirecting'
+            ? ServerEventRedirecting
+            : eventName extends 'redirected'
+              ? ServerEventRedirected
+              : eventName extends 'aborted'
+                ? ServerEventAborted
+                : eventName extends 'closed'
+                  ? ServerEventClosed
+                  : ServerEventCreated | ServerEventReady | ServerEventIncoming | ServerEventError | ServerEventRedirecting | ServerEventRedirected | ServerEventAborted | ServerEventClosed
+
+  type ServerListener<EventName = unknown> = (event: ServerEvent<EventName>) => void
 
   interface Server {
-    on (eventName: ServerEventName, listener: ServerListener)
+    on: <ServerEventName extends string>(eventName: ServerEventName, listener: ServerListener<ServerEventName>) => Server
     close: () => Promise<void>
   }
 
