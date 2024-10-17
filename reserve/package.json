@@ -1,12 +1,13 @@
 {
   "name": "reserve",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Lightweight http server statically configurable using regular expressions",
   "main": "./dist/index.js",
   "exports": {
     ".": {
       "require": "./dist/index.js",
-      "import": "./dist/index.mjs"
+      "import": "./dist/index.mjs",
+      "types": "./@types/index.d.ts"
     }
   },
   "files": [
