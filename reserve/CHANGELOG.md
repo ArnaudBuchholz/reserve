@@ -1,5 +1,6 @@
 |Version|content|
 |---|---|
+|2.0.5|`wasm` mime type|
 |2.0.4|Fixes package exports for type definitions|
 |2.0.3|Fixes in type definitions|
 |2.0.2|Fixed empty redirect hanlding in `file` ([#99](https://github.com/ArnaudBuchholz/reserve/issues/99))|
