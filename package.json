@@ -27,7 +27,7 @@
     "autocannon": "^7.15.0",
     "cors": "^2.8.5",
     "eslint-utils": "^3.0.0",
-    "express": "^4.19.2",
+    "express": "^4.21.2",
     "fastify": "^4.27.0",
     "mocha": "^10.4.0",
     "mock-require": "^3.0.3",
