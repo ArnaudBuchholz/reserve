@@ -8,6 +8,7 @@ const {
 } = require('../symbols')
 const smartImport = require('../helpers/smartImport')
 const { throwError, ERROR_CUSTOM_EXPECTED_FUNCTION } = require('../error')
+const send = require('../helpers/send')
 
 function withMatch (callback, request, response, [, ...additional]) {
   return callback.call(this, request, response, ...additional)
@@ -36,6 +37,18 @@ module.exports = {
     mapping.configuration = configuration
   },
   redirect: ({ mapping, match, request, response }) => {
-    return mapping[$customRedirect](request, response, match)
+    const result = mapping[$customRedirect](request, response, match)
+    if (result && result.then) {
+      return result.then(asyncResult => {
+        if (Array.isArray(asyncResult)) {
+          return send(response, asyncResult[0], asyncResult[1])
+        }
+        return asyncResult
+      })
+    }
+    if (Array.isArray(result)) {
+      return send(response, result[0], result[1])
+    }
+    return result
   }
 }

@@ -26,6 +26,19 @@ module.exports = async (request, response) => response.('X-Server', 'REserve')
 
 > Corresponding `xserver.js` file
 
+```javascript
+{
+  custom: () => [
+    '<html><title>Not found</title></html>',
+    {
+      statusCode :404
+    }
+  ]
+}
+```
+
+> Example of `custom` mapping sending back a response (new to version 2.1.0)
+
 ## Features
 
 The `custom` property can be either an [external module](external.md) or a [function](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Functions) that accepts at least two parameters : [`request`](https://nodejs.org/api/http.html#http_class_http_incomingmessage) and [`response`](https://nodejs.org/api/http.html#http_class_http_serverresponse).
@@ -44,6 +57,8 @@ The `custom` property can be either an [external module](external.md) or a [func
 
 * The function may return a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 
-* If the promise is resolved to a value (i.e. not `undefined`), an internal redirection occurs i.e. the request is going over the mappings again (*infinite loops are prevented, see [`max-redirect`](configuration.md#max-redirect-optional)*)
+* If the function returns *(or returns a promise resolving to)* a `string` or a `number`, an internal redirection occurs, i.e. the request is going over the mappings again (*infinite loops are prevented, see [`max-redirect`](configuration.md#max-redirect-optional)*)
+
+* With version 2.1.0, if the function returns *(or returns a promise resolving to)* an `array`, the two first values are passed to [`send`](send.md) to finalize the response.
 
 * If the `response` is not **finalized** after executing the function *(i.e. [`response.end`](https://nodejs.org/api/http.html#http_response_end_data_encoding_callback) was not called)*, the `request` is going over the remaining mappings

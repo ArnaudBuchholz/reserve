@@ -1,6 +1,6 @@
 {
   "name": "reserve",
-  "version": "2.0.6",
+  "version": "2.1.0",
   "description": "Lightweight http server statically configurable using regular expressions",
   "main": "./dist/index.js",
   "exports": {
@@ -60,18 +60,18 @@
   },
   "homepage": "https://github.com/ArnaudBuchholz/reserve#readme",
   "devDependencies": {
-    "@stryker-mutator/core": "^8.6.0",
-    "@stryker-mutator/mocha-runner": "^8.6.0",
-    "@types/node": "^22.9.0",
+    "@stryker-mutator/core": "^8.7.1",
+    "@stryker-mutator/mocha-runner": "^8.7.1",
+    "@types/node": "^22.13.5",
     "cors": "^2.8.5",
     "eslint-utils": "^3.0.0",
-    "mocha": "^10.8.2",
+    "mocha": "^11.1.0",
     "mock-require": "^3.0.3",
     "nyc": "^17.1.0",
     "punycache": "^1.0.0",
     "reserve": "",
     "standard": "^17.1.2",
-    "terser": "^5.36.0",
-    "typescript": "^5.6.3"
+    "terser": "^5.39.0",
+    "typescript": "^5.7.3"
   }
 }

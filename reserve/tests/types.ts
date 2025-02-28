@@ -19,7 +19,13 @@ export const configurations: Configuration[] = [{
   }, {
     use: () => (request: IncomingMessage): void => {}
   }, {
-    custom: async (request: IncomingMessage, response: ServerResponse): Promise<void> => {}
+    custom: async (request: IncomingMessage, response: ServerResponse) => {}
+  }, {
+    custom: (request: IncomingMessage, response: ServerResponse) => 'ok'
+  }, {
+    custom: async (request: IncomingMessage, response: ServerResponse) => (['OK'])
+  }, {
+    custom: (request: IncomingMessage, response: ServerResponse) => (['OK', { statusCode: 204 }])
   }]
 }]
 

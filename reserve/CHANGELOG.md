@@ -1,5 +1,6 @@
 |Version|content|
 |---|---|
+|2.1.0|`custom` handlers can return an array that is sent back as a response ([`custom`](https://github.com/ArnaudBuchholz/reserve/blob/main/docs/custom.md))|
 |2.0.5|`wasm` mime type|
 |2.0.4|Fixes package exports for type definitions|
 |2.0.3|Fixes in type definitions|
@@ -20,7 +21,7 @@
 ||⚠️BREAKING CHANGE: In `file`, absolute path are forbidden, trying to access a folder above `cwd` fails|
 ||⚠️BREAKING CHANGE: In `file`, **no** response is sent if the request is aborted while allocating the read stream|
 ||⚠️BREAKING CHANGE: In `file`, **no** response is sent if the request is aborted while allocating the read stream|
-||⚠️BREAKING CHANGE: In `file`, `static` behavior added ([`doc`](file.md))|
+||⚠️BREAKING CHANGE: In `file`, `static` behavior added ([`doc`](https://github.com/ArnaudBuchholz/reserve/blob/main/docs/file.md))|
 ||⚠️BREAKING CHANGE: Default configuration does not include proxy|
 ||⚠️BREAKING CHANGE: `mock` returns immediately even if the *server* is not ready (wait for `ready`)|
 ||⚠️BREAKING CHANGE: `Request` and `Response` are direct exports|
@@ -33,8 +34,8 @@
 ||⚠️BREAKING CHANGE: `if-match` signature and behavior change|
 ||Fix `use` to handle middleware that are not calling next|
 ||Response status code is preserved when set before `file`|
-||`static` option for performant `file` delivery ([`doc`](file.md))|
-||Expose `send` helper ([doc](send.md))|
+||`static` option for performant `file` delivery ([`doc`](https://github.com/ArnaudBuchholz/reserve/blob/main/docs/file.md))|
+||Expose `send` helper ([doc](https://github.com/ArnaudBuchholz/reserve/blob/main/docs/send.md))|
 ||Expose `punycache` helper ([doc](https://www.npmjs.com/package/punycache))|
 ||Fix types definitions|
 |1.15.9|Documentation update|

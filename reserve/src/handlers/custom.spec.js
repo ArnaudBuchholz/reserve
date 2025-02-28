@@ -5,6 +5,8 @@ const assert = require('assert')
 const { notExpected, wrapHandler } = require('test-tools')
 const customHandler = require('./custom')
 
+const textMimeType = 'text/plain'
+
 const handle = wrapHandler(customHandler, {
   mapping: {
     custom: () => {}
@@ -114,4 +116,47 @@ describe('handlers/custom', () => {
     }
   })
     .then(({ mapping }) => assert.strictEqual(typeof mapping.configuration, 'object')))
+
+  it('sends response when the result is an array (sync)', () => handle({
+    request: '/any',
+    mapping: {
+      custom: () => ['Hello World!']
+    }
+  })
+    .then(({ redirected, response }) => {
+      assert.strictEqual(redirected, undefined)
+      assert.strictEqual(response.statusCode, 200)
+      assert.strictEqual(response.headers['Content-Type'], textMimeType)
+      assert.strictEqual(response.toString(), 'Hello World!')
+    })
+  )
+
+  it('sends response when the result is an array (async)', () => handle({
+    request: '/any',
+    mapping: {
+      custom: async () => ['Hello World!']
+    }
+  })
+    .then(({ redirected, response }) => redirected.then(value => {
+      assert.strictEqual(value, undefined)
+      assert.strictEqual(response.statusCode, 200)
+      assert.strictEqual(response.headers['Content-Type'], textMimeType)
+      assert.strictEqual(response.toString(), 'Hello World!')
+    }))
+  )
+
+  it('enables the override of headers through options (second item of the array)', () => handle({
+    request: '/any',
+    mapping: {
+      custom: async () => ['Hello World!', { statusCode: 204, headers: { 'x-test': 'true' } }]
+    }
+  })
+    .then(({ redirected, response }) => redirected.then(value => {
+      assert.strictEqual(value, undefined)
+      assert.strictEqual(response.statusCode, 204)
+      assert.strictEqual(response.headers['x-test'], 'true')
+      assert.strictEqual(response.headers['Content-Type'], textMimeType)
+      assert.strictEqual(response.toString(), 'Hello World!')
+    }))
+  )
 })

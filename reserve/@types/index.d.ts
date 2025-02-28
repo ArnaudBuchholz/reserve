@@ -4,7 +4,12 @@ import { Server as HttpsServer } from 'https'
 import { Http2Server } from 'http2'
 
 declare module 'reserve' {
-  type RedirectResponse = void | number | string
+  type RedirectResponse = 
+    | void
+    /** Ends the response with corresponding status code */
+    | number
+    /** Triggers an internal redirect */
+    | string
 
   class Request extends IncomingMessage {
     setForgedUrl: (url: string) => void
@@ -32,8 +37,15 @@ declare module 'reserve' {
 
   // region custom
 
+  type CustomRedirectResponse = 
+    | RedirectResponse
+    /** Handles response through send */
+    | [ ReadableStream | string | object ]
+    /** Handles response through send */
+    | [ ReadableStream | string | object, SendOptions ]
+
   interface CustomMapping extends BaseMapping {
-    custom: ExternalModule | ((request: IncomingMessage, response: ServerResponse, ...capturedGroups: string[]) => Promise<RedirectResponse>)
+    custom: ExternalModule | ((request: IncomingMessage, response: ServerResponse, ...capturedGroups: string[]) => CustomRedirectResponse | Promise<CustomRedirectResponse>)
   }
 
   // endregion custom
