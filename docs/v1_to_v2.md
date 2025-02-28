@@ -114,12 +114,13 @@ To mimic the behavior of the `serve` function, the promise resolves to a server 
 
 ```javascript
 read('/reserve.json')
-  .then(configuration => new Promise((resolve, reject) => {
+  .then(configuration => mock(configuration))
+  .then(mocked => new Promise((resolve, reject) => {
     const mocked = mock(configuration)
     mocked
       .on('ready', () => resolve(mocked))
       .on('error', reject)
-  })
+  }))
   .then(mocked => {
     return mocked.request('GET', '/')
   })
