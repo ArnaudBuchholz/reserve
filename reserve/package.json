@@ -65,7 +65,7 @@
     "@types/node": "^22.13.13",
     "cors": "^2.8.5",
     "eslint-utils": "^3.0.0",
-    "mocha": "^11.1.0",
+    "mocha": "^10.8.2",
     "mock-require": "^3.0.3",
     "nyc": "^17.1.0",
     "punycache": "^1.0.0",
