@@ -16,7 +16,7 @@
     "@types/*.d.ts"
   ],
   "bin": {
-    "reserve": "./dist/cli.js"
+    "reserve": "dist/cli.js"
   },
   "types": "./@types/index.d.ts",
   "engines": {
