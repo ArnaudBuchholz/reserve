@@ -129,10 +129,32 @@ describe('helpers/send', () => {
     assert.strictEqual(response.headers['content-type'], 'abc')
   })
 
+  it('does not override content-type if defined in headers (case insensitive)', async () => {
+    await send(response, 'Hello World !', {
+      headers: {
+        'Content-Type': 'abc'
+      }
+    })
+    assert.strictEqual(response.statusCode, 200)
+    assert.strictEqual(response.toString(), 'Hello World !')
+    assert.strictEqual(response.headers['content-type'], 'abc')
+  })
+
   it('does not override content-length if defined in headers', async () => {
     await send(response, 'Hello World !', {
       headers: {
         'content-length': '123'
+      }
+    })
+    assert.strictEqual(response.statusCode, 200)
+    assert.strictEqual(response.toString(), 'Hello World !')
+    assert.strictEqual(response.headers['content-length'], '123')
+  })
+
+  it('does not override content-length if defined in headers (case insensitive)', async () => {
+    await send(response, 'Hello World !', {
+      headers: {
+        'Content-Length': '123'
       }
     })
     assert.strictEqual(response.statusCode, 200)

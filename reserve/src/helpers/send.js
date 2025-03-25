@@ -2,13 +2,14 @@
 
 const { pipeline } = require('../node-api')
 const { bin, text, json } = require('../mime')
+const headersFactory = require('../mock/headers')
 
 const CONTENT_TYPE = 'content-type'
 const CONTENT_LENGTH = 'content-length'
 
 module.exports = (response, data, options = {}) => {
   let { statusCode = 200, noBody } = options
-  const headers = { ...options.headers }
+  const headers = headersFactory(options.headers)
   let stream = false
   let contentType
   if (data === undefined) {
