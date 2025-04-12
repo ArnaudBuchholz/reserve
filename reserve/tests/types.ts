@@ -26,6 +26,14 @@ export const configurations: Configuration[] = [{
     custom: async (request: IncomingMessage, response: ServerResponse) => (['OK'])
   }, {
     custom: (request: IncomingMessage, response: ServerResponse) => (['OK', { statusCode: 204 }])
+  }, {
+    custom: ['Hello World !']
+  }, {
+    custom: [{ hello: 'World !' }]
+  }, {
+    custom: ['Hello World !', { headers: { 'content-type': 'text/plain '} }]
+  }, {
+    custom: [{ hello: 'World !' }, { headers: { 'content-type': 'application/json '} }]
   }]
 }]
 

@@ -39,9 +39,28 @@ module.exports = async (request, response) => response.('X-Server', 'REserve')
 
 > Example of `custom` mapping sending back a response (new to version 2.1.0)
 
+```javascript
+{
+  custom: [
+    '<html><title>Not found</title></html>',
+    {
+      statusCode :404
+    }
+  ]
+}
+```
+
+> Example of `custom` mapping sending back a response (new to version 2.2.0)
+
 ## Features
 
-The `custom` property can be either an [external module](external.md) or a [function](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Functions) that accepts at least two parameters : [`request`](https://nodejs.org/api/http.html#http_class_http_incomingmessage) and [`response`](https://nodejs.org/api/http.html#http_class_http_serverresponse).
+The `custom` property can be:
+
+* an [external module](external.md) resolving to a `function`,
+* a `function` that accepts at least two parameters : [`request`](https://nodejs.org/api/http.html#http_class_http_incomingmessage) and [`response`](https://nodejs.org/api/http.html#http_class_http_serverresponse),
+* an `array`, the two first values are passed to [`send`](send.md) to finalize the response.
+
+When `custom` is a `function`:
 
 * Capturing groups' values are passed as **additional parameters**
 

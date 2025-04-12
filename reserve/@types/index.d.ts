@@ -1,4 +1,3 @@
-import { Stats } from 'fs'
 import { IncomingMessage, ServerResponse, Server as HttpServer } from 'http'
 import { Server as HttpsServer } from 'https'
 import { Http2Server } from 'http2'
@@ -45,7 +44,13 @@ declare module 'reserve' {
     | [ ReadableStream | string | object, SendOptions ]
 
   interface CustomMapping extends BaseMapping {
-    custom: ExternalModule | ((request: IncomingMessage, response: ServerResponse, ...capturedGroups: string[]) => CustomRedirectResponse | Promise<CustomRedirectResponse>)
+    custom: 
+      | ExternalModule
+      | [string]
+      | [object]
+      | [string, SendOptions]
+      | [object, SendOptions]
+      | ((request: IncomingMessage, response: ServerResponse, ...capturedGroups: string[]) => CustomRedirectResponse | Promise<CustomRedirectResponse>)
   }
 
   // endregion custom

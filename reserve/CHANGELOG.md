@@ -1,5 +1,6 @@
 |Version|content|
 |---|---|
+|2.2.0|`custom` handlers can be a static array that is sent back as a response ([`custom`](https://github.com/ArnaudBuchholz/reserve/blob/main/docs/custom.md))|
 |2.1.1|`send` headers handling is now case insensitive|
 |2.1.0|`custom` handlers can return an array that is sent back as a response ([`custom`](https://github.com/ArnaudBuchholz/reserve/blob/main/docs/custom.md))|
 |2.0.5|`wasm` mime type|

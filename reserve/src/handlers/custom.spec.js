@@ -14,16 +14,54 @@ const handle = wrapHandler(customHandler, {
 })
 
 describe('handlers/custom', () => {
-  it('validates the custom function', async () => {
-    let exceptionCaught
-    try {
-      await customHandler.validate({
-        custom: false
-      })
-    } catch (e) {
-      exceptionCaught = e
-    }
-    assert.ok(!!exceptionCaught)
+  describe('validation', () => {
+    it('rejects a boolean', async () => {
+      let exceptionCaught
+      try {
+        await customHandler.validate({
+          custom: false
+        })
+      } catch (e) {
+        exceptionCaught = e
+      }
+      assert.ok(!!exceptionCaught)
+    })
+
+    it('rejects an empty array', async () => {
+      let exceptionCaught
+      try {
+        await customHandler.validate({
+          custom: []
+        })
+      } catch (e) {
+        exceptionCaught = e
+      }
+      assert.ok(!!exceptionCaught)
+    })
+
+    it('accepts an array with a value', async () => {
+      let exceptionCaught
+      try {
+        await customHandler.validate({
+          custom: ['Hello World !']
+        })
+      } catch (e) {
+        exceptionCaught = e
+      }
+      assert.ok(!exceptionCaught)
+    })
+
+    it('accepts an array with a value and options', async () => {
+      let exceptionCaught
+      try {
+        await customHandler.validate({
+          custom: ['Hello World !', { headers: { 'content-type': 'text/plain ' } }]
+        })
+      } catch (e) {
+        exceptionCaught = e
+      }
+      assert.ok(!exceptionCaught)
+    })
   })
 
   it('does not return a promise if the custom function is sync', () => handle({
@@ -158,5 +196,34 @@ describe('handlers/custom', () => {
       assert.strictEqual(response.headers['Content-Type'], textMimeType)
       assert.strictEqual(response.toString(), 'Hello World!')
     }))
+  )
+
+  it('sends response when the result is an array (static)', () => handle({
+    request: '/any',
+    mapping: {
+      custom: ['Hello World!']
+    }
+  })
+    .then(({ redirected, response }) => {
+      assert.strictEqual(redirected, undefined)
+      assert.strictEqual(response.statusCode, 200)
+      assert.strictEqual(response.headers['Content-Type'], textMimeType)
+      assert.strictEqual(response.toString(), 'Hello World!')
+    })
+  )
+
+  it('enables the override of headers through options (static)', () => handle({
+    request: '/any',
+    mapping: {
+      custom: ['Hello World!', { statusCode: 204, headers: { 'x-test': 'true' } }]
+    }
+  })
+    .then(({ redirected, response }) => {
+      assert.strictEqual(redirected, undefined)
+      assert.strictEqual(response.statusCode, 204)
+      assert.strictEqual(response.headers['x-test'], 'true')
+      assert.strictEqual(response.headers['Content-Type'], textMimeType)
+      assert.strictEqual(response.toString(), 'Hello World!')
+    })
   )
 })
