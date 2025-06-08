@@ -62,7 +62,7 @@
   "devDependencies": {
     "@stryker-mutator/core": "^8.7.1",
     "@stryker-mutator/mocha-runner": "^8.7.1",
-    "@types/node": "^22.14.1",
+    "@types/node": "^22.15.30",
     "cors": "^2.8.5",
     "eslint-utils": "^3.0.0",
     "mocha": "^10.8.2",
@@ -71,7 +71,7 @@
     "punycache": "^1.0.0",
     "reserve": "",
     "standard": "^17.1.2",
-    "terser": "^5.39.0",
+    "terser": "^5.41.0",
     "typescript": "^5.8.3"
   }
 }

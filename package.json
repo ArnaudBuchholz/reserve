@@ -7,7 +7,8 @@
   "author": "Arnaud Buchholz",
   "scripts": {
     "build": "npm run build --workspace reserve",
-    "lint": "npm run lint --workspaces"
+    "lint": "npm run lint --workspaces",
+    "update": "ncu --deep -i --format group"
   },
   "bugs": {
     "url": "https://github.com/ArnaudBuchholz/reserve/issues"
@@ -31,12 +32,13 @@
     "fastify": "^4.27.0",
     "mocha": "^10.4.0",
     "mock-require": "^3.0.3",
+    "npm-check-updates": "^18.0.1",
     "nyc": "^15.1.0",
     "punycache": "^1.0.0",
     "reserve": "",
-    "standard": "^17.1.0",
-    "terser": "^5.31.0",
-    "typescript": "^5.4.5"
+    "standard": "^17.1.2",
+    "terser": "^5.41.0",
+    "typescript": "^5.8.3"
   },
   "license": "MIT"
 }
