@@ -15,7 +15,7 @@ module.exports = (jsonConfiguration, mockedHandlers) => {
   const { on, emit } = newEventEmitter()
   const instance = {
     on,
-    close: () => Promise.resolve()
+    async close () {}
   }
   check(jsonConfiguration, mockedHandlers)
     .then(configuration => {

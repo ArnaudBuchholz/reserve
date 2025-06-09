@@ -48,8 +48,19 @@ function createServerAsync (emit, configuration, dispatcher) {
 
 module.exports = jsonConfiguration => {
   const { on, emit } = newEventEmitter()
-  const instance = { on }
   let server
+  const instance = {
+    on,
+    async close () {
+      if (server) {
+        await new Promise(resolve => server.close(() => resolve()))
+        /* istanbul ignore next */ // Depends on Node.js version
+        server.closeIdleConnections && server.closeIdleConnections()
+        // go over configuration's remaining contexts
+        // server.closeAllConnections && server.closeAllConnections()
+      }
+    }
+  }
   check(jsonConfiguration)
     .then(async configuration => {
       let port = configuration.port
@@ -71,10 +82,5 @@ module.exports = jsonConfiguration => {
     .catch(reason => {
       emit(EVENT_ERROR, { reason })
     })
-  instance.close = () => {
-    if (server) {
-      return new Promise(resolve => server.close(() => resolve()))
-    }
-  }
   return instance
 }
