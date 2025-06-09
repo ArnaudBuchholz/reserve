@@ -13,8 +13,6 @@ const $cachingStrategy = 'caching-strategy'
 const $mimeTypes = 'mime-types'
 const $static = 'static'
 
-const defaultStatic = {}
-
 const nodeFs = {
   stat,
   readdir,
@@ -151,7 +149,7 @@ module.exports = {
     },
     [$static]: {
       types: ['boolean', 'object'],
-      defaultValue: defaultStatic
+      defaultValue: false
     }
   },
   method: 'GET,HEAD',
@@ -167,9 +165,6 @@ module.exports = {
     const cachingStrategy = mapping[$cachingStrategy]
     if (typeof cachingStrategy === 'string' && cachingStrategy !== 'modified') {
       throwError(ERROR_FILE_CACHING_STRATEGY_SETTING)
-    }
-    if (mapping[$static] === defaultStatic) {
-      mapping[$static] = mapping[$customFileSystem] === nodeFs
     }
     if (mapping[$static] === true) {
       mapping[$static] = {}

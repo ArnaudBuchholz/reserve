@@ -777,7 +777,7 @@ describe('handlers/file', () => {
 
   describe('static', () => {
     describe('default', () => {
-      it('caches file system by default', async () => {
+      it('does not cache file system by default', async () => {
         const { redirected, mapping } = await handle({
           request: {
             method: 'GET',
@@ -785,7 +785,7 @@ describe('handlers/file', () => {
           }
         })
         await redirected
-        assert.notStrictEqual(mapping[$fileCache], undefined)
+        assert.strictEqual(mapping[$fileCache], undefined)
       })
 
       it('does *not* cache file system when custom-file-system is used', async () => {
@@ -812,6 +812,9 @@ describe('handlers/file', () => {
         request: {
           method: 'GET',
           url: './file.txt'
+        },
+        mapping: {
+          static: true
         }
       })
       await redirected
@@ -819,6 +822,32 @@ describe('handlers/file', () => {
       assert.notStrictEqual(cache.keys().length, 0)
       const stat = await cache.get('stat:/file.txt')
       assert.strictEqual(stat.size, 12)
+    })
+
+    it('returns cached information', async () => {
+      const { redirected, mapping, configuration } = await handle({
+        request: {
+          method: 'GET',
+          url: './file.txt'
+        },
+        mapping: {
+          static: true
+        }
+      })
+      await redirected
+      const cache = mapping[$fileCache]
+      const stat = await cache.get('stat:/file.txt')
+      stat.size = 24 // Change the size to test if the cache is used
+      const { redirected: cacheRedirected, response } = await handle({
+        configuration,
+        request: {
+          method: 'GET',
+          url: './file.txt'
+        },
+        mapping
+      })
+      await cacheRedirected
+      assert.strictEqual(response.headers['Content-Length'], '24')
     })
 
     it('can cache file system when custom-file-system is used', async () => {

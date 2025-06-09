@@ -44,13 +44,10 @@ Answers the request using **file system**.
 | `mime-types` | `{ [key: string]: string }` | `{}` | Dictionary indexed by file extension that overrides mime type resolution.<br>For instance : `{ "gsf": "application/x-font-ghostscript" }`. |
 | `caching-strategy` | `'modified'` \| `number` | `0` | Configures caching strategy :<br>• `'modified'` : use file last modification date, meaning the response header will contain [`Last-Modified`](https://developer.mozilla.org/fr/docs/Web/HTTP/Headers/Last-Modified) and the handler reacts to request headers [`If-Modified-Since`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Modified-Since) and [`If-Range`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Range),<br>• `number` : duration (in seconds), based on the response header [`Cache-Control` with `max-age`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control),<br>• `0` : [`Cache-Control` with `no-store`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control). |
 | `custom-file-system` | [`ExternalModule`](external.md) \| `CustomFileSystem` | `undefined` | Provides custom file system API *(see [below](#custom-file-system))*. |
-| `static` | `boolean` \| `PunycacheOptions` | *depends on `custom-file-system`* | Cache file system information for performance.<br>When `custom-file-system` is used, `static` is `false` by default *(but can be overridden)*.<br>Otherwise, `static` is `true` by default.<br>An object can be used to pass options to the cache handler, see [`punycache`](https://www.npmjs.com/package/punycache) documentation.|
+| `static` | `boolean` \| `PunycacheOptions` | `false` | Cache file system information for performance.<br>An object can be used to pass options to the cache handler, see [`punycache`](https://www.npmjs.com/package/punycache) documentation.|
 
 > [!WARNING]
-> When `static` is enabled, REserve does not expect the files / folders to change. For instance, if the file size changes while its information has been cached, the result might appear corrupted.
-
-> [!TIP]
-> During development, use `static`: `false` to ensure files are refreshed properly.
+> When `static` is enabled, REserve does not expect the files / folders to change. For instance, if the file size changes while its information is being cached, the result might appear corrupted.
 
 ## Custom File System
 

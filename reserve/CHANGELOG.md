@@ -1,12 +1,14 @@
 |Version|content|
 |---|---|
+|2.2.1|Fix `file` handlers static option, now defaulted to `false`
+|2.2.1|update to `punycache`@`1.0.1`
 |2.2.0|`custom` handlers can be a static array that is sent back as a response ([`custom`](https://github.com/ArnaudBuchholz/reserve/blob/main/docs/custom.md))|
 |2.1.1|`send` headers handling is now case insensitive|
 |2.1.0|`custom` handlers can return an array that is sent back as a response ([`custom`](https://github.com/ArnaudBuchholz/reserve/blob/main/docs/custom.md))|
 |2.0.5|`wasm` mime type|
 |2.0.4|Fixes package exports for type definitions|
 |2.0.3|Fixes in type definitions|
-|2.0.2|Fixed empty redirect hanlding in `file` ([#99](https://github.com/ArnaudBuchholz/reserve/issues/99))|
+|2.0.2|Fixed empty redirect handling in `file` ([#99](https://github.com/ArnaudBuchholz/reserve/issues/99))|
 |2.0.1|Fixed memory leak in the dispatcher ([#97](https://github.com/ArnaudBuchholz/reserve/issues/97))|
 |2.0.0|Refactoring to improve project structure and performances|
 ||⚠️BREAKING CHANGE: Support of CommonJS and ESM imports|
