@@ -1,6 +1,6 @@
 {
   "name": "reserve",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Lightweight http server statically configurable using regular expressions",
   "main": "./dist/index.js",
   "exports": {
@@ -68,7 +68,7 @@
     "mocha": "^10.8.2",
     "mock-require": "^3.0.3",
     "nyc": "^17.1.0",
-    "punycache": "^1.0.0",
+    "punycache": "^1.0.1",
     "reserve": "",
     "standard": "^17.1.2",
     "terser": "^5.41.0",
