@@ -45,7 +45,7 @@ module.exports = (handler, defaults = {}) => {
           mapping,
           redirect: redirect === undefined ? normalize(request.url) : redirect
         })
-        return { mapping, redirected, request, response }
+        return { configuration: iconfiguration, mapping, redirected, request, response }
       })
   }
 }
