@@ -1,5 +1,6 @@
 |Version|content|
 |---|---|
+|2.2.1|Speed improvement (replaced contexts dictionary with a map)
 |2.2.1|Fix `file` handlers static option, now defaulted to `false`
 |2.2.1|update to `punycache`@`1.0.1`
 |2.2.0|`custom` handlers can be a static array that is sent back as a response ([`custom`](https://github.com/ArnaudBuchholz/reserve/blob/main/docs/custom.md))|

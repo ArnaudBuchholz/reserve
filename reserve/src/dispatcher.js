@@ -37,7 +37,7 @@ function redirected (context) {
   emitParameters.timeSpent = Math.ceil(perfEnd - emitParameters.perfStart)
   emitParameters.statusCode = statusCode
   emit(EVENT_REDIRECTED, emitParameters)
-  delete contexts[id]
+  contexts.delete(id)
   redirected()
 }
 
@@ -189,7 +189,7 @@ module.exports = function (configuration, request, response) {
 
   emit(EVENT_INCOMING, emitParameters)
 
-  contexts[id] = context
+  contexts.set(id, context)
 
   if (configurationRequests.holding) {
     configurationRequests.holding.then(() => dispatch(context, url))

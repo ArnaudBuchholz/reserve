@@ -48,7 +48,7 @@ module.exports = class IConfiguration {
     const configuration = this[$configuration]
     await checkMappings(configuration, mappings)
     const configurationRequests = configuration[$configurationRequests]
-    const contexts = Object.values(configurationRequests.contexts)
+    const contexts = Array.from(configurationRequests.contexts.values())
     const requestContext = contexts.filter(({ request: candidate }) => candidate === request)[0]
     const requestsHolding = contexts.filter(candidate => candidate !== requestContext).map(({ holding }) => holding)
     const [timedOutPromise, , onTimeout] = defer()

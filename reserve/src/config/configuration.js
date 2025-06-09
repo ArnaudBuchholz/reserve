@@ -201,7 +201,7 @@ async function check (configuration, mockedHandlers) {
   checkedConfiguration[$configurationRequests] = {
     lastId: 0,
     holding: null,
-    contexts: {}
+    contexts: new Map()
   }
   return checkedConfiguration
 }
