@@ -135,7 +135,7 @@ declare module 'reserve' {
   /** REserve configuration information */
   interface IConfiguration {
     /** Dictionary of handlers indexed by their prefix */
-    readonly handlers: { [key in string]?: readonly Handler }
+    readonly handlers: { [key in string]?: Handler }
     /** List of active mappings */
     readonly mappings: Mapping[]
     readonly protocol: 'http' | 'https'
@@ -275,53 +275,77 @@ declare module 'reserve' {
   // endregion helpers
 
   interface SSLSettings {
+    /** a relative or absolute path to the certificate file */
     cert: string
+    /** a relative or absolute path to the key file */
     key: string
   }
 
+  type JavaScriptType = 'boolean' | 'number' | 'string' | 'object' | 'function';
+
   interface PropertySchema {
-    type?: string
-    types?: string[]
+    type?: JavaScriptType
+    types?: JavaScriptType[]
     defaultValue?: boolean | number | string | object | Function
   }
 
   interface RedirectContext {
+    /** REserve configuration information */
     configuration: IConfiguration
+    /** Mapping being executed */
     mapping: BaseMapping
+    /** Current mapping's regular expression match */
     match: RegExpMatchArray
+    /** URL to process (placeholders are substitued) */
     redirect: string
+    /** Current request */
     request: IncomingMessage
+    /** Current response */
     response: ServerResponse
   }
 
   interface Handler {
+    /** Handler schema, used to validate properties */
     readonly schema?: { [key: string]: string | string[] | PropertySchema }
+    /** When specified, restricts which methods it applies to */
     readonly method?: string
+    /** Validation function */
     readonly validate?: (mapping: BaseMapping, configuration: IConfiguration) => void
+    /** Handler's implementation */
     readonly redirect: (context: RedirectContext) => Promise<RedirectResponse>
   }
 
-  type Handlers = { [key: string]: Handler }
+  type Handlers = { [key in string]?: Handler }
 
   type Listener = ExternalModule | ServerListener
 
   type Mapping = BaseMapping | CustomMapping | FileMapping | StatusMapping | UrlMapping | UseMapping
 
   interface Configuration {
+    /** Used to set the host parameter when calling http(s) server's listen */
     hostname?: string
+    /** Used to set the port parameter when calling http(s) server's listen, use 0 to automatically allocates a free port */
     port?: number
+    /** Limits the number of internal redirections (defaulted to 10) */
     'max-redirect'?: number
+    /** Certificate information when building an https server */
     ssl?: SSLSettings
+    /** Allocates an HTTP/2 server when set to true */
     http2?: boolean
+    /** Additional server creation options (not validated) being passed to the appropriate native API */
     httpOptions?: object
+    /** Mapping associating a handler prefix to a handler definition */
     handlers?: Handlers
+    /** List of handlers to be executed upon server creation (see created event) */
     listeners?: Listener[]
+    /** List of mappings to be used by the server */
     mappings: Mapping[]
-    extend?: string
   }
 
+  /** Reads and validate JSON configuration file */
   function read (filename: string): Promise<Configuration>
 
+  /** Validate configuration */
   function check (configuration: Configuration): Promise<Configuration>
 
   type ServerEventName = 
@@ -336,15 +360,21 @@ declare module 'reserve' {
   
   type ServerEventCommon = {
     method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS' | 'TRACE' | 'PATCH' | string
-    incomingUrl: string // before normalization
-    url: string // after normalization
+    /** Before URL normalization */
+    incomingUrl: string
+    /** After URL normalization */
+    url: string
+    /** Request headers */
     headers: Headers
+    /** When the request was received by REserve */
     start: Date
+    /** Request unique ID (this ID is internal to REserve) */
     id: number
+    /** Internal request (generated with IConfiguration.dispatch) */
     internal: boolean
   }
 
-  type ServerEventCreated ={
+  type ServerEventCreated = {
     eventName: 'created'
     server: HttpServer | HttpsServer | Http2Server
     configuration: IConfiguration
@@ -352,8 +382,11 @@ declare module 'reserve' {
 
   type ServerEventReady = {
     eventName: 'ready'
+    /** URL to connect to the server */
     url: string
+    /** Configured or allocated port */
     port: number
+    /** HTTP/2 is enabled */
     http2 : boolean
   }
 
