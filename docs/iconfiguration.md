@@ -4,10 +4,10 @@
 
 ```TypeScript
 interface IConfiguration {
-  readonly handlers: { [key: string]: readonly Handler }
+  readonly handlers: { [key in string]?: readonly Handler }
   readonly mappings: (readonly Mapping)[]
   readonly http2: boolean
-  readonly protocol: string
+  readonly protocol: 'http' | 'https'
   setMappings: (mappings: Mapping[], request: IncomingMessage, timeout?: number) => Promise<void>
   dispatch: (request: IncomingMessage, response: ServerResponse) => Promise<void>
 }
