@@ -10,6 +10,7 @@ const byStatus = {
   405: 'Method Not Allowed',
   500: 'Internal Server Error',
   501: 'Not Implemented',
+  503: 'Service Unavailable',
   508: 'Loop Detected'
 }
 
