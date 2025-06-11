@@ -444,15 +444,17 @@ declare module 'reserve' {
   type ServerListener<EventName = ServerEventName> = (event: ServerEvent<EventName>) => void
 
   type ServerCloseOptions = {
-    timeout?: number // in milliseconds, default is 5000
-    force?: boolean // if true, closes immediately without waiting for ongoing requests to finish
+    /** If set, waits up to the timeout (ms) for the active requests to terminate */
+    timeout?: number
+    /** If set, terminate the active requests (after the timeout if specified) */
+    force?: true
   }
 
   interface Server {
     /** Register listener for the given event */
     on: <EventName extends ServerEventName>(eventName: EventName, listener: ServerListener<EventName>) => Server
-
-    close: () => Promise<void>
+    /** Terminate the server */
+    close: (options?: ServerCloseOptions) => Promise<void>
   }
 
   /** Validate configuration, allocate a server and start listening */

@@ -10,15 +10,22 @@ const {
   $configurationInterface
 } = require('./symbols')
 const getHostName = require('./helpers/hostname')
+const close = require('./close')
 
 module.exports = (jsonConfiguration, mockedHandlers) => {
   const { on, emit } = newEventEmitter()
+  let configuration
   const instance = {
     on,
-    async close () {}
+    async close (options) {
+      if (configuration) {
+        await close(configuration, options)
+      }
+    }
   }
   check(jsonConfiguration, mockedHandlers)
-    .then(configuration => {
+    .then(checkedConfiguration => {
+      configuration = checkedConfiguration
       configuration[$configurationEventEmitter] = emit
       configuration.listeners.forEach(listen => listen(instance))
       emit(EVENT_CREATED, {

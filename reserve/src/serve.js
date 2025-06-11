@@ -11,6 +11,7 @@ const {
 const getHostName = require('./helpers/hostname')
 const portIsUsed = require('./helpers/portIsUsed')
 const { throwError, ERROR_SERVE_PORT_ALREADY_USED } = require('./error')
+const close = require('./close')
 
 function createServer (configuration, requestHandler) {
   const { httpOptions } = configuration
@@ -49,21 +50,24 @@ function createServerAsync (emit, configuration, dispatcher) {
 module.exports = jsonConfiguration => {
   const { on, emit } = newEventEmitter()
   let server
+  let configuration
   const instance = {
     on,
-    async close () {
+    async close (options) {
       if (server) {
         await new Promise(resolve => server.close(() => resolve()))
         /* istanbul ignore next */ // Depends on Node.js version
         server.closeIdleConnections && server.closeIdleConnections()
-        // go over configuration's remaining contexts
-        // server.closeAllConnections && server.closeAllConnections()
+        await close(configuration, options)
+        /* istanbul ignore next */ // Depends on Node.js version
+        server.closeAllConnections && server.closeAllConnections()
       }
     }
   }
   check(jsonConfiguration)
-    .then(async configuration => {
-      let port = configuration.port
+    .then(async checkedConfiguration => {
+      configuration = checkedConfiguration
+      let { port, http2 } = configuration
       if (port !== 0 && await portIsUsed(port)) {
         throwError(ERROR_SERVE_PORT_ALREADY_USED, { port })
       }
@@ -72,7 +76,6 @@ module.exports = jsonConfiguration => {
       server = await createServerAsync(emit, configuration, dispatcher)
       const hostname = configuration.hostname || getHostName()
       port = server.address().port
-      const { http2 } = configuration
       emit(EVENT_READY, {
         url: `${configuration.protocol}://${hostname}:${port}/`,
         port,
