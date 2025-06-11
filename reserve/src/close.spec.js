@@ -55,4 +55,27 @@ describe('close', () => {
       assert.strictEqual(configuration[$configurationRequests].contexts.size, 1)
     })
   })
+
+  describe('with options.close', () => {
+    it('destroys all remaining requests', async () => {
+      const allocContext = () => {
+        const context = { request: { destroy: () => { context.destroyed = true } }, destroyed: false }
+        return context
+      }
+      const context1 = allocContext()
+      const context2 = allocContext()
+      const contexts = new Map([
+        ['1', context1],
+        ['2', context2]
+      ])
+      const configuration = {
+        [$configurationRequests]: {
+          contexts
+        }
+      }
+      await close(configuration, { force: true })
+      assert.strictEqual(context1.destroyed, true)
+      assert.strictEqual(context2.destroyed, true)
+    })
+  })
 })

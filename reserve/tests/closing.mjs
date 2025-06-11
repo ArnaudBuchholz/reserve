@@ -76,7 +76,7 @@ async function main () {
   console.log('Response status:', response.statusCode)
   request('non-closable')
 
-  await server.close()
+  await server.close({ force: true })
   const activeHandles = process._getActiveHandles()
   const activeRequests = process._getActiveRequests()
   if (activeHandles.length > 0 || activeRequests.length > 0) {

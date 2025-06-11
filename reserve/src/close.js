@@ -18,7 +18,9 @@ module.exports = async (configuration, options) => {
     ])
     clearTimeout(timeoutId)
   }
-//   if (force) {
-
-//   }
+  if (force) {
+    for (const { request } of configuration[$configurationRequests].contexts.values()) {
+      request.destroy()
+    }
+  }
 }
