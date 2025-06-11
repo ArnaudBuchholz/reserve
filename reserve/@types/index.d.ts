@@ -8,16 +8,6 @@ declare module 'reserve' {
     setForgedUrl: (url: string) => void
   }
 
-  class Response extends ServerResponse {
-    constructor(request?: Request)
-    /** Waits for the response to be completed */
-    waitForFinish: () => Promise<void>
-    /** Checks if the response is still in the initial state */
-    isInitial: () => boolean
-    /** Sets the response' writes asynchronous */
-    setAsynchronous: () => void
-  }
-
   type RedirectResponse = 
     | void
     /** Ends the response with corresponding status code */
@@ -348,14 +338,22 @@ declare module 'reserve' {
   /** Validate configuration */
   function check (configuration: Configuration): Promise<Configuration>
 
-  type ServerEventName = 
+  type ServerEventName =
+    /** Emitted after the HTTP(S) server is created and before it accepts requests */
     | 'created'
+    /** The server is listening and ready to receive requests */
     | 'ready'
+    /** New request received */
     | 'incoming'
+    /** An error occurred */
     | 'error'
+    /** Request will be processed by a handler */
     | 'redirecting'
+    /** Request is fully processed */
     | 'redirected'
+    /** Request was aborted */
     | 'aborted'
+    /** Request was closed */
     | 'closed'
   
   type ServerEventCommon = {
@@ -401,14 +399,19 @@ declare module 'reserve' {
 
   type ServerEventRedirecting = {
     eventName: 'redirecting'
+    /** Handler prefix */
     type: string
+    /** Redirection value */
     redirect: string | number
   } & ServerEventCommon
 
   type ServerEventRedirected = {
     eventName: 'redirected'
+    /** When the request was fully processed */
     end: Date
+    /** Comparison of end - start (not a high resolution timer) */
     timeSpent: number
+    /** Response status code */
     statusCode: number
   } & ServerEventCommon
 
@@ -438,7 +441,7 @@ declare module 'reserve' {
                   ? ServerEventClosed
                   : ServerEventCreated | ServerEventReady | ServerEventIncoming | ServerEventError | ServerEventRedirecting | ServerEventRedirected | ServerEventAborted | ServerEventClosed
 
-  type ServerListener<EventName = unknown> = (event: ServerEvent<EventName>) => void
+  type ServerListener<EventName = ServerEventName> = (event: ServerEvent<EventName>) => void
 
   type ServerCloseOptions = {
     timeout?: number // in milliseconds, default is 5000
@@ -446,28 +449,40 @@ declare module 'reserve' {
   }
 
   interface Server {
-    on: <ServerEventName extends string>(eventName: ServerEventName, listener: ServerListener<ServerEventName>) => Server
+    /** Register listener for the given event */
+    on: <EventName extends ServerEventName>(eventName: EventName, listener: ServerListener<EventName>) => Server
+
     close: () => Promise<void>
   }
 
+  /** Validate configuration, allocate a server and start listening */
   function serve (configuration: Configuration): Server
 
-  interface MockedResponse extends ServerResponse {
-    toString: () => string
+  class MockedResponse extends ServerResponse {
+    constructor(request?: Request)
+    /** Waits for the response to be completed */
     waitForFinish: () => Promise<void>
+    /** Checks if the response is still in the initial state */
     isInitial: () => boolean
+    /** Sets the response' writes asynchronous */
     setAsynchronous: () => void
   }
 
   type MockedRequestDefinition = {
+    /** Request method (defaulted to 'GET') */
     method?: string,
+    /** Request URL */
     url: string,
+    /** Request headers */
     headers?: Headers,
+    /** Request body */
     body?: string,
+    /** Additional properties (directly set on the request instance) */
     properties?: object
   }
 
   interface MockServer extends Server {
+    /** Simulate request and generates a response */
     request: ((method: string, url: string) => Promise<MockedResponse>) &
       ((method: string, url: string, headers: Headers) => Promise<MockedResponse>) &
       ((method: string, url: string, headers: Headers, body: string) => Promise<MockedResponse>) &
@@ -475,5 +490,6 @@ declare module 'reserve' {
       ((definition: MockedRequestDefinition) => Promise<MockedResponse>)
   }
 
-  function mock (configuration: Configuration, mockedHandlers?: Handlers): Promise<MockServer>
+  /** Validate configuration, simulate a server */
+  function mock (configuration: Configuration, mockedHandlers?: Handlers): MockServer
 }
