@@ -38,26 +38,36 @@ export const configurations: Configuration[] = [{
 }]
 
 export async function main() {
-  const mockServer = await mock({
+  const mockServer = mock({
     mappings: [{
       match: /.*/,
       file: '$1'
     }]
-  });
+  })
 
-  mockServer
-    .on('ready', ({ url }) => console.log(`Listening on ${url}`))
-    .on('error', ({ error }) => console.error(error));
+  await new Promise<void>((resolve, reject) => {
+    mockServer
+      .on('ready', ({ url }) => {
+        console.log(`Listening on ${url}`)
+        resolve()
+      })
+      .on('error', ({ error }) => {
+        console.error(error)
+        reject(error)
+      })
+  })
 
-  mockServer.request('GET', '/hello');
+  mockServer.request()
+
+  mockServer.request('GET', '/hello')
   mockServer.request('GET', '/hello', {
     'x-server': 'reserve'
-  });
+  })
   mockServer.request('PUT', '/hello', {
     'content-type': 'application/json'
   }, JSON.stringify({
     hello: 'World'
-  }));
+  }))
 }
 
 export const sendExample1 = (response: ServerResponse) => send(response, 'Hello World !')
