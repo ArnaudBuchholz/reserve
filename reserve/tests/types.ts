@@ -57,8 +57,6 @@ export async function main() {
       })
   })
 
-  mockServer.request()
-
   mockServer.request('GET', '/hello')
   mockServer.request('GET', '/hello', {
     'x-server': 'reserve'
