@@ -1,5 +1,5 @@
-import { serve } from 'reserve'
-import http from 'http'
+const { serve } = require('../src/index')
+const http = require('http')
 
 let baseUrl
 
@@ -75,8 +75,12 @@ async function main () {
   const response = await request('test')
   console.log('Response status:', response.statusCode)
   request('non-closable')
+  await new Promise(resolve => setTimeout(resolve, 500)) // Wait for a bit to ensure the non-closable resource is active
 
-  await server.close({ force: true })
+  console.log('=== closing ===')
+  await server.close({ timeout: 250, force: true })
+  console.log('=== closed! ===')
+  await new Promise(resolve => setTimeout(resolve, 250)) // Wait a bit to ensure all resources are cleaned up
   const activeHandles = process._getActiveHandles()
   const activeRequests = process._getActiveRequests()
   if (activeHandles.length > 0 || activeRequests.length > 0) {
@@ -84,7 +88,6 @@ async function main () {
     console.error('Active Handles:', activeHandles.map(handle => handle.constructor.name))
     console.error('Active Requests:', activeRequests)
   }
-  // https://stackoverflow.com/questions/14626636/how-do-i-shut-down-a-node-js-https-server-immediately
   console.log('Server closed, exiting...')
 }
 
