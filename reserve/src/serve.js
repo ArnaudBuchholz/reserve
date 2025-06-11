@@ -55,10 +55,11 @@ module.exports = jsonConfiguration => {
     on,
     async close (options) {
       if (server) {
+        // TODO: flag the server to return 503 
+        await close(configuration, options)
         await new Promise(resolve => server.close(() => resolve()))
         /* istanbul ignore next */ // Depends on Node.js version
         server.closeIdleConnections && server.closeIdleConnections()
-        await close(configuration, options)
         /* istanbul ignore next */ // Depends on Node.js version
         server.closeAllConnections && server.closeAllConnections()
       }

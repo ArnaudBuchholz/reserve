@@ -151,6 +151,8 @@ function evaluateMappings (context, url, index) {
 }
 
 module.exports = function (configuration, request, response) {
+  // TODO when closing, the server should return 503
+
   const url = normalize(request.url)
   const {
     [$configurationRequests]: configurationRequests,
@@ -184,6 +186,7 @@ module.exports = function (configuration, request, response) {
     response
   }
 
+  // TODO: should remove the request from contexts when it is closed or aborted
   request.on('aborted', () => emit(EVENT_ABORTED, emitParameters))
   request.on('close', () => emit(EVENT_CLOSED, emitParameters))
 
