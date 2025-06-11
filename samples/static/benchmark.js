@@ -10,7 +10,7 @@ async function test (name, url) {
       const impl = /^(.*)_PORT/.exec(portName)[1].toLocaleLowerCase()
       const result = await autocannon({
         url: `http://localhost:${port}${url}`,
-        connections: 10, //default
+        connections: 10, // default
         pipelining: 1, // default
         duration: 10 // default
       })
