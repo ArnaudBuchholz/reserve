@@ -83,7 +83,7 @@ serve({
 
 > Embedding `reserve` in a custom application (CommonJS)
 
-The resulting object exposes a method similar to the [EventEmitter::on method](https://nodejs.org/api/events.html#emitteroneventname-listener) and throws events with parameters, see [Server events](doc/events.md).
+The resulting [object](https://github.com/ArnaudBuchholz/reserve/blob/main/docs/serve.md) exposes a method similar to the [EventEmitter::on method](https://nodejs.org/api/events.html#emitteroneventname-listener) and throws events with parameters, see [Server events](https://github.com/ArnaudBuchholz/reserve/blob/main/docs/events.md).
 It also exposes a `close` method *(returning a `Promise` resolved when all pending requests are completed)* to shutdown the server.
 
 The package also gives access to the configuration reader :

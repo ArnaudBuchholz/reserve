@@ -5,11 +5,21 @@
 REserve's main entry point is `serve`.
 
 ```typescript
-interface Server {
-  on (eventName: ServerEventName, listener: ServerListener)
-  close: () => Promise<void>
+type ServerCloseOptions = {
+  /** If set, waits up to the timeout (ms) for the active requests to terminate */
+  timeout?: number
+  /** If set, terminate the active requests (after the timeout if specified) */
+  force?: true
 }
 
+interface Server {
+  /** Register listener for the given event */
+  on: <EventName extends ServerEventName>(eventName: EventName, listener: ServerListener<EventName>) => Server
+  /** Terminate the server */
+  close: (options?: ServerCloseOptions) => Promise<void>
+}
+
+/** Validate configuration, allocate a server and start listening */
 function serve (configuration: Configuration): Server
 ```
 
