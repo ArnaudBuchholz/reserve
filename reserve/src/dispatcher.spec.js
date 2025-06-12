@@ -1,10 +1,10 @@
 'use strict'
 
-const { describe, it, before } = require('mocha')
+const { describe, it, before, after } = require('mocha')
 const assert = require('assert')
 const { check, Request, Response } = require('./index')
 const dispatcher = require('./dispatcher')
-const { $configurationEventEmitter, $mappingMatch, $configurationRequests } = require('./symbols')
+const { $configurationEventEmitter, $mappingMatch, $configurationRequests, $configurationClosed } = require('./symbols')
 const { newEventEmitter } = require('./event')
 const status = require('./handlers/status')
 
@@ -546,5 +546,24 @@ describe('dispatcher', () => {
         })
       )
     })
+  })
+
+  describe('closing', () => {
+    before(() => defaultConfigurationPromise.then(configuration => {
+      configuration[$configurationClosed] = true
+    }))
+
+    after(() => defaultConfigurationPromise.then(configuration => {
+      configuration[$configurationClosed] = false
+    }))
+
+    it('rejects any new request', () => dispatch({ request: '/redirect' })
+      .then(({ emitted, response }) => {
+        assert.ok(!hasError(emitted))
+        assert.strictEqual(response.statusCode, 503)
+        assert.strictEqual(response.headers['Content-Type'], textMimeType)
+        assert.strictEqual(response.toString(), 'Service Unavailable')
+      })
+    )
   })
 })

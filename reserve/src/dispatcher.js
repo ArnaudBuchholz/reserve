@@ -13,6 +13,7 @@ const {
   EVENT_CLOSED
 } = require('./event')
 const {
+  $configurationClosed,
   $configurationInterface,
   $configurationRequests,
   $mappingMatch,
@@ -21,6 +22,7 @@ const {
   $configurationEventEmitter
 } = require('./symbols')
 const defer = require('./helpers/defer')
+const status = require('./handlers/status')
 
 function emitError ({ emit, emitParameters }, reason) {
   const handled = emit(EVENT_ERROR, emitParameters, { reason })
@@ -151,7 +153,9 @@ function evaluateMappings (context, url, index) {
 }
 
 module.exports = function (configuration, request, response) {
-  // TODO when closing, the server should return 503
+  if (configuration[$configurationClosed]) {
+    return Promise.resolve(status.redirect({ response, redirect: 503 }))
+  }
 
   const url = normalize(request.url)
   const {

@@ -121,4 +121,20 @@ describe('mock', () => {
       )
     })
   })
+
+  describe('closing', () => {
+    it('expose the close API', () => {
+      return read('/reserve.json')
+        .then(configuration => waitForReady(mock(configuration)))
+        .then(async mocked => {
+          await mocked.close()
+          return mocked
+        })
+        .then(mocked => mocked.request('GET', '/file.txt'))
+        .then(response => {
+          assert.strictEqual(response.statusCode, 503)
+          assert.strictEqual(response.toString(), 'Service Unavailable')
+        })
+    })
+  })
 })

@@ -4,6 +4,7 @@ const ns = 'REserve@'
 
 module.exports = {
   $configuration: Symbol(`${ns}configuration`),
+  $configurationClosed: Symbol(`${ns}configuration.closed`),
   $configurationInterface: Symbol(`${ns}configuration.interface`),
   $configurationRequests: Symbol(`${ns}configuration.requests`),
   $configurationEventEmitter: Symbol(`${ns}configuration.eventEmitter`),

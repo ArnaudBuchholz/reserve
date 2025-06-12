@@ -54,8 +54,8 @@ module.exports = jsonConfiguration => {
   const instance = {
     on,
     async close (options) {
+      // TODO: attempt to close before the server exists should generate an error
       if (server) {
-        // TODO: flag the server to return 503 
         await close(configuration, options)
         await new Promise(resolve => server.close(() => resolve()))
         /* istanbul ignore next */ // Depends on Node.js version

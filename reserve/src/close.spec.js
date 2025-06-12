@@ -3,12 +3,14 @@
 const assert = require('assert')
 const close = require('./close')
 const { it, describe } = require('mocha')
-const { $configurationRequests } = require('./symbols')
+const { $configurationRequests, $configurationClosed } = require('./symbols')
 
 describe('close', () => {
   describe('no options provided', () => {
-    it('does nothing', async () => {
-      assert.doesNotThrow(() => close({}))
+    it('sets closing flag', async () => {
+      const configuration = {}
+      await close(configuration)
+      assert.strictEqual(configuration[$configurationClosed], true)
     })
 
     it('does not wait for active requests to finish i', async () => {

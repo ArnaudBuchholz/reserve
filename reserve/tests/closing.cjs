@@ -78,7 +78,10 @@ async function main () {
   await new Promise(resolve => setTimeout(resolve, 500)) // Wait for a bit to ensure the non-closable resource is active
 
   console.log('=== closing ===')
-  await server.close({ timeout: 250, force: true })
+  const closing = server.close({ timeout: 250, force: true })
+  const responseWhileClosing = await request('test')
+  console.log('Response while closing:', responseWhileClosing.statusCode)
+  await closing
   console.log('=== closed! ===')
   await new Promise(resolve => setTimeout(resolve, 250)) // Wait a bit to ensure all resources are cleaned up
   const activeHandles = process._getActiveHandles()

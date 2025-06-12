@@ -1,9 +1,10 @@
 'use strict'
 
-const { $configurationRequests } = require('./symbols')
+const { $configurationRequests, $configurationClosed } = require('./symbols')
 const defer = require('./helpers/defer')
 
 module.exports = async (configuration, options) => {
+  configuration[$configurationClosed] = true
   const {
     timeout = 0,
     force = false

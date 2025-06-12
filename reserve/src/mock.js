@@ -18,9 +18,8 @@ module.exports = (jsonConfiguration, mockedHandlers) => {
   const instance = {
     on,
     async close (options) {
-      if (configuration) {
-        await close(configuration, options)
-      }
+      // TODO: attempt to close before the server exists should generate an error
+      await close(configuration, options)
     }
   }
   check(jsonConfiguration, mockedHandlers)
