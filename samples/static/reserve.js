@@ -24,7 +24,8 @@ serve({
       await send(response, 'Hello World !')
     }
   }, {
-    file: './www/$1'
+    file: './www/$1',
+    static: true
   }, {
     status: 404
   }]
