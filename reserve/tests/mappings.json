@@ -6,6 +6,13 @@
       "methods": "GET,POST"
     }
   }, {
+    "method": "HEAD",
+    "match": "/",
+    "status": 200
+  }, {
+    "match": "/hello",
+    "custom": ["Hello World !"]
+  }, {
     "match": "^/url/proxy/(https?)/(.*)",
     "url": "$1://$2",
     "unsecure-cookies": true

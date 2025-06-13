@@ -36,9 +36,9 @@
     "mocha": "mocha",
     "mocha-dbg": "node --inspect-brk node_modules/mocha/bin/_mocha",
     "cover": "nyc mocha && nyc report --reporter=lcov",
-    "perf-serve": "node . --config ./tests/http.json --silent",
-    "perf-test": "autocannon localhost:5000",
-    "perf": "start-server-and-test perf-test http-get://localhost:5000 perf-serve",
+    "perf-serve": "node dist/cli.js --config ./tests/http.json --silent",
+    "perf-test": "autocannon localhost:5000/hello",
+    "perf": "start-server-and-test perf-serve http://localhost:5000 perf-test",
     "reserve": "node ./samples/reserve",
     "test:types": "tsc --skipLibCheck tests/types.ts"
   },
@@ -71,6 +71,7 @@
     "punycache": "^1.0.1",
     "reserve": "",
     "standard": "^17.1.2",
+    "start-server-and-test": "^2.0.12",
     "terser": "^5.42.0",
     "typescript": "^5.8.3"
   }
