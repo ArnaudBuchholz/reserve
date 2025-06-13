@@ -1,5 +1,6 @@
 |Version|content|
 |---|---|
+|2.3.0|Fix simple matching when pattern ends with / ([#115](https://github.com/ArnaudBuchholz/reserve/issues/115))|
 |2.3.0|While closing, server rejects incoming requests with status `503`
 |2.3.0|Server close now exposes options to terminate active connections
 |2.3.0|Speed improvement (replaced contexts dictionary with a map)
