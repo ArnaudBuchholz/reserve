@@ -18,6 +18,7 @@ module.exports = {
   $mappingMethod: Symbol(`${ns}mapping.method`),
   $mappingHandler: Symbol(`${ns}mapping.handler`),
   $requestInternal: Symbol(`${ns}request.internal`),
+  $requestContext: Symbol(`${ns}request.context`),
   $useMiddleware: Symbol(`${ns}use.middleware`),
   $fileCache: Symbol(`${ns}file.cache`)
 }

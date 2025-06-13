@@ -43,6 +43,7 @@ async function dispatch ({ configurationPromise, events, request, beforeWait }) 
     beforeWait(request)
   }
   await promise
+  request.emit('close')
   assert.strictEqual(configuration[$configurationRequests].contexts.size, 0, 'No pending context')
   return {
     emitted,

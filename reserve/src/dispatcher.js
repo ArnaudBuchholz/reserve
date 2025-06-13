@@ -19,6 +19,7 @@ const {
   $mappingMatch,
   $mappingHandler,
   $requestInternal,
+  $requestContext,
   $configurationEventEmitter
 } = require('./symbols')
 const defer = require('./helpers/defer')
@@ -32,14 +33,13 @@ function emitError ({ emit, emitParameters }, reason) {
 }
 
 function redirected (context) {
-  const { emit, emitParameters, response: { statusCode }, redirected, configuration: { [$configurationRequests]: { contexts } }, id } = context
+  const { emit, emitParameters, response: { statusCode }, redirected } = context
   const perfEnd = performance.now()
   emitParameters.end = new Date()
   emitParameters.perfEnd = perfEnd
   emitParameters.timeSpent = Math.ceil(perfEnd - emitParameters.perfStart)
   emitParameters.statusCode = statusCode
   emit(EVENT_REDIRECTED, emitParameters)
-  contexts.delete(id)
   redirected()
 }
 
@@ -152,6 +152,17 @@ function evaluateMappings (context, url, index) {
   }
 }
 
+function onAborted () {
+  const { emit, emitParameters } = this[$requestContext]
+  emit(EVENT_ABORTED, emitParameters)
+}
+
+function onClose () {
+  const { emit, emitParameters, configuration: { [$configurationRequests]: { contexts } }, id } = this[$requestContext]
+  emit(EVENT_CLOSED, emitParameters)
+  contexts.delete(id)
+}
+
 module.exports = function (configuration, request, response) {
   if (configuration[$configurationClosed]) {
     return Promise.resolve(status.redirect({ response, redirect: 503 }))
@@ -190,9 +201,10 @@ module.exports = function (configuration, request, response) {
     response
   }
 
-  // TODO: should remove the request from contexts when it is closed or aborted
-  request.on('aborted', () => emit(EVENT_ABORTED, emitParameters))
-  request.on('close', () => emit(EVENT_CLOSED, emitParameters))
+  request[$requestContext] = context
+
+  request.on('aborted', onAborted)
+  request.on('close', onClose)
 
   emit(EVENT_INCOMING, emitParameters)
 
