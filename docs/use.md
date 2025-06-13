@@ -15,7 +15,20 @@ Enables the use of [express middleware functions](https://www.npmjs.com/search?q
 }
 ```
 
-> Example of mapping with the `use` handler
+> Example of mapping with the `use` handler with [`express-session`](https://www.npmjs.com/package/express-session)
+
+```json
+{
+  "use": "cors",
+  "options" : {
+    "origin": "http://example.com",
+    "methods": "GET,POST"
+  }
+}
+```
+
+> Example of mapping with the `use` handler with [`cors`](https://www.npmjs.com/package/cors)
+
 
 ## Features
 
