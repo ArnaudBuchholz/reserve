@@ -17,9 +17,10 @@ module.exports = match => {
   if (regexpClues.some(clue => match.includes(clue))) {
     return new RegExp(match)
   }
+  const hasEndingSlash = match.endsWith('/')
   return new RegExp(`^${
     match
       .replace(/\./g, '\\.')
       .replace(/:(\w+)/g, (_, id) => `(?<${id}>[^/]*)`)
-  }\\b(.*)`)
+  }${hasEndingSlash ? '' : '\\b'}(.*)`)
 }

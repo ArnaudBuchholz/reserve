@@ -108,10 +108,22 @@ describe('config/parseMatch', () => {
     })
 
     describe('otherwise a pattern', () => {
+      it('converts to regex (root)', () => {
+        const re = parseMatch('/')
+        assert.ok(re instanceof RegExp)
+        assert.strictEqual(re.toString(), '/^\\/(.*)/')
+      })
+
       it('converts to regex (no dot)', () => {
         const re = parseMatch('/path')
         assert.ok(re instanceof RegExp)
         assert.strictEqual(re.toString(), '/^\\/path\\b(.*)/')
+      })
+
+      it('converts to regex (ending slash)', () => {
+        const re = parseMatch('/path/')
+        assert.ok(re instanceof RegExp)
+        assert.strictEqual(re.toString(), '/^\\/path\\/(.*)/')
       })
 
       it('converts to regex (with dot)', () => {
@@ -130,6 +142,12 @@ describe('config/parseMatch', () => {
         const re = parseMatch('/books/:id/rentals')
         assert.ok(re instanceof RegExp)
         assert.strictEqual(re.toString(), '/^\\/books\\/(?<id>[^/]*)\\/rentals\\b(.*)/')
+      })
+
+      it('handles query parameter (:) in the middle of the url (and ending slash)', () => {
+        const re = parseMatch('/books/:id/rentals/')
+        assert.ok(re instanceof RegExp)
+        assert.strictEqual(re.toString(), '/^\\/books\\/(?<id>[^/]*)\\/rentals\\/(.*)/')
       })
     })
   })
