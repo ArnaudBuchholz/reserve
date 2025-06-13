@@ -1,4 +1,4 @@
-const { serve } = require('../src/index')
+const { serve, log } = require('../src/index')
 const http = require('http')
 
 let baseUrl
@@ -45,6 +45,7 @@ async function main () {
       status: 404
     }]
   })
+  log(server, true)
   const sockets = []
   let nextSocketId = 0
   server.on('created', ({ server: nativeServer }) => {
