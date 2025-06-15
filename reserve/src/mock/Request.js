@@ -1,6 +1,6 @@
 'use strict'
 
-const { Readable } = require('../node-api')
+const { Readable, Socket } = require('../node-api')
 const headersFactory = require('./headers')
 const BASE = 'http://localhost'
 
@@ -63,6 +63,13 @@ module.exports = class Request extends Readable {
 
   get headers () {
     return this._headers
+  }
+
+  get socket () {
+    if (!this._socket) {
+      this._socket = new Socket()
+    }
+    return this._socket
   }
 
   abort () {

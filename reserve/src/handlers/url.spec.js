@@ -65,6 +65,31 @@ describe('handlers/url', () => {
     })
   )
 
+  it('handles closed sockets', () => handle({
+    request: {
+      method: 'POST',
+      url: http.urls.echo,
+      headers: {
+        'x-status-code': 200,
+        'x-value-1': 'test',
+        host: 'http://example.com'
+      },
+      body: 'Hello World!'
+    }
+  })
+    .then(({ redirected, request, response }) => {
+      request.socket.emit('close')
+      return redirected
+        .then(value => {
+          assert.strictEqual(value, undefined)
+          assert.strictEqual(response.statusCode, 200)
+          assert.strictEqual(response.headers['x-value-1'], 'test')
+          assert.strictEqual(response.headers.host, undefined)
+          assert.strictEqual(response.toString(), '')
+        })
+    })
+  )
+
   it('pipes URL content (https)', () => handle({
     request: {
       method: 'POST',

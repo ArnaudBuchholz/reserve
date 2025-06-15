@@ -105,4 +105,10 @@ describe('mock/Request', () => {
     assert.ok(eventThrown)
     assert.ok(request.aborted)
   })
+
+  it('provides a socket', () => {
+    const request = new Request('GET', '/')
+    assert.ok(request.socket)
+    assert.strictEqual(request.socket.constructor.name, 'Socket')
+  })
 })
