@@ -1,11 +1,12 @@
 |Version|content|
 |---|---|
+|2.3.1|Improve detection of closed requests in the `url` handler|
 |2.3.0|Fix simple matching when pattern ends with / ([#115](https://github.com/ArnaudBuchholz/reserve/issues/115))|
-|2.3.0|While closing, server rejects incoming requests with status `503`
-|2.3.0|Server close now exposes options to terminate active connections
-|2.3.0|Speed improvement (replaced contexts dictionary with a map)
-|2.3.0|Fix `file` handlers static option, now defaulted to `false`
-|2.3.0|update to `punycache`@`1.0.1`
+|2.3.0|While closing, server rejects incoming requests with status `503`|
+|2.3.0|Server close now exposes options to terminate active connections|
+|2.3.0|Speed improvement (replaced contexts dictionary with a map)|
+|2.3.0|Fix `file` handlers static option, now defaulted to `false`|
+|2.3.0|update to `punycache`@`1.0.1`|
 |2.2.0|`custom` handlers can be a static array that is sent back as a response ([`custom`](https://github.com/ArnaudBuchholz/reserve/blob/main/docs/custom.md))|
 |2.1.1|`send` headers handling is now case insensitive|
 |2.1.0|`custom` handlers can return an array that is sent back as a response ([`custom`](https://github.com/ArnaudBuchholz/reserve/blob/main/docs/custom.md))|
