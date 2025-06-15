@@ -70,6 +70,10 @@ module.exports = {
     await validateHook(mapping, 'forward-response')
   },
   redirect: async ({ configuration, mapping, match, redirect: url, request, response }) => {
+    let socketClosed = false
+    request.socket.on('close', () => {
+      socketClosed = true
+    })
     const [promise, done, fail] = defer()
     const { method, headers } = request
     const options = {
@@ -118,7 +122,8 @@ module.exports = {
         http2ForbiddenResponseHeaders.forEach(header => delete responseHeaders[header])
       }
       response.writeHead(redirectedResponse.statusCode, responseHeaders)
-      if (request.aborted) {
+      if (request.aborted || socketClosed) {
+        redirectedResponse.destroy()
         response.end()
         return done()
       }
