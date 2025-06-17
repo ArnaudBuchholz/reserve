@@ -1,5 +1,6 @@
 |Version|content|
 |---|---|
+|2.3.2|Fix type definition of (Mocked)Response|
 |2.3.1|Improve detection of closed requests in the `url` handler|
 |2.3.0|Fix simple matching when pattern ends with / ([#115](https://github.com/ArnaudBuchholz/reserve/issues/115))|
 |2.3.0|While closing, server rejects incoming requests with status `503`|

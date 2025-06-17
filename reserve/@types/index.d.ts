@@ -460,7 +460,7 @@ declare module 'reserve' {
   /** Validate configuration, allocate a server and start listening */
   function serve (configuration: Configuration): Server
 
-  class MockedResponse extends ServerResponse {
+  class Response extends ServerResponse {
     constructor(request?: Request)
     /** Waits for the response to be completed */
     waitForFinish: () => Promise<void>
@@ -485,11 +485,11 @@ declare module 'reserve' {
 
   interface MockServer extends Server {
     /** Simulate request and generates a response */
-    request: ((method: string, url: string) => Promise<MockedResponse>) &
-      ((method: string, url: string, headers: Headers) => Promise<MockedResponse>) &
-      ((method: string, url: string, headers: Headers, body: string) => Promise<MockedResponse>) &
-      ((method: string, url: string, headers: Headers, body: string, properties: object) => Promise<MockedResponse>) &
-      ((definition: MockedRequestDefinition) => Promise<MockedResponse>)
+    request: ((method: string, url: string) => Promise<Response>) &
+      ((method: string, url: string, headers: Headers) => Promise<Response>) &
+      ((method: string, url: string, headers: Headers, body: string) => Promise<Response>) &
+      ((method: string, url: string, headers: Headers, body: string, properties: object) => Promise<Response>) &
+      ((definition: MockedRequestDefinition) => Promise<Response>)
   }
 
   /** Validate configuration, simulate a server */
