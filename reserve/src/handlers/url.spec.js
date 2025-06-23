@@ -6,7 +6,8 @@ const assert = require('assert')
 const { notExpected, wrapHandler, http } = require('test-tools')
 const urlHandler = require('./url')
 const handle = wrapHandler(urlHandler)
-const { $configuration } = require('../symbols')
+const { $configuration, $urlSocketClosed } = require('../symbols')
+const Request = require('../mock/Request')
 
 const uid = Symbol('uid')
 
@@ -89,6 +90,38 @@ describe('handlers/url', () => {
         })
     })
   )
+
+  it('handles reused sockets', () => {
+    const request = new Request({
+      method: 'POST',
+      url: http.urls.echo,
+      headers: {
+        'x-status-code': 200,
+        'x-value-1': 'test',
+        host: 'http://example.com'
+      },
+      body: 'Hello World!'
+    })
+    const { socket } = request
+    socket[$urlSocketClosed] = false
+    socket.on('close', () => {
+      socket[$urlSocketClosed] = true
+    })
+    return handle({
+      request
+    })
+      .then(({ redirected, request, response }) => {
+        request.socket.emit('close')
+        return redirected
+          .then(value => {
+            assert.strictEqual(value, undefined)
+            assert.strictEqual(response.statusCode, 200)
+            assert.strictEqual(response.headers['x-value-1'], 'test')
+            assert.strictEqual(response.headers.host, undefined)
+            assert.strictEqual(response.toString(), '')
+          })
+      })
+  })
 
   it('pipes URL content (https)', () => handle({
     request: {

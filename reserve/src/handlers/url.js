@@ -3,7 +3,7 @@
 const { http, https } = require('../node-api')
 const headersFactory = require('../mock/headers')
 const defer = require('../helpers/defer')
-const { $handlerPrefix } = require('../symbols')
+const { $handlerPrefix, $urlSocketClosed } = require('../symbols')
 const smartImport = require('../helpers/smartImport')
 const { newError, ERROR_URL_BODY_CONSUMED } = require('../error')
 
@@ -70,10 +70,13 @@ module.exports = {
     await validateHook(mapping, 'forward-response')
   },
   redirect: async ({ configuration, mapping, match, redirect: url, request, response }) => {
-    let socketClosed = false
-    request.socket.on('close', () => {
-      socketClosed = true
-    })
+    const { socket } = request
+    if (socket[$urlSocketClosed] === undefined) {
+      socket[$urlSocketClosed] = false
+      socket.on('close', () => {
+        socket[$urlSocketClosed] = true
+      })
+    }
     const [promise, done, fail] = defer()
     const { method, headers } = request
     const options = {
@@ -122,7 +125,7 @@ module.exports = {
         http2ForbiddenResponseHeaders.forEach(header => delete responseHeaders[header])
       }
       response.writeHead(redirectedResponse.statusCode, responseHeaders)
-      if (request.aborted || socketClosed) {
+      if (request.aborted || socket[$urlSocketClosed]) {
         redirectedResponse.destroy()
         response.end()
         return done()
