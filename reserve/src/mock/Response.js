@@ -61,6 +61,10 @@ module.exports = class Response extends Duplex {
     return this._headers
   }
 
+  getHeaders () {
+    return this._headers
+  }
+
   get statusCode () {
     return this._statusCode
   }

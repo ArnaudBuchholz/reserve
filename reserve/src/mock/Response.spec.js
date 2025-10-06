@@ -17,4 +17,17 @@ describe('mock/Response', () => {
       assert.strictEqual(response.getHeader('test'), '')
     })
   })
+
+  describe('getHeaders API', () => {
+    it('returns the headers values', () => {
+      const response = new Response()
+      response.setHeader('test', 12)
+      assert.deepStrictEqual(response.getHeaders(), { test: '12' })
+    })
+
+    it('defaults when no header is set', () => {
+      const response = new Response()
+      assert.deepStrictEqual(response.getHeaders(), {})
+    })
+  })
 })

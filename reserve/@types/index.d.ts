@@ -462,6 +462,8 @@ declare module 'reserve' {
 
   class Response extends ServerResponse {
     constructor(request?: Request)
+    /** Simpler access to headers */
+    readonly headers: Headers
     /** Waits for the response to be completed */
     waitForFinish: () => Promise<void>
     /** Checks if the response is still in the initial state */

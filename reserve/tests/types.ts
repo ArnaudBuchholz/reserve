@@ -61,11 +61,12 @@ export async function main() {
   mockServer.request('GET', '/hello', {
     'x-server': 'reserve'
   })
-  mockServer.request('PUT', '/hello', {
+  const response = await mockServer.request('PUT', '/hello', {
     'content-type': 'application/json'
   }, JSON.stringify({
     hello: 'World'
   }))
+  console.log(response.headers);
 }
 
 export const sendExample1 = (response: ServerResponse) => send(response, 'Hello World !')
