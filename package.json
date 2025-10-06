@@ -37,8 +37,8 @@
     "punycache": "^1.0.1",
     "reserve": "",
     "standard": "^17.1.2",
-    "terser": "^5.42.0",
-    "typescript": "^5.8.3"
+    "terser": "^5.44.0",
+    "typescript": "^5.9.3"
   },
   "license": "MIT"
 }

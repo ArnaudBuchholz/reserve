@@ -60,19 +60,19 @@
   },
   "homepage": "https://github.com/ArnaudBuchholz/reserve#readme",
   "devDependencies": {
-    "@stryker-mutator/core": "^8.7.1",
-    "@stryker-mutator/mocha-runner": "^8.7.1",
-    "@types/node": "^22.15.30",
+    "@stryker-mutator/core": "^9.2.0",
+    "@stryker-mutator/mocha-runner": "^9.2.0",
+    "@types/node": "^24.6.2",
     "cors": "^2.8.5",
     "eslint-utils": "^3.0.0",
-    "mocha": "^10.8.2",
+    "mocha": "^11.7.4",
     "mock-require": "^3.0.3",
     "nyc": "^17.1.0",
     "punycache": "^1.0.1",
     "reserve": "",
     "standard": "^17.1.2",
-    "start-server-and-test": "^2.0.12",
-    "terser": "^5.42.0",
-    "typescript": "^5.8.3"
+    "start-server-and-test": "^2.1.2",
+    "terser": "^5.44.0",
+    "typescript": "^5.9.3"
   }
 }
