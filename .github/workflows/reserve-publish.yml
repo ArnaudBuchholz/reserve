@@ -5,6 +5,13 @@ on:
   release:
     types: [created]
 
+permissions:
+  actions: read
+  contents: write
+  issues: write
+  pull-requests: write
+  id-token: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -34,5 +41,3 @@ jobs:
       - run: npm ci
       - run: npm run build --workspace reserve
       - run: npm publish --workspace reserve
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
