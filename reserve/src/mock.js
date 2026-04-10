@@ -47,8 +47,8 @@ module.exports = (jsonConfiguration, mockedHandlers) => {
         http2
       })
     })
-    .catch(error => {
-      emit(EVENT_ERROR, { error })
+    .catch(reason => {
+      emit(EVENT_ERROR, { reason })
     })
   return instance
 }

@@ -1,5 +1,6 @@
 |Version|content|
 |---|---|
+|2.3.5|Fix types definitions|
 |2.3.4|Fix type definition and improve (Mocked)Response|
 |2.3.3|Limit the number of listeners on the request's socket|
 |2.3.2|Fix type definition of (Mocked)Response|

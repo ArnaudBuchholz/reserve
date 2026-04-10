@@ -21,7 +21,7 @@ declare module 'reserve' {
     /** URL matching, capturing groups are allowed */
     match?: string | RegExp
     /** Request method matching */
-    method?: string
+    method?: string | string[]
     /** Inverts the matching process when set to true, enabling the implementation of an 'all but' pattern */
     'invert-match'?: boolean
     /** Executed only if the mapping matches the request, enabling finer control */
@@ -394,7 +394,7 @@ declare module 'reserve' {
 
   type ServerEventError = {
     eventName: 'error'
-    error: any
+    reason: any
   } & ServerEventCommon
 
   type ServerEventRedirecting = {
