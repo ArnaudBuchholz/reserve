@@ -51,9 +51,9 @@ export async function main() {
         console.log(`Listening on ${url}`)
         resolve()
       })
-      .on('error', ({ error }) => {
-        console.error(error)
-        reject(error)
+      .on('error', ({ reason }) => {
+        console.error(reason)
+        reject(reason)
       })
   })
 
