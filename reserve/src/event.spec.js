@@ -7,9 +7,9 @@ const { EVENT_CREATED, EVENT_READY, EVENT_INCOMING } = events
 
 describe('event', () => {
   describe('constants', () => {
-    const expected = 'created,ready,incoming,error,redirecting,redirected,aborted,closed'.split(',')
+    const expected = 'created,ready,incoming,error,redirecting,redirected,aborted,closed,rate-limit-exceeded,rate-limit-reset,rate-limit-warning'.split(',')
     expected.forEach(name => {
-      const constantName = 'EVENT_' + name.toUpperCase()
+      const constantName = 'EVENT_' + name.toUpperCase().replace(/-/g, '_')
       it(`exposes ${constantName}`, () => {
         assert.notStrictEqual(events[constantName], undefined)
       })

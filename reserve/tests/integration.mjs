@@ -83,12 +83,16 @@ async function test (config, base) {
       })
     })
     const extracted = {}
+    const normalizedExpected = { ...expected }
     Object.keys(expected)
       .filter(member => !['body'].includes(member))
       .forEach(member => {
         if (member === 'headers') {
           extracted.headers = {}
           Object.keys(expected.headers).forEach(header => { extracted.headers[header] = response.headers[header] })
+        } else if (typeof expected[member] === 'function') {
+          expected[member](response[member])
+          delete normalizedExpected[member]
         } else {
           extracted[member] = response[member]
         }
@@ -98,12 +102,12 @@ async function test (config, base) {
         extracted.body = JSON.parse(response.body)
       } else if (typeof expected.body === 'function') {
         await expected.body(response.body)
-        delete expected.body
+        delete normalizedExpected.body
       } else {
         extracted.body = response.body
       }
     }
-    assert.deepStrictEqual(extracted, expected, `${method} ${url}`)
+    assert.deepStrictEqual(extracted, normalizedExpected, `${method} ${url}`)
     return response
   }
 
@@ -268,6 +272,20 @@ async function test (config, base) {
   await match('/custom/configuration', {
     statusCode: 200
   })
+
+  const loadResponses = await Promise.all(Array.from({ length: 8 }, () => match({
+    url: '/rate-limit/load',
+    headers: {
+      'x-load-client': `load-${now}`
+    }
+  }, {
+    statusCode: value => [204, 429].includes(value),
+    headers: {}
+  })))
+  const loadStatusCodes = loadResponses.map(({ statusCode }) => statusCode).sort()
+  assert.deepStrictEqual(loadStatusCodes, [204, 204, 204, 429, 429, 429, 429, 429])
+  const blockedResponses = loadResponses.filter(({ statusCode }) => statusCode === 429)
+  assert.ok(blockedResponses.every(response => response.headers['retry-after']))
 
   await match('/status/301', {
     statusCode: 301,

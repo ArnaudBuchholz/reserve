@@ -13,7 +13,10 @@ const {
   EVENT_REDIRECTED,
   EVENT_REDIRECTING,
   EVENT_ABORTED,
-  EVENT_CLOSED
+  EVENT_CLOSED,
+  EVENT_RATE_LIMIT_EXCEEDED,
+  EVENT_RATE_LIMIT_RESET,
+  EVENT_RATE_LIMIT_WARNING
 } = require('../event')
 
 describe('log/log', () => {
@@ -271,6 +274,27 @@ describe('log/log', () => {
       assert.ok(!output[0].text.includes('METHOD'))
       assert.ok(!output[0].text.includes('URL'))
       assert.ok(output[0].text.includes('0D93'))
+    })
+
+    ;[
+      ['rate-limit-exceeded', EVENT_RATE_LIMIT_EXCEEDED, 'RL429'],
+      ['rate-limit-reset', EVENT_RATE_LIMIT_RESET, 'RLRST'],
+      ['rate-limit-warning', EVENT_RATE_LIMIT_WARNING, 'RLWRN']
+    ].forEach(([name, event, label]) => {
+      it(`logs '${name}'`, () => {
+        emit(event, request, {
+          rateLimit: {
+            key: 'client',
+            reason: 'reason'
+          }
+        })
+        const output = collect()
+        assert.strictEqual(output.length, 1)
+        assert.strictEqual(output[0].type, 'log')
+        assert.ok(output[0].text.includes(label))
+        assert.ok(output[0].text.includes('client'))
+        assert.ok(output[0].text.includes('reason'))
+      })
     })
   })
 })
