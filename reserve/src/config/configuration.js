@@ -24,6 +24,7 @@ const {
 const defaultHandlers = [
   require('../handlers/custom'),
   require('../handlers/file'),
+  require('../handlers/rate-limit'),
   require('../handlers/status'),
   require('../handlers/url'),
   require('../handlers/use')
@@ -137,10 +138,50 @@ async function checkProtocol (configuration) {
   }
 }
 
+function cloneRateLimitOptions (options) {
+  if (options === undefined || options === false || options === true) {
+    return options
+  }
+
+  return JSON.parse(JSON.stringify(options))
+}
+
+function mergeRateLimitOptions (globalOptions, mappingOptions) {
+  if (mappingOptions === undefined) {
+    return cloneRateLimitOptions(globalOptions)
+  }
+
+  if (mappingOptions === false || mappingOptions === true) {
+    return mappingOptions
+  }
+
+  if (globalOptions === undefined || globalOptions === false || globalOptions === true) {
+    return cloneRateLimitOptions(mappingOptions)
+  }
+
+  const merged = Object.assign({}, cloneRateLimitOptions(globalOptions), cloneRateLimitOptions(mappingOptions))
+
+  if (globalOptions.key || mappingOptions.key) {
+    merged.key = Object.assign({}, globalOptions.key || {}, mappingOptions.key || {})
+  }
+
+  return merged
+}
+
+function applyGlobalRateLimit (configuration, mapping) {
+  if (configuration['rate-limit'] === undefined) {
+    return
+  }
+
+  mapping['rate-limit'] = mergeRateLimitOptions(configuration['rate-limit'], mapping['rate-limit'])
+}
+
 async function checkMappings (configuration) {
   const configurationInterface = new IConfiguration(configuration)
   configuration[$configurationInterface] = configurationInterface
+
   for (const mapping of configuration.mappings) {
+    applyGlobalRateLimit(configuration, mapping)
     await checkMapping(configuration, mapping)
   }
 }

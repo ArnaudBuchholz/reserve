@@ -96,7 +96,9 @@ function redirecting (context, { mapping = {}, match, handler, type, redirect, u
       match,
       redirect,
       request,
-      response
+      response,
+      emit,
+      emitParameters
     })
     if (result && result.then) {
       result.then(handled.bind(null, context, { url, index }), reason => error(context, reason))

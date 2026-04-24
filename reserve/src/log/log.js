@@ -19,6 +19,11 @@ const onIncoming = event => logCommon.call(event, 'INCMG', true, event.method, e
 
 const onEvent = (type, event) => logCommon.call(event, type, true)
 
+const onRateLimit = (type, event) => {
+  const { rateLimit } = event
+  logCommon.call(event, type, true, rateLimit.key, rateLimit.reason)
+}
+
 const onRedirecting = event => {
   const redirect = event.redirect
   let redirectLabel
@@ -42,6 +47,9 @@ module.exports = (serve, verbose) => {
       .on('incoming', onIncoming)
       .on('aborted', onEvent.bind(null, 'ABORT'))
       .on('closed', onEvent.bind(null, 'CLOSE'))
+      .on('rate-limit-exceeded', onRateLimit.bind(null, 'RL429'))
+      .on('rate-limit-reset', onRateLimit.bind(null, 'RLRST'))
+      .on('rate-limit-warning', onRateLimit.bind(null, 'RLWRN'))
       .on('redirecting', onRedirecting)
   } else {
     serve
