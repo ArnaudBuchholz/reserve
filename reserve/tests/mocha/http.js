@@ -23,8 +23,8 @@ module.exports = {
     result.write = chunk => {
       response.write(chunk)
     }
-    result.end = () => {
-      response.end()
+    result.end = (chunk) => {
+      response.end(chunk)
       callback(response)
     }
     return result

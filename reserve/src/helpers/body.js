@@ -2,8 +2,18 @@
 
 const { text, json } = require('../mime')
 const defer = require('./defer')
+const { $bodyCache } = require('../symbols')
 
 module.exports = function (request, options = {}) {
+  if (request[$bodyCache] !== undefined) {
+    const cached = Promise.resolve(request[$bodyCache])
+    const toText = buffer => buffer.toString()
+    const toJson = buffer => JSON.parse(buffer.toString())
+    cached.buffer = () => cached
+    cached.text = () => cached.then(toText)
+    cached.json = () => cached.then(toJson)
+    return cached
+  }
   let type
   const [readBuffer, resolve, reject] = defer()
   request.on('error', reject)
@@ -33,6 +43,9 @@ module.exports = function (request, options = {}) {
       .on('data', chunk => buffers.push(chunk))
       .on('end', () => resolve(Buffer.concat(buffers)))
   }
+  readBuffer.then(buffer => {
+    request[$bodyCache] = buffer
+  })
   const toText = buffer => buffer.toString()
   const toJson = buffer => JSON.parse(buffer.toString())
   let promise

@@ -6,7 +6,7 @@ const assert = require('assert')
 const { notExpected, wrapHandler, http } = require('test-tools')
 const urlHandler = require('./url')
 const handle = wrapHandler(urlHandler)
-const { $configuration, $urlSocketClosed } = require('../symbols')
+const { $configuration, $urlSocketClosed, $bodyCache } = require('../symbols')
 const Request = require('../mock/Request')
 
 const uid = Symbol('uid')
@@ -40,6 +40,24 @@ describe('handlers/url', () => {
       assert.strictEqual(response.toString(), 'Hello World!')
     }))
   )
+
+  it('uses cached body when stream was already consumed', () => {
+    const request = new Request({
+      method: 'POST',
+      url: http.urls.echo,
+      headers: {
+        'x-status-code': 200
+      },
+      body: 'Hello World!'
+    })
+    request[$bodyCache] = Buffer.from('Hello Body Cache!')
+    return handle({ request })
+      .then(({ redirected, response }) => redirected.then(value => {
+        assert.strictEqual(value, undefined)
+        assert.strictEqual(response.statusCode, 200)
+        assert.strictEqual(response.toString(), 'Hello Body Cache!')
+      }))
+  })
 
   it('handles aborted requests', () => handle({
     request: {

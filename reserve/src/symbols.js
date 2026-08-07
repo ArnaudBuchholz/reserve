@@ -20,6 +20,7 @@ module.exports = {
   $requestInternal: Symbol(`${ns}request.internal`),
   $requestContext: Symbol(`${ns}request.context`),
   $useMiddleware: Symbol(`${ns}use.middleware`),
+  $bodyCache: Symbol(`${ns}body.cache`),
   $fileCache: Symbol(`${ns}file.cache`),
   $urlSocketClosed: Symbol(`${ns}url.socketClosed`)
 }

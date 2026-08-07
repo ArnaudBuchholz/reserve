@@ -186,4 +186,21 @@ describe('helpers/body', () => {
   ]))
     .then(notExpected, reason => assert.strictEqual(reason.message, 'fail'))
   )
+
+  it('caches the result on the request object', async () => {
+    const req = request(['Hello', ' World'])
+    await body(req)
+    return body(req)
+      .then(buffer => {
+        assert.ok(buffer instanceof Buffer)
+        assert.strictEqual(Buffer.compare(buffer, Buffer.from('Hello World')), 0)
+      }, notExpected)
+  })
+
+  it('returns cache with correct type accessors', async () => {
+    const req = request(['Hello'])
+    await body(req)
+    return body(req).text()
+      .then(text => assert.strictEqual(text, 'Hello'), notExpected)
+  })
 })

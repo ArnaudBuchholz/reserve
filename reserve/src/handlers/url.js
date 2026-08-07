@@ -3,7 +3,7 @@
 const { http, https } = require('../node-api')
 const headersFactory = require('../mock/headers')
 const defer = require('../helpers/defer')
-const { $handlerPrefix, $urlSocketClosed } = require('../symbols')
+const { $handlerPrefix, $urlSocketClosed, $bodyCache } = require('../symbols')
 const smartImport = require('../helpers/smartImport')
 const { newError, ERROR_URL_BODY_CONSUMED } = require('../error')
 
@@ -136,9 +136,14 @@ module.exports = {
         .pipe(response)
     })
     redirectedRequest.on('error', fail)
-    request
-      .on('error', fail)
-      .pipe(redirectedRequest)
+    const cachedBody = request[$bodyCache]
+    if (cachedBody !== undefined) {
+      redirectedRequest.end(cachedBody)
+    } else {
+      request
+        .on('error', fail)
+        .pipe(redirectedRequest)
+    }
     return promise
   }
 }

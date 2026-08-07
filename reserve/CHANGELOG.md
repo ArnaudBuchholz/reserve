@@ -1,5 +1,6 @@
 |Version|content|
 |---|---|
+|2.3.6|`body` helper stores the deserialized body on the request to enable forwarding the request in `url`|
 |2.3.5|Fix types definitions|
 |2.3.4|Fix type definition and improve (Mocked)Response|
 |2.3.3|Limit the number of listeners on the request's socket|
