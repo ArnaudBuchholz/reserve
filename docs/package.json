@@ -12,7 +12,7 @@
   "author": "Arnaud Buchholz <arnaud.buchholz@free.fr>",
   "license": "MIT",
   "devDependencies": {
-    "github-markdown-css": "^5.8.1",
+    "github-markdown-css": "^5.9.0",
     "rehype-raw": "^7.0.0",
     "rehype-stringify": "^10.0.1",
     "remark": "^15.0.1",
