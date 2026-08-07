@@ -203,4 +203,21 @@ describe('helpers/body', () => {
     return body(req).text()
       .then(text => assert.strictEqual(text, 'Hello'), notExpected)
   })
+
+  it('returns cache with buffer accessor', async () => {
+    const req = request(['Hello'])
+    await body(req)
+    return body(req).buffer()
+      .then(buffer => {
+        assert.ok(buffer instanceof Buffer)
+        assert.strictEqual(Buffer.compare(buffer, Buffer.from('Hello')), 0)
+      }, notExpected)
+  })
+
+  it('returns cache with json accessor', async () => {
+    const req = request(['{"hello":"world"}'])
+    await body(req)
+    return body(req).json()
+      .then(json => assert.deepStrictEqual(json, { hello: 'world' }), notExpected)
+  })
 })
