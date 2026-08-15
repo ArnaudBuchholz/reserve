@@ -246,7 +246,7 @@ declare module 'reserve' {
   function send (response: ServerResponse, data?: string | object, options?: SendOptions): void
 
   /** Response capturing helper (check documentation) */
-  function capture (response: ServerResponse, stream: WritableStream): Promise<void>
+  function capture (response: ServerResponse, stream: WritableStream): Promise<{ status: number; headers: Headers }>
 
   interface PunycacheCache {
     /** Sets the value in the cache */

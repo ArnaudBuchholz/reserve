@@ -35,7 +35,7 @@ function _getParameters (forEnd, args) {
 const writeParameters = _getParameters.bind(null, false)
 const endParameters = _getParameters.bind(null, true)
 
-function capture (response, headers, writableStream) {
+function capture (response, status, headers, writableStream) {
   const [promise, done, fail] = defer()
   const { emit, end, write } = response
 
@@ -63,7 +63,7 @@ function capture (response, headers, writableStream) {
 
     response.on('error', onError)
 
-    writableStream.on('finish', () => done())
+    writableStream.on('finish', () => done({ status, headers }))
 
     let writeToOut = true
 
@@ -121,8 +121,8 @@ module.exports = (response, writableStream) => {
   const [promise, done, fail] = defer()
   const { writeHead } = response
   response.writeHead = function (status, headers = {}) {
-    if (status === 200) {
-      done(capture(response, headers, writableStream))
+    if (Math.floor(status / 100) === 2) {
+      done(capture(response, status, headers, writableStream))
     } else {
       fail(newError(ERROR_CAPTURE_INVALID_STATUS))
     }

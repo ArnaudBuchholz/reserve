@@ -111,7 +111,9 @@ describe('helpers/capture', () => {
       onEnd = resolve
     })
     promise
-      .then(() => {
+      .then(({ status, headers }) => {
+        assert.strictEqual(status, 200)
+        assert.deepStrictEqual(headers, { 'content-encoding': 'identity' })
         assert.strictEqual(writableStream.toString(), loremIpsum)
         return Promise.all([response.waitForFinish(), reachedEnd])
       })
@@ -130,7 +132,9 @@ describe('helpers/capture', () => {
     it(`${label} (on write)`, done => {
       const { response, writableStream, promise, steps = 5 } = testSetup()
       promise
-        .then(() => {
+        .then(({ status, headers }) => {
+          assert.strictEqual(status, 200)
+          assert.deepStrictEqual(headers, {})
           assert.strictEqual(writableStream.toString(), loremIpsum)
           return response.waitForFinish()
         })
@@ -146,7 +150,9 @@ describe('helpers/capture', () => {
     it(`${label} (on end)`, done => {
       const { response, writableStream, promise, steps = 5 } = testSetup()
       promise
-        .then(() => {
+        .then(({ status, headers }) => {
+          assert.strictEqual(status, 200)
+          assert.deepStrictEqual(headers, {})
           assert.strictEqual(writableStream.toString(), loremIpsum)
           return response.waitForFinish()
         })
@@ -187,7 +193,9 @@ describe('helpers/capture', () => {
       it(`supports ${contentEncoding}`, done => {
         const { response, writableStream, promise } = setup()
         promise
-          .then(() => {
+          .then(({ status, headers }) => {
+            assert.strictEqual(status, 200)
+            assert.deepStrictEqual(headers, { 'content-encoding': contentEncoding })
             assert.strictEqual(writableStream.toString(), loremIpsum)
             return response.waitForFinish()
           })

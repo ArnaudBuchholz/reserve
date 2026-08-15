@@ -5,7 +5,7 @@
 REserve offers a mechanism to **capture the response stream** and **duplicate its content** to another **writable stream**.
 
 ```typescript
-function capture (response: ServerResponse, stream: WritableStream): Promise<void>
+function capture (response: ServerResponse, stream: WritableStream): Promise<{ status: number; headers: Headers }>
 ```
 
 > Types definition for `capture`
