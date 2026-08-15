@@ -1,6 +1,7 @@
 'use strict'
 
 const { readFile, stat, dirname, isAbsolute, join } = require('../node-api')
+const jsonParse = require('../helpers/jsonParse')
 const IConfiguration = require('./iconfiguration')
 const checkMapping = require('./checkMapping')
 const checkMethod = require('./checkMethod')
@@ -84,8 +85,8 @@ async function setHandlers (configuration, mockedHandlers = {}) {
     handlers[type] = Object.assign({}, defaultHandlers[type])
     return handlers
   }, {})
-  configuration.handlers = Object.assign({}, configuration.handlers || {}, copyOfDefaultHandlers)
-  Object.keys(mockedHandlers).forEach(type => Object.assign(configuration.handlers[type], mockedHandlers[type]))
+  configuration.handlers = Object.assign(Object.create(null), configuration.handlers || {}, copyOfDefaultHandlers)
+  Object.keys(mockedHandlers).forEach(type => Object.assign(configuration.handlers, { [type]: mockedHandlers[type] }))
   for (const type of Object.keys(configuration.handlers)) {
     await validateHandler(configuration, type)
   }
@@ -174,7 +175,7 @@ function extend (filePath, configuration) {
     const basefilePath = join(folderPath, configuration.extend)
     delete configuration.extend
     return readFile(basefilePath)
-      .then(buffer => JSON.parse(buffer.toString()))
+      .then(buffer => jsonParse(buffer.toString()))
       .then(baseConfiguration => {
         // Only merge mappings
         const baseMappings = baseConfiguration.mappings
@@ -192,7 +193,7 @@ async function check (configuration, mockedHandlers) {
   if (typeof configuration !== 'object' || configuration === null) {
     throwError(ERROR_CONFIG_NOT_AN_OBJECT)
   }
-  const checkedConfiguration = Object.assign({}, configuration)
+  const checkedConfiguration = Object.assign(Object.create(null), configuration)
   applyDefaults(checkedConfiguration)
   await setHandlers(checkedConfiguration, mockedHandlers)
   await checkListeners(checkedConfiguration)
@@ -214,7 +215,7 @@ async function read (fileName) {
     filePath = join(process.cwd(), fileName)
   }
   return stat(filePath)
-    .then(() => readFile(filePath).then(buffer => JSON.parse(buffer.toString())))
+    .then(() => readFile(filePath).then(buffer => jsonParse(buffer.toString())))
     .then(configuration => extend(filePath, configuration))
 }
 

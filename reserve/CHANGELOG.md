@@ -1,5 +1,6 @@
 |Version|content|
 |---|---|
+|2.3.8|Fix security concerns on prototype pollution ([#123](https://github.com/ArnaudBuchholz/reserve/issues/123))|
 |2.3.7|`capture` helper now returns the status code and headers|
 |2.3.6|`body` helper stores the deserialized body on the request to enable forwarding the request in `url`|
 |2.3.5|Fix types definitions|

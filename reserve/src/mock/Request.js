@@ -24,6 +24,7 @@ module.exports = class Request extends Readable {
     this._headers = headersFactory(headers)
     this._body = body
     if (properties) {
+      // properties is test/mock-only — always developer-supplied, never parsed from external input
       Object.assign(this, properties)
     }
   }

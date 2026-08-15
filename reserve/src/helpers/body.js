@@ -2,13 +2,14 @@
 
 const { text, json } = require('../mime')
 const defer = require('./defer')
+const jsonParse = require('./jsonParse')
 const { $bodyCache } = require('../symbols')
 
 module.exports = function (request, options = {}) {
   if (request[$bodyCache] !== undefined) {
     const cached = Promise.resolve(request[$bodyCache])
     const toText = buffer => buffer.toString()
-    const toJson = buffer => JSON.parse(buffer.toString())
+    const toJson = buffer => jsonParse(buffer.toString())
     cached.buffer = () => cached
     cached.text = () => cached.then(toText)
     cached.json = () => cached.then(toJson)
@@ -47,7 +48,7 @@ module.exports = function (request, options = {}) {
     request[$bodyCache] = buffer
   })
   const toText = buffer => buffer.toString()
-  const toJson = buffer => JSON.parse(buffer.toString())
+  const toJson = buffer => jsonParse(buffer.toString())
   let promise
   if (type === text) {
     promise = readBuffer.then(toText)
