@@ -82,6 +82,7 @@ describe('config/configuration', () => {
       float: 42.3,
       null: null
     }
+
     Object.keys(invalidConfigurations).forEach(description => {
       it(`rejects invalid type (${description})`, () => shouldFail(check(invalidConfigurations[description])))
     })
@@ -112,6 +113,251 @@ describe('config/configuration', () => {
           assert.strictEqual(configuration.ssl.key, 'privatekey')
           assert.strictEqual(configuration.ssl.cert, 'certificate')
           assert.strictEqual(configuration.protocol, 'https')
+        })
+    })
+
+    it('applies global rate-limit to mappings', () => {
+      return check({
+        'rate-limit': {
+          limit: 5,
+          windowMs: 2000
+        },
+        mappings: [{
+          status: 204
+        }]
+      })
+        .then(configuration => {
+          assert.deepStrictEqual(configuration.mappings[0]['rate-limit'], {
+            algorithm: 'fixed-window',
+            limit: 5,
+            windowMs: 2000,
+            key: { type: 'ip' },
+            whitelist: [],
+            blacklist: []
+          })
+        })
+    })
+
+    it('merges mapping rate-limit with global rate-limit', () => {
+      return check({
+        'rate-limit': {
+          algorithm: 'fixed-window',
+          limit: 5,
+          windowMs: 2000,
+          key: {
+            type: 'header',
+            name: 'x-api-key'
+          },
+          whitelist: ['trusted-client']
+        },
+        mappings: [{
+          status: 204,
+          'rate-limit': {
+            limit: 2,
+            key: {
+              name: 'authorization'
+            },
+            blacklist: ['blocked-client']
+          }
+        }]
+      })
+        .then(configuration => {
+          assert.deepStrictEqual(configuration.mappings[0]['rate-limit'], {
+            algorithm: 'fixed-window',
+            limit: 2,
+            windowMs: 2000,
+            key: {
+              type: 'header',
+              name: 'authorization'
+            },
+            whitelist: ['trusted-client'],
+            blacklist: ['blocked-client']
+          })
+        })
+    })
+
+    it('merges mapping rate-limit key over global settings when global key is missing', () => {
+      return check({
+        'rate-limit': {
+          limit: 5,
+          windowMs: 2000
+        },
+        mappings: [{
+          status: 204,
+          'rate-limit': {
+            key: {
+              type: 'header',
+              name: 'authorization'
+            }
+          }
+        }]
+      })
+        .then(configuration => {
+          assert.deepStrictEqual(configuration.mappings[0]['rate-limit'].key, {
+            type: 'header',
+            name: 'authorization'
+          })
+        })
+    })
+
+    it('keeps global rate-limit key when mapping key is missing', () => {
+      return check({
+        'rate-limit': {
+          limit: 5,
+          windowMs: 2000,
+          key: {
+            type: 'header',
+            name: 'x-api-key'
+          }
+        },
+        mappings: [{
+          status: 204,
+          'rate-limit': {
+            limit: 3
+          }
+        }]
+      })
+        .then(configuration => {
+          assert.deepStrictEqual(configuration.mappings[0]['rate-limit'].key, {
+            type: 'header',
+            name: 'x-api-key'
+          })
+        })
+    })
+
+    it('merges rate-limit options without key settings', () => {
+      return check({
+        'rate-limit': {
+          limit: 5,
+          windowMs: 2000
+        },
+        mappings: [{
+          status: 204,
+          'rate-limit': {
+            limit: 3
+          }
+        }]
+      })
+        .then(configuration => {
+          assert.deepStrictEqual(configuration.mappings[0]['rate-limit'].key, {
+            type: 'ip'
+          })
+        })
+    })
+
+    it('applies disabled global rate-limit to mappings', () => {
+      return check({
+        'rate-limit': false,
+        mappings: [{
+          status: 204
+        }]
+      })
+        .then(configuration => {
+          assert.strictEqual(configuration.mappings[0]['rate-limit'], false)
+        })
+    })
+
+    it('applies enabled global rate-limit defaults to mappings', () => {
+      return check({
+        'rate-limit': true,
+        mappings: [{
+          status: 204
+        }]
+      })
+        .then(configuration => {
+          assert.deepStrictEqual(configuration.mappings[0]['rate-limit'], {
+            algorithm: 'fixed-window',
+            limit: 10,
+            windowMs: 60000,
+            key: { type: 'ip' },
+            whitelist: [],
+            blacklist: []
+          })
+        })
+    })
+
+    it('lets mapping disable global rate-limit', () => {
+      return check({
+        'rate-limit': {
+          limit: 5,
+          windowMs: 2000
+        },
+        mappings: [{
+          status: 204,
+          'rate-limit': false
+        }]
+      })
+        .then(configuration => {
+          assert.strictEqual(configuration.mappings[0]['rate-limit'], false)
+        })
+    })
+
+    it('lets mapping enable its own rate-limit over global settings', () => {
+      return check({
+        'rate-limit': {
+          limit: 5,
+          windowMs: 2000
+        },
+        mappings: [{
+          status: 204,
+          'rate-limit': true
+        }]
+      })
+        .then(configuration => {
+          assert.deepStrictEqual(configuration.mappings[0]['rate-limit'], {
+            algorithm: 'fixed-window',
+            limit: 10,
+            windowMs: 60000,
+            key: { type: 'ip' },
+            whitelist: [],
+            blacklist: []
+          })
+        })
+    })
+
+    it('uses mapping rate-limit object when global rate-limit is true', () => {
+      return check({
+        'rate-limit': true,
+        mappings: [{
+          status: 204,
+          'rate-limit': {
+            limit: 3,
+            windowMs: 1500
+          }
+        }]
+      })
+        .then(configuration => {
+          assert.deepStrictEqual(configuration.mappings[0]['rate-limit'], {
+            algorithm: 'fixed-window',
+            limit: 3,
+            windowMs: 1500,
+            key: { type: 'ip' },
+            whitelist: [],
+            blacklist: []
+          })
+        })
+    })
+
+    it('uses mapping rate-limit object when global rate-limit is false', () => {
+      return check({
+        'rate-limit': false,
+        mappings: [{
+          status: 204,
+          'rate-limit': {
+            limit: 4,
+            windowMs: 2500
+          }
+        }]
+      })
+        .then(configuration => {
+          assert.deepStrictEqual(configuration.mappings[0]['rate-limit'], {
+            algorithm: 'fixed-window',
+            limit: 4,
+            windowMs: 2500,
+            key: { type: 'ip' },
+            whitelist: [],
+            blacklist: []
+          })
         })
     })
 

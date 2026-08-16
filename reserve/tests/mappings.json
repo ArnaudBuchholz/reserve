@@ -27,6 +27,20 @@
     "match": "^/custom/configuration",
     "custom": "./configuration.js"
   }, {
+    "match": "^/rate-limit/load$",
+    "rate-limit": {
+      "algorithm": "fixed-window",
+      "limit": 3,
+      "windowMs": 60000,
+      "key": {
+        "type": "header",
+        "name": "x-load-client"
+      }
+    }
+  }, {
+    "match": "^/rate-limit/load$",
+    "status": 204
+  }, {
     "match": "^/status/301",
     "status": 301,
     "headers": {

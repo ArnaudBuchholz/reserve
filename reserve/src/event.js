@@ -2,7 +2,7 @@
 
 const { throwError, ERROR_EVENT_UNKNOWN_NAME, ERROR_EVENT_INVALID_CALLBACK } = require('./error')
 
-const names = 'created,ready,incoming,error,redirecting,redirected,aborted,closed'.split(',')
+const names = 'created,ready,incoming,error,redirecting,redirected,aborted,closed,rate-limit-exceeded,rate-limit-reset,rate-limit-warning'.split(',')
 
 function newEventEmitter () {
   const registry = []
@@ -62,5 +62,8 @@ module.exports = {
   EVENT_REDIRECTING: 4,
   EVENT_REDIRECTED: 5,
   EVENT_ABORTED: 6,
-  EVENT_CLOSED: 7
+  EVENT_CLOSED: 7,
+  EVENT_RATE_LIMIT_EXCEEDED: 8,
+  EVENT_RATE_LIMIT_RESET: 9,
+  EVENT_RATE_LIMIT_WARNING: 10
 }
